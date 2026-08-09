@@ -1,16 +1,10 @@
-internal import Institute_Model
-internal import Institute_Inventory
-
 internal import File_System
+internal import Institute_Inventory
+internal import Institute_Model
 
 extension Institute.Context {
-    struct Link: Sendable {
-        let path: File.Path
-        let target: File.Path
-
-        init(path: File.Path, target: File.Path) {
-            self.path = path
-            self.target = target
-        }
-    }
+  struct Link: Sendable {
+    let path: File.Path
+    let target: File.Path
+  }
 }

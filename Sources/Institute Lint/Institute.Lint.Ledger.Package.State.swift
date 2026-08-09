@@ -1,15 +1,15 @@
-public import Institute_Model
 internal import Institute_Development
+public import Institute_Model
 
 extension Institute.Lint.Ledger.Package {
-    /// Whether one inventory repository produced usable structured evidence.
-    public enum State: Swift.String, Equatable, Sendable {
-        case measured
-        case unmeasured
-    }
+  /// Whether one inventory repository produced usable structured evidence.
+  public enum State: Swift.String, Equatable, Sendable {
+    case measured
+    case unmeasured
+  }
 }
 
 extension Institute.Lint.Ledger.Package.State {
-    /// The ledger-state wire token owned by this enum.
-    public var token: Swift.String { rawValue }
+  /// The ledger-state wire token owned by this enum.
+  public var token: Swift.String { rawValue }
 }
