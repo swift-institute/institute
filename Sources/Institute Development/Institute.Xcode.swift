@@ -1,68 +1,69 @@
-public import Institute_Model
-public import Institute_Inventory
-
 public import File_System
+public import Institute_Inventory
+public import Institute_Model
 public import Xcode_Workspace
 
 extension Institute {
-    public enum Xcode {}
+  public enum Xcode {}
 }
 
 extension Institute.Xcode {
-    public static func document(
-        _ repositories: [Institute.Repository]
-    ) -> Xcode_Workspace.Xcode.Workspace {
-        Xcode_Workspace.Xcode.Workspace(
-            references: [
-                .init(location: .group("."))
-            ]
-                + repositories.map {
-                    .init(location: .group("../\(Institute.Layout.reference(for: $0))"))
-                }
-        )
-    }
-
-    public static func render(_ repositories: [Institute.Repository]) -> Swift.String {
-        document(repositories).xml + "\n"
-    }
-
-    public static func path(at root: File.Directory) -> File {
-        root[directory: "institute.xcworkspace"][file: "contents.xcworkspacedata"]
-    }
-
-    public static func contents(at root: File.Directory) -> Swift.String? {
-        do throws(Either<File.System.Read.Full.Error, Never>) {
-            return try path(at: root).read.full { bytes in
-                var storage = [Byte]()
-                storage.reserveCapacity(bytes.count)
-                for index in bytes.indices {
-                    storage.append(bytes[index])
-                }
-                return Swift.String(decoding: storage, as: Swift.UTF8.self)
-            }
-        } catch {
-            return nil
+  public static func document(
+    _ repositories: [Institute.Repository]
+  ) -> Xcode_Workspace.Xcode.Workspace {
+    Xcode_Workspace.Xcode.Workspace(
+      references: [
+        .init(location: .group("."))
+      ]
+        + repositories.map {
+          .init(location: .group("../\(Institute.Layout.reference(for: $0))"))
         }
-    }
+    )
+  }
 
-    public static func current(_ repositories: [Institute.Repository], at root: File.Directory) -> Bool {
-        contents(at: root) == render(repositories)
-    }
+  public static func render(_ repositories: [Institute.Repository]) -> Swift.String {
+    document(repositories).xml + "\n"
+  }
 
-    public static func write(
-        _ repositories: [Institute.Repository],
-        at root: File.Directory
-    ) throws(Institute.Error) {
-        let bundle = root[directory: "institute.xcworkspace"]
-        do throws(File.System.Create.Directory.Error) {
-            try bundle.create.recursive()
-        } catch {
-            throw .filesystem("cannot create \(bundle): \(error)")
+  public static func path(at root: File.Directory) -> File {
+    root[directory: "institute.xcworkspace"][file: "contents.xcworkspacedata"]
+  }
+
+  public static func contents(at root: File.Directory) -> Swift.String? {
+    do throws(Either<File.System.Read.Full.Error, Never>) {
+      return try path(at: root).read.full { bytes in
+        var storage = [Byte]()
+        storage.reserveCapacity(bytes.count)
+        for index in bytes.indices {
+          storage.append(bytes[index])
         }
-        do throws(File.System.Write.Atomic.Error) {
-            try path(at: root).write.atomic(render(repositories))
-        } catch {
-            throw .filesystem("cannot write \(bundle): \(error)")
-        }
+        return Swift.String(decoding: storage, as: Swift.UTF8.self)
+      }
+    } catch {
+      return nil
     }
+  }
+
+  public static func current(_ repositories: [Institute.Repository], at root: File.Directory)
+    -> Bool
+  {
+    contents(at: root) == render(repositories)
+  }
+
+  public static func write(
+    _ repositories: [Institute.Repository],
+    at root: File.Directory
+  ) throws(Institute.Error) {
+    let bundle = root[directory: "institute.xcworkspace"]
+    do throws(File.System.Create.Directory.Error) {
+      try bundle.create.recursive()
+    } catch {
+      throw .filesystem("cannot create \(bundle): \(error)")
+    }
+    do throws(File.System.Write.Atomic.Error) {
+      try path(at: root).write.atomic(render(repositories))
+    } catch {
+      throw .filesystem("cannot write \(bundle): \(error)")
+    }
+  }
 }

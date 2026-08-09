@@ -3,263 +3,263 @@ import JSON
 import Tagged_Primitives_Standard_Library_Integration
 import Testing
 
-@testable import Institute_Model
-@testable import Institute_Inventory
+@testable import Institute_Conversion
 @testable import Institute_Dependency
 @testable import Institute_Development
-@testable import Institute_Lint
-@testable import Institute_Pages
 @testable import Institute_Doctor
-@testable import Institute_Conversion
 @testable import Institute_Instruments
+@testable import Institute_Inventory
+@testable import Institute_Lint
+@testable import Institute_Model
+@testable import Institute_Pages
 
 extension Institute.Inventory.Test.Unit {
-    /// Positive control: "Delete a known entry in a scratch input;
-    /// regeneration restores it." A repository live and eligible, but absent
-    /// from the committed configuration passed as `existing`, is added back
-    /// by the merge exactly as `Client.discover(_:)` found it.
-    @Test
-    func `A repository missing from the committed inventory is restored by regeneration`() throws {
-        let key = Institute.Repository.Key(
-            owner: .init("swift-primitives"),
-            name: .init("swift-deleted-by-mistake")
-        )
-        let existing = Institute.Configuration(
-            version: 1,
-            scope: "swift-institute",
-            swift: "6.3.3",
-            xcode: "26.6",
-            repositories: []
-        )
-        let discovery = Institute.Inventory.Discovery(
-            repositories: [.init(id: .init(1), key: key, layer: .primitives)],
-            exclusions: []
-        )
+  /// Positive control: "Delete a known entry in a scratch input;
+  /// regeneration restores it." A repository live and eligible, but absent
+  /// from the committed configuration passed as `existing`, is added back
+  /// by the merge exactly as `Client.discover(_:)` found it.
+  @Test
+  func `A repository missing from the committed inventory is restored by regeneration`() throws {
+    let key = Institute.Repository.Key(
+      owner: .init("swift-primitives"),
+      name: .init("swift-deleted-by-mistake")
+    )
+    let existing = Institute.Configuration(
+      version: 1,
+      scope: "swift-institute",
+      swift: "6.3.3",
+      xcode: "26.6",
+      repositories: []
+    )
+    let discovery = Institute.Inventory.Discovery(
+      repositories: [.init(id: .init(1), key: key, layer: .primitives)],
+      exclusions: []
+    )
 
-        let merged = try Institute.Inventory.Merge()(discovery, into: existing)
+    let merged = try Institute.Inventory.Merge()(discovery, into: existing)
 
-        #expect(merged.repositories.map(\.name) == [key.name.underlying])
-        #expect(merged.repositories.map(\.url) == [key.url])
-    }
+    #expect(merged.repositories.map(\.name) == [key.name.underlying])
+    #expect(merged.repositories.map(\.url) == [key.url])
+  }
 
-    /// Positive control: "Add a stale scratch entry; regeneration
-    /// removes/reports it." A repository committed to `existing` but no
-    /// longer returned by live discovery (deleted, gone private, archived —
-    /// any reason) is dropped rather than carried forward, because
-    /// `Merge` only ever emits from `discovery.repositories`.
-    @Test
-    func `A repository no longer live is dropped as stale by regeneration`() throws {
-        let survivor = Institute.Repository.Key(
-            owner: .init("swift-foundations"),
-            name: .init("swift-survivor")
-        )
-        let stale = Institute.Repository.Key(
-            owner: .init("swift-foundations"),
-            name: .init("swift-gone-private")
-        )
-        let existing = Institute.Configuration(
-            version: 1,
-            scope: "swift-institute",
-            swift: "6.3.3",
-            xcode: "26.6",
-            repositories: [
-                .init(
-                    name: survivor.name.underlying,
-                    url: survivor.url,
-                    organization: survivor.owner.underlying,
-                    layer: .foundations
-                ),
-                .init(
-                    name: stale.name.underlying,
-                    url: stale.url,
-                    organization: stale.owner.underlying,
-                    layer: .foundations
-                ),
-            ]
-        )
-        // The live discovery only returns `survivor` — `stale` went
-        // private, was archived, or was deleted; from Merge's perspective
-        // the reason is immaterial, only that discovery no longer reports it.
-        let discovery = Institute.Inventory.Discovery(
-            repositories: [.init(id: .init(1), key: survivor, layer: .foundations)],
-            exclusions: []
-        )
+  /// Positive control: "Add a stale scratch entry; regeneration
+  /// removes/reports it." A repository committed to `existing` but no
+  /// longer returned by live discovery (deleted, gone private, archived —
+  /// any reason) is dropped rather than carried forward, because
+  /// `Merge` only ever emits from `discovery.repositories`.
+  @Test
+  func `A repository no longer live is dropped as stale by regeneration`() throws {
+    let survivor = Institute.Repository.Key(
+      owner: .init("swift-foundations"),
+      name: .init("swift-survivor")
+    )
+    let stale = Institute.Repository.Key(
+      owner: .init("swift-foundations"),
+      name: .init("swift-gone-private")
+    )
+    let existing = Institute.Configuration(
+      version: 1,
+      scope: "swift-institute",
+      swift: "6.3.3",
+      xcode: "26.6",
+      repositories: [
+        .init(
+          name: survivor.name.underlying,
+          url: survivor.url,
+          organization: survivor.owner.underlying,
+          layer: .foundations
+        ),
+        .init(
+          name: stale.name.underlying,
+          url: stale.url,
+          organization: stale.owner.underlying,
+          layer: .foundations
+        ),
+      ]
+    )
+    // The live discovery only returns `survivor` — `stale` went
+    // private, was archived, or was deleted; from Merge's perspective
+    // the reason is immaterial, only that discovery no longer reports it.
+    let discovery = Institute.Inventory.Discovery(
+      repositories: [.init(id: .init(1), key: survivor, layer: .foundations)],
+      exclusions: []
+    )
 
-        let merged = try Institute.Inventory.Merge()(discovery, into: existing)
+    let merged = try Institute.Inventory.Merge()(discovery, into: existing)
 
-        #expect(merged.repositories.map(\.name) == [survivor.name.underlying])
-        #expect(!merged.repositories.map(\.name).contains(stale.name.underlying))
-    }
+    #expect(merged.repositories.map(\.name) == [survivor.name.underlying])
+    #expect(!merged.repositories.map(\.name).contains(stale.name.underlying))
+  }
 
-    @Test
-    func `Merge preserves exact-key annotations and sorts layer owner name`() throws {
-        let foundations = GitHub.Organization.Name("swift-foundations")
-        let standards = GitHub.Organization.Name("swift-standards")
-        let annotated = Institute.Repository.Key(
-            owner: foundations,
-            name: .init("swift-zeta")
+  @Test
+  func `Merge preserves exact-key annotations and sorts layer owner name`() throws {
+    let foundations = GitHub.Organization.Name("swift-foundations")
+    let standards = GitHub.Organization.Name("swift-standards")
+    let annotated = Institute.Repository.Key(
+      owner: foundations,
+      name: .init("swift-zeta")
+    )
+    let existing = Institute.Configuration(
+      version: 1,
+      scope: "swift-institute",
+      swift: "6.3.3",
+      xcode: "26.6",
+      repositories: [
+        .init(
+          name: annotated.name.underlying,
+          url: annotated.url,
+          organization: annotated.owner.underlying,
+          layer: .components
         )
-        let existing = Institute.Configuration(
-            version: 1,
-            scope: "swift-institute",
-            swift: "6.3.3",
-            xcode: "26.6",
-            repositories: [
-                .init(
-                    name: annotated.name.underlying,
-                    url: annotated.url,
-                    organization: annotated.owner.underlying,
-                    layer: .components
-                )
-            ]
-        )
-        let discovery = Institute.Inventory.Discovery(
-            repositories: [
-                .init(
-                    id: .init(2),
-                    key: annotated,
-                    layer: .foundations
-                ),
-                .init(
-                    id: .init(1),
-                    key: .init(owner: standards, name: .init("swift-alpha")),
-                    layer: .standards
-                ),
-            ],
-            exclusions: []
-        )
+      ]
+    )
+    let discovery = Institute.Inventory.Discovery(
+      repositories: [
+        .init(
+          id: .init(2),
+          key: annotated,
+          layer: .foundations
+        ),
+        .init(
+          id: .init(1),
+          key: .init(owner: standards, name: .init("swift-alpha")),
+          layer: .standards
+        ),
+      ],
+      exclusions: []
+    )
 
-        let merged = try Institute.Inventory.Merge()(discovery, into: existing)
+    let merged = try Institute.Inventory.Merge()(discovery, into: existing)
 
-        #expect(merged.repositories.map(\.name) == ["swift-alpha", "swift-zeta"])
-        #expect(merged.repositories.map(\.layer) == [.standards, .components])
-        #expect(merged.repositories[1].url == annotated.url)
-    }
+    #expect(merged.repositories.map(\.name) == ["swift-alpha", "swift-zeta"])
+    #expect(merged.repositories.map(\.layer) == [.standards, .components])
+    #expect(merged.repositories[1].url == annotated.url)
+  }
 }
 
 extension Institute.Inventory.Test.`Edge Case` {
-    @Test
-    func `Duplicate existing key is rejected`() {
-        let key = Institute.Repository.Key(
-            owner: .init("swift-foundations"),
-            name: .init("swift-file")
-        )
-        let repository = Institute.Repository(
-            name: key.name.underlying,
-            url: key.url,
-            organization: key.owner.underlying,
-            layer: .foundations
-        )
-        let existing = Institute.Configuration(
-            version: 1,
-            scope: "swift-institute",
-            swift: "6.3.3",
-            xcode: "26.6",
-            repositories: [repository, repository]
-        )
+  @Test
+  func `Duplicate existing key is rejected`() {
+    let key = Institute.Repository.Key(
+      owner: .init("swift-foundations"),
+      name: .init("swift-file")
+    )
+    let repository = Institute.Repository(
+      name: key.name.underlying,
+      url: key.url,
+      organization: key.owner.underlying,
+      layer: .foundations
+    )
+    let existing = Institute.Configuration(
+      version: 1,
+      scope: "swift-institute",
+      swift: "6.3.3",
+      xcode: "26.6",
+      repositories: [repository, repository]
+    )
 
-        #expect(throws: Institute.Inventory.Merge.Error.self) {
-            _ = try Institute.Inventory.Merge()(
-                .init(repositories: [], exclusions: []),
-                into: existing
-            )
-        }
+    #expect(throws: Institute.Inventory.Merge.Error.self) {
+      _ = try Institute.Inventory.Merge()(
+        .init(repositories: [], exclusions: []),
+        into: existing
+      )
     }
+  }
 
-    @Test
-    func `Duplicate candidate key is rejected`() {
-        let key = Institute.Repository.Key(
-            owner: .init("swift-foundations"),
-            name: .init("swift-file")
-        )
-        let candidate = Institute.Inventory.Repository(
-            id: .init(1),
-            key: key,
-            layer: .foundations
-        )
-        let existing = Institute.Configuration(
-            version: 1,
-            scope: "swift-institute",
-            swift: "6.3.3",
-            xcode: "26.6",
-            repositories: []
-        )
+  @Test
+  func `Duplicate candidate key is rejected`() {
+    let key = Institute.Repository.Key(
+      owner: .init("swift-foundations"),
+      name: .init("swift-file")
+    )
+    let candidate = Institute.Inventory.Repository(
+      id: .init(1),
+      key: key,
+      layer: .foundations
+    )
+    let existing = Institute.Configuration(
+      version: 1,
+      scope: "swift-institute",
+      swift: "6.3.3",
+      xcode: "26.6",
+      repositories: []
+    )
 
-        #expect(throws: Institute.Inventory.Merge.Error.self) {
-            _ = try Institute.Inventory.Merge()(
-                .init(repositories: [candidate, candidate], exclusions: []),
-                into: existing
-            )
-        }
+    #expect(throws: Institute.Inventory.Merge.Error.self) {
+      _ = try Institute.Inventory.Merge()(
+        .init(repositories: [candidate, candidate], exclusions: []),
+        into: existing
+      )
     }
+  }
 
-    @Test
-    func `Owner change is an explicit transfer with annotation and default layers`() throws {
-        let old = Institute.Repository.Key(
-            owner: .init("swift-standards"),
-            name: .init("swift-moved")
+  @Test
+  func `Owner change is an explicit transfer with annotation and default layers`() throws {
+    let old = Institute.Repository.Key(
+      owner: .init("swift-standards"),
+      name: .init("swift-moved")
+    )
+    let new = Institute.Repository.Key(
+      owner: .init("swift-foundations"),
+      name: old.name
+    )
+    let existing = Institute.Configuration(
+      version: 1,
+      scope: "swift-institute",
+      swift: "6.3.3",
+      xcode: "26.6",
+      repositories: [
+        .init(
+          name: old.name.underlying,
+          url: old.url,
+          organization: old.owner.underlying,
+          layer: .standards
         )
-        let new = Institute.Repository.Key(
-            owner: .init("swift-foundations"),
-            name: old.name
-        )
-        let existing = Institute.Configuration(
-            version: 1,
-            scope: "swift-institute",
-            swift: "6.3.3",
-            xcode: "26.6",
-            repositories: [
-                .init(
-                    name: old.name.underlying,
-                    url: old.url,
-                    organization: old.owner.underlying,
-                    layer: .standards
-                )
-            ]
-        )
-        let discovery = Institute.Inventory.Discovery(
-            repositories: [.init(id: .init(1), key: new, layer: .foundations)],
-            exclusions: []
-        )
+      ]
+    )
+    let discovery = Institute.Inventory.Discovery(
+      repositories: [.init(id: .init(1), key: new, layer: .foundations)],
+      exclusions: []
+    )
 
-        do throws(Institute.Inventory.Merge.Error) {
-            _ = try Institute.Inventory.Merge()(discovery, into: existing)
-            Issue.record("Expected transfer review failure")
-        } catch {
-            guard case .transfer(let name, let from, let to, let annotation, let layer) = error else {
-                Issue.record("Unexpected error: \(error)")
-                return
-            }
-            #expect(name == old.name)
-            #expect(from == old)
-            #expect(to == new)
-            #expect(annotation == .standards)
-            #expect(layer == .foundations)
-        }
+    do throws(Institute.Inventory.Merge.Error) {
+      _ = try Institute.Inventory.Merge()(discovery, into: existing)
+      Issue.record("Expected transfer review failure")
+    } catch {
+      guard case .transfer(let name, let from, let to, let annotation, let layer) = error else {
+        Issue.record("Unexpected error: \(error)")
+        return
+      }
+      #expect(name == old.name)
+      #expect(from == old)
+      #expect(to == new)
+      #expect(annotation == .standards)
+      #expect(layer == .foundations)
     }
+  }
 
-    @Test
-    func `Unknown annotation field is rejected instead of discarded`() {
-        let json = """
-            {
-              "version": 1,
-              "scope": "swift-institute",
-              "swift": "6.3.3",
-              "xcode": "26.6",
-              "repositories": [
-                {
-                  "name": "swift-example",
-                  "url": "https://github.com/swift-foundations/swift-example.git",
-                  "organization": "swift-foundations",
-                  "layer": "foundations",
-                  "annotation": "must-survive"
-                }
-              ]
-            }
-            """
+  @Test
+  func `Unknown annotation field is rejected instead of discarded`() {
+    let json = """
+      {
+        "version": 1,
+        "scope": "swift-institute",
+        "swift": "6.3.3",
+        "xcode": "26.6",
+        "repositories": [
+          {
+            "name": "swift-example",
+            "url": "https://github.com/swift-foundations/swift-example.git",
+            "organization": "swift-foundations",
+            "layer": "foundations",
+            "annotation": "must-survive"
+          }
+        ]
+      }
+      """
 
-        #expect(throws: JSON.Error.self) {
-            _ = try Institute.Configuration(jsonString: json)
-        }
+    #expect(throws: JSON.Error.self) {
+      _ = try Institute.Configuration(jsonString: json)
     }
+  }
 }
