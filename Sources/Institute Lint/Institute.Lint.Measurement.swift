@@ -66,7 +66,7 @@ extension Institute.Lint {
         /// looks like a sweep that is slow.
         public var duration: Duration = .zero
 
-        package init(
+        public init(
             repository: Institute.Repository.Key? = nil,
             package: Swift.String,
             verdict: Verdict,
