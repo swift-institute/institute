@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    if: ${{ !github.event.repository.private }}
+    name: ci / matrix
+    uses: swift-institute/.github/.github/workflows/swift-ci.yml@main
+    with:
+      lint-bundle: institute
