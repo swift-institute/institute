@@ -1,0 +1,10 @@
+# .github/metadata.yaml
+# Source of truth for GitHub-side metadata, converged nightly by
+# swift-institute/.github sync-metadata-nightly.yml (04:00 UTC). Silence in
+# `settings:` means "apply the rule default" — squash-only, delete-branch-on-
+# merge, and secret scanning all converge from the fleet defaults, matching
+# the posture already live on this repository and its control-plane siblings.
+description: "The Institute domain model — inventory, dependency, doctor, lint, pages, conversion, instruments and development, as libraries."
+homepage: "https://swift-institute.org"
+readme:
+  family: C
