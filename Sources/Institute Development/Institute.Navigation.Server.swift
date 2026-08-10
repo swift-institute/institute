@@ -1,8 +1,15 @@
 public import Environment
 public import Institute_Inventory
 public import Institute_Model
-public import POSIX_Kernel_Process
 public import Process
+
+// TEMPORARY (institute#10): exec-replace has no cross-platform owner yet —
+// swift-process's `Process` exposes Spawn and Exit only. Route through
+// `Process` once it exposes the replace operation behind its platform
+// conditioning; until then the substrate import is platform-conditioned.
+#if canImport(Darwin) || canImport(Glibc) || canImport(Musl)
+  public import POSIX_Kernel_Process
+#endif
 
 extension Institute.Navigation {
   /// Runs the SourceKit-LSP selected by Xcode with the invoking stdio and
@@ -17,22 +24,30 @@ extension Institute.Navigation {
       "\(key)=\(environment.values[key] ?? "")"
     }
 
-    do {
-      try unsafe withCStringArray(arguments) { argumentVector in
-        try unsafe withCStringArray(variables) { environmentVector in
-          try unsafe server.withCString { path in
-            try unsafe POSIX.Kernel.Process.Execute.execve(
-              path: path,
-              argv: argumentVector,
-              envp: environmentVector
-            )
+    #if canImport(Darwin) || canImport(Glibc) || canImport(Musl)
+      do {
+        try unsafe withCStringArray(arguments) { argumentVector in
+          try unsafe withCStringArray(variables) { environmentVector in
+            try unsafe server.withCString { path in
+              try unsafe POSIX.Kernel.Process.Execute.execve(
+                path: path,
+                argv: argumentVector,
+                envp: environmentVector
+              )
+            }
           }
         }
+      } catch {
+        throw .process("cannot replace navigation launcher with SourceKit-LSP: \(error)")
       }
-    } catch {
-      throw .process("cannot replace navigation launcher with SourceKit-LSP: \(error)")
-    }
-    throw .process("SourceKit-LSP execution returned without replacing the launcher")
+      throw .process("SourceKit-LSP execution returned without replacing the launcher")
+    #else
+      _ = server
+      _ = arguments
+      _ = variables
+      _ = environment
+      throw .configuration("navigation serving is unavailable on this platform")
+    #endif
   }
 
   static func sourceKitLSP() throws(Institute.Error) -> Swift.String {

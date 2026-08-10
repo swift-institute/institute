@@ -63,6 +63,7 @@ let package = Package(
         .package(url: "https://github.com/swift-foundations/swift-github-http.git", branch: "main"),
         .package(url: "https://github.com/swift-foundations/swift-git.git", branch: "main"),
         .package(url: "https://github.com/swift-foundations/swift-json.git", branch: "main"),
+        .package(url: "https://github.com/swift-foundations/swift-kernel.git", branch: "main"),
         .package(url: "https://github.com/swift-foundations/swift-package-manager.git", branch: "main"),
         .package(url: "https://github.com/swift-foundations/swift-posix.git", branch: "main"),
         .package(url: "https://github.com/swift-foundations/swift-process.git", branch: "main"),
@@ -81,7 +82,7 @@ let package = Package(
             name: "Build Coordinator",
             dependencies: [
                 .product(name: "File System", package: "swift-file-system"),
-                .product(name: "POSIX Kernel Lock", package: "swift-posix"),
+                .product(name: "Kernel", package: "swift-kernel"),
                 .product(name: "Process", package: "swift-process"),
             ]
         ),
@@ -95,9 +96,6 @@ let package = Package(
                 .product(name: "Git", package: "swift-git"),
                 .product(name: "GitHub", package: "swift-github"),
                 .product(name: "JSON", package: "swift-json"),
-                .product(name: "POSIX Kernel File", package: "swift-posix"),
-                .product(name: "POSIX Kernel Lock", package: "swift-posix"),
-                .product(name: "POSIX Kernel Process", package: "swift-posix"),
                 .product(name: "RFC 3986", package: "swift-rfc-3986"),
             ]
         ),
@@ -142,7 +140,18 @@ let package = Package(
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "Git", package: "swift-git"),
                 .product(name: "JSON", package: "swift-json"),
-                .product(name: "POSIX Kernel Process", package: "swift-posix"),
+                // TEMPORARY (institute#10): exec-replace has no cross-platform
+                // owner yet — swift-process's `Process` exposes Spawn and Exit
+                // only. Route through `Process` once it exposes the replace
+                // operation behind its platform conditioning; until then the
+                // substrate edge is conditioned off the Windows graph.
+                .product(
+                    name: "POSIX Kernel Process",
+                    package: "swift-posix",
+                    condition: .when(platforms: [
+                        .macOS, .iOS, .tvOS, .watchOS, .visionOS, .linux,
+                    ])
+                ),
                 .product(name: "Package Manager", package: "swift-package-manager"),
                 .product(name: "Process", package: "swift-process"),
                 .product(name: "RFC 3986", package: "swift-rfc-3986"),
