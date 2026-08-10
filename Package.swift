@@ -5,7 +5,11 @@ import PackageDescription
 let package = Package(
     name: "institute",
     platforms: [
-        .macOS(.v26)
+        .macOS("27"),
+        .iOS("27"),
+        .tvOS("27"),
+        .watchOS("27"),
+        .visionOS("27"),
     ],
     products: [
         .library(
