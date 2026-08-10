@@ -1,5 +1,5 @@
 internal import File_System
-private import POSIX_Kernel_Lock
+private import Kernel
 internal import Process
 
 extension Build.Coordinator {
@@ -78,8 +78,8 @@ extension Build.Coordinator {
       let message = "cannot open SwiftPM coordination lock \(path): \(error)"
       throw cleanup(.filesystem(message)) ?? .filesystem(message)
     }
-    do throws(POSIX.Kernel.Lock.Error) {
-      try POSIX.Kernel.Lock.lock(
+    do throws(Kernel.Lock.Error) {
+      try Kernel.Lock.lock(
         lock.kernelDescriptor,
         range: .file,
         kind: .exclusive
@@ -107,8 +107,8 @@ extension Build.Coordinator {
 
     failure = cleanup(failure)
 
-    do throws(POSIX.Kernel.Lock.Error) {
-      try POSIX.Kernel.Lock.unlock(lock.kernelDescriptor, range: .file)
+    do throws(Kernel.Lock.Error) {
+      try Kernel.Lock.unlock(lock.kernelDescriptor, range: .file)
     } catch {
       let message = "cannot release SwiftPM coordination lock \(path): \(error)"
       failure =
