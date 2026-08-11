@@ -81,6 +81,7 @@ extension Institute.Verification.Check {
             + " did not reach a satisfying outcome"
         )
       }
+
     case .unverified:
       break
     }

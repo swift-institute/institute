@@ -119,6 +119,12 @@ extension Institute.Navigation {
     var pointers: [UnsafePointer<CChar>?] = unsafe []
     unsafe pointers.reserveCapacity(values.count + 1)
 
+    // reason: [#260] closure-passthrough rethrow — this local recursive
+    // helper's only throws source is the enclosing function's untyped
+    // `body` closure parameter; the enclosing signature is the sanctioned
+    // last-parameter shape, and the helper cannot be narrower than the
+    // closure it rethrows.
+    // swiftlint:disable:next typed_throws_required
     func descend(_ index: Swift.Int) throws -> Result {
       guard index < values.count else {
         unsafe pointers.append(nil)

@@ -217,7 +217,7 @@ extension Institute.Doctor.Test.Integration {
     try Institute.Xcode.write([], at: fixture.directory)
 
     let report = await fixture.doctor(tool: {
-      (executable, _) throws(Institute.Error) -> Swift.String in
+      executable, _ throws(Institute.Error) -> Swift.String in
       throw .process("\(executable) is unavailable")
     }).run()
 

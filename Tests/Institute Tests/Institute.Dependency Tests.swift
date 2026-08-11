@@ -337,22 +337,29 @@ extension Institute.Dependency.Test.Integration {
         switch key.identity {
         case consumer.identity:
           .available(metadata(key))
+
         case "swift-foundations/unavailable":
           .unavailable("fixture unavailable")
+
         case "swift-foundations/limited":
           .rateLimited("fixture rate limit")
+
         case "swift-foundations/malformed", "swift-foundations/unmeasured":
           .available(metadata(key))
+
         case "swift-foundations/archived":
           .available(metadata(key, archived: true))
+
         case "old/vendor":
           .available(
             metadata(
               .init(owner: .init("vendor"), name: .init("renamed"))
             )
           )
+
         case "coenttb/personal":
           .available(metadata(key, user: true))
+
         case "public/restricted":
           .available(
             metadata(
@@ -360,6 +367,7 @@ extension Institute.Dependency.Test.Integration {
               visibility: .private
             )
           )
+
         default:
           .available(metadata(key))
         }
@@ -381,10 +389,13 @@ extension Institute.Dependency.Test.Integration {
               ]
             )
           )
+
         case "swift-foundations/malformed":
           .malformed("fixture malformed source")
+
         case "swift-foundations/unmeasured":
           .unmeasured("fixture unmeasured source")
+
         default:
           .unmeasured("unexpected source request")
         }
@@ -404,12 +415,14 @@ extension Institute.Dependency.Test.Integration {
               """#.utf8
             )
           )
+
         case "nested":
           .available(
             [Byte](
               #".package(url: "https://github.com/old/vendor.git", branch: "main")"#.utf8
             )
           )
+
         case "variant":
           .available(
             [Byte](
@@ -417,6 +430,7 @@ extension Institute.Dependency.Test.Integration {
                 .utf8
             )
           )
+
         default:
           .unavailable("fixture blob unavailable")
         }
@@ -466,14 +480,19 @@ extension Institute.Dependency.Test.Integration {
         switch key.identity {
         case consumer.identity:
           .available(metadata(consumer))
+
         case "failure-control/unavailable":
           .unavailable("fixture unavailable dependency")
+
         case "failure-control/rate-limited":
           .rateLimited("fixture rate-limited dependency")
+
         case "failure-control/malformed":
           .malformed("fixture malformed dependency")
+
         case "failure-control/unmeasured":
           .unmeasured("fixture unmeasured dependency")
+
         default:
           .unmeasured("unexpected repository \(key.identity)")
         }

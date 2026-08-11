@@ -353,20 +353,28 @@ extension Institute.Coherence.Run {
     }
 
     let selectionField = canonical ? "policy" : Self.narrowingDescription(selection.origin)
+    let workspaceCommit: Swift.String?
+    do throws(Institute.Error) {
+      workspaceCommit = try Institute.Doctor.spawn(
+        "git",
+        arguments: ["-C", root.checkout.description, "rev-parse", "HEAD"]
+      )
+    } catch {
+      workspaceCommit = nil
+    }
+    let workspaceJsonBlob: Swift.String?
+    do throws(Institute.Error) {
+      workspaceJsonBlob = try Institute.Doctor.spawn(
+        "git",
+        arguments: ["-C", root.checkout.description, "rev-parse", "HEAD:Institute.json"]
+      )
+    } catch {
+      workspaceJsonBlob = nil
+    }
     return .init(
       instrument: .init(
-        workspaceCommit: Self.line(
-          try? Institute.Doctor.spawn(
-            "git",
-            arguments: ["-C", root.checkout.description, "rev-parse", "HEAD"]
-          )
-        ),
-        workspaceJsonBlob: Self.line(
-          try? Institute.Doctor.spawn(
-            "git",
-            arguments: ["-C", root.checkout.description, "rev-parse", "HEAD:Institute.json"]
-          )
-        ),
+        workspaceCommit: Self.line(workspaceCommit),
+        workspaceJsonBlob: Self.line(workspaceJsonBlob),
         selection: selectionField,
         buildPath: buildPath.rawValue
       ),
@@ -395,10 +403,18 @@ extension Institute.Coherence.Run {
   private func heads() -> [Swift.String: Swift.String] {
     var heads = [Swift.String: Swift.String]()
     for repository in selection.repositories {
-      guard
-        let directory = try? root.materialization(for: repository),
-        let head = try? git.head("main", at: directory.description)
-      else { continue }
+      let directory: File.Directory
+      do throws(Institute.Error) {
+        directory = try root.materialization(for: repository)
+      } catch {
+        continue
+      }
+      let head: Git.Object.ID
+      do throws(Git.Client.Error) {
+        head = try git.head("main", at: directory.description)
+      } catch {
+        continue
+      }
       heads["\(repository.organization)/\(repository.name)"] = head.rawValue
     }
     return heads

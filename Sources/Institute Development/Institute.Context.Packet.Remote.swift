@@ -18,9 +18,19 @@ extension Institute.Context.Packet.Remote {
         let title = try Swift.String.deserialize(document["title"])
         let state = try Swift.String.deserialize(document["state"])
         let type = try Swift.String.deserialize(document["type"]["name"])
-        let stateReason = try? Swift.String.deserialize(document["state_reason"])
+        let stateReason: Swift.String?
+        do throws(JSON.Error) {
+          stateReason = try Swift.String.deserialize(document["state_reason"])
+        } catch {
+          stateReason = nil
+        }
         let url = try Swift.String.deserialize(document["html_url"])
-        let body = (try? Swift.String.deserialize(document["body"])) ?? ""
+        let body: Swift.String
+        do throws(JSON.Error) {
+          body = try Swift.String.deserialize(document["body"])
+        } catch {
+          body = ""
+        }
         let assignees = try strings(document["assignees"], key: "login")
         let labels = try strings(document["labels"], key: "name")
         let parent = await parent(of: key)
@@ -39,6 +49,7 @@ extension Institute.Context.Packet.Remote {
                 "included comment \(comment.url) belongs to \(comment.issue.identity), not \(key.identity)"
               )
             }
+
           case .unavailable(let reason), .malformed(let reason), .unmeasured(let reason):
             diagnostics.append(reason)
           }
@@ -76,8 +87,10 @@ extension Institute.Context.Packet.Remote {
       do { return (try identity(document), []) } catch {
         return (nil, ["\(key.identity): malformed native parent: \(error)"])
       }
+
     case .unavailable(let reason):
       return reason == "native parent absent" ? (nil, []) : (nil, [reason])
+
     case .malformed(let reason), .unmeasured(let reason): return (nil, [reason])
     }
   }
@@ -95,6 +108,7 @@ extension Institute.Context.Packet.Remote {
         for value in values { children.append(try identity(value)) }
         return (children.sorted(), [])
       } catch { return ([], ["\(key.identity): malformed native sub-issues response: \(error)"]) }
+
     case .unavailable(let reason), .malformed(let reason), .unmeasured(let reason):
       return ([], [reason])
     }
@@ -121,12 +135,18 @@ extension Institute.Context.Packet.Remote {
     let response = await json(endpoint)
     guard case .available(let document) = response else { return response.retyping() }
     do {
+      let body: Swift.String
+      do throws(JSON.Error) {
+        body = try Swift.String.deserialize(document["body"])
+      } catch {
+        body = ""
+      }
       return .available(
         .init(
           url: try Swift.String.deserialize(document["html_url"]),
           issue: try commentIssue(document["issue_url"]),
           author: try Swift.String.deserialize(document["user"]["login"]),
-          body: (try? Swift.String.deserialize(document["body"])) ?? ""
+          body: body
         )
       )
     } catch {
@@ -210,8 +230,10 @@ extension Institute.Context.Packet.Remote {
       do { return .available(try JSON.parse(body)) } catch {
         return .malformed("GitHub returned malformed JSON for \(endpoint): \(error)")
       }
+
     case 401, 404:
       return .unavailable("GitHub cannot provide \(endpoint) (HTTP \(response.status.code))")
+
     default: return .unmeasured("GitHub returned HTTP \(response.status.code) for \(endpoint)")
     }
   }

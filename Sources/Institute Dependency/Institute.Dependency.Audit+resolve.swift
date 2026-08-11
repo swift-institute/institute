@@ -77,6 +77,7 @@ extension Institute.Dependency.Audit {
           )
         }
         edges[resolution.declared] = (identity, metadata.key.url, .measured, nil)
+
       case .unavailable(let reason):
         append(
           resolution.declared,
@@ -86,6 +87,7 @@ extension Institute.Dependency.Audit {
           indices: &indices,
           edges: &edges
         )
+
       case .rateLimited(let reason):
         append(
           resolution.declared,
@@ -95,6 +97,7 @@ extension Institute.Dependency.Audit {
           indices: &indices,
           edges: &edges
         )
+
       case .malformed(let reason):
         append(
           resolution.declared,
@@ -104,6 +107,7 @@ extension Institute.Dependency.Audit {
           indices: &indices,
           edges: &edges
         )
+
       case .unmeasured(let reason):
         append(
           resolution.declared,

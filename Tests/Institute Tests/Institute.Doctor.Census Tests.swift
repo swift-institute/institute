@@ -251,7 +251,7 @@ extension Institute.Doctor.Test.Integration {
     )
 
     let report = await fixture.doctor(tool: {
-      (executable, arguments) throws(Institute.Error) -> Swift.String in
+      executable, arguments throws(Institute.Error) -> Swift.String in
       if executable == "git", arguments.first == "ls-remote" {
         return "1111111111111111111111111111111111111111\trefs/heads/main\n"
       }
@@ -274,7 +274,7 @@ extension Institute.Doctor.Test.Integration {
     )
 
     let report = await fixture.doctor(tool: {
-      (executable, arguments) throws(Institute.Error) -> Swift.String in
+      executable, arguments throws(Institute.Error) -> Swift.String in
       if executable == "git", arguments.first == "ls-remote" {
         throw .process("could not resolve host")
       }

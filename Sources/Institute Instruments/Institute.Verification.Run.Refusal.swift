@@ -45,10 +45,13 @@ extension Institute.Verification.Run.Refusal {
     switch self {
     case .unresolvableTarget(let kind):
       "the lint gate could not resolve the subject as a lint target (\(kind))"
+
     case .unresolvableConfiguration(let kind):
       "the lint gate could not resolve the subject's rule set (\(kind))"
+
     case .unavailableInstallation(let kind):
       "the lint gate could not establish a swift-linter installation (\(kind))"
+
     case .unsealableMeasurementReason:
       "the lint gate declined to measure, for a reason that cannot cross the receipt "
         + "boundary"

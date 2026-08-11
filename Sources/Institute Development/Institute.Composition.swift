@@ -386,8 +386,10 @@ extension Institute.Composition {
     switch state {
     case .sourceControlCheckout(let checkout):
       print("  resolved: source-control checkout @ \(checkout.revision)")
+
     case .fileSystem:
       print("  resolved: local file-system source")
+
     case .edited:
       print("  resolved: edited working copy")
     }

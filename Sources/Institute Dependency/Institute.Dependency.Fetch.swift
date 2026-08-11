@@ -17,12 +17,16 @@ extension Institute.Dependency.Fetch {
     switch self {
     case .available:
       nil
+
     case .unavailable(let reason):
       (.unavailable, reason)
+
     case .rateLimited(let reason):
       (.rateLimited, reason)
+
     case .malformed(let reason):
       (.malformed, reason)
+
     case .unmeasured(let reason):
       (.unmeasured, reason)
     }

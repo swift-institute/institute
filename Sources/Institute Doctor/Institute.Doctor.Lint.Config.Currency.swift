@@ -5,6 +5,7 @@ public import Institute_Inventory
 public import Institute_Lint
 public import Institute_Model
 public import Institute_Pages
+internal import Thread_Pool
 
 extension Institute.Doctor {
   /// One local `swift-linter` remote-config cache entry, against a live
@@ -84,10 +85,20 @@ extension Institute.Doctor {
         directory: "v1"
       ]
       guard cache.stat.exists else { continue }
-      guard let files = try? await cache.files() else { continue }
+      let files: [File]
+      do throws(Either<Kernel.Thread.Pool.Error, File.Directory.Contents.Error>) {
+        files = try await cache.files()
+      } catch {
+        continue
+      }
       for file in files {
         guard file.name.description.hasSuffix(".yml") else { continue }
-        guard let text = try? contents(of: file) else { continue }
+        let text: Swift.String
+        do throws(Institute.Error) {
+          text = try contents(of: file)
+        } catch {
+          continue
+        }
         guard let parsed = Self.parseCache(text) else { continue }
         found.append((entry.name, parsed.source, parsed.body))
       }

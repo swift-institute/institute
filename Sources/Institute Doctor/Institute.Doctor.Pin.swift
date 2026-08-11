@@ -79,6 +79,7 @@ extension Institute.Doctor {
   func pins(_ materialized: [(Institute.Repository, File.Directory)]) async -> Outcome {
     switch await pinPopulation(materialized) {
     case .failure(let reason): return Self.pins.unmeasured(reason: "\(reason)")
+
     case .success(let gathered):
       return Self.pins.run(
         population: gathered.population.map(\.pin),

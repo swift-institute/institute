@@ -75,6 +75,7 @@ extension Institute.Doctor.Fixture {
     case "swift":
       "swift-driver version: 1.168.5 Apple Swift version 6.3 (swiftlang-6.3.0.1)\n"
         + "Target: arm64-apple-macosx26.0.0"
+
     case "xcodebuild": "Xcode 26.0\nBuild version 17A400"
     case "xcode-select": "\(developer)\n"
     case "xcrun": "\(developer)/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift\n"

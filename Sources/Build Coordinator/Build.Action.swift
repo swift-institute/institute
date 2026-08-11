@@ -16,6 +16,7 @@ extension Build.Action {
     switch self {
     case .build, .test, .run:
       ["swift", rawValue]
+
     case .resolve, .update, .clean, .dumpPackage:
       ["swift", "package", rawValue]
     }

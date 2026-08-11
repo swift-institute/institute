@@ -146,8 +146,10 @@ extension Institute.Lint.Measurement.Verdict {
   public var text: Swift.String {
     switch self {
     case .clean: "clean"
+
     case .violations(let count, let failing):
       "\(count) violation\(count == 1 ? "" : "s")\(failing ? " (error severity)" : " (advisory)")"
+
     case .unmeasured(let reason): "UNMEASURED — \(reason)"
     }
   }
@@ -262,6 +264,7 @@ extension Institute.Lint {
     switch format {
     case .text:
       structured = nil
+
     case .sarif:
       do throws(Finding.Error) {
         let parsed = try Finding.parse(sarif: standardOutput)
@@ -289,7 +292,7 @@ extension Institute.Lint {
             status: status
           )
         }
-        let normalized = try parsed.map { (finding) throws(Finding.Error) in
+        let normalized = try parsed.map { finding throws(Finding.Error) in
           try finding.relative(to: package)
         }
         let carriesError = normalized.contains(where: \.severity.isError)

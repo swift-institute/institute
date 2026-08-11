@@ -22,12 +22,21 @@ extension Institute.Conversion.Check {
     _ repository: Institute.Repository,
     _ digest: Swift.String
   ) -> Swift.Bool {
-    guard let location = try? root.materialization(for: repository) else { return false }
-    return
-      (try? Institute.Doctor.spawn(
+    let location: File.Directory
+    do throws(Institute.Error) {
+      location = try root.materialization(for: repository)
+    } catch {
+      return false
+    }
+    do throws(Institute.Error) {
+      _ = try Institute.Doctor.spawn(
         "git",
         arguments: ["-C", location.description, "cat-file", "-e", "\(digest)^{blob}"]
-      )) != nil
+      )
+    } catch {
+      return false
+    }
+    return true
   }
 }
 

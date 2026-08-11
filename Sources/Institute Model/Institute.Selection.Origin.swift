@@ -44,6 +44,7 @@ extension Institute.Selection.Origin {
     switch self {
     case .committed(let count):
       count
+
     case .overridden(let committed, let added, let removed):
       committed + added.count - removed.count
     }
@@ -63,6 +64,7 @@ extension Institute.Selection.Origin: CustomStringConvertible {
     case .committed(let count):
       return "selection: \(Institute.Selection.filename) — \(count) selected;"
         + " no local override"
+
     case .overridden(let committed, let added, let removed):
       let line =
         "selection: \(Institute.Selection.filename) — \(committed) selected;"

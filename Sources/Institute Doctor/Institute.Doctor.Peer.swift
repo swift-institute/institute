@@ -64,6 +64,7 @@ extension Institute.Doctor {
     switch subject.state {
     case .optedOut, .declared, .canonical, .absent:
       []
+
     case .unindexed(let path):
       [
         .init(
@@ -73,6 +74,7 @@ extension Institute.Doctor {
             + "declaration — fast-forward the peer's control-plane checkout"
         )
       ]
+
     case .invalid(let reason):
       [
         .init(
@@ -116,6 +118,7 @@ extension Institute.Doctor {
             state: .optedOut
           )
         )
+
       case .missing(let path):
         subjects.append(
           .init(
@@ -125,6 +128,7 @@ extension Institute.Doctor {
             state: .unindexed(path)
           )
         )
+
       case .invalid(let reason):
         subjects.append(
           .init(
@@ -134,6 +138,7 @@ extension Institute.Doctor {
             state: .invalid(reason)
           )
         )
+
       case .declared(let configuration):
         subjects.append(
           .init(

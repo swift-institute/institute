@@ -77,6 +77,7 @@ extension Institute.Root {
           throw .filesystem(
             "cannot inspect existing materialization prefix \(prefix): \(inspection)"
           )
+
         case .failure(let error):
           if error.isNotFound {
             future = true

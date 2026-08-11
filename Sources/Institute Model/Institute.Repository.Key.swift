@@ -75,6 +75,7 @@ extension Institute.Repository.Key {
       switch byte {
       case 0x30...0x39, 0x41...0x5A, 0x61...0x7A, 0x2D, 0x2E, 0x5F:
         true
+
       default:
         false
       }

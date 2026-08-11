@@ -114,8 +114,10 @@ extension Institute.Doctor {
           message: "\(repository.name): HEAD is detached; sync will not touch it"
         )
       )
+
     case .branch("main"):
       break
+
     case .branch(let branch):
       findings.append(
         .init(
@@ -209,6 +211,7 @@ extension Institute.Doctor {
       switch result {
       case .success(let census):
         population.append(census)
+
       case .failure(let error):
         return Self.census.unmeasured(
           reason: "\(materialized[offset].0.name): cannot read its working state: \(error)"

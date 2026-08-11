@@ -72,7 +72,12 @@ extension Institute.Lint.Shadow {
     var modules = Swift.Set<Swift.String>()
 
     for name in Self.roots {
-      guard let component = try? File.Path.Component(name) else { continue }
+      let component: File.Path.Component
+      do throws(File.Path.Component.Error) {
+        component = try File.Path.Component(name)
+      } catch {
+        continue
+      }
       let root = package[directory: component]
       guard File(root.path).stat.isDirectory else { continue }
       // Both roots contribute modules. A test-support target is a
@@ -150,9 +155,15 @@ extension Institute.Lint.Shadow {
           declarations: &declarations,
           reexports: &reexports
         )
+
       default:
         guard name.hasSuffix(".swift") else { continue }
-        guard let source = try? Institute.Lint.read(File(path)) else { continue }
+        let source: Swift.String
+        do throws(Institute.Error) {
+          source = try Institute.Lint.read(File(path))
+        } catch {
+          continue
+        }
         let reading = Self.read(
           source,
           at: (relative + [name]).joined(separator: "/")

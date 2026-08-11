@@ -81,6 +81,7 @@ extension Institute.Doctor {
           message: "\(tool): \(minimum) or newer is required; found \(found.text)"
         )
       ]
+
     case .override(let variable, let value):
       guard let value else { return [] }
       return [
@@ -90,6 +91,7 @@ extension Institute.Doctor {
             + "one toolchain configuration — Xcode's bundled toolchain. Unset \(variable)."
         )
       ]
+
     case .residence(let tool, let resolved, let developer):
       guard !resolved.hasPrefix(developer) else { return [] }
       return [

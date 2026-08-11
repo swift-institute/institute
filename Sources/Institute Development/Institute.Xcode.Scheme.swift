@@ -176,6 +176,7 @@ extension Institute.Xcode.Scheme {
         switch target.kind {
         case .regular, .executable:
           buildables.append(.init(reference: reference, target: target.name.underlying))
+
         case .test, .plugin, .binary, .system, .macro:
           continue
         }

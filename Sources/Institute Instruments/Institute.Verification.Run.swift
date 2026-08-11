@@ -231,46 +231,46 @@ extension Institute.Verification.Run {
   /// (``Institute/Doctor/spawn``'s callers) already reaches the system
   /// through a spawned tool rather than a linked framework.
   static func realNow() -> Swift.String {
-    (try? Institute.Doctor.spawn("date", arguments: ["-u", "+%Y-%m-%dT%H:%M:%SZ"]))
-      .map { $0.split(separator: "\n").first.map(Swift.String.init) ?? "unknown" } ?? "unknown"
+    let output: Swift.String
+    do throws(Institute.Error) {
+      output = try Institute.Doctor.spawn("date", arguments: ["-u", "+%Y-%m-%dT%H:%M:%SZ"])
+    } catch {
+      return "unknown"
+    }
+    return output.split(separator: "\n").first.map(Swift.String.init) ?? "unknown"
   }
 }
 
 extension Institute.Verification.Run {
-  /// Runs one `Build.Action` at `path` and folds the coordinator's
+  /// Runs one `Build.Action` at `request.path` and folds the coordinator's
   /// result into an ``Operation/Result``. Shared by ``realBuild``,
   /// ``realTest``, and each nested test package ``realNestedTests``
   /// discovers.
   static func run(
     _ operation: Institute.Verification.Operation.Kind,
-    action: Build.Action,
-    at path: Swift.String,
-    subpath: Swift.String?,
-    fresh: Swift.Bool,
-    jobs: Swift.Int?,
-    arguments: [Swift.String],
+    request: Institute.Verification.Operation.Request,
     started: Swift.String,
     now: @Sendable () -> Swift.String
   ) -> Institute.Verification.Operation.Result {
     let clock = Swift.ContinuousClock()
     let clockStart = clock.now
-    let coordinator = Build.Coordinator(jobs: jobs)
+    let coordinator = Build.Coordinator(jobs: request.jobs)
     let outcome: Institute.Verification.Operation.Outcome
     let exitCode: Swift.Int32?
     var compileEvidence: Swift.String?
     var testCounts: Institute.Verification.Operation.TestCounts?
     do throws(Build.Error) {
       let result = try coordinator.run(
-        action,
-        at: path,
-        fresh: fresh,
-        arguments: arguments,
+        request.action,
+        at: request.path,
+        fresh: request.fresh,
+        arguments: request.arguments,
         capturingDiagnostics: true
       )
       exitCode = result.exitCode
       if result.exitCode == 0 {
         outcome = .success
-        if action == .test {
+        if request.action == .test {
           testCounts = Self.parseTestCounts(
             Swift.String(decoding: result.standardOutput ?? [], as: Swift.UTF8.self)
           )
@@ -285,17 +285,17 @@ extension Institute.Verification.Run {
     } catch {
       exitCode = nil
       outcome = .unmeasured(
-        reason: "the build coordinator could not run \(action.rawValue): \(error)")
+        reason: "the build coordinator could not run \(request.action.rawValue): \(error)")
     }
     return .init(
       operation: operation,
-      subpath: subpath,
-      arguments: arguments,
+      subpath: request.subpath,
+      arguments: request.arguments,
       startedAt: started,
       endedAt: now(),
       durationSeconds: Self.seconds(clock.now - clockStart),
       exitCode: exitCode,
-      provenance: fresh ? .fresh : .cached,
+      provenance: request.fresh ? .fresh : .cached,
       outcome: outcome,
       compileEvidence: compileEvidence,
       testCounts: testCounts,
@@ -318,12 +318,14 @@ extension Institute.Verification.Run {
   ) -> Institute.Verification.Operation.Result {
     Self.run(
       .build,
-      action: .build,
-      at: path,
-      subpath: nil,
-      fresh: fresh,
-      jobs: jobs,
-      arguments: arguments,
+      request: .init(
+        action: .build,
+        path: path,
+        subpath: nil,
+        fresh: fresh,
+        jobs: jobs,
+        arguments: arguments
+      ),
       started: Self.realNow(),
       now: Self.realNow
     )
@@ -337,12 +339,14 @@ extension Institute.Verification.Run {
   ) -> Institute.Verification.Operation.Result {
     Self.run(
       .test,
-      action: .test,
-      at: path,
-      subpath: nil,
-      fresh: fresh,
-      jobs: jobs,
-      arguments: arguments,
+      request: .init(
+        action: .test,
+        path: path,
+        subpath: nil,
+        fresh: fresh,
+        jobs: jobs,
+        arguments: arguments
+      ),
       started: Self.realNow(),
       now: Self.realNow
     )
@@ -428,7 +432,12 @@ extension Institute.Verification.Run {
     _ jobs: Swift.Int?,
     _ arguments: [Swift.String]
   ) -> [Institute.Verification.Operation.Result] {
-    guard let testsComponent = try? File.Path.Component("Tests") else { return [] }
+    let testsComponent: File.Path.Component
+    do throws(File.Path.Component.Error) {
+      testsComponent = try File.Path.Component("Tests")
+    } catch {
+      return []
+    }
     let root: File.Directory
     do throws(File.Path.Error) {
       root = try File.Directory(validating: path)
@@ -447,19 +456,26 @@ extension Institute.Verification.Run {
 
     var results: [Institute.Verification.Operation.Result] = []
     for entry in entries where entry.type == .directory {
-      guard let name = Swift.String(entry.name), let component = try? File.Path.Component(name)
-      else { continue }
+      guard let name = Swift.String(entry.name) else { continue }
+      let component: File.Path.Component
+      do throws(File.Path.Component.Error) {
+        component = try File.Path.Component(name)
+      } catch {
+        continue
+      }
       let nested = tests[directory: component]
       guard nested[file: "Package.swift"].stat.exists else { continue }
       results.append(
         Self.run(
           .nestedTests,
-          action: .test,
-          at: nested.description,
-          subpath: "Tests/\(name)",
-          fresh: fresh,
-          jobs: jobs,
-          arguments: arguments,
+          request: .init(
+            action: .test,
+            path: nested.description,
+            subpath: "Tests/\(name)",
+            fresh: fresh,
+            jobs: jobs,
+            arguments: arguments
+          ),
           started: Self.realNow(),
           now: Self.realNow
         )
@@ -507,8 +523,10 @@ extension Institute.Verification.Run {
     switch measurement.verdict {
     case .clean:
       outcome = .success
+
     case .violations(_, let failing):
       outcome = failing ? .failure : .success
+
     case .unmeasured(let reason):
       // The engine's own unmeasured reasons quote the package and
       // hierarchy paths it was given (see `Institute.Lint.Run`'s
@@ -587,8 +605,10 @@ extension Institute.Verification.Run {
       switch kind {
       case .build:
         results.append(tools.build(packagePath, fresh, jobs, arguments))
+
       case .test:
         results.append(tools.test(packagePath, fresh, jobs, arguments))
+
       case .nestedTests:
         let nested = tools.nestedTests(packagePath, fresh, jobs, arguments)
         if nested.isEmpty {
@@ -608,6 +628,7 @@ extension Institute.Verification.Run {
         } else {
           results.append(contentsOf: nested)
         }
+
       case .lint:
         results.append(tools.lint(packagePath))
       }

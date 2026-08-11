@@ -37,9 +37,11 @@ extension Institute.Verification {
       let value = try Swift.String(json: state)
       switch value {
       case "verified": return .verified
+
       case "unverified":
         guard let reason = object["reason"] else { throw .missingKey("reason") }
         return try .unverified(reason: Swift.String(json: reason))
+
       default:
         throw .typeMismatch(expected: "verified or unverified", got: value)
       }

@@ -278,9 +278,11 @@ extension Institute.Lint.Shadow {
       switch tokens[index] {
       case .symbol("<"):
         depth += 1
+
       case .symbol(">"):
         depth -= 1
         if depth == 0 { return found }
+
       case .identifier(let word):
         guard depth == 1, index > opening else { break }
         let previous = tokens[index - 1]
@@ -288,6 +290,7 @@ extension Institute.Lint.Shadow {
         if let name = Institute.Lint.Shadow(rawValue: word) {
           found.append(name)
         }
+
       default:
         break
       }

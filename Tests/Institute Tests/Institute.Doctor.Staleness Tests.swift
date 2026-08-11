@@ -103,7 +103,7 @@ extension Institute.Doctor.Test.Integration {
     )
 
     let report = await fixture.doctor(tool: {
-      (executable, arguments) throws(Institute.Error) -> Swift.String in
+      executable, arguments throws(Institute.Error) -> Swift.String in
       if executable == "git", arguments.first == "ls-remote" {
         return "1111111111111111111111111111111111111111\trefs/heads/main\n"
       }
@@ -139,7 +139,7 @@ extension Institute.Doctor.Test.Integration {
     )
 
     let report = await fixture.doctor(tool: {
-      (executable, arguments) throws(Institute.Error) -> Swift.String in
+      executable, arguments throws(Institute.Error) -> Swift.String in
       if executable == "git", arguments.first == "ls-remote" {
         return "1111111111111111111111111111111111111111\trefs/heads/main\n"
       }
@@ -255,7 +255,7 @@ extension Institute.Doctor.Test.Integration {
     )
 
     let report = await fixture.doctor(tool: {
-      (executable, arguments) throws(Institute.Error) -> Swift.String in
+      executable, arguments throws(Institute.Error) -> Swift.String in
       if executable == "gh", arguments.first == "api", arguments.contains("-H") {
         return "rule_one: true\nrule_two: true\n"
       }
@@ -289,7 +289,7 @@ extension Institute.Doctor.Test.Integration {
     )
 
     let report = await fixture.doctor(tool: {
-      (executable, arguments) throws(Institute.Error) -> Swift.String in
+      executable, arguments throws(Institute.Error) -> Swift.String in
       if executable == "gh", arguments.first == "api", arguments.contains("-H") {
         return "rule_one: true\n"
       }

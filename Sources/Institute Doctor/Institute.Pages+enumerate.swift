@@ -62,20 +62,28 @@ extension Institute.Pages {
       )
     }
 
+    let workspaceCommit: Swift.String?
+    do throws(Institute.Error) {
+      workspaceCommit = try Institute.Doctor.spawn(
+        "git",
+        arguments: ["-C", root.checkout.description, "rev-parse", "HEAD"]
+      )
+    } catch {
+      workspaceCommit = nil
+    }
+    let workspaceJsonBlob: Swift.String?
+    do throws(Institute.Error) {
+      workspaceJsonBlob = try Institute.Doctor.spawn(
+        "git",
+        arguments: ["-C", root.checkout.description, "rev-parse", "HEAD:Institute.json"]
+      )
+    } catch {
+      workspaceJsonBlob = nil
+    }
     return Inventory(
       instrument: .init(
-        workspaceCommit: Self.line(
-          try? Institute.Doctor.spawn(
-            "git",
-            arguments: ["-C", root.checkout.description, "rev-parse", "HEAD"]
-          )
-        ),
-        workspaceJsonBlob: Self.line(
-          try? Institute.Doctor.spawn(
-            "git",
-            arguments: ["-C", root.checkout.description, "rev-parse", "HEAD:Institute.json"]
-          )
-        ),
+        workspaceCommit: Self.line(workspaceCommit),
+        workspaceJsonBlob: Self.line(workspaceJsonBlob),
         selection: selectionField
       ),
       repositories: repositories,
@@ -94,7 +102,13 @@ extension Institute.Pages {
     // `.canonical` carries its state and no pages — recorded, never
     // papered over with a directory walk this instrument is not
     // entitled to make.
-    guard state == .canonical, let directory = try? root.materialization(for: repository) else {
+    let materialized: File.Directory?
+    do throws(Institute.Error) {
+      materialized = try root.materialization(for: repository)
+    } catch {
+      materialized = nil
+    }
+    guard state == .canonical, let directory = materialized else {
       return .init(
         organization: repository.organization,
         name: repository.name,

@@ -75,6 +75,7 @@ extension Institute.Inventory.Effective {
       self.private =
         switch scope {
         case .public: nil
+
         case .effective:
           Limb(
             population: effective.private.repositories,
@@ -154,6 +155,7 @@ extension Institute.Inventory.Effective.Output {
           coordinate: name.underlying,
           reason: unmeasured.reason
         )
+
       case .repository(let key):
         self.init(
           kind: .repository,

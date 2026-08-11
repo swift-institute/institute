@@ -126,8 +126,10 @@ extension Build.Coordinator {
     switch output.status {
     case .exited:
       return output
+
     case .signaled(let signal):
       throw .process("\(description) terminated by signal \(signal)")
+
     case .stopped(let signal):
       throw .process("\(description) stopped by signal \(signal)")
     }

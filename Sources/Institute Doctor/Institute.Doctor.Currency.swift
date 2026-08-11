@@ -60,6 +60,7 @@ extension Institute.Doctor {
     switch repository.presence {
     case .both:
       []
+
     case .committed:
       [
         .init(
@@ -67,6 +68,7 @@ extension Institute.Doctor {
           message: "\(repository.name): in Institute.json but not discovered on GitHub"
         )
       ]
+
     case .discovered:
       [
         .init(
@@ -74,6 +76,7 @@ extension Institute.Doctor {
           message: "\(repository.name): discovered on GitHub but missing from Institute.json"
         )
       ]
+
     case .moved(let from, let to):
       [
         .init(
@@ -82,6 +85,7 @@ extension Institute.Doctor {
             "\(repository.name): organization mismatch — Institute.json has \(from), GitHub discovery has \(to)"
         )
       ]
+
     case .mismatch(let field, let committed, let discovered):
       [
         .init(

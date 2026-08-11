@@ -38,6 +38,7 @@ extension Institute.Doctor {
     switch repository.state {
     case .canonical:
       []
+
     case .legacy:
       [
         .init(
@@ -46,6 +47,7 @@ extension Institute.Doctor {
             + "location; expected \(repository.location) — legacy contents were not touched"
         )
       ]
+
     case .both:
       [
         .init(
@@ -54,6 +56,7 @@ extension Institute.Doctor {
             + "in-checkout materialization also remains and was not touched"
         )
       ]
+
     case .absent:
       [
         .init(
@@ -61,6 +64,7 @@ extension Institute.Doctor {
           message: "\(repository.name): missing or not a Git repository at \(repository.location)"
         )
       ]
+
     case .invalid(let diagnostic):
       [
         .init(
