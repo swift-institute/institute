@@ -1,11 +1,11 @@
 public import Async_Fanout
 public import File_System
-internal import Thread_Pool
 public import Institute_Development
 public import Institute_Inventory
 public import Institute_Lint
 public import Institute_Model
 public import Institute_Pages
+internal import Thread_Pool
 
 extension Institute.Doctor {
   /// One local `swift-linter` remote-config cache entry, against a live

@@ -102,7 +102,8 @@ extension Institute.Doctor.Test.Integration {
       to: "swift-foundations/swift-example/Package.resolved"
     )
 
-    let report = await fixture.doctor(tool: {executable, arguments throws(Institute.Error) -> Swift.String in
+    let report = await fixture.doctor(tool: {
+      executable, arguments throws(Institute.Error) -> Swift.String in
       if executable == "git", arguments.first == "ls-remote" {
         return "1111111111111111111111111111111111111111\trefs/heads/main\n"
       }
@@ -137,7 +138,8 @@ extension Institute.Doctor.Test.Integration {
       to: "swift-foundations/swift-example/Package.resolved"
     )
 
-    let report = await fixture.doctor(tool: {executable, arguments throws(Institute.Error) -> Swift.String in
+    let report = await fixture.doctor(tool: {
+      executable, arguments throws(Institute.Error) -> Swift.String in
       if executable == "git", arguments.first == "ls-remote" {
         return "1111111111111111111111111111111111111111\trefs/heads/main\n"
       }
@@ -252,7 +254,8 @@ extension Institute.Doctor.Test.Integration {
       to: "swift-foundations/swift-example/.swiftlint/RemoteConfigCache/v1/cached.yml"
     )
 
-    let report = await fixture.doctor(tool: {executable, arguments throws(Institute.Error) -> Swift.String in
+    let report = await fixture.doctor(tool: {
+      executable, arguments throws(Institute.Error) -> Swift.String in
       if executable == "gh", arguments.first == "api", arguments.contains("-H") {
         return "rule_one: true\nrule_two: true\n"
       }
@@ -285,7 +288,8 @@ extension Institute.Doctor.Test.Integration {
       to: "swift-foundations/swift-example/.swiftlint/RemoteConfigCache/v1/cached.yml"
     )
 
-    let report = await fixture.doctor(tool: {executable, arguments throws(Institute.Error) -> Swift.String in
+    let report = await fixture.doctor(tool: {
+      executable, arguments throws(Institute.Error) -> Swift.String in
       if executable == "gh", arguments.first == "api", arguments.contains("-H") {
         return "rule_one: true\n"
       }

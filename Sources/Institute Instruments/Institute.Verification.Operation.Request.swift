@@ -17,20 +17,5 @@ extension Institute.Verification.Operation {
     let jobs: Swift.Int?
     let arguments: [Swift.String]
 
-    init(
-      action: Build.Action,
-      path: Swift.String,
-      subpath: Swift.String?,
-      fresh: Swift.Bool,
-      jobs: Swift.Int?,
-      arguments: [Swift.String]
-    ) {
-      self.action = action
-      self.path = path
-      self.subpath = subpath
-      self.fresh = fresh
-      self.jobs = jobs
-      self.arguments = arguments
-    }
   }
 }
