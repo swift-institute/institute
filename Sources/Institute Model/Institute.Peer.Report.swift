@@ -22,10 +22,13 @@ extension Institute.Peer.Report: CustomStringConvertible {
     switch presence {
     case .absent:
       return "peer \(peer.name): not materialized (opt-in)"
+
     case .missing(let path):
       return "peer \(peer.name): materialized without an inventory at \(path)"
+
     case .invalid(let reason):
       return "peer \(peer.name): inventory unusable — \(reason)"
+
     case .declared(let configuration):
       return
         ([

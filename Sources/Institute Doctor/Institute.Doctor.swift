@@ -108,6 +108,7 @@ extension Institute.Doctor {
       outcomes.append(record(Self.currency.omitted))
       outcomes.append(record(Self.resolutionCurrency.omitted))
       outcomes.append(record(Self.lintConfigCurrency.omitted))
+
     case .institute(let inventory):
       do throws(Institute.Error) {
         outcomes.append(record(currency(try await inventory())))

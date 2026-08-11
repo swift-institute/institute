@@ -49,6 +49,7 @@ extension Institute.Doctor {
             + "Neither `institute lint` nor `institute package lint` can run without it."
         )
       ]
+
     case .parity(let findings):
       return findings.map { .init(severity: .error, message: $0) }
     }

@@ -149,15 +149,19 @@ extension Institute.Verification.Operation {
       switch value {
       case "success": return .success
       case "failure": return .failure
+
       case "not-applicable":
         guard let reason = object["reason"] else { throw .missingKey("reason") }
         return try .notApplicable(reason: Swift.String(json: reason))
+
       case "skipped":
         guard let reason = object["reason"] else { throw .missingKey("reason") }
         return try .skipped(reason: Swift.String(json: reason))
+
       case "unmeasured":
         guard let reason = object["reason"] else { throw .missingKey("reason") }
         return try .unmeasured(reason: Swift.String(json: reason))
+
       default:
         throw .typeMismatch(
           expected: "success, failure, not-applicable, skipped, or unmeasured",

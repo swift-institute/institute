@@ -33,10 +33,13 @@ extension Institute.Doctor.Result: CustomStringConvertible {
     switch self {
     case .ok(let population):
       "ok (population \(population))"
+
     case .finding(let severity, let population):
       "\(severity) findings (population \(population))"
+
     case .unmeasured(let reason):
       "unmeasured — \(reason)"
+
     case .notApplicable(let scope):
       "not run (\(scope))"
     }

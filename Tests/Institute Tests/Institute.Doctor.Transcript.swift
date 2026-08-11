@@ -18,7 +18,7 @@ extension Institute.Doctor {
   /// its fan-outs, and a test that asserted on an unsynchronised buffer
   /// would be asserting on the synchronisation, not the transcript.
   final class Transcript: Sendable {
-    private nonisolated(unsafe) var storage = [Swift.String]()
+    nonisolated(unsafe) private var storage = [Swift.String]()
     private let lock = NSLock()
 
     var lines: [Swift.String] {

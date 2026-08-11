@@ -195,6 +195,7 @@ extension Institute.Dependency.Audit {
                 declared: declared
               )
             )
+
           case .path(let value, let line):
             exclusions.append(
               .init(
@@ -208,6 +209,7 @@ extension Institute.Dependency.Audit {
                 reason: "path dependency has no canonical repository URL"
               )
             )
+
           case .registry(let value, let line):
             exclusions.append(
               .init(
@@ -221,6 +223,7 @@ extension Institute.Dependency.Audit {
                 reason: "registry dependency has no canonical repository URL"
               )
             )
+
           case .malformed(let reason, let line):
             malformed = true
             exclusions.append(

@@ -156,6 +156,7 @@ extension Institute.Lint.Sweep {
     switch scope {
     case .all:
       selected = targets
+
     case .changed:
       let git = self.git
       let local = await concurrently(targets) { entry in

@@ -31,22 +31,29 @@ extension Institute.Verification.Error {
     switch self {
     case .subject(let message):
       "cannot establish the verification subject: \(message)"
+
     case .headMismatch(let claimed, let observed):
       "claimed head \(claimed) does not match the checked-out head \(observed); "
         + "refusing to seal a receipt for a commit this run did not observe"
+
     case .dirtySubject(let path):
       "\(path) has uncommitted changes; refusing to seal a receipt for a dirty subject"
+
     case .noOperationExecuted:
       "zero operations reached a real outcome; a receipt attesting nothing was measured "
         + "is refused"
+
     case .requiredOperationMissing(let kind):
       "required operation \(kind.rawValue) was not requested; refusing to seal a receipt "
         + "silently missing it"
+
     case .requiredOperationNotExecuted(let kind):
       "required operation \(kind.rawValue) was skipped or unmeasured; refusing to seal a "
         + "receipt claiming it ran"
+
     case .unsafeContent(let reason):
       "refusing to seal: captured evidence \(reason)"
+
     case .configuration(let message):
       message
     }

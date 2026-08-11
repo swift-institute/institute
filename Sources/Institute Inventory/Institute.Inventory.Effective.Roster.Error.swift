@@ -26,6 +26,7 @@ extension Institute.Inventory.Effective.Roster.Error {
     switch self {
     case .unreadable(let path): "cannot read the supplied roster at \(path)"
     case .malformed(let reason): "the supplied roster is not a valid roster document: \(reason)"
+
     case .emptyPopulation:
       "the supplied roster carries no repositories; refusing to digest an empty "
         + "population, which would publish a real digest of a measurement nobody made"

@@ -68,30 +68,35 @@ extension Institute.Lint.Target {
           "lint target \(target.name.underlying) declares an absolute path: \(declared)"
         )
       }
-      var root = package.path
+      var components: [File.Path.Component] = []
       for component in path.components {
         switch component.string {
         case ".":
           continue
+
         case "..":
           throw .configuration(
             "lint target \(target.name.underlying) escapes its package: \(declared)"
           )
+
         default:
-          root = root / component
+          components.append(component)
         }
       }
-      return File.Directory(root)
+      return File.Directory(components.reduce(package.path, /))
     }
 
     let parent: File.Path
     switch target.kind {
     case .test:
       parent = "Tests"
+
     case .plugin:
       parent = "Plugins"
+
     case .regular, .executable, .system, .macro:
       parent = "Sources"
+
     case .binary:
       return nil
     }

@@ -67,11 +67,14 @@ extension Institute.Sync {
         }
         try root.preflight(parent, under: root.hierarchy)
         try clone(inspection.repository, to: path)
+
       case .update(let remote):
         try root.preflight(path, under: root.hierarchy)
         try update(inspection.repository, to: remote, at: path)
+
       case .current, .skip:
         break
+
       case .fail:
         throw .repository("unreachable conflicting plan")
       }
@@ -226,7 +229,9 @@ extension Institute.Sync {
           )
         )
       }
-      guard (try? client.probe(repository.url, ref: main)) != nil else {
+      do throws(Git.Client.Error) {
+        _ = try client.probe(repository.url, ref: main)
+      } catch {
         return .init(
           repository: repository,
           action: .fail("canonical origin/main is unavailable")
@@ -418,7 +423,7 @@ extension Institute.Sync {
     }
 
     let originMain = try reference("refs/remotes/origin/main")
-    try execute { () throws(Git.Client.Error) -> Void in
+    try execute { () throws(Git.Client.Error) in
       try client.fetch(
         "origin",
         object: remote,
@@ -448,7 +453,7 @@ extension Institute.Sync {
     try root.preflight(temporary, under: root.hierarchy)
 
     do throws(Institute.Error) {
-      try execute { () throws(Git.Client.Error) -> Void in
+      try execute { () throws(Git.Client.Error) in
         try client.clone(repository.url, to: temporary.description)
       }
     } catch {
@@ -474,10 +479,10 @@ extension Institute.Sync {
     }
 
     try root.preflight(path, under: root.hierarchy)
-    try execute { () throws(Git.Client.Error) -> Void in
+    try execute { () throws(Git.Client.Error) in
       try client.switch("main", at: path.description)
     }
-    try execute { () throws(Git.Client.Error) -> Void in
+    try execute { () throws(Git.Client.Error) in
       try client.track("main", upstream: "origin/main", at: path.description)
     }
   }

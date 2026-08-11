@@ -25,8 +25,10 @@ extension Institute.Verification.Inventory.Digest.Error {
     case .unmeasuredWithoutCause:
       "an unmeasured inventory digest requires a cause; \"unmeasured\" on its own "
         + "records that a measurement is missing without recording why"
+
     case .measuredWithCause:
       "a measured inventory digest cannot also carry an unmeasured cause"
+
     case .notLowercaseHex64:
       "an inventory digest must be 64 lowercase hexadecimal digits, or \"unmeasured\" "
         + "with a cause"

@@ -42,6 +42,7 @@ extension Institute.Doctor {
             message: "\(manifest.name): manifest identity is \(identity)"
           )
         ]
+
     case .unevaluable(let diagnostic):
       [
         .init(

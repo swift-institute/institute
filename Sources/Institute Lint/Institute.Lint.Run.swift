@@ -249,6 +249,7 @@ extension Institute.Lint {
       measurement.duration = elapsed
       guard let file = target.file else { return measurement }
       return measurement.restricted(to: file)
+
     case .signaled(let signal):
       return .init(
         package: package,
@@ -259,6 +260,7 @@ extension Institute.Lint {
         diagnostics: standardError,
         status: -1
       )
+
     case .stopped(let signal):
       return .init(
         package: package,

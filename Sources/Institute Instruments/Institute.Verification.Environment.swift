@@ -123,10 +123,10 @@ extension Institute.Verification.Environment {
   /// fail because it could not identify its own toolchain string.
   static func observe() -> Institute.Verification.Environment {
     .init(
-      swift: Self.line(try? Institute.Doctor.spawn("swift", arguments: ["--version"])),
-      xcode: Self.line(try? Institute.Doctor.spawn("xcodebuild", arguments: ["-version"])),
+      swift: Self.line(Self.interrogate("swift", arguments: ["--version"])),
+      xcode: Self.line(Self.interrogate("xcodebuild", arguments: ["-version"])),
       sdk: Self.line(
-        try? Institute.Doctor.spawn(
+        Self.interrogate(
           "xcrun",
           arguments: ["--sdk", "macosx", "--show-sdk-version"]
         )
@@ -135,6 +135,21 @@ extension Institute.Verification.Environment {
       architecture: Self.currentArchitecture,
       runnerImage: Self.currentRunnerImage()
     )
+  }
+
+  /// One toolchain interrogation, with the failure posture stated
+  /// explicitly: an interrogation that fails yields `nil`, which
+  /// ``line(_:)`` renders as `"unknown"` — descriptive metadata must
+  /// never fail the run.
+  private static func interrogate(
+    _ executable: Swift.String,
+    arguments: [Swift.String]
+  ) -> Swift.String? {
+    do throws(Institute.Error) {
+      return try Institute.Doctor.spawn(executable, arguments: arguments)
+    } catch {
+      return nil
+    }
   }
 
   private static func line(_ value: Swift.String?) -> Swift.String {

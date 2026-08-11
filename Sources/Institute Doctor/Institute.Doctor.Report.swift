@@ -84,6 +84,7 @@ extension Institute.Doctor.Report {
       switch outcome.result {
       case .ok(let population), .finding(_, let population):
         (outcome.check, population)
+
       case .unmeasured, .notApplicable:
         nil
       }
@@ -130,8 +131,10 @@ extension Institute.Doctor.Report: CustomStringConvertible {
     switch status {
     case 2:
       "doctor: not passing — \(unmeasured) check(s) unmeasured."
+
     case 1:
       "doctor: not passing — \(errors) error(s), \(warnings) warning(s)."
+
     default:
       "doctor: passed — \(ok + withFindings) check(s) measured, "
         + "\(omitted) not run (institute-internal), \(warnings) warning(s)."

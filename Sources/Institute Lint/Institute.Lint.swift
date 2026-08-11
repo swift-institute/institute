@@ -149,7 +149,11 @@ extension Institute.Lint {
   /// into a hierarchy that has none yet is the first install, and it
   /// still has to work.
   public static func existing(from path: Swift.String) -> Self? {
-    try? Self.resolve(from: path)
+    do throws(Institute.Error) {
+      return try Self.resolve(from: path)
+    } catch {
+      return nil
+    }
   }
 }
 

@@ -107,8 +107,12 @@ extension Institute.Coherence {
     guard let colon = diagnostic.firstIndex(of: ":") else { return nil }
     let path = Swift.String(diagnostic[diagnostic.startIndex..<colon])
     for repository in repositories {
-      guard let directory = try? Institute.Layout.directory(for: repository, at: root.hierarchy)
-      else { continue }
+      let directory: File.Directory
+      do throws(Institute.Error) {
+        directory = try Institute.Layout.directory(for: repository, at: root.hierarchy)
+      } catch {
+        continue
+      }
       if path.hasPrefix(directory.description) { return repository }
     }
     return nil

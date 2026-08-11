@@ -62,6 +62,7 @@ let package = Package(
         .package(url: "https://github.com/swift-foundations/swift-package-manager.git", branch: "main"),
         .package(url: "https://github.com/swift-foundations/swift-posix.git", branch: "main"),
         .package(url: "https://github.com/swift-foundations/swift-process.git", branch: "main"),
+        .package(url: "https://github.com/swift-foundations/swift-threads.git", branch: "main"),
         .package(url: "https://github.com/swift-foundations/swift-xcode.git", branch: "main"),
         .package(url: "https://github.com/swift-ietf/swift-rfc-3986.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-byte-primitives.git", branch: "main"),
@@ -190,6 +191,7 @@ let package = Package(
                 .product(name: "JSON", package: "swift-json"),
                 .product(name: "Package Manager", package: "swift-package-manager"),
                 .product(name: "Process", package: "swift-process"),
+                .product(name: "Thread Pool", package: "swift-threads"),
             ]
         ),
         .target(

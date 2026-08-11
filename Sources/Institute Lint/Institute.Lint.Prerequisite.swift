@@ -34,6 +34,7 @@ extension Institute.Lint.Prerequisite {
   public var reason: Swift.String {
     switch self {
     case .sarif: "structured findings are unavailable; prerequisite \(issue)"
+
     case .currency:
       "the installed swift-linter is not built from the current rule packs; "
         + "prerequisite \(issue)"

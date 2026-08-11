@@ -321,6 +321,7 @@ extension Institute.Lint.Ledger.Report {
         if let prerequisite = package.prerequisite {
           lines.append("  prerequisite: \(prerequisite.token) · \(prerequisite.issue)")
         }
+
       case .measured:
         lines.append(
           "MEASURED    \(package.repository.identity) · owner \(package.owner) · layer "
