@@ -276,7 +276,7 @@ extension Institute.Sync {
     let remote = try execute { () throws(Git.Client.Error) -> Swift.String in
       try client.remote("origin", at: path.description)
     }
-    guard remote == repository.url else {
+    guard Self.sameRepository(remote, repository.url) else {
       return .init(
         repository: repository,
         action: .fail("origin is \(remote), expected \(repository.url)")

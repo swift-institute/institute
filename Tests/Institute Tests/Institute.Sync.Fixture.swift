@@ -66,6 +66,24 @@ extension Institute.Sync.Fixture {
     try command(["push", remote.path, "main"], at: source)
   }
 
+  /// Moves `local` off `main` onto a fresh branch, without touching
+  /// `origin`. Used to reach `inspect`'s origin check while stopping the
+  /// inspection at the following branch check, before it needs
+  /// `repository.url` to be a reachable remote (`probe`/`fetch`) — the
+  /// origin string itself only ever has to be text `git remote` can store.
+  func checkout(_ branch: Swift.String) throws {
+    try command(["checkout", "-b", branch], at: local)
+  }
+
+  /// Rewrites `local`'s configured `origin` URL to an arbitrary string,
+  /// independent of what it actually resolves to. `git remote set-url`
+  /// only writes config text; it performs no reachability check, which is
+  /// what makes it usable to stage a same-repository-different-transport
+  /// (or genuinely-different-repository) origin string for `inspect`.
+  func setOrigin(_ url: Swift.String) throws {
+    try command(["remote", "set-url", "origin", url], at: local)
+  }
+
   func replaceRemote() throws {
     let replacement = base.appending(path: "replacement")
     try client.initialize(at: replacement.path, bare: false)
