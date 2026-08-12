@@ -185,4 +185,82 @@ extension Institute.Sync.Test.Integration {
     #expect(after.status.isEmpty)
     #expect(try fixture.residue().isEmpty)
   }
+
+  /// `inspect`'s origin check must agree with `sameRepository`/`displaced`
+  /// on transport spelling — a live control proved the two owners disagreed
+  /// (swift-institute/institute-application#201): raw `==` failed 9
+  /// checkouts whose `origin` was SSH against `Institute.json`'s canonical
+  /// HTTPS URL.
+  ///
+  /// Each fixture parks `local` on a non-`main` branch before rewriting
+  /// `origin`, so a passing origin check is provably observed at the next
+  /// gate — the branch check's `.skip` — without requiring the synthetic
+  /// `repository.url` used here to be a reachable remote for `probe`/`fetch`.
+  private static func originCheck(
+    origin: Swift.String,
+    canonical: Swift.String
+  ) throws -> Institute.Sync {
+    let fixture = try Institute.Sync.Fixture()
+    try fixture.checkout("not-main")
+    try fixture.setOrigin(origin)
+    let repository = Institute.Repository(
+      name: "swift-example",
+      url: canonical,
+      organization: "swift-foundations",
+      layer: .foundations
+    )
+    return Institute.Sync(
+      root: try Institute.Root(checkout: File.Directory(validating: fixture.root.path)),
+      selection: .init(repositories: [repository], origin: .committed(count: 1)),
+      client: fixture.client
+    )
+  }
+
+  @Test
+  func `scp-style SSH origin against the canonical HTTPS URL is not a conflict`() throws {
+    let sync = try Self.originCheck(
+      origin: "git@github.com:swift-foundations/swift-example.git",
+      canonical: "https://github.com/swift-foundations/swift-example.git"
+    )
+
+    try sync.run(dry: true)
+  }
+
+  @Test
+  func `ssh scheme origin against the canonical HTTPS URL is not a conflict`() throws {
+    let sync = try Self.originCheck(
+      origin: "ssh://git@github.com/swift-foundations/swift-example.git",
+      canonical: "https://github.com/swift-foundations/swift-example.git"
+    )
+
+    try sync.run(dry: true)
+  }
+
+  /// The negative control: a genuinely different repository must still
+  /// produce `.fail`, proving `sameRepository` didn't loosen `inspect`'s
+  /// origin check into uselessness — it only removed the transport-spelling
+  /// false positive. `run(dry:)` throws before any mutation whenever a
+  /// planned inspection is fatal (`Institute.Action.fatal`), which is
+  /// exactly `.fail`, so a throw here is a direct observation of that case.
+  ///
+  /// This doesn't re-capture the `.fail` reason text: `run(dry:)` prints
+  /// each inspection's `Action.text` concurrently with every other test in
+  /// this (parallel-by-default) suite, so redirecting the process-global
+  /// `stdout` here would race arbitrary other tests' output. The reason
+  /// string itself — `"origin is \(remote), expected \(repository.url)"` —
+  /// is unchanged by this fix; only the guard's comparison operator moved
+  /// from `==` to `Self.sameRepository`, and `sameRepository` distinguishing
+  /// genuinely different repositories is already covered directly by
+  /// `Institute Sync Displaced Tests`.
+  @Test
+  func `an origin naming a genuinely different repository still conflicts`() throws {
+    let sync = try Self.originCheck(
+      origin: "git@github.com:swift-foundations/swift-other.git",
+      canonical: "https://github.com/swift-foundations/swift-example.git"
+    )
+
+    #expect(throws: Institute.Error.self) {
+      try sync.run(dry: true)
+    }
+  }
 }
