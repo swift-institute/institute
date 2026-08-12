@@ -266,6 +266,16 @@ let package = Package(
             ],
             path: "Tests/Institute Tests"
         ),
+        .testTarget(
+            name: "Institute Development Tests",
+            dependencies: [
+                "Institute Development",
+                "Institute Model",
+                .product(name: "File System", package: "swift-file-system"),
+                .product(name: "JSON", package: "swift-json"),
+            ],
+            path: "Tests/Institute Development Tests"
+        ),
     ],
     swiftLanguageModes: [.v6]
 )
