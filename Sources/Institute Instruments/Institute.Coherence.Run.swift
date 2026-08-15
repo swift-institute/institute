@@ -388,7 +388,8 @@ extension Institute.Coherence.Run {
                             return try Institute.Doctor.spawn(
                                 "git",
                                 arguments: [
-                                    "-C", root.checkout.description, "rev-parse", "HEAD:Institute.json",
+                                    "-C", root.checkout.description, "rev-parse",
+                                    "HEAD:Institute.json",
                                 ]
                             )
                         } catch {

@@ -124,11 +124,11 @@ extension Institute.Navigation {
                 unsafe pointers.append(nil)
                 defer { unsafe pointers.removeLast() }
                 return try unsafe pointers.withUnsafeBufferPointer {
-                    (buffer) throws(Failure) -> Result in
+                    buffer throws(Failure) -> Result in
                     try unsafe body(buffer.baseAddress!)
                 }
             }
-            return try unsafe values[index].withCString { (pointer) throws(Failure) -> Result in
+            return try unsafe values[index].withCString { pointer throws(Failure) -> Result in
                 unsafe pointers.append(pointer)
                 defer { unsafe pointers.removeLast() }
                 return try descend(index + 1)

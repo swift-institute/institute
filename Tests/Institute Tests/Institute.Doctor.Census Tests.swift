@@ -251,7 +251,9 @@ extension Institute.Doctor.Test.Integration {
             to: "swift-foundations/swift-example/Package.resolved"
         )
 
-        let report = await fixture.doctor(tool: {executable, arguments throws(Institute.Error) -> Swift.String in
+        let report = await fixture.doctor(tool: {
+            executable,
+            arguments throws(Institute.Error) -> Swift.String in
             if executable == "git", arguments.first == "ls-remote" {
                 return "1111111111111111111111111111111111111111\trefs/heads/main\n"
             }
@@ -273,7 +275,9 @@ extension Institute.Doctor.Test.Integration {
             to: "swift-foundations/swift-example/Package.resolved"
         )
 
-        let report = await fixture.doctor(tool: {executable, arguments throws(Institute.Error) -> Swift.String in
+        let report = await fixture.doctor(tool: {
+            executable,
+            arguments throws(Institute.Error) -> Swift.String in
             if executable == "git", arguments.first == "ls-remote" {
                 throw .process("could not resolve host")
             }

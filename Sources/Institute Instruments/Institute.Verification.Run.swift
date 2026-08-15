@@ -238,7 +238,8 @@ extension Institute.Verification.Run {
         } catch {
             output = nil
         }
-        return output
+        return
+            output
             .map { $0.split(separator: "\n").first.map(Swift.String.init) ?? "unknown" }
             ?? "unknown"
     }
