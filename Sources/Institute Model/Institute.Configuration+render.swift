@@ -1,18 +1,18 @@
 import JSON
 
 extension Institute.Configuration {
-  public func rendered() throws(Institute.Error) -> Swift.String {
-    let configuration = try validated()
-    let output = configuration.jsonString(pretty: true, sortKeys: true) + "\n"
-    let decoded: Self
-    do throws(JSON.Error) {
-      decoded = try Self(jsonString: output)
-    } catch {
-      throw .configuration("generated Institute.json is invalid: \(error)")
+    public func rendered() throws(Institute.Error) -> Swift.String {
+        let configuration = try validated()
+        let output = configuration.jsonString(pretty: true, sortKeys: true) + "\n"
+        let decoded: Self
+        do throws(JSON.Error) {
+            decoded = try Self(jsonString: output)
+        } catch {
+            throw .configuration("generated Institute.json is invalid: \(error)")
+        }
+        guard try decoded.validated() == configuration else {
+            throw .configuration("generated Institute.json does not round-trip")
+        }
+        return output
     }
-    guard try decoded.validated() == configuration else {
-      throw .configuration("generated Institute.json does not round-trip")
-    }
-    return output
-  }
 }

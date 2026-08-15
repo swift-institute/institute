@@ -9,8 +9,8 @@
 @testable import Institute_Pages
 
 extension Institute.Inventory.Test {
-  enum Failure: Swift.Error, Equatable, Sendable {
-    case malformed
-    case status
-  }
+    enum Failure: Swift.Error, Equatable, Sendable {
+        case malformed
+        case status
+    }
 }

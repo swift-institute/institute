@@ -2,12 +2,12 @@ internal import Institute_Inventory
 public import Institute_Model
 
 extension Institute.Dependency {
-  /// Repository ownership after URL redirects have been resolved.
-  public enum Ownership: Swift.String, Equatable, Sendable {
-    case institute
-    case personalOwner = "personal-owner"
-    case thirdParty = "third-party"
-    case sanctionedException = "sanctioned-exception"
-    case unmeasured
-  }
+    /// Repository ownership after URL redirects have been resolved.
+    public enum Ownership: Swift.String, Equatable, Sendable {
+        case institute
+        case personalOwner = "personal-owner"
+        case thirdParty = "third-party"
+        case sanctionedException = "sanctioned-exception"
+        case unmeasured
+    }
 }
