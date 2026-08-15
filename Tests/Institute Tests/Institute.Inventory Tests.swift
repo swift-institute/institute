@@ -11,10 +11,10 @@ import Testing
 @testable import Institute_Pages
 
 extension Institute.Inventory {
-  @Suite
-  struct Test {
-    @Suite struct Unit {}
-    @Suite struct `Edge Case` {}
-    @Suite struct Integration {}
-  }
+    @Suite
+    struct Test {
+        @Suite struct Unit {}
+        @Suite struct `Edge Case` {}
+        @Suite struct Integration {}
+    }
 }

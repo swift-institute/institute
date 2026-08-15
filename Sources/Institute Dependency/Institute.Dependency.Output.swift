@@ -3,24 +3,24 @@ internal import Institute_Inventory
 public import Institute_Model
 
 extension Institute.Dependency {
-  /// Rendering selected for the dependency audit.
-  public enum Output: Sendable, Equatable, Argument.Codable {
-    case human
-    case json
+    /// Rendering selected for the dependency audit.
+    public enum Output: Sendable, Equatable, Argument.Codable {
+        case human
+        case json
 
-    public init?(argument: Swift.String) {
-      switch argument {
-      case "human": self = .human
-      case "json": self = .json
-      default: return nil
-      }
-    }
+        public init?(argument: Swift.String) {
+            switch argument {
+            case "human": self = .human
+            case "json": self = .json
+            default: return nil
+            }
+        }
 
-    public var argumentDescription: Swift.String {
-      switch self {
-      case .human: "human"
-      case .json: "json"
-      }
+        public var argumentDescription: Swift.String {
+            switch self {
+            case .human: "human"
+            case .json: "json"
+            }
+        }
     }
-  }
 }

@@ -19,75 +19,75 @@ import Testing
 @Suite
 struct `Institute Sync Displaced Tests` {
 
-  @Test
-  func `SSH and HTTPS forms of the same repository compare equal`() {
-    // The exact pair that defeated the first implementation.
-    #expect(
-      Institute.Sync.sameRepository(
-        "git@github.com:swift-foundations/swift-json.git",
-        "https://github.com/swift-foundations/swift-json.git"
-      )
-    )
-  }
+    @Test
+    func `SSH and HTTPS forms of the same repository compare equal`() {
+        // The exact pair that defeated the first implementation.
+        #expect(
+            Institute.Sync.sameRepository(
+                "git@github.com:swift-foundations/swift-json.git",
+                "https://github.com/swift-foundations/swift-json.git"
+            )
+        )
+    }
 
-  @Test
-  func `trailing .git and trailing slash do not affect identity`() {
-    #expect(
-      Institute.Sync.sameRepository(
-        "https://github.com/swift-foundations/swift-json",
-        "https://github.com/swift-foundations/swift-json.git"
-      )
-    )
-    #expect(
-      Institute.Sync.sameRepository(
-        "https://github.com/swift-foundations/swift-json/",
-        "https://github.com/swift-foundations/swift-json.git"
-      )
-    )
-  }
+    @Test
+    func `trailing .git and trailing slash do not affect identity`() {
+        #expect(
+            Institute.Sync.sameRepository(
+                "https://github.com/swift-foundations/swift-json",
+                "https://github.com/swift-foundations/swift-json.git"
+            )
+        )
+        #expect(
+            Institute.Sync.sameRepository(
+                "https://github.com/swift-foundations/swift-json/",
+                "https://github.com/swift-foundations/swift-json.git"
+            )
+        )
+    }
 
-  @Test
-  func `ssh scheme form compares equal to scp form`() {
-    #expect(
-      Institute.Sync.sameRepository(
-        "ssh://git@github.com/swift-foundations/swift-json.git",
-        "git@github.com:swift-foundations/swift-json.git"
-      )
-    )
-  }
+    @Test
+    func `ssh scheme form compares equal to scp form`() {
+        #expect(
+            Institute.Sync.sameRepository(
+                "ssh://git@github.com/swift-foundations/swift-json.git",
+                "git@github.com:swift-foundations/swift-json.git"
+            )
+        )
+    }
 
-  /// The negative control. Normalization that answers "yes" too readily is
-  /// worse than the `==` it replaced: this comparison gates a REFUSAL, so a
-  /// false positive blocks a legitimate clone.
-  @Test
-  func `different repositories, owners, and hosts compare unequal`() {
-    #expect(
-      !Institute.Sync.sameRepository(
-        "https://github.com/swift-foundations/swift-json.git",
-        "https://github.com/swift-foundations/swift-json-feed.git"
-      )
-    )
-    #expect(
-      !Institute.Sync.sameRepository(
-        "https://github.com/swift-foundations/swift-json.git",
-        "https://github.com/swift-primitives/swift-json.git"
-      )
-    )
-    #expect(
-      !Institute.Sync.sameRepository(
-        "https://github.com/swift-foundations/swift-json.git",
-        "https://gitlab.com/swift-foundations/swift-json.git"
-      )
-    )
-  }
+    /// The negative control. Normalization that answers "yes" too readily is
+    /// worse than the `==` it replaced: this comparison gates a REFUSAL, so a
+    /// false positive blocks a legitimate clone.
+    @Test
+    func `different repositories, owners, and hosts compare unequal`() {
+        #expect(
+            !Institute.Sync.sameRepository(
+                "https://github.com/swift-foundations/swift-json.git",
+                "https://github.com/swift-foundations/swift-json-feed.git"
+            )
+        )
+        #expect(
+            !Institute.Sync.sameRepository(
+                "https://github.com/swift-foundations/swift-json.git",
+                "https://github.com/swift-primitives/swift-json.git"
+            )
+        )
+        #expect(
+            !Institute.Sync.sameRepository(
+                "https://github.com/swift-foundations/swift-json.git",
+                "https://gitlab.com/swift-foundations/swift-json.git"
+            )
+        )
+    }
 
-  @Test
-  func `case differences in host and owner do not defeat identity`() {
-    #expect(
-      Institute.Sync.sameRepository(
-        "https://GitHub.com/Swift-Foundations/swift-json.git",
-        "https://github.com/swift-foundations/swift-json.git"
-      )
-    )
-  }
+    @Test
+    func `case differences in host and owner do not defeat identity`() {
+        #expect(
+            Institute.Sync.sameRepository(
+                "https://GitHub.com/Swift-Foundations/swift-json.git",
+                "https://github.com/swift-foundations/swift-json.git"
+            )
+        )
+    }
 }
