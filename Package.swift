@@ -164,6 +164,7 @@ let package = Package(
         .target(
             name: "Institute Lint",
             dependencies: [
+                "Build Coordinator",
                 "Institute Model",
                 "Institute Development",
                 .product(name: "Async Fanout", package: "swift-async"),
