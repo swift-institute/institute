@@ -1,4 +1,5 @@
 public import File_System
+private import Kernel
 
 extension Institute.Root {
     /// The active sibling-layout location of `repository`.
