@@ -212,7 +212,7 @@ extension Institute.Lint {
         if let source = try localAsset(asset) {
             return try Self.read(source)
         }
-        try run(
+        return try run(
             "curl",
             arguments: [
                 "--fail",
