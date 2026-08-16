@@ -254,25 +254,32 @@ extension Institute.Lint {
 }
 
 extension Institute.Lint {
-    /// The published asset names for the platform this build runs on.
+    /// The release asset names for the platform this build runs on.
     ///
     /// The Linux assets carry no suffix because CI's own container is
     /// the reference platform; every other platform's assets are
-    /// suffixed. An unsupported platform fails here rather than falling
-    /// back to the unsuffixed names, which would install a Linux binary
-    /// on macOS and fail later with something unrecognisable.
+    /// suffixed. Unsupported platforms retain distinct names so the
+    /// checksum and installation machinery remains testable there, but
+    /// installation from the canonical release is refused before any
+    /// download. They never fall back to the unsuffixed Linux names.
     public enum Asset {
         #if os(macOS) && arch(arm64)
             /// The platform token this build installs for.
             public static let platform = "macos-arm64"
             static let suffix = "-macos-arm64"
+            static let published = true
         #elseif os(Linux) && arch(x86_64)
             public static let platform = "linux-x86_64"
             static let suffix = ""
+            static let published = true
+        #elseif os(Windows) && arch(x86_64)
+            public static let platform = "windows-x86_64"
+            static let suffix = "-windows-x86_64"
+            static let published = false
         #else
-            #error(
-                "swift-linter publishes no asset for this platform; add it to the ci-binaries release before installing here"
-            )
+            public static let platform = "unsupported"
+            static let suffix = "-unsupported"
+            static let published = false
         #endif
 
         /// The dispatcher CLI asset.

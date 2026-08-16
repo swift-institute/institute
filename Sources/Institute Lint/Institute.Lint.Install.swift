@@ -17,6 +17,12 @@ extension Institute.Lint {
     /// republish installs beside the previous build rather than over it,
     /// and the previous build remains intact for a comparison.
     public func install() throws(Institute.Error) {
+        guard Asset.published || origin != Self.downloadBase else {
+            throw .configuration(
+                "swift-linter publishes no asset for \(Asset.platform); "
+                    + "add it to the ci-binaries release before installing here"
+            )
+        }
         try Institute.Root.preflight(tools, under: hierarchy)
         try Institute.Root.preflight(state, under: hierarchy)
         try create(tools)

@@ -94,6 +94,22 @@ struct `Institute Lint Install Tests` {
         }
     }
 
+    #if os(Windows)
+        /// The package remains buildable on Windows, while the canonical
+        /// release still refuses to masquerade its Linux binaries as native
+        /// tools. The refusal must happen before the first download.
+        @Test
+        func `the canonical release refuses an unpublished platform`() throws {
+            let origin = try Origin()
+            defer { origin.remove() }
+
+            let lint = Institute.Lint(hierarchy: origin.hierarchy)
+            #expect(throws: Institute.Error.self) {
+                try lint.install()
+            }
+        }
+    #endif
+
     /// The positive control. Without it, a passing negative control
     /// proves only that install fails — which it would also do if the
     /// origin were unreachable for some unrelated reason.
