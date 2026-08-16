@@ -2,6 +2,7 @@ public import File_System
 public import GitHub
 public import Institute_Model
 public import JSON
+private import Kernel
 
 #if canImport(Darwin)
     private import Darwin
