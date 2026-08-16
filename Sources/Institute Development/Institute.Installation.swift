@@ -2,6 +2,7 @@ public import Environment
 public import File_System
 public import Institute_Inventory
 public import Institute_Model
+private import Kernel
 
 extension Institute {
     /// The account-local installation of the Institute command.

@@ -17,6 +17,12 @@ extension Institute.Lint {
     /// republish installs beside the previous build rather than over it,
     /// and the previous build remains intact for a comparison.
     public func install() throws(Institute.Error) {
+        guard Asset.published || origin != Self.downloadBase else {
+            throw .configuration(
+                "swift-linter publishes no asset for \(Asset.platform); "
+                    + "add it to the ci-binaries release before installing here"
+            )
+        }
         try Institute.Root.preflight(tools, under: hierarchy)
         try Institute.Root.preflight(state, under: hierarchy)
         try create(tools)
@@ -174,6 +180,16 @@ extension Institute.Lint {
         _ asset: Swift.String,
         into directory: File.Directory
     ) throws(Institute.Error) {
+        let destination = directory[file: try Self.component(asset)]
+        if let source = try localAsset(asset) {
+            do throws(File.System.Copy.Error) {
+                try source.copy.to(destination)
+            } catch {
+                throw .filesystem("cannot copy local release asset \(source): \(error)")
+            }
+            return
+        }
+
         _ = try run(
             "curl",
             arguments: [
@@ -182,11 +198,11 @@ extension Institute.Lint {
                 "--show-error",
                 "--location",
                 "--retry", "2",
-                "--output", directory[file: try Self.component(asset)].description,
+                "--output", destination.description,
                 "\(origin)/\(asset)",
             ]
         )
-        guard directory[file: try Self.component(asset)].stat.isFile else {
+        guard destination.stat.isFile else {
             throw .process("\(asset) did not download to \(directory)")
         }
     }
@@ -199,7 +215,10 @@ extension Institute.Lint {
     /// release, and re-implementing the fetch beside it would be a second
     /// spelling of the same request.
     func fetch(_ asset: Swift.String) throws(Institute.Error) -> Swift.String {
-        try run(
+        if let source = try localAsset(asset) {
+            return try Self.read(source)
+        }
+        return try run(
             "curl",
             arguments: [
                 "--fail",
@@ -210,6 +229,23 @@ extension Institute.Lint {
                 "\(origin)/\(asset)",
             ]
         )
+    }
+
+    /// Resolves an injected local release origin without requiring a network
+    /// transfer tool. The production origin is HTTPS; `file://` exists so the
+    /// install and checksum gates can be driven against controlled release
+    /// bytes and so an operator can verify a staged release offline.
+    private func localAsset(_ asset: Swift.String) throws(Institute.Error) -> File? {
+        let prefix = "file://"
+        guard origin.hasPrefix(prefix) else { return nil }
+
+        let path: File.Path
+        do throws(File.Path.Error) {
+            path = try File.Path(Swift.String(origin.dropFirst(prefix.count)))
+        } catch {
+            throw .configuration("invalid local release origin \(origin): \(error)")
+        }
+        return File.Directory(path)[file: try Self.component(asset)]
     }
 
     /// The `SHA256SUMS` file as a name → digest map.
