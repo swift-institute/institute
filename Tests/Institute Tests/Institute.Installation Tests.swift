@@ -45,8 +45,19 @@ extension Institute.Installation.Test {
             let commandDirectory = home[directory: ".local"][directory: "bin"]
             environmentPath =
                 exposesCommand
-                ? "\(commandDirectory):/usr/bin:/bin"
-                : "/usr/bin:/bin"
+                ? [commandDirectory.description, "/usr/bin", "/bin"]
+                    .joined(separator: Self.pathSeparator)
+                : ["/usr/bin", "/bin"].joined(separator: Self.pathSeparator)
+        }
+
+        /// The platform's PATH list separator, matching what
+        /// `Process.Spawn.Executable.directories(in:)` splits on.
+        static var pathSeparator: Swift.String {
+            #if os(Windows)
+                ";"
+            #else
+                ":"
+            #endif
         }
 
         var installation: Institute.Installation {
@@ -99,10 +110,6 @@ extension Institute.Installation.Test.Unit {
                 == .executable
         )
         #expect(
-            try File.System.Link.Read.Target.target(of: installation.command.path)
-                == File.Path("../share/swift-institute/institute/bin/institute")
-        )
-        #expect(
             try File.System.Canonical.resolve(installation.command.path)
                 == installation.executable.path
         )
@@ -123,8 +130,8 @@ extension Institute.Installation.Test.Unit {
                 == "coordinator-version-two"
         )
         #expect(
-            try File.System.Link.Read.Target.target(of: installation.command.path)
-                == File.Path("../share/swift-institute/institute/bin/institute")
+            try File.System.Canonical.resolve(installation.command.path)
+                == File.System.Canonical.resolve(installation.executable.path)
         )
     }
 
@@ -142,7 +149,8 @@ extension Institute.Installation.Test.Unit {
         let installation = try Institute.Installation(
             source: fixture.source,
             home: home,
-            environmentPath: "\(commandDirectory):/usr/bin:/bin"
+            environmentPath: [commandDirectory.description, "/usr/bin", "/bin"]
+                .joined(separator: Institute.Installation.Test.Fixture.pathSeparator)
         )
 
         try installation.install()
@@ -191,8 +199,8 @@ extension Institute.Installation.Test.`Edge Case` {
             try installation.install()
         }
         #expect(
-            try File.System.Link.Read.Target.target(of: fixture.command.path)
-                == foreign.path
+            try File.System.Canonical.resolve(fixture.command.path)
+                == File.System.Canonical.resolve(foreign.path)
         )
         #expect(!fixture.root.stat.exists)
     }

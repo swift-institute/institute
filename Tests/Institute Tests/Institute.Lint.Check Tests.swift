@@ -81,9 +81,9 @@ extension Institute.Lint.Check.Test.Unit {
         let files = try Institute.Lint.Check.files(under: root)
         let names = Set(files.map(\.description))
 
-        #expect(names.contains("\(path)/Sources/Widget/Widget.swift"))
-        #expect(names.contains("\(path)/Tests/Widget Tests/WidgetTests.swift"))
-        #expect(!names.contains("\(path)/Sources/Widget/Notes.txt"))
+        #expect(names.contains(try Institute.Lint.Check.Test.expected(root, "Sources/Widget/Widget.swift")))
+        #expect(names.contains(try Institute.Lint.Check.Test.expected(root, "Tests/Widget Tests/WidgetTests.swift")))
+        #expect(!names.contains(try Institute.Lint.Check.Test.expected(root, "Sources/Widget/Notes.txt")))
     }
 }
 
@@ -108,10 +108,10 @@ extension Institute.Lint.Check.Test.`Edge Case` {
         let files = try Institute.Lint.Check.files(under: root)
         let names = Set(files.map(\.description))
 
-        #expect(!names.contains("\(path)/Sources/Widget/Widget.docc/Resources/Sample.swift"))
-        #expect(!names.contains("\(path)/Tests/Support/Fixture.swift"))
-        #expect(!names.contains("\(path)/Tests/Tutorial/Tutorial.swift"))
-        #expect(names.contains("\(path)/Tests/Widget Tests/Kept.swift"))
+        #expect(!names.contains(try Institute.Lint.Check.Test.expected(root, "Sources/Widget/Widget.docc/Resources/Sample.swift")))
+        #expect(!names.contains(try Institute.Lint.Check.Test.expected(root, "Tests/Support/Fixture.swift")))
+        #expect(!names.contains(try Institute.Lint.Check.Test.expected(root, "Tests/Tutorial/Tutorial.swift")))
+        #expect(names.contains(try Institute.Lint.Check.Test.expected(root, "Tests/Widget Tests/Kept.swift")))
     }
 
     @Test
@@ -134,7 +134,7 @@ extension Institute.Lint.Check.Test.`Edge Case` {
         let files = try Institute.Lint.Check.files(under: root)
         let names = Set(files.map(\.description))
 
-        #expect(names.contains("\(path)/Tests/Widget Tests/Support/Nested.swift"))
+        #expect(names.contains(try Institute.Lint.Check.Test.expected(root, "Tests/Widget Tests/Support/Nested.swift")))
     }
 
     @Test
@@ -156,6 +156,21 @@ extension Institute.Lint.Check.Test.`Edge Case` {
 }
 
 extension Institute.Lint.Check.Test {
+    /// The platform-native description of `relative` (slash-separated)
+    /// under `root`, for comparing against walked file descriptions.
+    static func expected(
+        _ root: File.Directory,
+        _ relative: Swift.String
+    ) throws -> Swift.String {
+        var parts = relative.split(separator: "/").map(Swift.String.init)
+        let file = parts.removeLast()
+        var directory = root
+        for part in parts {
+            directory = directory[directory: try File.Path.Component(part)]
+        }
+        return directory[file: try File.Path.Component(file)].description
+    }
+
     static func temporaryPackage() throws -> Swift.String {
         let base = FileManager.default.temporaryDirectory.appending(
             path: "institute-check-tests-\(UUID().uuidString)"

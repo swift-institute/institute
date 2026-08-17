@@ -1,3 +1,4 @@
+public import FIPS_180_4
 public import File_System
 public import Institute_Development
 public import Institute_Model
@@ -274,21 +275,27 @@ extension Institute.Lint {
 
     /// The SHA-256 of `file`, as lowercase hexadecimal.
     ///
-    /// Spawns the platform digest tool rather than hashing in-process:
-    /// the ecosystem publishes no SHA-2 implementation, and CI verifies
-    /// the same assets the same way with `sha256sum -c`. The comparison
-    /// itself stays here rather than being delegated to the tool's own
-    /// `-c` mode, so the failure is this capability's to report.
+    /// Computed in-process over the file's bytes through the Institute's
+    /// sole SHA-2 owner — `FIPS_180_4.SHA256`
+    /// (swift-standards/swift-fips-180-4). This replaced the historical
+    /// `shasum` spawn, which predated the ecosystem publishing a SHA-2
+    /// implementation and which no platform digest tool satisfies on
+    /// Windows. The comparison itself stays here rather than being
+    /// delegated to an external tool, so the failure is this
+    /// capability's to report.
     private func digestOf(_ file: File) throws(Institute.Error) -> Swift.String {
-        let output = try run("shasum", arguments: ["-a", "256", file.description])
-        guard
-            let field = output.split(separator: " ", omittingEmptySubsequences: true).first,
-            field.count == 64,
-            field.allSatisfy(\.isHexDigit)
-        else {
-            throw .process("cannot read a SHA-256 digest for \(file) out of: \(output)")
+        do throws(Either<File.System.Read.Full.Error, Never>) {
+            return try file.read.full { bytes in
+                var storage = [Byte]()
+                storage.reserveCapacity(bytes.count)
+                for index in bytes.indices {
+                    storage.append(bytes[index])
+                }
+                return FIPS_180_4.SHA256.digest(storage).hex
+            }
+        } catch {
+            throw .filesystem("cannot read \(file) for digesting: \(error)")
         }
-        return Swift.String(field).lowercased()
     }
 
     private func place(

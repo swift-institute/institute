@@ -231,18 +231,14 @@ extension Institute.Lint.Check {
     /// auto-fetched.
     static func resolve(_ tool: Swift.String) -> File? {
         guard let path = Environment.read("PATH") else { return nil }
-        #if os(Windows)
-            let separator: Swift.Character = ";"
-        #else
-            let separator: Swift.Character = ":"
-        #endif
         let component: File.Path.Component
         do throws(File.Path.Component.Error) {
             component = try File.Path.Component(Swift.String(tool))
         } catch {
             return nil
         }
-        for directory in path.split(separator: separator, omittingEmptySubsequences: true) {
+        for directory in Process.Spawn.Executable.directories(in: path)
+        where !directory.isEmpty {
             let directoryPath: File.Path
             do throws(File.Path.Error) {
                 directoryPath = try File.Path(Swift.String(directory))

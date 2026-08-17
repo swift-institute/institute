@@ -171,6 +171,7 @@ let package = Package(
                 "Institute Development",
                 .product(name: "Async Fanout", package: "swift-async"),
                 .product(name: "Environment", package: "swift-environment"),
+                .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "Git", package: "swift-git"),
                 .product(name: "JSON", package: "swift-json"),
@@ -254,6 +255,7 @@ let package = Package(
                     package: "swift-byte-primitives"
                 ),
                 .product(name: "Command", package: "swift-arguments"),
+                .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "Git", package: "swift-git"),
                 .product(name: "GitHub", package: "swift-github"),

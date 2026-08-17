@@ -39,12 +39,12 @@ extension Institute.Lint.Target.Test.Unit {
 
         #expect(
             roots.map(\.description) == [
-                "/fixture/package/Sources/Library",
-                "/fixture/package/Sources/Tool",
-                "/fixture/package/Tests/Library Tests",
-                "/fixture/package/Plugins/Generator",
-                "/fixture/package/Sources/Macros",
-                "/fixture/package/Sources/CLibrary",
+                package[directory: "Sources"][directory: "Library"].description,
+                package[directory: "Sources"][directory: "Tool"].description,
+                package[directory: "Tests"][directory: "Library Tests"].description,
+                package[directory: "Plugins"][directory: "Generator"].description,
+                package[directory: "Sources"][directory: "Macros"].description,
+                package[directory: "Sources"][directory: "CLibrary"].description,
             ]
         )
     }
@@ -69,7 +69,12 @@ extension Institute.Lint.Target.Test.Unit {
         )
         let paths = roots.map(\.description)
 
-        #expect(paths == ["/fixture/package/Code/Library", "/fixture/package/Tests/Declared"])
+        #expect(
+            paths == [
+                package[directory: "Code"][directory: "Library"].description,
+                package[directory: "Tests"][directory: "Declared"].description,
+            ]
+        )
         #expect(!paths.contains("/fixture/package/Scripts"))
         #expect(!paths.contains("/fixture/package/Experiments"))
         #expect(!paths.contains("/fixture/package/Research"))
@@ -78,6 +83,17 @@ extension Institute.Lint.Target.Test.Unit {
 }
 
 extension Institute.Lint.Target.Test.`Edge Case` {
+    /// A platform-native absolute path outside the package, so the
+    /// refusal fires on every platform (a bare `/outside` is not an
+    /// absolute path on Windows).
+    static var absoluteOutside: Swift.String {
+        #if os(Windows)
+            "C:\\outside"
+        #else
+            "/outside"
+        #endif
+    }
+
     @Test
     func `a package-root target makes the whole package declared scope`() throws {
         let package = File.Directory("/fixture/package")
@@ -102,7 +118,10 @@ extension Institute.Lint.Target.Test.`Edge Case` {
             at: package
         )
 
-        #expect(roots.map(\.description) == ["/fixture/package/Sources/Shared"])
+        #expect(
+            roots.map(\.description)
+                == [package[directory: "Sources"][directory: "Shared"].description]
+        )
     }
 
     @Test
@@ -111,7 +130,13 @@ extension Institute.Lint.Target.Test.`Edge Case` {
 
         #expect(throws: Institute.Error.self) {
             try Institute.Lint.Target.roots(
-                [.init(name: .init(_unchecked: "Absolute"), kind: .regular, path: "/outside")],
+                [
+                    .init(
+                        name: .init(_unchecked: "Absolute"),
+                        kind: .regular,
+                        path: Self.absoluteOutside
+                    )
+                ],
                 at: package
             )
         }

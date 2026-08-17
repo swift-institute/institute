@@ -110,6 +110,26 @@ extension Institute.Root {
                     "materialization prefix resolves outside \(base): \(prefix) -> \(canonical)"
                 )
             }
+            // A real directory resolves to its parent's resolution plus
+            // its own name. Anything else is a link form — on platforms
+            // whose metadata misreports reparse points as directories
+            // (observed on Windows), the stat-kind guard above cannot
+            // see it, so the resolution identity is the guard of record.
+            if let parent = prefix.path.parent,
+                let name = Array(prefix.path.components).last
+            {
+                let resolvedParent: File.Path
+                do throws(File.System.Canonical.Error) {
+                    resolvedParent = try File.System.Canonical.resolve(parent)
+                } catch {
+                    throw .filesystem(
+                        "materialization prefix changed during inspection \(prefix): \(error)"
+                    )
+                }
+                guard canonical == resolvedParent / name else {
+                    throw .filesystem("materialization prefix is a symbolic link: \(prefix)")
+                }
+            }
         }
     }
 
