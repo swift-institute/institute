@@ -137,9 +137,11 @@ let package = Package(
                 "Institute Model",
                 "Institute Inventory",
                 .product(name: "Async Fanout", package: "swift-async"),
+                .product(name: "Byte Primitives", package: "swift-byte-primitives"),
                 .product(name: "Command", package: "swift-arguments"),
                 .product(name: "Environment", package: "swift-environment"),
                 .product(name: "File System", package: "swift-file-system"),
+                .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "Git", package: "swift-git"),
                 .product(name: "JSON", package: "swift-json"),
                 // TEMPORARY (institute#10): exec-replace has no cross-platform
