@@ -3,10 +3,10 @@ public import Institute_Inventory
 public import Institute_Model
 public import JSON
 
-extension Institute.Materialization {
-  /// The set of local materialisations registered on this machine,
+extension Institute.Hierarchy {
+  /// The set of local hierarchies registered on this machine,
   /// persisted at the checkout root under
-  /// `.workspace/materializations.json` — a sibling of the composition
+  /// `.workspace/hierarchies.json` — a sibling of the composition
   /// ledger at `.workspace/compositions.json`, following its persistence
   /// shape exactly: a schema ``version`` refused on mismatch, written
   /// pretty-printed with sorted keys and a trailing newline, and an
@@ -17,16 +17,16 @@ extension Institute.Materialization {
   /// search, no checkout deletion, and no Git worktree operation of any
   /// kind — it owns exactly the registry record.
   public struct Registry: Swift.Equatable, Swift.Sendable, JSON.Serializable {
-    /// The registered materialisations, in registration order.
-    public let materializations: [Institute.Materialization]
+    /// The registered hierarchies, in registration order.
+    public let hierarchies: [Institute.Hierarchy]
 
-    public init(materializations: [Institute.Materialization] = []) {
-      self.materializations = materializations
+    public init(hierarchies: [Institute.Hierarchy] = []) {
+      self.hierarchies = hierarchies
     }
   }
 }
 
-extension Institute.Materialization.Registry {
+extension Institute.Hierarchy.Registry {
   /// The schema version written to the registry. Bumped only on a
   /// breaking shape change; a mismatch is refused during decoding.
   internal static let version: Swift.Int = 1
@@ -34,7 +34,7 @@ extension Institute.Materialization.Registry {
   public static func serialize(_ value: Self) -> JSON {
     [
       "version": Self.version.json,
-      "materializations": value.materializations.json,
+      "hierarchies": value.hierarchies.json,
     ]
   }
 
@@ -46,28 +46,28 @@ extension Institute.Materialization.Registry {
     let number = try Swift.Int(json: version)
     guard number == Self.version else {
       throw .typeMismatch(
-        expected: "materialization registry version \(Self.version)",
+        expected: "hierarchy registry version \(Self.version)",
         got: Swift.String(number)
       )
     }
-    guard let materializations = object["materializations"] else {
-      throw .missingKey("materializations")
+    guard let hierarchies = object["hierarchies"] else {
+      throw .missingKey("hierarchies")
     }
-    return try Self(materializations: [Institute.Materialization](json: materializations))
+    return try Self(hierarchies: [Institute.Hierarchy](json: hierarchies))
   }
 }
 
-extension Institute.Materialization.Registry {
+extension Institute.Hierarchy.Registry {
   private static func file(at checkout: File.Directory) -> File {
-    checkout[directory: ".workspace"][file: "materializations.json"]
+    checkout[directory: ".workspace"][file: "hierarchies.json"]
   }
 
   /// Loads the registry at `checkout`, or the empty registry when the
   /// file is absent — the ordinary state of a workspace with no
-  /// registered materialisation.
+  /// registered hierarchy.
   public static func load(
     at checkout: File.Directory
-  ) throws(Institute.Materialization.Registry.Error) -> Self {
+  ) throws(Institute.Hierarchy.Registry.Error) -> Self {
     let file = Self.file(at: checkout)
     guard file.stat.exists else { return .init() }
 
@@ -82,14 +82,14 @@ extension Institute.Materialization.Registry {
         return storage
       }
     } catch {
-      throw .workspace(.filesystem("cannot read the materialization registry \(file): \(error)"))
+      throw .workspace(.filesystem("cannot read the hierarchy registry \(file): \(error)"))
     }
 
     do throws(JSON.Error) {
       return try .init(jsonString: Swift.String(decoding: bytes, as: Swift.UTF8.self))
     } catch {
       throw .workspace(
-        .filesystem("cannot decode the materialization registry \(file): \(error)")
+        .filesystem("cannot decode the hierarchy registry \(file): \(error)")
       )
     }
   }
@@ -98,7 +98,7 @@ extension Institute.Materialization.Registry {
   /// needed.
   public func save(
     at checkout: File.Directory
-  ) throws(Institute.Materialization.Registry.Error) {
+  ) throws(Institute.Hierarchy.Registry.Error) {
     let container = checkout[directory: ".workspace"]
     do throws(File.System.Create.Directory.Error) {
       try container.create.recursive()
@@ -106,18 +106,18 @@ extension Institute.Materialization.Registry {
       throw .workspace(.filesystem("cannot create \(container): \(error)"))
     }
 
-    let file = Institute.Materialization.Registry.file(at: checkout)
+    let file = Institute.Hierarchy.Registry.file(at: checkout)
     do throws(File.System.Write.Atomic.Error) {
       try file.write.atomic(jsonString(pretty: true, sortKeys: true) + "\n")
     } catch {
       throw .workspace(
-        .filesystem("cannot write the materialization registry \(file): \(error)")
+        .filesystem("cannot write the hierarchy registry \(file): \(error)")
       )
     }
   }
 }
 
-extension Institute.Materialization.Registry {
+extension Institute.Hierarchy.Registry {
   /// Registers `id` at `locator` with `ownership`.
   ///
   /// Atomic: loads the current registry, validates, and writes the
@@ -127,7 +127,7 @@ extension Institute.Materialization.Registry {
   ///
   /// Refuses a duplicate id and refuses a locator that canonically
   /// resolves to the same physical directory as an already-registered
-  /// materialisation — canonicalized via ``File/System/Canonical/
+  /// hierarchy — canonicalized via ``File/System/Canonical/
   /// resolve(_:)`` so two different literal paths (a symlink alias, a
   /// relative spelling) naming the same directory still collide. An
   /// already-registered locator that no longer resolves at all cannot
@@ -135,14 +135,14 @@ extension Institute.Materialization.Registry {
   /// ``status(of:at:)``, not refused here.
   @discardableResult
   public static func register(
-    id: Institute.Materialization.ID,
+    id: Institute.Hierarchy.ID,
     locator: File.Directory,
-    ownership: Institute.Materialization.Ownership,
+    ownership: Institute.Hierarchy.Ownership,
     at checkout: File.Directory
-  ) throws(Institute.Materialization.Registry.Error) -> Self {
+  ) throws(Institute.Hierarchy.Registry.Error) -> Self {
     let registry = try Self.load(at: checkout)
 
-    guard !registry.materializations.contains(where: { $0.id == id }) else {
+    guard !registry.hierarchies.contains(where: { $0.id == id }) else {
       throw .duplicate(id)
     }
 
@@ -151,11 +151,11 @@ extension Institute.Materialization.Registry {
       canonical = try File.System.Canonical.resolve(locator.path)
     } catch {
       throw .workspace(
-        .filesystem("cannot resolve materialization root \(locator): \(error)")
+        .filesystem("cannot resolve hierarchy root \(locator): \(error)")
       )
     }
 
-    for existing in registry.materializations {
+    for existing in registry.hierarchies {
       let existingCanonical: File.Path
       do throws(File.System.Canonical.Error) {
         existingCanonical = try File.System.Canonical.resolve(existing.locator.path)
@@ -168,8 +168,8 @@ extension Institute.Materialization.Registry {
     }
 
     let updated = Self(
-      materializations: registry.materializations + [
-        Institute.Materialization(id: id, locator: locator, ownership: ownership)
+      hierarchies: registry.hierarchies + [
+        Institute.Hierarchy(id: id, locator: locator, ownership: ownership)
       ]
     )
     try updated.save(at: checkout)
@@ -182,21 +182,21 @@ extension Institute.Materialization.Registry {
   /// locator whose root no longer exists is still returned here. Use
   /// ``status(of:at:)`` for the fail-closed physical check.
   public static func resolve(
-    _ id: Institute.Materialization.ID,
+    _ id: Institute.Hierarchy.ID,
     at checkout: File.Directory
-  ) throws(Institute.Materialization.Registry.Error) -> File.Directory {
+  ) throws(Institute.Hierarchy.Registry.Error) -> File.Directory {
     let registry = try Self.load(at: checkout)
-    guard let found = registry.materializations.first(where: { $0.id == id }) else {
+    guard let found = registry.hierarchies.first(where: { $0.id == id }) else {
       throw .notFound(id)
     }
     return found.locator
   }
 
-  /// Every registered materialisation, in registration order.
+  /// Every registered hierarchy, in registration order.
   public static func list(
     at checkout: File.Directory
-  ) throws(Institute.Materialization.Registry.Error) -> [Institute.Materialization] {
-    try Self.load(at: checkout).materializations
+  ) throws(Institute.Hierarchy.Registry.Error) -> [Institute.Hierarchy] {
+    try Self.load(at: checkout).hierarchies
   }
 
   /// `id`'s current physical root, fail-closed.
@@ -206,9 +206,9 @@ extension Institute.Materialization.Registry {
   /// directory, is reported as ``Error/missing(_:)`` — never silently
   /// treated as valid.
   public static func status(
-    of id: Institute.Materialization.ID,
+    of id: Institute.Hierarchy.ID,
     at checkout: File.Directory
-  ) throws(Institute.Materialization.Registry.Error) -> File.Directory {
+  ) throws(Institute.Hierarchy.Registry.Error) -> File.Directory {
     let locator = try Self.resolve(id, at: checkout)
 
     let canonical: File.Path
@@ -233,22 +233,22 @@ extension Institute.Materialization.Registry {
 
   /// Removes `id`'s registry record.
   ///
-  /// This never touches the filesystem at the materialisation's root —
-  /// for either ``Institute/Materialization/Ownership`` case, the
+  /// This never touches the filesystem at the hierarchy's root —
+  /// for either ``Institute/Hierarchy/Ownership`` case, the
   /// registry record is the only thing this ever deletes. No checkout
   /// deletion, and no Git worktree operation, happens here or anywhere in
   /// this type.
   @discardableResult
   public static func forget(
-    _ id: Institute.Materialization.ID,
+    _ id: Institute.Hierarchy.ID,
     at checkout: File.Directory
-  ) throws(Institute.Materialization.Registry.Error) -> Self {
+  ) throws(Institute.Hierarchy.Registry.Error) -> Self {
     let registry = try Self.load(at: checkout)
-    guard registry.materializations.contains(where: { $0.id == id }) else {
+    guard registry.hierarchies.contains(where: { $0.id == id }) else {
       throw .notFound(id)
     }
     let updated = Self(
-      materializations: registry.materializations.filter { $0.id != id }
+      hierarchies: registry.hierarchies.filter { $0.id != id }
     )
     try updated.save(at: checkout)
     return updated

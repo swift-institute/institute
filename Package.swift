@@ -96,6 +96,7 @@ let package = Package(
                 .product(name: "Git", package: "swift-git"),
                 .product(name: "GitHub", package: "swift-github"),
                 .product(name: "JSON", package: "swift-json"),
+                .product(name: "Kernel", package: "swift-kernel"),
                 .product(name: "RFC 3986", package: "swift-rfc-3986"),
             ]
         ),
@@ -108,6 +109,7 @@ let package = Package(
                 .product(name: "GitHub", package: "swift-github"),
                 .product(name: "GitHub HTTP", package: "swift-github-http"),
                 .product(name: "JSON", package: "swift-json"),
+                .product(name: "Kernel", package: "swift-kernel"),
                 .product(name: "Process", package: "swift-process"),
             ]
         ),
@@ -164,10 +166,12 @@ let package = Package(
         .target(
             name: "Institute Lint",
             dependencies: [
+                "Build Coordinator",
                 "Institute Model",
                 "Institute Development",
                 .product(name: "Async Fanout", package: "swift-async"),
                 .product(name: "Environment", package: "swift-environment"),
+                .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "Git", package: "swift-git"),
                 .product(name: "JSON", package: "swift-json"),
@@ -251,6 +255,7 @@ let package = Package(
                     package: "swift-byte-primitives"
                 ),
                 .product(name: "Command", package: "swift-arguments"),
+                .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "Git", package: "swift-git"),
                 .product(name: "GitHub", package: "swift-github"),

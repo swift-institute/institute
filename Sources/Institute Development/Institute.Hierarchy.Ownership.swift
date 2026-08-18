@@ -1,8 +1,8 @@
 public import Institute_Model
 public import JSON
 
-extension Institute.Materialization {
-  /// Whether Institute may ever mutate a materialisation's filesystem
+extension Institute.Hierarchy {
+  /// Whether Institute may ever mutate a hierarchy's filesystem
   /// content.
   ///
   /// This type records a permission only; nothing in this file — or in
@@ -18,7 +18,7 @@ extension Institute.Materialization {
   }
 }
 
-extension Institute.Materialization.Ownership: JSON.Serializable {
+extension Institute.Hierarchy.Ownership: JSON.Serializable {
   public static func serialize(_ value: Self) -> JSON {
     value.rawValue.json
   }

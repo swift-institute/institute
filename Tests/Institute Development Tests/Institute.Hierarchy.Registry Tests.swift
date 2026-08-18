@@ -6,7 +6,7 @@ import Testing
 @testable import Institute_Development
 @testable import Institute_Model
 
-extension Institute.Materialization.Registry {
+extension Institute.Hierarchy.Registry {
   @Suite
   struct Test {
     @Suite struct Unit {}
@@ -14,32 +14,32 @@ extension Institute.Materialization.Registry {
   }
 }
 
-extension Institute.Materialization.Registry.Test.Unit {
+extension Institute.Hierarchy.Registry.Test.Unit {
   @Test
   func `a registry round-trips through JSON`() throws {
-    let materialization = Institute.Materialization(
-      id: try Institute.Materialization.ID("swift-color"),
+    let hierarchy = Institute.Hierarchy(
+      id: try Institute.Hierarchy.ID("swift-color"),
       locator: File.Directory(try File.Path("/tmp/swift-color")),
       ownership: .managed
     )
-    let registry = Institute.Materialization.Registry(materializations: [materialization])
-    let decoded = try Institute.Materialization.Registry(jsonString: registry.jsonString())
+    let registry = Institute.Hierarchy.Registry(hierarchies: [hierarchy])
+    let decoded = try Institute.Hierarchy.Registry(jsonString: registry.jsonString())
     #expect(decoded == registry)
   }
 
   @Test
   func `serialization is deterministic regardless of insertion order in a re-decoded value`() throws {
-    let a = Institute.Materialization(
-      id: try Institute.Materialization.ID("swift-color"),
+    let a = Institute.Hierarchy(
+      id: try Institute.Hierarchy.ID("swift-color"),
       locator: File.Directory(try File.Path("/tmp/a")),
       ownership: .managed
     )
-    let b = Institute.Materialization(
-      id: try Institute.Materialization.ID("swift-shape"),
+    let b = Institute.Hierarchy(
+      id: try Institute.Hierarchy.ID("swift-shape"),
       locator: File.Directory(try File.Path("/tmp/b")),
       ownership: .adopted
     )
-    let registry = Institute.Materialization.Registry(materializations: [a, b])
+    let registry = Institute.Hierarchy.Registry(hierarchies: [a, b])
     let first = registry.jsonString(pretty: true, sortKeys: true)
     let second = registry.jsonString(pretty: true, sortKeys: true)
     #expect(first == second)
@@ -49,14 +49,14 @@ extension Institute.Materialization.Registry.Test.Unit {
   @Test
   func `deserialize rejects a mismatched version`() {
     #expect(throws: JSON.Error.self) {
-      _ = try Institute.Materialization.Registry(
-        jsonString: "{\"version\": 999, \"materializations\": []}"
+      _ = try Institute.Hierarchy.Registry(
+        jsonString: "{\"version\": 999, \"hierarchies\": []}"
       )
     }
   }
 }
 
-extension Institute.Materialization.Registry.Test.Integration {
+extension Institute.Hierarchy.Registry.Test.Integration {
   private static func temporaryCheckout() throws -> File.Directory {
     let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
     try FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
@@ -68,7 +68,7 @@ extension Institute.Materialization.Registry.Test.Integration {
     let checkout = try Self.temporaryCheckout()
     defer { try? FileManager.default.removeItem(atPath: checkout.path.description) }
 
-    #expect(try Institute.Materialization.Registry.list(at: checkout).isEmpty)
+    #expect(try Institute.Hierarchy.Registry.list(at: checkout).isEmpty)
   }
 
   @Test
@@ -82,20 +82,20 @@ extension Institute.Materialization.Registry.Test.Integration {
       withIntermediateDirectories: true
     )
 
-    let id = try Institute.Materialization.ID("swift-color")
-    try Institute.Materialization.Registry.register(
+    let id = try Institute.Hierarchy.ID("swift-color")
+    try Institute.Hierarchy.Registry.register(
       id: id,
       locator: root,
       ownership: .managed,
       at: checkout
     )
 
-    let ledgerPath = checkout.path.description + "/.workspace/materializations.json"
+    let ledgerPath = checkout.path.description + "/.workspace/hierarchies.json"
     let raw = try Swift.String(contentsOfFile: ledgerPath, encoding: .utf8)
     #expect(raw.hasSuffix("\n"))
     #expect(!raw.hasSuffix("\n\n"))
 
-    let listed = try Institute.Materialization.Registry.list(at: checkout)
+    let listed = try Institute.Hierarchy.Registry.list(at: checkout)
     #expect(listed.map(\.id) == [id])
   }
 
@@ -106,17 +106,17 @@ extension Institute.Materialization.Registry.Test.Integration {
 
     let first = try Self.directory(under: checkout, name: "first")
     let second = try Self.directory(under: checkout, name: "second")
-    let id = try Institute.Materialization.ID("swift-color")
+    let id = try Institute.Hierarchy.ID("swift-color")
 
-    try Institute.Materialization.Registry.register(
+    try Institute.Hierarchy.Registry.register(
       id: id,
       locator: first,
       ownership: .managed,
       at: checkout
     )
 
-    #expect(throws: Institute.Materialization.Registry.Error.self) {
-      try Institute.Materialization.Registry.register(
+    #expect(throws: Institute.Hierarchy.Registry.Error.self) {
+      try Institute.Hierarchy.Registry.register(
         id: id,
         locator: second,
         ownership: .managed,
@@ -138,16 +138,16 @@ extension Institute.Materialization.Registry.Test.Integration {
     )
     let alias = try File.Directory(validating: aliasPath)
 
-    try Institute.Materialization.Registry.register(
-      id: try Institute.Materialization.ID("one"),
+    try Institute.Hierarchy.Registry.register(
+      id: try Institute.Hierarchy.ID("one"),
       locator: real,
       ownership: .managed,
       at: checkout
     )
 
-    #expect(throws: Institute.Materialization.Registry.Error.self) {
-      try Institute.Materialization.Registry.register(
-        id: try Institute.Materialization.ID("two"),
+    #expect(throws: Institute.Hierarchy.Registry.Error.self) {
+      try Institute.Hierarchy.Registry.register(
+        id: try Institute.Hierarchy.ID("two"),
         locator: alias,
         ownership: .managed,
         at: checkout
@@ -161,8 +161,8 @@ extension Institute.Materialization.Registry.Test.Integration {
     defer { try? FileManager.default.removeItem(atPath: checkout.path.description) }
 
     let root = try Self.directory(under: checkout, name: "gone")
-    let id = try Institute.Materialization.ID("swift-color")
-    try Institute.Materialization.Registry.register(
+    let id = try Institute.Hierarchy.ID("swift-color")
+    try Institute.Hierarchy.Registry.register(
       id: id,
       locator: root,
       ownership: .managed,
@@ -171,13 +171,13 @@ extension Institute.Materialization.Registry.Test.Integration {
 
     try FileManager.default.removeItem(atPath: root.path.description)
 
-    #expect(throws: Institute.Materialization.Registry.Error.self) {
-      _ = try Institute.Materialization.Registry.status(of: id, at: checkout)
+    #expect(throws: Institute.Hierarchy.Registry.Error.self) {
+      _ = try Institute.Hierarchy.Registry.status(of: id, at: checkout)
     }
 
     // The raw registry record is unaffected: `resolve` still reports the
     // locator exactly as registered, it just does not vouch for it.
-    let resolved = try Institute.Materialization.Registry.resolve(id, at: checkout)
+    let resolved = try Institute.Hierarchy.Registry.resolve(id, at: checkout)
     #expect(resolved == root)
   }
 
@@ -186,23 +186,23 @@ extension Institute.Materialization.Registry.Test.Integration {
     let checkout = try Self.temporaryCheckout()
     defer { try? FileManager.default.removeItem(atPath: checkout.path.description) }
 
-    for ownership: Institute.Materialization.Ownership in [.managed, .adopted] {
+    for ownership: Institute.Hierarchy.Ownership in [.managed, .adopted] {
       let root = try Self.directory(under: checkout, name: "root-\(ownership.rawValue)")
       let marker = root.path.description + "/marker.txt"
       try "content".write(toFile: marker, atomically: true, encoding: .utf8)
 
-      let id = try Institute.Materialization.ID("materialization-\(ownership.rawValue)")
-      try Institute.Materialization.Registry.register(
+      let id = try Institute.Hierarchy.ID("hierarchy-\(ownership.rawValue)")
+      try Institute.Hierarchy.Registry.register(
         id: id,
         locator: root,
         ownership: ownership,
         at: checkout
       )
 
-      try Institute.Materialization.Registry.forget(id, at: checkout)
+      try Institute.Hierarchy.Registry.forget(id, at: checkout)
 
-      #expect(throws: Institute.Materialization.Registry.Error.self) {
-        _ = try Institute.Materialization.Registry.resolve(id, at: checkout)
+      #expect(throws: Institute.Hierarchy.Registry.Error.self) {
+        _ = try Institute.Hierarchy.Registry.resolve(id, at: checkout)
       }
       // The root and its content were never touched by `forget`.
       #expect(FileManager.default.fileExists(atPath: root.path.description))
@@ -215,9 +215,9 @@ extension Institute.Materialization.Registry.Test.Integration {
     let checkout = try Self.temporaryCheckout()
     defer { try? FileManager.default.removeItem(atPath: checkout.path.description) }
 
-    #expect(throws: Institute.Materialization.Registry.Error.self) {
-      try Institute.Materialization.Registry.forget(
-        try Institute.Materialization.ID("never-registered"),
+    #expect(throws: Institute.Hierarchy.Registry.Error.self) {
+      try Institute.Hierarchy.Registry.forget(
+        try Institute.Hierarchy.ID("never-registered"),
         at: checkout
       )
     }
@@ -230,31 +230,31 @@ extension Institute.Materialization.Registry.Test.Integration {
 
     let before = try Self.directory(under: checkout, name: "before")
     let after = try Self.directory(under: checkout, name: "after")
-    let id = try Institute.Materialization.ID("swift-color")
+    let id = try Institute.Hierarchy.ID("swift-color")
 
-    try Institute.Materialization.Registry.register(
+    try Institute.Hierarchy.Registry.register(
       id: id,
       locator: before,
       ownership: .managed,
       at: checkout
     )
-    #expect(try Institute.Materialization.Registry.resolve(id, at: checkout) == before)
+    #expect(try Institute.Hierarchy.Registry.resolve(id, at: checkout) == before)
 
     // The locator changes underneath the same id — the id itself is
     // never derived from, or tied to, any particular physical path.
-    try Institute.Materialization.Registry.forget(id, at: checkout)
-    try Institute.Materialization.Registry.register(
+    try Institute.Hierarchy.Registry.forget(id, at: checkout)
+    try Institute.Hierarchy.Registry.register(
       id: id,
       locator: after,
       ownership: .managed,
       at: checkout
     )
 
-    let resolved = try Institute.Materialization.Registry.resolve(id, at: checkout)
+    let resolved = try Institute.Hierarchy.Registry.resolve(id, at: checkout)
     #expect(resolved == after)
     #expect(resolved != before)
 
-    let listed = try Institute.Materialization.Registry.list(at: checkout)
+    let listed = try Institute.Hierarchy.Registry.list(at: checkout)
     #expect(listed.map(\.id) == [id])
   }
 
