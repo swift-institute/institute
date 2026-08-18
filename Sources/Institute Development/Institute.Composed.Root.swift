@@ -28,16 +28,24 @@ extension Institute.Composed.Root {
     /// The composed root's one synthetic target and package name.
     public static let targetName: File.Path.Component = "CoherenceComposedRoot"
 
+    public static func directory(in workspace: Institute.Composition.Workspace) -> File.Directory {
+        workspace.generatedRoot
+    }
+
+    /// The legacy entry point, retained as a compatibility wrapper over
+    /// the checkout-shaped ``Institute/Composition/Workspace`` and
+    /// owning no behaviour of its own.
+    @available(*, deprecated, message: "use directory(in:) with a Composition.Workspace")
     public static func directory(at checkout: File.Directory) -> File.Directory {
-        checkout[directory: directoryName]
+        directory(in: .checkout(checkout))
     }
 
-    static func manifestFile(at checkout: File.Directory) -> File {
-        directory(at: checkout)[file: "Package.swift"]
+    static func manifestFile(in workspace: Institute.Composition.Workspace) -> File {
+        directory(in: workspace)[file: "Package.swift"]
     }
 
-    static func sourceFile(at checkout: File.Directory) -> File {
-        directory(at: checkout)[directory: "Sources"][directory: targetName][file: "Root.swift"]
+    static func sourceFile(in workspace: Institute.Composition.Workspace) -> File {
+        directory(in: workspace)[directory: "Sources"][directory: targetName][file: "Root.swift"]
     }
 
     /// The repositories the composed root actually declares a
@@ -100,6 +108,45 @@ extension Institute.Composed.Root {
         return lines.joined(separator: "\n")
     }
 
+    /// `manifests` with every workspace-relative reference recomputed
+    /// for `workspace`'s generated root.
+    ///
+    /// A reference is stored as `../<layout reference>`, correct exactly
+    /// when the generated root sits directly under the checkout the
+    /// reference was computed against. For the checkout-shaped
+    /// workspace that is already true and every manifest passes through
+    /// unchanged, byte for byte. For any other workspace each reference
+    /// is resolved against the workspace ``Institute/Composition/Workspace/anchor``
+    /// and re-expressed for the generated root — as a relative path when
+    /// the source sits below the generated root (it ordinarily does
+    /// not), and otherwise as the source's absolute path, which
+    /// `.package(path:)` accepts. Deterministic relative rendering
+    /// across roots is the build plan's task, not this one's.
+    static func rebased(
+        _ manifests: [Institute.Composed.Manifest],
+        in workspace: Institute.Composition.Workspace
+    ) -> [Institute.Composed.Manifest] {
+        guard workspace.container != workspace.anchor else { return manifests }
+        let root = directory(in: workspace)
+        return manifests.map { manifest in
+            var reference = manifest.reference
+            if reference.hasPrefix("../") {
+                let remainder = Swift.String(reference.dropFirst(3))
+                if let path = try? File.Path(remainder) {
+                    let absolute = workspace.anchor.path.appending(path)
+                    reference = absolute.relative(to: root.path)?.description
+                        ?? absolute.description
+                }
+            }
+            return .init(
+                reference: reference,
+                package: manifest.package,
+                libraryProducts: manifest.libraryProducts,
+                buildableTargetCount: manifest.buildableTargetCount
+            )
+        }
+    }
+
     /// The synthetic target's one source file. Its contents never depend
     /// on the selection — the composed graph is compiled through the
     /// manifest's declared product dependencies, not through anything
@@ -118,24 +165,36 @@ extension Institute.Composed.Root {
     public static func write(
         _ manifests: [Institute.Composed.Manifest],
         swift: Swift.String,
-        at checkout: File.Directory
+        in workspace: Institute.Composition.Workspace
     ) throws(Institute.Error) {
-        let root = directory(at: checkout)
+        let root = directory(in: workspace)
+        let rebased = rebased(manifests, in: workspace)
         do throws(File.System.Create.Directory.Error) {
             try root[directory: "Sources"][directory: targetName].create.recursive()
         } catch {
             throw .filesystem("cannot create \(root): \(error)")
         }
         do throws(File.System.Write.Atomic.Error) {
-            try manifestFile(at: checkout).write.atomic(render(manifests, swift: swift))
+            try manifestFile(in: workspace).write.atomic(render(rebased, swift: swift))
         } catch {
-            throw .filesystem("cannot write \(manifestFile(at: checkout)): \(error)")
+            throw .filesystem("cannot write \(manifestFile(in: workspace)): \(error)")
         }
         do throws(File.System.Write.Atomic.Error) {
-            try sourceFile(at: checkout).write.atomic(source)
+            try sourceFile(in: workspace).write.atomic(source)
         } catch {
-            throw .filesystem("cannot write \(sourceFile(at: checkout)): \(error)")
+            throw .filesystem("cannot write \(sourceFile(in: workspace)): \(error)")
         }
+    }
+
+    /// The legacy entry point, retained as a compatibility wrapper over
+    /// the checkout-shaped workspace and owning no behaviour of its own.
+    @available(*, deprecated, message: "use write(_:swift:in:) with a Composition.Workspace")
+    public static func write(
+        _ manifests: [Institute.Composed.Manifest],
+        swift: Swift.String,
+        at checkout: File.Directory
+    ) throws(Institute.Error) {
+        try write(manifests, swift: swift, in: .checkout(checkout))
     }
 }
 
@@ -145,7 +204,7 @@ extension Institute.Composed.Root {
     /// — the SwiftPM analogue of
     /// ``Xcode/Build/run(fresh:arguments:capturingDiagnostics:)``.
     public static func build(
-        at checkout: File.Directory,
+        in workspace: Institute.Composition.Workspace,
         fresh: Swift.Bool,
         arguments: [Swift.String],
         capturingDiagnostics: Swift.Bool,
@@ -154,7 +213,7 @@ extension Institute.Composed.Root {
         do throws(Build_Coordinator.Build.Error) {
             return try coordinator.run(
                 .build,
-                at: directory(at: checkout).description,
+                at: directory(in: workspace).description,
                 fresh: fresh,
                 arguments: arguments,
                 capturingDiagnostics: capturingDiagnostics
@@ -162,5 +221,24 @@ extension Institute.Composed.Root {
         } catch {
             throw .process("\(error)")
         }
+    }
+
+    /// The legacy entry point, retained as a compatibility wrapper over
+    /// the checkout-shaped workspace and owning no behaviour of its own.
+    @available(*, deprecated, message: "use build(in:fresh:arguments:capturingDiagnostics:coordinator:)")
+    public static func build(
+        at checkout: File.Directory,
+        fresh: Swift.Bool,
+        arguments: [Swift.String],
+        capturingDiagnostics: Swift.Bool,
+        coordinator: Build_Coordinator.Build.Coordinator = .init()
+    ) throws(Institute.Error) -> Build_Coordinator.Build.Coordinator.Result {
+        try build(
+            in: .checkout(checkout),
+            fresh: fresh,
+            arguments: arguments,
+            capturingDiagnostics: capturingDiagnostics,
+            coordinator: coordinator
+        )
     }
 }
