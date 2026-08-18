@@ -3,6 +3,7 @@ public import File_System
 public import Institute_Inventory
 public import Institute_Model
 private import Kernel
+private import Process
 
 extension Institute {
     /// The account-local installation of the Institute command.
@@ -118,14 +119,11 @@ extension Institute.Installation {
         try placeExecutable()
 
         if try metadata(at: command.path) == nil {
-            do throws(File.System.Link.Symbolic.Error) {
-                try File.System.Link.Symbolic.create(
-                    at: command.path,
-                    pointingTo: Self.commandTarget
-                )
-            } catch {
-                throw .filesystem("cannot create Institute command link \(command): \(error)")
-            }
+            try Institute.Materialization.install(
+                at: command.path,
+                pointingTo: Self.commandTarget,
+                canonical: executable.path
+            )
         }
 
         let findings = try diagnostics()
@@ -183,9 +181,8 @@ extension Institute.Installation {
     }
 
     private var commandDirectoryIsOnPath: Swift.Bool {
-        for value in environmentPath.split(
-            separator: ":",
-            omittingEmptySubsequences: false
+        for value in Process.Spawn.Executable.directories(
+            in: environmentPath
         ) where !value.isEmpty {
             let directory: File.Directory
             do throws(Paths.Path.Error) {
@@ -245,20 +242,28 @@ extension Institute.Installation {
             )
         }
 
-        if let info = try metadata(at: command.path) {
+        if try metadata(at: command.path) != nil {
             guard managed else {
                 findings.append(
                     "refusing to replace unmanaged Institute command: \(command)"
                 )
                 return findings
             }
-            guard info.type == .symbolicLink else {
+            switch try Institute.Materialization.verdict(
+                at: command.path,
+                expecting: Self.commandTarget,
+                canonical: executable.path
+            ) {
+            case .missing, .satisfied:
+                break
+
+            case .unmanaged:
                 findings.append(
                     "refusing to replace non-link Institute command: \(command)"
                 )
                 return findings
-            }
-            guard try target(of: command.path) == Self.commandTarget else {
+
+            case .divergent:
                 findings.append(
                     "refusing to replace divergent Institute command link: \(command)"
                 )
@@ -307,9 +312,11 @@ extension Institute.Installation {
             throw .filesystem("cannot inspect Institute executable permissions: \(error)")
         }
         guard
-            let commandInfo = try metadata(at: command.path),
-            commandInfo.type == .symbolicLink,
-            try target(of: command.path) == Self.commandTarget
+            try Institute.Materialization.verdict(
+                at: command.path,
+                expecting: Self.commandTarget,
+                canonical: executable.path
+            ) == .satisfied
         else {
             findings.append("missing or divergent Institute command link: \(command)")
             return findings
@@ -391,9 +398,8 @@ extension Institute.Installation {
         } catch {
             throw .configuration("the running Institute command name is invalid: \(error)")
         }
-        for value in environmentPath.split(
-            separator: ":",
-            omittingEmptySubsequences: false
+        for value in Process.Spawn.Executable.directories(
+            in: environmentPath
         ) where !value.isEmpty {
             let directory: File.Directory
             do throws(Paths.Path.Error) {

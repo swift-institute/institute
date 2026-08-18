@@ -87,8 +87,12 @@ extension Institute.Layout.Test.Unit {
         let directory = try Institute.Layout.directory(for: repository, at: root)
         let parent = try Institute.Layout.parent(for: repository, at: root)
 
-        #expect(directory.description == "/scratch/swift-standards/swift-ietf/swift-rfc-0000")
-        #expect(parent.description == "/scratch/swift-standards/swift-ietf")
+        // Platform-native comparison: the layout composes paths with the
+        // platform's own separator, so the expectation must too.
+        let expectedParent = root[directory: "swift-standards"][directory: "swift-ietf"]
+        let expectedDirectory = expectedParent[directory: "swift-rfc-0000"]
+        #expect(directory.description == expectedDirectory.description)
+        #expect(parent.description == expectedParent.description)
     }
 
 }
