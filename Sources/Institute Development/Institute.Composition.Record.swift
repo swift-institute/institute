@@ -52,6 +52,23 @@ extension Institute.Composition {
 }
 
 extension Institute.Composition.Record {
+    /// The ledger record a source-map transaction rewrite mints: the pair
+    /// API composes through a one-entry transaction, and the rewrite's
+    /// verbatim declared/planned clauses become the persisted reversal.
+    public init(
+        consumer: Swift.String,
+        rewrite: Institute.Development.VerificationPlan.Transaction.Rewrite
+    ) {
+        self.init(
+            consumer: consumer,
+            dependency: rewrite.reference,
+            declared: rewrite.declared,
+            planned: rewrite.planned
+        )
+    }
+}
+
+extension Institute.Composition.Record {
     public static func serialize(_ value: Self) -> JSON {
         [
             "consumer": value.consumer.json,

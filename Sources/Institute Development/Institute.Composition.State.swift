@@ -103,6 +103,13 @@ extension Institute.Composition.State {
         }
     }
 
+    /// Every active record touching `consumer`, in insertion order — the
+    /// set a source-map transaction inspects before mutating, so an active
+    /// pairwise composition is refused rather than silently overwritten.
+    public func records(consumer: Swift.String) -> [Institute.Composition.Record] {
+        records.filter { $0.consumer == consumer }
+    }
+
     /// The record redirecting `consumer`'s `dependency`, if one is active.
     public func record(
         consumer: Swift.String,
