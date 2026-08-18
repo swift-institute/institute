@@ -81,27 +81,40 @@ extension Institute.Composition {
         let manifest = try manifestFile(for: consumerRepository)
         let source = try read(manifest)
 
-        let rewrite: Package.Manifest.Redirection.Rewrite
-        do throws(Package.Manifest.Redirection.Error) {
-            rewrite = try Package.Manifest.Redirection.redirect(
-                source,
-                dependency: dependencyRepository.url,
-                to: dependencyDirectory.description
-            )
-        } catch {
+        // The pair API is compatibility surface: it constructs a one-entry
+        // source map and delegates to the transaction owner
+        // (``Institute/Development/VerificationPlan/Transaction``), which
+        // captures the exact preimage before the manifest is touched.
+        let transaction = try Institute.Development.VerificationPlan.Transaction.begin(
+            consumer: consumer,
+            manifest: manifest,
+            source: source,
+            assignments: [
+                .init(
+                    reference: dependency,
+                    url: dependencyRepository.url,
+                    path: dependencyDirectory.description
+                )
+            ],
+            ledger: state
+        )
+        guard let rewrite = transaction.rewrites.first else {
             throw .composition(
                 "\(consumer) does not declare \(dependency) by URL; nothing to compose"
             )
         }
-        try write(rewrite.source, to: manifest)
+        try transaction.apply(through: self)
 
-        let record = Record(
-            consumer: consumer,
-            dependency: dependency,
-            declared: rewrite.declared,
-            planned: rewrite.planned
-        )
-        try state.adding(record).save(at: root.checkout)
+        let record = Record(consumer: consumer, rewrite: rewrite)
+        do throws(Institute.Error) {
+            try state.adding(record).save(at: root.checkout)
+        } catch {
+            // The unwind path the pair mechanism never had: any failure
+            // between the manifest write and the ledger save restores the
+            // exact preimage before rethrowing.
+            try transaction.restore(through: self, after: error)
+            throw error
+        }
 
         report(composed: record, manifest: manifest)
     }
@@ -212,7 +225,7 @@ extension Institute.Composition {
         )
     }
 
-    private func require(_ name: Swift.String) throws(Institute.Error) -> Institute.Repository {
+    internal func require(_ name: Swift.String) throws(Institute.Error) -> Institute.Repository {
         guard let repository = configuration.repositories.first(where: { $0.name == name }) else {
             throw .composition("\(name) is not a workspace repository (absent from Institute.json)")
         }
@@ -225,7 +238,7 @@ extension Institute.Composition {
         try root.materialization(for: repository)
     }
 
-    private func manifestFile(
+    internal func manifestFile(
         for repository: Institute.Repository
     ) throws(Institute.Error) -> File {
         let file = try directory(for: repository)[file: "Package.swift"]
@@ -240,7 +253,7 @@ extension Institute.Composition {
         return file
     }
 
-    private func read(_ file: File) throws(Institute.Error) -> Swift.String {
+    internal func read(_ file: File) throws(Institute.Error) -> Swift.String {
         do throws(Either<File.System.Read.Full.Error, Never>) {
             return try file.read.full { span in
                 var storage = [Byte]()
@@ -255,7 +268,7 @@ extension Institute.Composition {
         }
     }
 
-    private func write(_ source: Swift.String, to file: File) throws(Institute.Error) {
+    internal func write(_ source: Swift.String, to file: File) throws(Institute.Error) {
         do throws(File.System.Write.Atomic.Error) {
             try file.write.atomic(source)
         } catch {
