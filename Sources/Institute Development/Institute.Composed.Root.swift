@@ -132,11 +132,12 @@ extension Institute.Composed.Root {
             var reference = manifest.reference
             if reference.hasPrefix("../") {
                 let remainder = Swift.String(reference.dropFirst(3))
-                if let path = try? File.Path(remainder) {
-                    let absolute = workspace.anchor.path.appending(path)
-                    reference = absolute.relative(to: root.path)?.description
+                do throws(File.Path.Error) {
+                    let absolute = workspace.anchor.path.appending(try File.Path(remainder))
+                    reference =
+                        absolute.relative(to: root.path)?.description
                         ?? absolute.description
-                }
+                } catch {}
             }
             return .init(
                 reference: reference,
@@ -225,7 +226,7 @@ extension Institute.Composed.Root {
 
     /// The legacy entry point, retained as a compatibility wrapper over
     /// the checkout-shaped workspace and owning no behaviour of its own.
-    @available(*, deprecated, message: "use build(in:fresh:arguments:capturingDiagnostics:coordinator:)")
+    @available(*, deprecated, message: "use build(in:) with a Composition.Workspace")
     public static func build(
         at checkout: File.Directory,
         fresh: Swift.Bool,

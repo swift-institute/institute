@@ -114,13 +114,19 @@ extension Institute.Composition.Workspace {
         }
 
         /// Releases the lock: the in-process claim first, then the
-        /// kernel lock with the descriptor.
+        /// kernel lock with the descriptor. A failed kernel release is
+        /// folded into the descriptor's close — the process-exit
+        /// fallback keeps it safe either way.
         public consuming func release() {
             Institute.Composition.Workspace.held.withLock { held in
                 held.remove(container)
             }
-            try? Kernel.Lock.unlock(descriptor.kernelDescriptor, range: .file)
-            try? descriptor.close()
+            do throws(Kernel.Lock.Error) {
+                try Kernel.Lock.unlock(descriptor.kernelDescriptor, range: .file)
+            } catch {}
+            do throws(Kernel.Close.Error) {
+                try descriptor.close()
+            } catch {}
         }
     }
 
@@ -170,7 +176,9 @@ extension Institute.Composition.Workspace {
             )
         } catch {
             _ = Self.held.withLock { held in held.remove(key) }
-            try? descriptor.close()
+            do throws(Kernel.Close.Error) {
+                try descriptor.close()
+            } catch {}
             throw .composition("composition workspace \(container) is already locked: \(error)")
         }
 
