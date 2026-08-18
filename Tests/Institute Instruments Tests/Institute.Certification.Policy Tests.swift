@@ -57,9 +57,16 @@ extension Institute.Certification.Test.Policy {
             from: snapshot,
             policy: policy
         )
-        // One package member × (build, test) × 2 platforms; the
-        // control-plane member contributes none.
-        #expect(derived.count == 4)
+        // One package member × (build, test) × 2 platforms, plus the two
+        // default quality obligations (format, lint) on the designated
+        // quality platform; the control-plane member contributes none.
+        #expect(derived.count == 6)
+        #expect(
+            derived.filter { $0.kind == .format || $0.kind == .lint }
+                .allSatisfy { $0.platform == .linux }
+        )
+        #expect(derived.count(where: { $0.kind == .format }) == 1)
+        #expect(derived.count(where: { $0.kind == .lint }) == 1)
         #expect(derived.allSatisfy { $0.key.identity == "swift-primitives/swift-color" })
         #expect(
             derived
