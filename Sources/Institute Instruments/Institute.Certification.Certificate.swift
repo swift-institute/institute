@@ -21,10 +21,11 @@ extension Institute.Certification {
         public let kind: Swift.String
         public let snapshot: Snapshot
         public let control: Control
+        public let policy: Policy
         public let obligations: [Obligation]
         public let accounts: [Account]
         public let exceptions: [Exception]
-        public let closure: [Closure.Proof]
+        public let closure: [Closure.Coverage]
         public let coherenceReceipts: [Swift.String]
         public let verdict: Verdict
 
@@ -33,15 +34,34 @@ extension Institute.Certification {
             kind: Swift.String = "fleet-certificate",
             snapshot: Snapshot,
             control: Control,
+            policy: Policy,
             obligations: [Obligation],
             accounts: [Account],
             exceptions: [Exception],
-            closure: [Closure.Proof] = [],
+            closure: [Closure.Coverage],
             coherenceReceipts: [Swift.String]
         ) throws(Institute.Error) {
             let required = Set(obligations)
             guard required.count == obligations.count else {
                 throw .repository("duplicate obligation in certification plan")
+            }
+            let admissible = Set(policy.admissible)
+            for exception in exceptions {
+                guard admissible.contains(exception.reason) else {
+                    throw .repository(
+                        "exception reason \(exception.reason.rawValue) is not admissible "
+                            + "under this policy — waivers are policy-governed, never "
+                            + "constructor-granted"
+                    )
+                }
+            }
+            var coverageConsumers = Set<Institute.Repository.Key>()
+            for record in closure {
+                guard coverageConsumers.insert(record.consumer).inserted else {
+                    throw .repository(
+                        "duplicate closure coverage for \(record.consumer.identity)"
+                    )
+                }
             }
             var covered = Set<Obligation>()
             for obligation in accounts.map(\.obligation) + exceptions.map(\.obligation) {
@@ -65,6 +85,7 @@ extension Institute.Certification {
             self.kind = kind
             self.snapshot = snapshot
             self.control = control
+            self.policy = policy
             self.obligations = obligations.sorted(by: Obligation.precedes)
             self.accounts = accounts.sorted {
                 Obligation.precedes($0.obligation, $1.obligation)
@@ -73,17 +94,29 @@ extension Institute.Certification {
                 Obligation.precedes($0.obligation, $1.obligation)
             }
             self.closure = closure.sorted {
-                ($0.consumer.identity, $0.location) < ($1.consumer.identity, $1.location)
+                Institute.Repository.Key.precedes($0.consumer, $1.consumer)
             }
             self.coherenceReceipts = coherenceReceipts.sorted()
 
+            // Every package member owes an evaluated closure coverage
+            // record: closure proof is a structural prerequisite of a
+            // certificate, never decorative evidence. A member the closure
+            // instrument never evaluated leaves the certificate
+            // UNMEASURED even when its builds and tests are green.
+            let uncoveredClosure = snapshot.members.contains { member in
+                if case .package = member.kind {
+                    !coverageConsumers.contains(member.key)
+                } else {
+                    false
+                }
+            }
             let uncovered = required.subtracting(covered)
             self.verdict =
                 if accounts.contains(where: {
                     if case .failed = $0.outcome { true } else { false }
                 }) || closure.contains(where: { !$0.passes }) {
                     .failed
-                } else if !uncovered.isEmpty
+                } else if !uncovered.isEmpty || uncoveredClosure
                     || accounts.contains(where: {
                         if case .unmeasured = $0.outcome { true } else { false }
                     })
@@ -103,6 +136,7 @@ extension Institute.Certification.Certificate {
             "kind": value.kind.json,
             "snapshot": value.snapshot.json,
             "control": value.control.json,
+            "policy": value.policy.json,
             "obligations": value.obligations.json,
             "accounts": value.accounts.json,
             "exceptions": value.exceptions.json,
@@ -120,6 +154,7 @@ extension Institute.Certification.Certificate {
         guard let kind = object["kind"] else { throw .missingKey("kind") }
         guard let snapshot = object["snapshot"] else { throw .missingKey("snapshot") }
         guard let control = object["control"] else { throw .missingKey("control") }
+        guard let policy = object["policy"] else { throw .missingKey("policy") }
         guard let obligations = object["obligations"] else { throw .missingKey("obligations") }
         guard let accounts = object["accounts"] else { throw .missingKey("accounts") }
         guard let exceptions = object["exceptions"] else { throw .missingKey("exceptions") }
@@ -135,10 +170,11 @@ extension Institute.Certification.Certificate {
                 kind: Swift.String(json: kind),
                 snapshot: Institute.Certification.Snapshot(json: snapshot),
                 control: Institute.Certification.Control(json: control),
+                policy: Institute.Certification.Policy(json: policy),
                 obligations: [Institute.Certification.Obligation](json: obligations),
                 accounts: [Institute.Certification.Account](json: accounts),
                 exceptions: [Institute.Certification.Exception](json: exceptions),
-                closure: [Institute.Certification.Closure.Proof](json: closure),
+                closure: [Institute.Certification.Closure.Coverage](json: closure),
                 coherenceReceipts: [Swift.String](json: coherenceReceipts)
             )
         } catch let error as JSON.Error {

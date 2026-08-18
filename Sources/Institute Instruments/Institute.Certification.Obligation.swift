@@ -36,6 +36,12 @@ extension Institute.Certification.Obligation {
         /// The member package's own test suites must execute.
         case test
 
+        /// The Institute lint sweep must run over the member.
+        case lint
+
+        /// The format gate must run over the member.
+        case format
+
         public static func serialize(_ value: Self) -> JSON { value.rawValue.json }
 
         public static func deserialize(_ json: JSON) throws(JSON.Error) -> Self {

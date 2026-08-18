@@ -74,11 +74,18 @@ extension Institute.Certification {
             kind: Obligation.Kind,
             directory: File.Directory
         ) -> Account.Outcome {
-            let action: Build.Action =
-                switch kind {
-                case .build: .build
-                case .test: .test
-                }
+            let action: Build.Action
+            switch kind {
+            case .build: action = .build
+
+            case .test: action = .test
+
+            case .lint, .format:
+                return .unmeasured(
+                    reason: "quality obligations are executed by the quality "
+                        + "instruments, not the package execution instrument"
+                )
+            }
             let result: Build.Coordinator.Result
             do throws(Build.Error) {
                 result = try coordinator.run(
