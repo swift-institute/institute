@@ -11,7 +11,26 @@ extension Institute.Certification {
     public struct Policy: Equatable, Sendable, JSON.Serializable {
         public let platforms: [Platform]
 
-        public init(platforms: [Platform]) throws(Institute.Error) {
+        /// The quality obligations every package member owes, executed
+        /// once per member on the designated quality platform (`linux`) —
+        /// platform-independent gates whose omission must still be a
+        /// visible uncovered obligation (.github#269).
+        public let quality: [Obligation.Kind]
+
+        /// Which exception reasons this policy admits as lawful coverage.
+        ///
+        /// Waiver admissibility is a property of the exact promoted
+        /// policy, never of a certificate constructor: by default only
+        /// `notApplicable` is admissible, so a known defect can never
+        /// turn green unless the policy that judges the certificate
+        /// explicitly authorizes that reason (.github#627 promotion).
+        public let admissible: [Exception.Reason]
+
+        public init(
+            platforms: [Platform],
+            quality: [Obligation.Kind] = [.lint, .format],
+            admissible: [Exception.Reason] = [.notApplicable]
+        ) throws(Institute.Error) {
             guard !platforms.isEmpty else {
                 throw .configuration("a certification policy requires at least one platform")
             }
@@ -21,11 +40,24 @@ extension Institute.Certification {
                     throw .configuration("duplicate policy platform: \(platform.rawValue)")
                 }
             }
+            for kind in quality {
+                guard kind == .lint || kind == .format else {
+                    throw .configuration(
+                        "\(kind.rawValue) is a package execution obligation, not a quality gate"
+                    )
+                }
+            }
             self.platforms = platforms.sorted { $0.rawValue < $1.rawValue }
+            self.quality = Set(quality).sorted { $0.rawValue < $1.rawValue }
+            self.admissible = Set(admissible).sorted { $0.rawValue < $1.rawValue }
         }
 
         public static func serialize(_ value: Self) -> JSON {
-            ["platforms": value.platforms.json]
+            [
+                "platforms": value.platforms.json,
+                "quality": value.quality.json,
+                "admissible": value.admissible.json,
+            ]
         }
 
         public static func deserialize(_ json: JSON) throws(JSON.Error) -> Self {
@@ -33,9 +65,13 @@ extension Institute.Certification {
                 throw .typeMismatch(expected: "object", got: "non-object")
             }
             guard let platforms = object["platforms"] else { throw .missingKey("platforms") }
+            guard let quality = object["quality"] else { throw .missingKey("quality") }
+            guard let admissible = object["admissible"] else { throw .missingKey("admissible") }
             do {
                 return try Self(
-                    platforms: [Institute.Certification.Platform](json: platforms)
+                    platforms: [Institute.Certification.Platform](json: platforms),
+                    quality: [Institute.Certification.Obligation.Kind](json: quality),
+                    admissible: [Institute.Certification.Exception.Reason](json: admissible)
                 )
             } catch let error as JSON.Error {
                 throw error
@@ -68,6 +104,9 @@ extension Institute.Certification.Obligation {
             for platform in policy.platforms {
                 obligations.append(.init(key: member.key, kind: .build, platform: platform))
                 obligations.append(.init(key: member.key, kind: .test, platform: platform))
+            }
+            for kind in policy.quality {
+                obligations.append(.init(key: member.key, kind: kind, platform: .linux))
             }
         }
         return obligations.sorted(by: precedes)

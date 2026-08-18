@@ -197,15 +197,25 @@ extension Institute.Certification.Test.Closure {
                 policy: nil,
                 runtimeReceipts: []
             ),
+            policy: .init(platforms: [.linux], quality: []),
             obligations: [obligation],
             accounts: [.init(obligation: obligation, outcome: .met(evidence: "d1"))],
             exceptions: [],
             closure: [
                 .init(
+                    consumer: Self.key("swift-primitives/swift-color"),
+                    proofs: []
+                ),
+                .init(
                     consumer: Self.key("swift-foundations/swift-sockets"),
-                    location: "https://github.com/swift-foundations/swift-tls.git",
-                    verdict: .ungoverned(Self.key("swift-foundations/swift-tls"))
-                )
+                    proofs: [
+                        .init(
+                            consumer: Self.key("swift-foundations/swift-sockets"),
+                            location: "https://github.com/swift-foundations/swift-tls.git",
+                            verdict: .ungoverned(Self.key("swift-foundations/swift-tls"))
+                        )
+                    ]
+                ),
             ],
             coherenceReceipts: []
         )
