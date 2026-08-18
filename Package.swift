@@ -234,6 +234,7 @@ let package = Package(
                 .product(name: "Git", package: "swift-git"),
                 .product(name: "GitHub", package: "swift-github"),
                 .product(name: "JSON", package: "swift-json"),
+                .product(name: "SPM Standard", package: "swift-spm-standard"),
             ]
         ),
         .testTarget(
@@ -278,6 +279,7 @@ let package = Package(
                 "Institute Instruments",
                 "Institute Model",
                 .product(name: "JSON", package: "swift-json"),
+                .product(name: "SPM Standard", package: "swift-spm-standard"),
             ],
             path: "Tests/Institute Instruments Tests"
         ),

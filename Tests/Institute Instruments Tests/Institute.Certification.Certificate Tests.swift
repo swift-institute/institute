@@ -35,6 +35,16 @@ extension Institute.Certification.Test.Certificate {
         )
     }
 
+    private static func policy(
+        admissible: [Institute.Certification.Exception.Reason] = [.notApplicable]
+    ) throws -> Institute.Certification.Policy {
+        try .init(platforms: [.linux], quality: [], admissible: admissible)
+    }
+
+    private static func coverage() -> [Institute.Certification.Closure.Coverage] {
+        [.init(consumer: key("swift-primitives/swift-color"), proofs: [])]
+    }
+
     private static func control() throws -> Institute.Certification.Control {
         try .init(
             certifier: .init(b),
@@ -56,12 +66,14 @@ extension Institute.Certification.Test.Certificate {
         let certificate = try Institute.Certification.Certificate(
             snapshot: Self.snapshot(),
             control: Self.control(),
+            policy: Self.policy(),
             obligations: [Self.obligation(.build, .linux), Self.obligation(.test, .linux)],
             accounts: [
                 .init(obligation: Self.obligation(.build, .linux), outcome: .met(evidence: "d1")),
                 .init(obligation: Self.obligation(.test, .linux), outcome: .met(evidence: "d2")),
             ],
             exceptions: [],
+            closure: Self.coverage(),
             coherenceReceipts: []
         )
         #expect(certificate.verdict == .certified)
@@ -72,11 +84,13 @@ extension Institute.Certification.Test.Certificate {
         let certificate = try Institute.Certification.Certificate(
             snapshot: Self.snapshot(),
             control: Self.control(),
+            policy: Self.policy(),
             obligations: [Self.obligation(.build, .linux), Self.obligation(.test, .linux)],
             accounts: [
                 .init(obligation: Self.obligation(.build, .linux), outcome: .met(evidence: "d1"))
             ],
             exceptions: [],
+            closure: Self.coverage(),
             coherenceReceipts: []
         )
         #expect(certificate.verdict == .unmeasured)
@@ -87,6 +101,7 @@ extension Institute.Certification.Test.Certificate {
         let certificate = try Institute.Certification.Certificate(
             snapshot: Self.snapshot(),
             control: Self.control(),
+            policy: Self.policy(),
             obligations: [Self.obligation(.build, .linux), Self.obligation(.test, .linux)],
             accounts: [
                 .init(
@@ -95,16 +110,18 @@ extension Institute.Certification.Test.Certificate {
                 )
             ],
             exceptions: [],
+            closure: Self.coverage(),
             coherenceReceipts: []
         )
         #expect(certificate.verdict == .failed)
     }
 
     @Test
-    func `a typed exception with authority completes coverage`() throws {
+    func `a policy-admitted exception completes coverage`() throws {
         let certificate = try Institute.Certification.Certificate(
             snapshot: Self.snapshot(),
             control: Self.control(),
+            policy: Self.policy(admissible: [.notApplicable, .knownDefect]),
             obligations: [Self.obligation(.build, .linux), Self.obligation(.test, .windows)],
             accounts: [
                 .init(obligation: Self.obligation(.build, .linux), outcome: .met(evidence: "d1"))
@@ -116,9 +133,49 @@ extension Institute.Certification.Test.Certificate {
                     authority: "swift-institute/.github#600"
                 )
             ],
+            closure: Self.coverage(),
             coherenceReceipts: []
         )
         #expect(certificate.verdict == .certified)
+    }
+
+    @Test
+    func `a known defect is refused unless the policy admits it`() throws {
+        #expect(throws: Institute.Error.self) {
+            _ = try Institute.Certification.Certificate(
+                snapshot: Self.snapshot(),
+                control: Self.control(),
+                policy: Self.policy(),
+                obligations: [Self.obligation(.test, .windows)],
+                accounts: [],
+                exceptions: [
+                    .init(
+                        obligation: Self.obligation(.test, .windows),
+                        reason: .knownDefect,
+                        authority: "swift-institute/.github#600"
+                    )
+                ],
+                closure: Self.coverage(),
+                coherenceReceipts: []
+            )
+        }
+    }
+
+    @Test
+    func `a package member without closure coverage is unmeasured`() throws {
+        let certificate = try Institute.Certification.Certificate(
+            snapshot: Self.snapshot(),
+            control: Self.control(),
+            policy: Self.policy(),
+            obligations: [Self.obligation(.build, .linux)],
+            accounts: [
+                .init(obligation: Self.obligation(.build, .linux), outcome: .met(evidence: "d1"))
+            ],
+            exceptions: [],
+            closure: [],
+            coherenceReceipts: []
+        )
+        #expect(certificate.verdict == .unmeasured)
     }
 
     @Test
@@ -127,6 +184,7 @@ extension Institute.Certification.Test.Certificate {
             _ = try Institute.Certification.Certificate(
                 snapshot: Self.snapshot(),
                 control: Self.control(),
+                policy: Self.policy(),
                 obligations: [Self.obligation(.build, .linux)],
                 accounts: [
                     .init(
@@ -141,6 +199,7 @@ extension Institute.Certification.Test.Certificate {
                         authority: "swift-institute/.github#600"
                     )
                 ],
+                closure: Self.coverage(),
                 coherenceReceipts: []
             )
         }
@@ -152,6 +211,7 @@ extension Institute.Certification.Test.Certificate {
             _ = try Institute.Certification.Certificate(
                 snapshot: Self.snapshot(),
                 control: Self.control(),
+                policy: Self.policy(),
                 obligations: [Self.obligation(.build, .linux)],
                 accounts: [
                     .init(
@@ -160,6 +220,7 @@ extension Institute.Certification.Test.Certificate {
                     )
                 ],
                 exceptions: [],
+                closure: Self.coverage(),
                 coherenceReceipts: []
             )
         }
@@ -170,11 +231,13 @@ extension Institute.Certification.Test.Certificate {
         let certificate = try Institute.Certification.Certificate(
             snapshot: Self.snapshot(),
             control: Self.control(),
+            policy: Self.policy(),
             obligations: [Self.obligation(.build, .linux)],
             accounts: [
                 .init(obligation: Self.obligation(.build, .linux), outcome: .met(evidence: "d1"))
             ],
             exceptions: [],
+            closure: Self.coverage(),
             coherenceReceipts: ["c1"]
         )
         let decoded = try Institute.Certification.Certificate(
@@ -197,23 +260,39 @@ extension Institute.Certification.Test.Certificate {
         let certificate = try Institute.Certification.Certificate(
             snapshot: Self.snapshot(),
             control: Self.control(),
+            policy: Self.policy(),
             obligations: [Self.obligation(.build, .linux)],
             accounts: [
                 .init(obligation: Self.obligation(.build, .linux), outcome: .met(evidence: "d1"))
             ],
             exceptions: [],
+            closure: Self.coverage(),
             coherenceReceipts: []
         )
         let member = Self.key("swift-primitives/swift-color")
         #expect(
-            try certificate.status(against: [member: .init(Self.a)])
+            try certificate.status(against: [member: .init(Self.a)], control: Self.control())
                 == .current
         )
         #expect(
-            try certificate.status(against: [member: .init(Self.b)])
-                == .superseded(moved: [member])
+            try certificate.status(against: [member: .init(Self.b)], control: Self.control())
+                == .superseded(moved: [member], controlMoved: false)
         )
         // An unobserved member is moved: unknown is never current.
-        #expect(certificate.status(against: [:]) == .superseded(moved: [member]))
+        #expect(
+            try certificate.status(against: [:], control: Self.control())
+                == .superseded(moved: [member], controlMoved: false)
+        )
+        // Control movement supersedes exactly as head movement does.
+        let movedControl = try Institute.Certification.Control(
+            certifier: .init(Self.a),
+            toolchain: "Swift 6.5",
+            policy: nil,
+            runtimeReceipts: []
+        )
+        #expect(
+            try certificate.status(against: [member: .init(Self.a)], control: movedControl)
+                == .superseded(moved: [], controlMoved: true)
+        )
     }
 }
