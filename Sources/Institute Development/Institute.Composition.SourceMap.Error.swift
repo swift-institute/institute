@@ -44,6 +44,18 @@ extension Institute.Composition.SourceMap {
 
         /// A closure repository has no source assignment.
         case unassigned(Swift.String)
+
+        /// A dependency under an Institute-governed organization is
+        /// absent from the declared population. Presumptively an
+        /// inventory-integrity failure, never a lawful external — a
+        /// governed edge outside the census would silently leave the
+        /// composed local graph and resolve remotely (the swift-tls
+        /// class, institute-application#212).
+        case populationIntegrity(
+            reference: Swift.String,
+            identity: Swift.String,
+            organization: Swift.String
+        )
     }
 }
 
@@ -85,6 +97,10 @@ extension Institute.Composition.SourceMap.Error: Swift.CustomStringConvertible {
 
         case .unassigned(let reference):
             "closure repository \(reference) has no source assignment"
+
+        case .populationIntegrity(let reference, let identity, let organization):
+            "\(reference) depends on \(identity) under governed organization "
+                + "\(organization), which is absent from the declared population"
         }
     }
 }

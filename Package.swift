@@ -81,6 +81,7 @@ let package = Package(
         .target(
             name: "Build Coordinator",
             dependencies: [
+                .product(name: "Environment", package: "swift-environment"),
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "Kernel", package: "swift-kernel"),
                 .product(name: "Process", package: "swift-process"),
@@ -291,8 +292,10 @@ let package = Package(
                 .product(name: "JSON", package: "swift-json"),
                 .product(name: "Package Manager", package: "swift-package-manager"),
                 .product(name: "SPM Standard", package: "swift-spm-standard"),
+                "Build Coordinator",
             ],
-            path: "Tests/Institute Development Tests"
+            path: "Tests/Institute Development Tests",
+            exclude: ["Fixtures"]
         ),
     ],
     swiftLanguageModes: [.v6]

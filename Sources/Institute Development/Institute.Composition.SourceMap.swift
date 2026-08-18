@@ -73,8 +73,11 @@ extension Institute.Composition.SourceMap {
     /// fixture can exercise every law without spawning SwiftPM.
     /// Forward closure is computed only from evaluated manifests, by
     /// mapping each dependency's evaluated identity back to an
-    /// inventory repository; identities that match no inventory
-    /// repository are external and contribute nothing.
+    /// inventory repository. An identity outside the roster is
+    /// lawfully external — contributing nothing — only when its
+    /// location is also outside every Institute-governed organization;
+    /// a governed edge absent from the declared population fails
+    /// closed as ``Error/populationIntegrity(reference:identity:organization:)``.
     public func normalized(
         scope: Institute.Composition.Scope,
         roster: [Institute.Repository],
@@ -88,6 +91,8 @@ extension Institute.Composition.SourceMap {
             roster.map { ($0.name, $0) },
             uniquingKeysWith: { first, _ in first }
         )
+        let governed = Swift.Set(roster.map(\.organization))
+            .union(roster.map(\.layer.organization))
 
         for reference in overrides.keys.sorted() {
             guard byReference[reference] != nil else {
@@ -168,8 +173,29 @@ extension Institute.Composition.SourceMap {
 
             for dependency in evaluation.dependencies {
                 let token = dependency.identity.underlying
-                if byReference[token] != nil, !visited.contains(token) {
-                    pending.append(token)
+                if byReference[token] != nil {
+                    if !visited.contains(token) {
+                        pending.append(token)
+                    }
+                    continue
+                }
+                // A dependency outside the roster is lawfully external
+                // only when it also lives outside every Institute-owned
+                // organization. A governed-organization edge absent
+                // from the declared population is a population-integrity
+                // failure, never a silent remote resolution — the
+                // swift-tls class (institute-application#212).
+                if case .sourceControl(_, .remote(let location), _) = dependency.source {
+                    let url = "\(location)"
+                    if let organization = Self.organization(of: url),
+                        governed.contains(organization)
+                    {
+                        throw .populationIntegrity(
+                            reference: reference,
+                            identity: token,
+                            organization: organization
+                        )
+                    }
                 }
             }
         }
@@ -206,5 +232,16 @@ extension Institute.Composition.SourceMap {
         }
 
         return ordered
+    }
+}
+
+extension Institute.Composition.SourceMap {
+    /// The GitHub organization of a source-control location, or `nil`
+    /// when the location does not name one.
+    static func organization(of url: Swift.String) -> Swift.String? {
+        guard let range = url.range(of: "github.com/") else { return nil }
+        let remainder = url[range.upperBound...]
+        let segment = remainder.prefix { $0 != "/" }
+        return segment.isEmpty ? nil : Swift.String(segment)
     }
 }

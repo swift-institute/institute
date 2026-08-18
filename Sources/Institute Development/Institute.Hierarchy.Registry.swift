@@ -2,6 +2,7 @@ public import File_System
 public import Institute_Inventory
 public import Institute_Model
 public import JSON
+private import Kernel
 
 extension Institute.Hierarchy {
     /// The set of local hierarchies registered on this machine,
