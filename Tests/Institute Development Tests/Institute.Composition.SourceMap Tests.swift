@@ -323,6 +323,53 @@ extension Institute.Composition.SourceMap.Test {
     }
 
     @Test
+    func `a governed-organization dependency outside the population fails closed`() throws {
+        var fixture = try Fixture()
+        defer { fixture.tearDown() }
+
+        let a = Fixture.repository("swift-a-primitives")
+        try fixture.materialize(a)
+        let location = try Package.Dependency.Evaluation.Source.Location.remote(
+            .init("https://github.com/swift-primitives/swift-tls.git")
+        )
+        fixture.evaluations = fixture.evaluations.mapValues { evaluation in
+            .init(
+                name: evaluation.name,
+                toolsVersion: evaluation.toolsVersion,
+                dependencies: [
+                    .init(
+                        source: .sourceControl(
+                            identity: .init("swift-tls"),
+                            location: location,
+                            requirement: .branch("main")
+                        )
+                    )
+                ]
+            )
+        }
+
+        let map = Institute.Composition.SourceMap(defaultHierarchy: fixture.hierarchy)
+        do {
+            _ = try map.normalized(
+                scope: .seeds(["swift-a-primitives"]),
+                roster: [a],
+                at: fixture.checkout,
+                evaluate: fixture.evaluate
+            )
+            Issue.record("governed out-of-population edge was accepted as external")
+        } catch let error as Institute.Composition.SourceMap.Error {
+            guard case .populationIntegrity(let reference, let identity, let organization) = error
+            else {
+                Issue.record("unexpected error \(error)")
+                return
+            }
+            #expect(reference == "swift-a-primitives")
+            #expect(identity == "swift-tls")
+            #expect(organization == "swift-primitives")
+        }
+    }
+
+    @Test
     func `an unregistered hierarchy fails closed`() throws {
         var fixture = try Fixture()
         defer { fixture.tearDown() }

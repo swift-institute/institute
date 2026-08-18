@@ -1,3 +1,4 @@
+private import Environment
 internal import File_System
 private import Kernel
 internal import Process
@@ -55,6 +56,40 @@ extension Build.Coordinator {
         capture: Swift.Bool = false,
         cleanup: (Build.Error?) -> Build.Error?
     ) throws(Build.Error) -> Process.Output {
+        // A coordinator-spawned child — a test run invoking a fixture
+        // build, most concretely — already executes inside its
+        // ancestor's critical section: the ancestor institute process
+        // holds the machine-wide lock across the child's whole
+        // lifetime, so the invariant this lock protects is held, and
+        // acquiring again from the child would block on our own
+        // ancestor forever (measured: a fixture build under `institute
+        // package test` deadlocked exactly this way). The marker is
+        // exported to every coordinated child below and never set any
+        // other way.
+        if Environment.read(Self.heldMarker) != nil {
+            var output: Process.Output?
+            var failure: Build.Error?
+            do throws(Process.Error) {
+                output = try Process.Spawn.run(
+                    .init(
+                        executable: "/usr/bin/env",
+                        arguments: invocation,
+                        stdout: capture ? .pipe : .inherit,
+                        stderr: capture ? .pipe : .inherit,
+                        workingDirectory: directory
+                    )
+                )
+            } catch {
+                failure = .process("cannot execute \(description): \(error)")
+            }
+            failure = cleanup(failure)
+            if let failure { throw failure }
+            guard let output else {
+                throw .process("\(description) produced neither output nor an error")
+            }
+            return try Self.exited(output, describing: description)
+        }
+
         let path: File.Path
         do throws(File.Path.Error) {
             path = try File.Path.Temporary.deterministic(
@@ -96,6 +131,8 @@ extension Build.Coordinator {
                 .init(
                     executable: "/usr/bin/env",
                     arguments: invocation,
+                    environment: Environment.read.all()
+                        .merging([Self.heldMarker: "1"]) { _, marker in marker },
                     stdout: capture ? .pipe : .inherit,
                     stderr: capture ? .pipe : .inherit,
                     workingDirectory: directory
@@ -123,6 +160,18 @@ extension Build.Coordinator {
             throw .process("\(description) produced neither output nor an error")
         }
 
+        return try Self.exited(output, describing: description)
+    }
+
+    /// The environment marker a coordinated child inherits while its
+    /// ancestor holds the machine-wide lock.
+    private static let heldMarker = "INSTITUTE_BUILD_COORDINATION_HELD"
+
+    /// Maps a child's termination onto the coordinated contract.
+    private static func exited(
+        _ output: Process.Output,
+        describing description: Swift.String
+    ) throws(Build.Error) -> Process.Output {
         switch output.status {
         case .exited:
             return output
