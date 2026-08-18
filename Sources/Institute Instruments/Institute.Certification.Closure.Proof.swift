@@ -23,6 +23,7 @@ extension Institute.Certification.Closure {
         public var passes: Swift.Bool {
             switch verdict {
             case .exact, .local, .excludedMember: true
+
             case .ungoverned, .revisionSkew, .networkEscape, .unexpectedLocal,
                 .unclassifiable:
                 false
