@@ -53,6 +53,7 @@ extension Institute.Composition.Workspace.Test.Unit {
             Institute.Composed.Manifest(
                 reference: "../swift-primitives/swift-bit-primitives",
                 package: "swift-bit-primitives",
+                identity: "swift-bit-primitives",
                 libraryProducts: ["Bit Primitives"],
                 buildableTargetCount: 1
             )
@@ -73,6 +74,7 @@ extension Institute.Composition.Workspace.Test.Unit {
             Institute.Composed.Manifest(
                 reference: "../swift-primitives/swift-bit-primitives",
                 package: "swift-bit-primitives",
+                identity: "swift-bit-primitives",
                 libraryProducts: ["Bit Primitives"],
                 buildableTargetCount: 1
             )
@@ -168,6 +170,7 @@ extension Institute.Composition.Workspace.Test.Integration {
                 .init(
                     reference: "../swift-primitives/swift-bit-primitives",
                     package: "swift-bit-primitives",
+                    identity: "swift-bit-primitives",
                     libraryProducts: ["Bit Primitives"],
                     buildableTargetCount: 1
                 )
