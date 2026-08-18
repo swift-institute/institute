@@ -68,6 +68,12 @@ extension Institute.Composed {
         /// The path-dependency identity SwiftPM resolves for this
         /// repository — its materialized directory name.
         public let package: Swift.String
+        /// The identity actually derived from the materialized
+        /// directory, admitted only after the manifest at that
+        /// directory evaluated — never an inventory name taken on
+        /// faith. The build plan qualifies every product dependency
+        /// with this value.
+        public let identity: Swift.String
         /// Library product names only; executable and plugin products
         /// are not addressable from another target's dependencies.
         public let libraryProducts: [Swift.String]
@@ -79,11 +85,13 @@ extension Institute.Composed {
         public init(
             reference: Swift.String,
             package: Swift.String,
+            identity: Swift.String,
             libraryProducts: [Swift.String],
             buildableTargetCount: Swift.Int
         ) {
             self.reference = reference
             self.package = package
+            self.identity = identity
             self.libraryProducts = libraryProducts
             self.buildableTargetCount = buildableTargetCount
         }
@@ -136,10 +144,15 @@ extension Institute.Composed {
                 case .test, .plugin, .binary, .system, .macro: continue
                 }
             }
+            var identity = repository.name
+            for component in directory.path.components {
+                identity = component.string
+            }
             manifests.append(
                 .init(
                     reference: "../\(Institute.Layout.reference(for: repository))",
                     package: repository.name,
+                    identity: identity,
                     libraryProducts: libraries,
                     buildableTargetCount: buildableCount
                 )

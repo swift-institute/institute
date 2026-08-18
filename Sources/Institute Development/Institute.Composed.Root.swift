@@ -69,14 +69,47 @@ extension Institute.Composed.Root {
         contributing(manifests).reduce(0) { $0 + $1.buildableTargetCount }
     }
 
-    /// The synthetic manifest's text.
+    /// The synthetic manifest's text for a validated build plan: one
+    /// `.package(path:)` per plan package — excluded packages
+    /// included, so transitive resolution can never silently choose a
+    /// remote source for them — and synthetic target dependencies for
+    /// library products only, package-qualified by evaluated identity.
+    public static func render(
+        _ plan: Institute.Composition.BuildPlan,
+        swift: Swift.String
+    ) -> Swift.String {
+        renderCore(plan.packages, swift: swift)
+    }
+
+    /// The legacy manifest-based entry point, retained as a deprecated
+    /// adapter over the plan representation and owning no rendering
+    /// behaviour of its own. Unlike the validated plan path it
+    /// tolerates an empty or library-less selection, matching its
+    /// historical contract.
     public static func render(
         _ manifests: [Institute.Composed.Manifest],
         swift: Swift.String
     )
         -> Swift.String
     {
-        let selected = contributing(manifests)
+        renderCore(
+            contributing(manifests).map { manifest in
+                .init(
+                    identity: manifest.identity,
+                    reference: manifest.reference,
+                    libraryProducts: manifest.libraryProducts,
+                    buildableTargetCount: manifest.buildableTargetCount
+                )
+            },
+            swift: swift
+        )
+    }
+
+    static func renderCore(
+        _ packages: [Institute.Composition.BuildPlan.Package],
+        swift: Swift.String
+    ) -> Swift.String {
+        let ordered = packages.sorted { $0.reference < $1.reference }
         var lines = [Swift.String]()
         lines.append("// swift-tools-version: \(swift)")
         lines.append("")
@@ -85,18 +118,18 @@ extension Institute.Composed.Root {
         lines.append("let package = Package(")
         lines.append("    name: \"\(targetName)\",")
         lines.append("    dependencies: [")
-        for manifest in selected {
-            lines.append("        .package(path: \"\(manifest.reference)\"),")
+        for package in ordered {
+            lines.append("        .package(path: \"\(package.reference)\"),")
         }
         lines.append("    ],")
         lines.append("    targets: [")
         lines.append("        .target(")
         lines.append("            name: \"\(targetName)\",")
         lines.append("            dependencies: [")
-        for manifest in selected {
-            for product in manifest.libraryProducts {
+        for package in ordered where package.exclusion == nil {
+            for product in package.libraryProducts {
                 lines.append(
-                    "                .product(name: \"\(product)\", package: \"\(manifest.package)\"),"
+                    "                .product(name: \"\(product)\", package: \"\(package.identity)\"),"
                 )
             }
         }
@@ -142,6 +175,7 @@ extension Institute.Composed.Root {
             return .init(
                 reference: reference,
                 package: manifest.package,
+                identity: manifest.identity,
                 libraryProducts: manifest.libraryProducts,
                 buildableTargetCount: manifest.buildableTargetCount
             )
@@ -161,6 +195,30 @@ extension Institute.Composed.Root {
         // file's contents.
 
         """
+
+    /// Writes the composed root fresh from a validated build plan.
+    public static func write(
+        _ plan: Institute.Composition.BuildPlan,
+        swift: Swift.String,
+        in workspace: Institute.Composition.Workspace
+    ) throws(Institute.Error) {
+        let root = directory(in: workspace)
+        do throws(File.System.Create.Directory.Error) {
+            try root[directory: "Sources"][directory: targetName].create.recursive()
+        } catch {
+            throw .filesystem("cannot create \(root): \(error)")
+        }
+        do throws(File.System.Write.Atomic.Error) {
+            try manifestFile(in: workspace).write.atomic(render(plan, swift: swift))
+        } catch {
+            throw .filesystem("cannot write \(manifestFile(in: workspace)): \(error)")
+        }
+        do throws(File.System.Write.Atomic.Error) {
+            try sourceFile(in: workspace).write.atomic(source)
+        } catch {
+            throw .filesystem("cannot write \(sourceFile(in: workspace)): \(error)")
+        }
+    }
 
     /// Writes the composed root fresh, replacing any prior generation.
     public static func write(
