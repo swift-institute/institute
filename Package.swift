@@ -278,6 +278,8 @@ let package = Package(
                 "Institute Model",
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "JSON", package: "swift-json"),
+                .product(name: "Package Manager", package: "swift-package-manager"),
+                .product(name: "SPM Standard", package: "swift-spm-standard"),
             ],
             path: "Tests/Institute Development Tests"
         ),
