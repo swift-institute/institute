@@ -81,9 +81,21 @@ extension Institute.Lint.Check.Test.Unit {
         let files = try Institute.Lint.Check.files(under: root)
         let names = Set(files.map(\.description))
 
-        #expect(names.contains(try Institute.Lint.Check.Test.expected(root, "Sources/Widget/Widget.swift")))
-        #expect(names.contains(try Institute.Lint.Check.Test.expected(root, "Tests/Widget Tests/WidgetTests.swift")))
-        #expect(!names.contains(try Institute.Lint.Check.Test.expected(root, "Sources/Widget/Notes.txt")))
+        #expect(
+            names.contains(
+                try Institute.Lint.Check.Test.expected(root, "Sources/Widget/Widget.swift")
+            )
+        )
+        #expect(
+            names.contains(
+                try Institute.Lint.Check.Test.expected(root, "Tests/Widget Tests/WidgetTests.swift")
+            )
+        )
+        #expect(
+            !names.contains(
+                try Institute.Lint.Check.Test.expected(root, "Sources/Widget/Notes.txt")
+            )
+        )
     }
 }
 
@@ -108,10 +120,29 @@ extension Institute.Lint.Check.Test.`Edge Case` {
         let files = try Institute.Lint.Check.files(under: root)
         let names = Set(files.map(\.description))
 
-        #expect(!names.contains(try Institute.Lint.Check.Test.expected(root, "Sources/Widget/Widget.docc/Resources/Sample.swift")))
-        #expect(!names.contains(try Institute.Lint.Check.Test.expected(root, "Tests/Support/Fixture.swift")))
-        #expect(!names.contains(try Institute.Lint.Check.Test.expected(root, "Tests/Tutorial/Tutorial.swift")))
-        #expect(names.contains(try Institute.Lint.Check.Test.expected(root, "Tests/Widget Tests/Kept.swift")))
+        #expect(
+            !names.contains(
+                try Institute.Lint.Check.Test.expected(
+                    root,
+                    "Sources/Widget/Widget.docc/Resources/Sample.swift"
+                )
+            )
+        )
+        #expect(
+            !names.contains(
+                try Institute.Lint.Check.Test.expected(root, "Tests/Support/Fixture.swift")
+            )
+        )
+        #expect(
+            !names.contains(
+                try Institute.Lint.Check.Test.expected(root, "Tests/Tutorial/Tutorial.swift")
+            )
+        )
+        #expect(
+            names.contains(
+                try Institute.Lint.Check.Test.expected(root, "Tests/Widget Tests/Kept.swift")
+            )
+        )
     }
 
     @Test
@@ -134,7 +165,14 @@ extension Institute.Lint.Check.Test.`Edge Case` {
         let files = try Institute.Lint.Check.files(under: root)
         let names = Set(files.map(\.description))
 
-        #expect(names.contains(try Institute.Lint.Check.Test.expected(root, "Tests/Widget Tests/Support/Nested.swift")))
+        #expect(
+            names.contains(
+                try Institute.Lint.Check.Test.expected(
+                    root,
+                    "Tests/Widget Tests/Support/Nested.swift"
+                )
+            )
+        )
     }
 
     @Test

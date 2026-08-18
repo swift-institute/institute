@@ -482,10 +482,12 @@ extension Institute.Context {
             ) {
             case .missing, .satisfied:
                 continue
+
             case .unmanaged:
                 findings.append(
                     "refusing to replace non-link context path: \(link.path)"
                 )
+
             case .divergent:
                 findings.append(
                     "refusing to replace divergent context link: \(link.path)"
@@ -501,10 +503,12 @@ extension Institute.Context {
             ) {
             case .missing, .satisfied:
                 break
+
             case .unmanaged:
                 findings.append(
                     "refusing to replace non-link retired context path: \(legacy)"
                 )
+
             case .divergent:
                 findings.append(
                     "refusing to replace divergent retired context link: \(legacy)"
@@ -531,8 +535,10 @@ extension Institute.Context {
             ) {
             case .unmanaged:
                 findings.append("retired context path is not a symbolic link: \(legacy)")
+
             case .divergent:
                 findings.append("retired context link has the wrong target: \(legacy)")
+
             case .missing, .satisfied:
                 break
             }
@@ -569,10 +575,13 @@ extension Institute.Context {
             ) {
             case .missing:
                 findings.append("missing context link: \(link.path)")
+
             case .unmanaged:
                 findings.append("context link is not a symbolic link: \(link.path)")
+
             case .divergent:
                 findings.append("context link has the wrong target: \(link.path)")
+
             case .satisfied:
                 continue
             }

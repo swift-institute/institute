@@ -256,11 +256,13 @@ extension Institute.Installation {
             ) {
             case .missing, .satisfied:
                 break
+
             case .unmanaged:
                 findings.append(
                     "refusing to replace non-link Institute command: \(command)"
                 )
                 return findings
+
             case .divergent:
                 findings.append(
                     "refusing to replace divergent Institute command link: \(command)"

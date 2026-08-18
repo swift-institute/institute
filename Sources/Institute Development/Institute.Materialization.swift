@@ -176,6 +176,7 @@ extension Institute.Materialization {
                     return .divergent
                 }
                 return .satisfied
+
             case .regular:
                 // A file copy-materialization matches its target's bytes.
                 guard let targetInfo = try metadata(at: canonical),
@@ -185,6 +186,7 @@ extension Institute.Materialization {
                     return .unmanaged
                 }
                 return .satisfied
+
             default:
                 return .unmanaged
             }
@@ -221,6 +223,7 @@ extension Institute.Materialization {
                         "cannot write the materialization marker in \(path): \(error)"
                     )
                 }
+
             case .regular:
                 let contents = try read(File(canonical))
                 do throws(File.System.Write.Atomic.Error) {
@@ -228,6 +231,7 @@ extension Institute.Materialization {
                 } catch {
                     throw .filesystem("cannot copy-materialize \(path): \(error)")
                 }
+
             default:
                 throw .filesystem(
                     "cannot materialize \(path): target \(canonical) is neither a "
