@@ -24,6 +24,7 @@ extension Institute.Certification {
         public let obligations: [Obligation]
         public let accounts: [Account]
         public let exceptions: [Exception]
+        public let closure: [Closure.Proof]
         public let coherenceReceipts: [Swift.String]
         public let verdict: Verdict
 
@@ -35,6 +36,7 @@ extension Institute.Certification {
             obligations: [Obligation],
             accounts: [Account],
             exceptions: [Exception],
+            closure: [Closure.Proof] = [],
             coherenceReceipts: [Swift.String]
         ) throws(Institute.Error) {
             let required = Set(obligations)
@@ -70,13 +72,16 @@ extension Institute.Certification {
             self.exceptions = exceptions.sorted {
                 Obligation.precedes($0.obligation, $1.obligation)
             }
+            self.closure = closure.sorted {
+                ($0.consumer.identity, $0.location) < ($1.consumer.identity, $1.location)
+            }
             self.coherenceReceipts = coherenceReceipts.sorted()
 
             let uncovered = required.subtracting(covered)
             self.verdict =
                 if accounts.contains(where: {
                     if case .failed = $0.outcome { true } else { false }
-                }) {
+                }) || closure.contains(where: { !$0.passes }) {
                     .failed
                 } else if !uncovered.isEmpty
                     || accounts.contains(where: {
@@ -101,6 +106,7 @@ extension Institute.Certification.Certificate {
             "obligations": value.obligations.json,
             "accounts": value.accounts.json,
             "exceptions": value.exceptions.json,
+            "closure": value.closure.json,
             "coherenceReceipts": value.coherenceReceipts.json,
             "verdict": value.verdict.json,
         ]
@@ -117,6 +123,7 @@ extension Institute.Certification.Certificate {
         guard let obligations = object["obligations"] else { throw .missingKey("obligations") }
         guard let accounts = object["accounts"] else { throw .missingKey("accounts") }
         guard let exceptions = object["exceptions"] else { throw .missingKey("exceptions") }
+        guard let closure = object["closure"] else { throw .missingKey("closure") }
         guard let coherenceReceipts = object["coherenceReceipts"] else {
             throw .missingKey("coherenceReceipts")
         }
@@ -131,6 +138,7 @@ extension Institute.Certification.Certificate {
                 obligations: [Institute.Certification.Obligation](json: obligations),
                 accounts: [Institute.Certification.Account](json: accounts),
                 exceptions: [Institute.Certification.Exception](json: exceptions),
+                closure: [Institute.Certification.Closure.Proof](json: closure),
                 coherenceReceipts: [Swift.String](json: coherenceReceipts)
             )
         } catch let error as JSON.Error {
