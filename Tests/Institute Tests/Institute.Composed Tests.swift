@@ -29,6 +29,7 @@ extension Institute.Composed.Test {
         .init(
             reference: reference,
             package: package,
+            identity: package,
             libraryProducts: libraryProducts,
             buildableTargetCount: buildableTargetCount
         )
@@ -124,6 +125,7 @@ extension Institute.Composed.Test.`Edge Case` {
     @Test
     func
         `A repository with no library product is excluded from the composed root and its target count`()
+        throws
     {
         let manifests = [
             Institute.Composed.Test.manifest(
@@ -142,10 +144,34 @@ extension Institute.Composed.Test.`Edge Case` {
             ),
         ]
 
+        // Legacy manifest-based adapter: the historical contract keeps
+        // the library-less repository out of the render entirely.
         let text = Institute.Composed.Root.render(manifests, swift: "6.3.3")
-
         #expect(!text.contains("swift-example-tool"))
         #expect(Institute.Composed.Root.expectedTargetCount(in: manifests) == 3)
+
+        // Validated plan path: the library-less package stays a path
+        // dependency — visible to resolution — and is excluded from
+        // synthetic target dependencies with a typed reason code.
+        let plan = try Institute.Composition.BuildPlan(
+            seeds: [],
+            packages: manifests.map { manifest in
+                .init(
+                    identity: manifest.identity,
+                    reference: manifest.reference,
+                    libraryProducts: manifest.libraryProducts,
+                    buildableTargetCount: manifest.buildableTargetCount
+                )
+            }
+        )
+        let planText = Institute.Composed.Root.render(plan, swift: "6.3.3")
+        #expect(planText.contains(".package(path: \"../swift-primitives/swift-example-tool\"),"))
+        #expect(!planText.contains("package: \"swift-example-tool\""))
+        #expect(plan.pathDependencyCount == 2)
+        #expect(plan.libraryContributingCount == 1)
+        #expect(plan.expectedTargetCount == 3)
+        #expect(plan.exclusions.count == 1)
+        #expect(plan.exclusions.first?.reason == .noLibraryProduct)
     }
 
     @Test
