@@ -1,4 +1,5 @@
 import Build_Coordinator
+import FIPS_180_4
 import File_System
 import Foundation
 import JSON
@@ -51,18 +52,39 @@ extension Institute.Coherence.Receipt {
         defer {
             do { try file.delete() } catch {}
         }
-        let output = try Institute.Doctor.spawn(
-            "shasum",
-            arguments: ["-a", "256", file.description]
-        )
-        guard
-            let field = output.split(separator: " ", omittingEmptySubsequences: true).first,
-            field.count == 64,
-            field.allSatisfy(\.isHexDigit)
-        else {
-            throw .process("cannot read a SHA-256 digest for the legacy receipt out of: \(output)")
-        }
-        return Swift.String(field).lowercased()
+        #if os(Windows)
+            // `shasum` is not a Windows binary. The scratch-file
+            // round-trip is preserved; only the digest of those bytes is
+            // computed in-process. The POSIX legs keep the fully
+            // independent platform-tool witness.
+            do throws(Either<File.System.Read.Full.Error, Never>) {
+                return try file.read.full { bytes in
+                    var storage = [Byte]()
+                    storage.reserveCapacity(bytes.count)
+                    for index in bytes.indices {
+                        storage.append(bytes[index])
+                    }
+                    return FIPS_180_4.SHA256.digest(storage).hex
+                }
+            } catch {
+                throw .filesystem("cannot read the scratch legacy receipt: \(error)")
+            }
+        #else
+            let output = try Institute.Doctor.spawn(
+                "shasum",
+                arguments: ["-a", "256", file.description]
+            )
+            guard
+                let field = output.split(separator: " ", omittingEmptySubsequences: true).first,
+                field.count == 64,
+                field.allSatisfy(\.isHexDigit)
+            else {
+                throw .process(
+                    "cannot read a SHA-256 digest for the legacy receipt out of: \(output)"
+                )
+            }
+            return Swift.String(field).lowercased()
+        #endif
     }
 }
 

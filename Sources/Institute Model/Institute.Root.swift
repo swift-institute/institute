@@ -1,4 +1,5 @@
 public import File_System
+private import Kernel
 
 extension Institute {
     /// The two filesystem roots that define one Institute checkout.

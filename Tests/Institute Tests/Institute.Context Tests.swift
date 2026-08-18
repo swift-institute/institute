@@ -89,6 +89,18 @@ extension Institute.Context.Test {
     fileprivate static func projections(_ context: Institute.Context) -> File.Directory {
         context.home[directory: ".claude"][directory: "skills"]
     }
+
+    /// The materialization contract's observable outcome: the entry at
+    /// `path` resolves canonically to the same object as `target`,
+    /// whatever mechanism materialized it (symbolic link, junction).
+    /// Asserted instead of reading stored link text, per the Windows-lane
+    /// adjudication of 2026-08-17 (provisional pending ratification).
+    fileprivate static func resolves(
+        _ path: File.Path,
+        to target: File.Path
+    ) throws -> Swift.Bool {
+        try File.System.Canonical.resolve(path) == File.System.Canonical.resolve(target)
+    }
 }
 
 extension Institute.Context.Test.Unit {
@@ -102,33 +114,43 @@ extension Institute.Context.Test.Unit {
 
             #expect(try context.diagnostics().isEmpty)
             #expect(
-                try File.System.Link.Read.Target.target(
-                    of: context.home[directory: ".agents"].path / "skills"
-                ) == skills.path
+                try Institute.Context.Test.resolves(
+                    context.home[directory: ".agents"].path / "skills",
+                    to: skills.path
+                )
             )
             #expect(
-                try File.System.Link.Read.Target.target(
-                    of: context.entry[file: "CLAUDE.md"].path
-                ) == File.Path("AGENTS.md")
+                try Institute.Context.Test.resolves(
+                    context.entry[file: "CLAUDE.md"].path,
+                    to: context.entry[file: "AGENTS.md"].path
+                )
             )
             #expect(
-                try File.System.Link.Read.Target.target(of: skills.path / "public-skill")
-                    == institute[directory: "Skills"].path / "public-skill"
+                try Institute.Context.Test.resolves(
+                    skills.path / "public-skill",
+                    to: institute[directory: "Skills"].path / "public-skill"
+                )
             )
             #expect(
-                try File.System.Link.Read.Target.target(of: skills.path / "internal-skill")
-                    == institute[directory: "Internal"][directory: "Skills"].path
-                    / "internal-skill"
+                try Institute.Context.Test.resolves(
+                    skills.path / "internal-skill",
+                    to: institute[directory: "Internal"][directory: "Skills"].path
+                        / "internal-skill"
+                )
             )
             #expect(
-                try File.System.Link.Read.Target.target(of: skills.path / "engagement-skill")
-                    == institute[directory: "Engagement"][directory: "Skills"].path
-                    / "engagement-skill"
+                try Institute.Context.Test.resolves(
+                    skills.path / "engagement-skill",
+                    to: institute[directory: "Engagement"][directory: "Skills"].path
+                        / "engagement-skill"
+                )
             )
             #expect(
-                try File.System.Link.Read.Target.target(of: skills.path / "rule-skill")
-                    == context.entry[directory: "rule-institute"][directory: "Skills"].path
-                    / "rule-skill"
+                try Institute.Context.Test.resolves(
+                    skills.path / "rule-skill",
+                    to: context.entry[directory: "rule-institute"][directory: "Skills"].path
+                        / "rule-skill"
+                )
             )
             // The projection is not reachable by walking down from the checkout,
             // which is the whole point: it is reachable from every root instead.
@@ -278,15 +300,17 @@ extension Institute.Context.Test.`Edge Case` {
 
             #expect(try context.diagnostics().isEmpty)
             #expect(
-                try File.System.Link.Read.Target.target(
-                    of: context.entry[file: "CLAUDE.md"].path
-                ) == File.Path("AGENTS.md")
+                try Institute.Context.Test.resolves(
+                    context.entry[file: "CLAUDE.md"].path,
+                    to: context.entry[file: "AGENTS.md"].path
+                )
             )
             #expect(!legacy[file: "skills"].stat.exists)
             #expect(
-                try File.System.Link.Read.Target.target(
-                    of: context.home[directory: ".agents"].path / "skills"
-                ) == Institute.Context.Test.projections(context).path
+                try Institute.Context.Test.resolves(
+                    context.home[directory: ".agents"].path / "skills",
+                    to: Institute.Context.Test.projections(context).path
+                )
             )
         }
     }
@@ -341,7 +365,7 @@ extension Institute.Context.Test.`Edge Case` {
 
             try context.install()
 
-            #expect(try File.System.Link.Read.Target.target(of: alias) == canonical)
+            #expect(try Institute.Context.Test.resolves(alias, to: canonical))
             #expect(try context.diagnostics().isEmpty)
         }
     }
@@ -378,7 +402,7 @@ extension Institute.Context.Test.`Edge Case` {
 
             try context.install()
 
-            #expect(try File.System.Link.Read.Target.target(of: alias) == foreign.path)
+            #expect(try Institute.Context.Test.resolves(alias, to: foreign.path))
             #expect(try context.diagnostics().isEmpty)
         }
     }

@@ -2,6 +2,7 @@ public import Environment
 public import File_System
 public import Institute_Inventory
 public import Institute_Model
+private import Kernel
 public import Skill_Validation
 
 extension Institute {
@@ -127,14 +128,11 @@ extension Institute.Context {
             }
         }
         for link in links where try metadata(at: link.path) == nil {
-            do throws(File.System.Link.Symbolic.Error) {
-                try File.System.Link.Symbolic.create(
-                    at: link.path,
-                    pointingTo: link.target
-                )
-            } catch {
-                throw .filesystem("cannot create symbolic link \(link.path): \(error)")
-            }
+            try Institute.Materialization.install(
+                at: link.path,
+                pointingTo: link.target,
+                canonical: link.canonical
+            )
         }
 
         let diagnostics = try diagnostics(
@@ -244,7 +242,8 @@ extension Institute.Context {
             .init(path: agents.path / "skills", target: skills.path),
             .init(
                 path: entry[file: "CLAUDE.md"].path,
-                target: relativeAgentDocumentPath
+                target: relativeAgentDocumentPath,
+                canonical: entry[file: "AGENTS.md"].path
             ),
         ] + (try projections())
     }
@@ -367,10 +366,11 @@ extension Institute.Context {
     ) throws(Institute.Error) -> [File.Path] {
         var retired = try staleManagedSkillLinks(expecting: links)
         let legacy = legacyAgents.path / "skills"
-        if let info = try metadata(at: legacy),
-            info.type == .symbolicLink,
-            try target(of: legacy) == skills.path
-        {
+        if try Institute.Materialization.verdict(
+            at: legacy,
+            expecting: skills.path,
+            canonical: skills.path
+        ) == .satisfied {
             retired.append(legacy)
         }
         return retired.sorted { "\($0)" < "\($1)" }
@@ -475,32 +475,44 @@ extension Institute.Context {
             {
                 continue
             }
-            guard info.type == .symbolicLink else {
+            switch try Institute.Materialization.verdict(
+                at: link.path,
+                expecting: link.target,
+                canonical: link.canonical
+            ) {
+            case .missing, .satisfied:
+                continue
+
+            case .unmanaged:
                 findings.append(
                     "refusing to replace non-link context path: \(link.path)"
                 )
-                continue
-            }
-            guard try target(of: link.path) == link.target else {
+
+            case .divergent:
                 findings.append(
                     "refusing to replace divergent context link: \(link.path)"
                 )
-                continue
             }
         }
         let legacy = legacyAgents.path / "skills"
-        if let info = try metadata(at: legacy) {
-            guard info.type == .symbolicLink else {
+        if try metadata(at: legacy) != nil {
+            switch try Institute.Materialization.verdict(
+                at: legacy,
+                expecting: skills.path,
+                canonical: skills.path
+            ) {
+            case .missing, .satisfied:
+                break
+
+            case .unmanaged:
                 findings.append(
                     "refusing to replace non-link retired context path: \(legacy)"
                 )
-                return findings
-            }
-            guard try target(of: legacy) == skills.path else {
+
+            case .divergent:
                 findings.append(
                     "refusing to replace divergent retired context link: \(legacy)"
                 )
-                return findings
             }
         }
         return findings
@@ -515,11 +527,20 @@ extension Institute.Context {
             findings.append("retired context link remains installed: \(path)")
         }
         let legacy = legacyAgents.path / "skills"
-        if let info = try metadata(at: legacy) {
-            if info.type != .symbolicLink {
+        if try metadata(at: legacy) != nil {
+            switch try Institute.Materialization.verdict(
+                at: legacy,
+                expecting: skills.path,
+                canonical: skills.path
+            ) {
+            case .unmanaged:
                 findings.append("retired context path is not a symbolic link: \(legacy)")
-            } else if try target(of: legacy) != skills.path {
+
+            case .divergent:
                 findings.append("retired context link has the wrong target: \(legacy)")
+
+            case .missing, .satisfied:
+                break
             }
         }
         for directory in directories {
@@ -547,16 +568,21 @@ extension Institute.Context {
             }
         }
         for link in links {
-            guard let info = try metadata(at: link.path) else {
+            switch try Institute.Materialization.verdict(
+                at: link.path,
+                expecting: link.target,
+                canonical: link.canonical
+            ) {
+            case .missing:
                 findings.append("missing context link: \(link.path)")
-                continue
-            }
-            guard info.type == .symbolicLink else {
+
+            case .unmanaged:
                 findings.append("context link is not a symbolic link: \(link.path)")
-                continue
-            }
-            guard try target(of: link.path) == link.target else {
+
+            case .divergent:
                 findings.append("context link has the wrong target: \(link.path)")
+
+            case .satisfied:
                 continue
             }
         }
