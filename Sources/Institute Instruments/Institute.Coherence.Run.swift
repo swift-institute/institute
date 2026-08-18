@@ -144,7 +144,7 @@ extension Institute.Coherence.Run {
     {
         { root, selection in
             let manifests = try Institute.Composed.manifests(for: selection.repositories, at: root)
-            try Institute.Composed.Root.write(manifests, swift: swift, at: root.checkout)
+            try Institute.Composed.Root.write(manifests, swift: swift, in: .checkout(root.checkout))
             return Institute.Composed.Root.expectedTargetCount(in: manifests)
         }
     }
@@ -154,7 +154,7 @@ extension Institute.Coherence.Run {
         _ selection: Institute.Selection.Resolved
     ) throws(Institute.Error) -> Build_Coordinator.Build.Coordinator.Result {
         try Institute.Composed.Root.build(
-            at: root.checkout,
+            in: .checkout(root.checkout),
             fresh: false,
             arguments: [],
             capturingDiagnostics: true
