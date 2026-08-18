@@ -32,13 +32,17 @@ extension Institute.Hierarchy.Registry.Error: Swift.CustomStringConvertible {
         switch self {
         case .duplicate(let id):
             "hierarchy id \(id) is already registered"
+
         case .collision(let existing, let requested):
             "hierarchy \(requested) resolves to the same physical root as "
                 + "already-registered \(existing)"
+
         case .notFound(let id):
             "no hierarchy is registered for id \(id)"
+
         case .missing(let id):
             "hierarchy \(id)'s registered root no longer exists on disk"
+
         case .workspace(let error):
             "\(error)"
         }
