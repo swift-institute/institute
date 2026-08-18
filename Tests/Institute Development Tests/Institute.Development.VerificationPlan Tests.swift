@@ -1,6 +1,7 @@
 import Dispatch
 import File_System
 import Foundation
+import Synchronization
 import Testing
 
 @testable import Institute_Development
@@ -206,7 +207,8 @@ extension Institute.Development.VerificationPlan.Test.Transaction {
         let original = try fixture.read("consumer")
 
         var observed = [Swift.String]()
-        let results = try fixture.plan.run(seeds: ["consumer"]) { _ in
+        let results = try fixture.plan.run(seeds: ["consumer"]) {
+            (_: Swift.String) throws(Institute.Error) in
             observed.append(try fixture.readDuringVerification())
             return .passed
         }
@@ -236,7 +238,8 @@ extension Institute.Development.VerificationPlan.Test.Transaction {
         let original = try fixture.read("consumer")
 
         #expect(throws: Institute.Error.self) {
-            try fixture.plan.run(seeds: ["consumer"]) { _ in
+            try fixture.plan.run(seeds: ["consumer"]) {
+                (_: Swift.String) throws(Institute.Error) in
                 // The manifest is mutated at this point; fail after it.
                 throw Institute.Error.composition("injected verification owner failure")
             }
@@ -254,17 +257,19 @@ extension Institute.Development.VerificationPlan.Test.Transaction {
         defer { fixture.remove() }
         let original = try fixture.read("consumer")
 
-        let started = DispatchSemaphore(value: 0)
+        let started = Mutex<Swift.Bool>(false)
         let proceed = DispatchSemaphore(value: 0)
         let plan = fixture.plan
         let task = Task.detached {
             try plan.run(seeds: ["consumer"]) { _ in
-                started.signal()
+                started.withLock { flag in flag = true }
                 proceed.wait()
                 return .passed
             }
         }
-        started.wait()
+        while !started.withLock({ flag in flag }) {
+            try await Task.sleep(nanoseconds: 5_000_000)
+        }
         task.cancel()
         proceed.signal()
 
@@ -391,7 +396,8 @@ extension Institute.Development.VerificationPlan.Test.`Edge Case` {
 
         _ = try fixture.plan.run(seeds: ["consumer", "consumer-b"]) { _ in .passed }
         #expect(throws: Institute.Error.self) {
-            try fixture.plan.run(seeds: ["consumer"]) { _ in
+            try fixture.plan.run(seeds: ["consumer"]) {
+                (_: Swift.String) throws(Institute.Error) in
                 throw Institute.Error.composition("injected failure")
             }
         }
@@ -406,17 +412,19 @@ extension Institute.Development.VerificationPlan.Test.`Edge Case` {
         let fixture = try Institute.Development.VerificationPlan.Test.Fixture()
         defer { fixture.remove() }
 
-        let started = DispatchSemaphore(value: 0)
+        let started = Mutex<Swift.Bool>(false)
         let proceed = DispatchSemaphore(value: 0)
         let plan = fixture.plan
         let task = Task.detached {
             try plan.run(seeds: ["consumer"]) { _ in
-                started.signal()
+                started.withLock { flag in flag = true }
                 proceed.wait()
                 return .passed
             }
         }
-        started.wait()
+        while !started.withLock({ flag in flag }) {
+            try await Task.sleep(nanoseconds: 5_000_000)
+        }
         defer { proceed.signal() }
 
         #expect(throws: Institute.Error.self) {
