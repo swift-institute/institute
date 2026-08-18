@@ -272,6 +272,15 @@ let package = Package(
             path: "Tests/Institute Tests"
         ),
         .testTarget(
+            name: "Institute Instruments Tests",
+            dependencies: [
+                "Institute Instruments",
+                "Institute Model",
+                .product(name: "JSON", package: "swift-json"),
+            ],
+            path: "Tests/Institute Instruments Tests"
+        ),
+        .testTarget(
             name: "Institute Development Tests",
             dependencies: [
                 "Institute Development",
