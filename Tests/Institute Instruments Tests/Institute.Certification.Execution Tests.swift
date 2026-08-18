@@ -95,7 +95,11 @@ extension Institute.Certification.Test.Execution {
         )
         let accounts = execution.accounts(
             for: [
-                .init(key: Self.key("swift-primitives/swift-color"), kind: .build, platform: .windows)
+                .init(
+                    key: Self.key("swift-primitives/swift-color"),
+                    kind: .build,
+                    platform: .windows
+                )
             ],
             in: try Self.snapshot()
         )
@@ -115,7 +119,11 @@ extension Institute.Certification.Test.Execution {
         )
         let accounts = execution.accounts(
             for: [
-                .init(key: Self.key("swift-primitives/swift-color"), kind: .test, platform: .macos)
+                .init(
+                    key: Self.key("swift-primitives/swift-color"),
+                    kind: .test,
+                    platform: .macos
+                )
             ],
             in: try Self.snapshot()
         )
@@ -130,7 +138,11 @@ extension Institute.Certification.Test.Execution {
         )
         let accounts = execution.accounts(
             for: [
-                .init(key: Self.key("swift-primitives/swift-color"), kind: .build, platform: .macos)
+                .init(
+                    key: Self.key("swift-primitives/swift-color"),
+                    kind: .build,
+                    platform: .macos
+                )
             ],
             in: try Self.snapshot()
         )
@@ -150,7 +162,11 @@ extension Institute.Certification.Test.Execution {
         )
         let accounts = execution.accounts(
             for: [
-                .init(key: Self.key("swift-primitives/swift-color"), kind: .build, platform: .macos)
+                .init(
+                    key: Self.key("swift-primitives/swift-color"),
+                    kind: .build,
+                    platform: .macos
+                )
             ],
             in: try Self.snapshot()
         )
@@ -168,7 +184,11 @@ extension Institute.Certification.Test.Execution {
         )
         let accounts = execution.accounts(
             for: [
-                .init(key: Self.key("swift-primitives/swift-absent"), kind: .build, platform: .macos)
+                .init(
+                    key: Self.key("swift-primitives/swift-absent"),
+                    kind: .build,
+                    platform: .macos
+                )
             ],
             in: try Self.snapshot()
         )

@@ -28,8 +28,7 @@ extension Institute.Certification {
             @Sendable (Institute.Root, Institute.Repository) throws(Institute.Error) ->
                 Revision
 
-        public let run:
-            @Sendable (Obligation.Kind, File.Directory) -> Account.Outcome
+        public let run: @Sendable (Obligation.Kind, File.Directory) -> Account.Outcome
 
         public init(
             root: Institute.Root,
