@@ -312,7 +312,7 @@ extension Institute.Composition.SourceMap.Test {
                 evaluate: fixture.evaluate
             )
             Issue.record("divergence was accepted")
-        } catch let error as Institute.Composition.SourceMap.Error {
+        } catch {
             guard case .identityDivergence(let reference, let evaluated) = error else {
                 Issue.record("unexpected error \(error)")
                 return
@@ -357,7 +357,7 @@ extension Institute.Composition.SourceMap.Test {
                 evaluate: fixture.evaluate
             )
             Issue.record("governed out-of-population edge was accepted as external")
-        } catch let error as Institute.Composition.SourceMap.Error {
+        } catch {
             guard case .populationIntegrity(let reference, let identity, let organization) = error
             else {
                 Issue.record("unexpected error \(error)")

@@ -213,7 +213,7 @@ extension Institute.Composed.Root.Integration {
                 at: checkoutDirectory
             )
             Issue.record("divergence was silently accepted")
-        } catch let error as Institute.Composition.SourceMap.Error {
+        } catch {
             guard case .identityDivergence(let reference, let evaluated) = error else {
                 Issue.record("unexpected error \(error)")
                 return
