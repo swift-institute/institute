@@ -126,7 +126,7 @@ extension Institute.Certification.Test.Closure {
     }
 
     @Test
-    func `an edge to a typed-excluded member is recorded and passes`() throws {
+    func `an edge to a typed-excluded member is hard red`() throws {
         let proofs = Institute.Certification.Closure.proofs(
             consumer: Self.key("swift-foundations/swift-sockets"),
             resolution: .init(dependencies: [
@@ -137,11 +137,59 @@ extension Institute.Certification.Test.Closure {
             ]),
             snapshot: try Self.snapshot()
         )
-        #expect(proofs[0].passes)
+        #expect(!proofs[0].passes)
         #expect(
             proofs[0].verdict
                 == .excludedMember(Self.key("swift-primitives/swift-legacy"))
         )
+    }
+
+    @Test
+    func `a noncanonical location is unclassifiable, never silently external`() throws {
+        let proofs = Institute.Certification.Closure.proofs(
+            consumer: Self.key("swift-foundations/swift-sockets"),
+            resolution: .init(dependencies: [
+                Self.dependency(
+                    "git@github.com:swift-primitives/swift-color.git",
+                    Self.checkout(Self.a)
+                )
+            ]),
+            snapshot: try Self.snapshot()
+        )
+        #expect(proofs.count == 1)
+        #expect(!proofs[0].passes)
+        #expect(proofs[0].verdict == .unclassifiable)
+    }
+
+    @Test
+    func `a provably external https host produces no proof`() throws {
+        let proofs = Institute.Certification.Closure.proofs(
+            consumer: Self.key("swift-foundations/swift-sockets"),
+            resolution: .init(dependencies: [
+                Self.dependency(
+                    "https://gitlab.com/anything/at-all.git",
+                    Self.checkout(Self.a)
+                )
+            ]),
+            snapshot: try Self.snapshot()
+        )
+        #expect(proofs.isEmpty)
+    }
+
+    @Test
+    func `coverage refuses a proof belonging to another consumer`() throws {
+        #expect(throws: Institute.Error.self) {
+            _ = try Institute.Certification.Closure.Coverage(
+                consumer: Self.key("swift-primitives/swift-color"),
+                proofs: [
+                    .init(
+                        consumer: Self.key("swift-foundations/swift-sockets"),
+                        location: "https://github.com/swift-primitives/swift-color.git",
+                        verdict: .exact(Self.key("swift-primitives/swift-color"))
+                    )
+                ]
+            )
+        }
     }
 
     @Test
@@ -202,11 +250,11 @@ extension Institute.Certification.Test.Closure {
             accounts: [.init(obligation: obligation, outcome: .met(evidence: "d1"))],
             exceptions: [],
             closure: [
-                .init(
+                try .init(
                     consumer: Self.key("swift-primitives/swift-color"),
                     proofs: []
                 ),
-                .init(
+                try .init(
                     consumer: Self.key("swift-foundations/swift-sockets"),
                     proofs: [
                         .init(

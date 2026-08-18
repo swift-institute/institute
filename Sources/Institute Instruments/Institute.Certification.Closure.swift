@@ -56,12 +56,22 @@ extension Institute.Certification.Closure {
         for dependency in resolution.dependencies {
             let location = dependency.reference.location
             guard let owner = Self.owner(of: location) else {
-                // Not a github.com URL — a local path or another host.
-                // Local paths are certifiable only through `.localPath`
-                // acceptance below, and reach it via key-less
-                // classification: without a canonical key the edge cannot
-                // be a governed member, so a governed-looking non-URL
-                // location fails in the fallthrough.
+                // A location the canonical owner cannot parse is never
+                // silently external: a noncanonical spelling (SSH remote,
+                // trailing slash, redirect) of a governed source would
+                // otherwise vanish from certification. Fail closed unless
+                // the location provably cannot be a governed source — and
+                // the only spelling this instrument accepts as provably
+                // external is a non-github.com URL with a resolvable host
+                // component; everything else is unclassifiable.
+                if Self.provablyExternal(location) { continue }
+                proofs.append(
+                    .init(
+                        consumer: consumer,
+                        location: location,
+                        verdict: .unclassifiable
+                    )
+                )
                 continue
             }
             guard governed.contains(owner) else { continue }
@@ -77,6 +87,11 @@ extension Institute.Certification.Closure {
                 continue
             }
             guard let member = snapshot[key] else {
+                // An edge to a typed-excluded member is HARD RED, not a
+                // pass: exclusion removes a member's obligations, it does
+                // not license compiling its moving source without exact
+                // identity. A consumer that still depends on an excluded
+                // member is a certification failure at that consumer.
                 proofs.append(
                     .init(
                         consumer: consumer,
@@ -142,6 +157,17 @@ extension Institute.Certification.Closure {
         let remainder = location.dropFirst(prefix.count)
         guard let separator = remainder.firstIndex(of: "/") else { return nil }
         return Swift.String(remainder[..<separator])
+    }
+
+    /// Whether a location provably cannot be a governed source: an
+    /// `https://` URL whose host is not `github.com`. Anything else —
+    /// SSH remotes, scp-like spellings, bare paths — is unclassifiable
+    /// rather than external, because governed sources could hide there.
+    private static func provablyExternal(_ location: Swift.String) -> Swift.Bool {
+        guard location.hasPrefix("https://") else { return false }
+        let remainder = location.dropFirst("https://".count)
+        guard let separator = remainder.firstIndex(of: "/") else { return false }
+        return remainder[..<separator] != "github.com"
     }
 
     private static func key(of location: Swift.String) -> Institute.Repository.Key? {

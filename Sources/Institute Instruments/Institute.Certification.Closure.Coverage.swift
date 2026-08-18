@@ -14,7 +14,18 @@ extension Institute.Certification.Closure {
         public let consumer: Institute.Repository.Key
         public let proofs: [Proof]
 
-        public init(consumer: Institute.Repository.Key, proofs: [Proof]) {
+        public init(
+            consumer: Institute.Repository.Key,
+            proofs: [Proof]
+        ) throws(Institute.Error) {
+            for proof in proofs {
+                guard proof.consumer == consumer else {
+                    throw .repository(
+                        "closure coverage for \(consumer.identity) contains a proof "
+                            + "belonging to \(proof.consumer.identity)"
+                    )
+                }
+            }
             self.consumer = consumer
             self.proofs = proofs.sorted { $0.location < $1.location }
         }
@@ -40,9 +51,18 @@ extension Institute.Certification.Closure.Coverage {
         }
         guard let consumer = object["consumer"] else { throw .missingKey("consumer") }
         guard let proofs = object["proofs"] else { throw .missingKey("proofs") }
-        return try Self(
-            consumer: Institute.Repository.Key(json: consumer),
-            proofs: [Institute.Certification.Closure.Proof](json: proofs)
-        )
+        do {
+            return try Self(
+                consumer: Institute.Repository.Key(json: consumer),
+                proofs: [Institute.Certification.Closure.Proof](json: proofs)
+            )
+        } catch let error as JSON.Error {
+            throw error
+        } catch {
+            throw .typeMismatch(
+                expected: "coverage whose proofs all belong to its consumer",
+                got: Swift.String(describing: error)
+            )
+        }
     }
 }
