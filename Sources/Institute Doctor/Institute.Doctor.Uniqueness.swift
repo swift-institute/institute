@@ -162,10 +162,12 @@ extension Institute.Doctor.Uniqueness {
                 targets[target, default: []].insert(declaration.repository)
             }
         }
-        let productSubjects = products
+        let productSubjects =
+            products
             .map { Self(namespace: .product, name: $0.key, owners: $0.value.sorted()) }
             .sorted { $0.name < $1.name }
-        let targetSubjects = targets
+        let targetSubjects =
+            targets
             .map { Self(namespace: .target, name: $0.key, owners: $0.value.sorted()) }
             .sorted { $0.name < $1.name }
         return productSubjects + targetSubjects
