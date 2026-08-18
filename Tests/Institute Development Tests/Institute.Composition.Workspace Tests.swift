@@ -175,9 +175,17 @@ extension Institute.Composition.Workspace.Test.Integration {
             swift: "6.3.3",
             in: workspace
         )
-        let manifest = workspace.generatedRoot.path.description + "/Package.swift"
-        #expect(FileManager.default.fileExists(atPath: manifest))
-        let text = try String(contentsOfFile: manifest, encoding: .utf8)
+        let manifest = workspace.generatedRoot[file: "Package.swift"]
+        #expect(manifest.stat.exists)
+        let bytes = try manifest.read.full { span in
+            var storage = [Byte]()
+            storage.reserveCapacity(span.count)
+            for index in span.indices {
+                storage.append(span[index])
+            }
+            return storage
+        }
+        let text = Swift.String(decoding: bytes, as: Swift.UTF8.self)
         #expect(text.contains("/swift-primitives/swift-bit-primitives"))
         #expect(!text.contains("\"../swift-primitives"))
     }
