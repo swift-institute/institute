@@ -20,12 +20,17 @@ extension Institute.Certification.Closure {
         }
 
         /// Whether this edge keeps the certificate lawful.
+        ///
+        /// `excludedMember` fails: exclusion removes obligations, never the
+        /// requirement that compiled source carry exact identity — a
+        /// consumer still depending on an excluded member is red at that
+        /// consumer (second-review ruling, 2026-08-18).
         public var passes: Swift.Bool {
             switch verdict {
-            case .exact, .local, .excludedMember: true
+            case .exact, .local: true
 
             case .ungoverned, .revisionSkew, .networkEscape, .unexpectedLocal,
-                .unclassifiable:
+                .unclassifiable, .excludedMember:
                 false
             }
         }

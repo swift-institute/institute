@@ -41,8 +41,8 @@ extension Institute.Certification.Test.Certificate {
         try .init(platforms: [.linux], quality: [], admissible: admissible)
     }
 
-    private static func coverage() -> [Institute.Certification.Closure.Coverage] {
-        [.init(consumer: key("swift-primitives/swift-color"), proofs: [])]
+    private static func coverage() throws -> [Institute.Certification.Closure.Coverage] {
+        [try .init(consumer: key("swift-primitives/swift-color"), proofs: [])]
     }
 
     private static func control() throws -> Institute.Certification.Control {
@@ -73,7 +73,7 @@ extension Institute.Certification.Test.Certificate {
                 .init(obligation: Self.obligation(.test, .linux), outcome: .met(evidence: "d2")),
             ],
             exceptions: [],
-            closure: Self.coverage(),
+            closure: try Self.coverage(),
             coherenceReceipts: []
         )
         #expect(certificate.verdict == .certified)
@@ -90,7 +90,7 @@ extension Institute.Certification.Test.Certificate {
                 .init(obligation: Self.obligation(.build, .linux), outcome: .met(evidence: "d1"))
             ],
             exceptions: [],
-            closure: Self.coverage(),
+            closure: try Self.coverage(),
             coherenceReceipts: []
         )
         #expect(certificate.verdict == .unmeasured)
@@ -110,7 +110,7 @@ extension Institute.Certification.Test.Certificate {
                 )
             ],
             exceptions: [],
-            closure: Self.coverage(),
+            closure: try Self.coverage(),
             coherenceReceipts: []
         )
         #expect(certificate.verdict == .failed)
@@ -133,7 +133,7 @@ extension Institute.Certification.Test.Certificate {
                     authority: "swift-institute/.github#600"
                 )
             ],
-            closure: Self.coverage(),
+            closure: try Self.coverage(),
             coherenceReceipts: []
         )
         #expect(certificate.verdict == .certified)
@@ -155,7 +155,7 @@ extension Institute.Certification.Test.Certificate {
                         authority: "swift-institute/.github#600"
                     )
                 ],
-                closure: Self.coverage(),
+                closure: try Self.coverage(),
                 coherenceReceipts: []
             )
         }
@@ -199,7 +199,7 @@ extension Institute.Certification.Test.Certificate {
                         authority: "swift-institute/.github#600"
                     )
                 ],
-                closure: Self.coverage(),
+                closure: try Self.coverage(),
                 coherenceReceipts: []
             )
         }
@@ -220,7 +220,7 @@ extension Institute.Certification.Test.Certificate {
                     )
                 ],
                 exceptions: [],
-                closure: Self.coverage(),
+                closure: try Self.coverage(),
                 coherenceReceipts: []
             )
         }
@@ -237,7 +237,7 @@ extension Institute.Certification.Test.Certificate {
                 .init(obligation: Self.obligation(.build, .linux), outcome: .met(evidence: "d1"))
             ],
             exceptions: [],
-            closure: Self.coverage(),
+            closure: try Self.coverage(),
             coherenceReceipts: ["c1"]
         )
         let decoded = try Institute.Certification.Certificate(
@@ -266,7 +266,7 @@ extension Institute.Certification.Test.Certificate {
                 .init(obligation: Self.obligation(.build, .linux), outcome: .met(evidence: "d1"))
             ],
             exceptions: [],
-            closure: Self.coverage(),
+            closure: try Self.coverage(),
             coherenceReceipts: []
         )
         let member = Self.key("swift-primitives/swift-color")
