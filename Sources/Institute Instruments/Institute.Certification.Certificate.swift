@@ -13,9 +13,11 @@ extension Institute.Certification {
     /// - the verdict is derived (``Verdict``), never supplied.
     ///
     /// Composed-root integration evidence participates through
-    /// `coherenceReceipts` — digests of `Institute.Coherence.Receipt`
-    /// values, the one canonical receipt seam. A certificate references
-    /// that seam; it does not duplicate it.
+    /// `coherenceReceipts` — typed references to
+    /// `Institute.Coherence.Receipt` values, the one canonical receipt
+    /// seam. A certificate references that seam; it does not duplicate
+    /// it, and a reference of any other kind, or a duplicate reference,
+    /// is refused.
     public struct Certificate: Equatable, Sendable, Institute.Receipt.Sealed {
         public let version: Swift.Int
         public let kind: Swift.String
@@ -26,7 +28,7 @@ extension Institute.Certification {
         public let accounts: [Account]
         public let exceptions: [Exception]
         public let closure: [Closure.Coverage]
-        public let coherenceReceipts: [Swift.String]
+        public let coherenceReceipts: [Institute.Receipt.Reference]
         public let verdict: Verdict
 
         public init(
@@ -39,7 +41,7 @@ extension Institute.Certification {
             accounts: [Account],
             exceptions: [Exception],
             closure: [Closure.Coverage],
-            coherenceReceipts: [Swift.String]
+            coherenceReceipts: [Institute.Receipt.Reference]
         ) throws(Institute.Error) {
             let required = Set(obligations)
             guard required.count == obligations.count else {
@@ -96,7 +98,18 @@ extension Institute.Certification {
             self.closure = closure.sorted {
                 Institute.Repository.Key.precedes($0.consumer, $1.consumer)
             }
-            self.coherenceReceipts = coherenceReceipts.sorted()
+            for reference in coherenceReceipts {
+                guard reference.kind == Institute.Coherence.Receipt.canonicalKind else {
+                    throw .repository(
+                        "a certificate cites only ecosystem-coherence receipts; a "
+                            + "reference of kind '\(reference.kind)' is refused"
+                    )
+                }
+            }
+            guard Set(coherenceReceipts).count == coherenceReceipts.count else {
+                throw .repository("duplicate coherence receipt reference")
+            }
+            self.coherenceReceipts = coherenceReceipts.sorted { $0.digest < $1.digest }
 
             // Every package member owes an evaluated closure coverage
             // record: closure proof is a structural prerequisite of a
@@ -175,7 +188,7 @@ extension Institute.Certification.Certificate {
                 accounts: [Institute.Certification.Account](json: accounts),
                 exceptions: [Institute.Certification.Exception](json: exceptions),
                 closure: [Institute.Certification.Closure.Coverage](json: closure),
-                coherenceReceipts: [Swift.String](json: coherenceReceipts)
+                coherenceReceipts: [Institute.Receipt.Reference](json: coherenceReceipts)
             )
         } catch let error as JSON.Error {
             throw error

@@ -216,3 +216,31 @@ extension Institute.Coherence {
 // ``canonical`` and ``digest`` come from ``Institute/Receipt/Sealed``
 // (issue #83 Part 1) — this type contributed no members beyond the
 // `JSON.Serializable` shape above, so the digest behavior did not change.
+
+extension Institute.Coherence.Receipt {
+    /// The kind every ecosystem-coherence receipt declares; references
+    /// citing a coherence receipt are validated against exactly this.
+    public static let canonicalKind = "ecosystem-coherence"
+
+    /// The typed reference a certificate cites this receipt by.
+    ///
+    /// Refuses a non-canonical receipt: a `selection` other than
+    /// `"policy"` means a local narrowing was in effect, and doctrine
+    /// forbids citing such a run as a full-roster composition result —
+    /// the refusal happens here, at reference minting, so an
+    /// inadmissible receipt can never enter a certificate typedly.
+    public func reference() throws(Institute.Error) -> Institute.Receipt.Reference {
+        guard instrument.selection == "policy" else {
+            throw .repository(
+                "a coherence receipt with selection '\(instrument.selection)' is "
+                    + "non-canonical and cannot be cited by a certificate"
+            )
+        }
+        guard kind == Self.canonicalKind else {
+            throw .repository(
+                "a receipt of kind '\(kind)' is not an ecosystem-coherence receipt"
+            )
+        }
+        return try .init(of: self, kind: kind)
+    }
+}

@@ -238,7 +238,12 @@ extension Institute.Certification.Test.Certificate {
             ],
             exceptions: [],
             closure: try Self.coverage(),
-            coherenceReceipts: ["c1"]
+            coherenceReceipts: [
+                try .init(
+                    digest: Swift.String(repeating: "c", count: 64),
+                    kind: Institute.Coherence.Receipt.canonicalKind
+                )
+            ]
         )
         let decoded = try Institute.Certification.Certificate(
             jsonString: certificate.canonical
@@ -252,6 +257,57 @@ extension Institute.Certification.Test.Certificate {
         )
         #expect(throws: JSON.Error.self) {
             _ = try Institute.Certification.Certificate(jsonString: corrupt)
+        }
+    }
+
+    @Test
+    func `a coherence reference of a foreign kind is refused`() throws {
+        #expect(throws: Institute.Error.self) {
+            _ = try Institute.Certification.Certificate(
+                snapshot: Self.snapshot(),
+                control: Self.control(),
+                policy: Self.policy(),
+                obligations: [Self.obligation(.build, .linux)],
+                accounts: [
+                    .init(
+                        obligation: Self.obligation(.build, .linux),
+                        outcome: .met(evidence: "d1")
+                    )
+                ],
+                exceptions: [],
+                closure: try Self.coverage(),
+                coherenceReceipts: [
+                    try .init(
+                        digest: Swift.String(repeating: "c", count: 64),
+                        kind: "fleet-certificate"
+                    )
+                ]
+            )
+        }
+    }
+
+    @Test
+    func `a duplicate coherence reference is refused`() throws {
+        let reference = try Institute.Receipt.Reference(
+            digest: Swift.String(repeating: "c", count: 64),
+            kind: Institute.Coherence.Receipt.canonicalKind
+        )
+        #expect(throws: Institute.Error.self) {
+            _ = try Institute.Certification.Certificate(
+                snapshot: Self.snapshot(),
+                control: Self.control(),
+                policy: Self.policy(),
+                obligations: [Self.obligation(.build, .linux)],
+                accounts: [
+                    .init(
+                        obligation: Self.obligation(.build, .linux),
+                        outcome: .met(evidence: "d1")
+                    )
+                ],
+                exceptions: [],
+                closure: try Self.coverage(),
+                coherenceReceipts: [reference, reference]
+            )
         }
     }
 
