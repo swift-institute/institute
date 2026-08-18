@@ -59,6 +59,13 @@ extension Institute.Composition.State.Test.Unit {
     }
 
     @Test
+    func `records touching one consumer are all reported`() {
+        let state = Institute.Composition.State(records: [Self.record])
+        #expect(state.records(consumer: "swift-color") == [Self.record])
+        #expect(state.records(consumer: "swift-other").isEmpty)
+    }
+
+    @Test
     func `deserialize rejects a mismatched version`() {
         #expect(throws: JSON.Error.self) {
             _ = try Institute.Composition.State(

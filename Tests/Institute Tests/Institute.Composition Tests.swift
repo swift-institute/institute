@@ -209,6 +209,29 @@ extension Institute.Composition.Test.`Edge Case` {
     }
 
     @Test
+    func `a ledger-save failure after the manifest write restores the preimage`() throws {
+        let fixture = try Institute.Composition.Test.Fixture()
+        defer { fixture.remove() }
+        let original = try fixture.read()
+
+        // Make the ledger unsaveable: `.workspace` exists as a plain file,
+        // so creating the ledger directory fails after the manifest write.
+        let blocked = fixture.root.appending(path: ".workspace")
+        try Swift.String("not a directory").write(
+            to: blocked,
+            atomically: true,
+            encoding: .utf8
+        )
+
+        #expect(throws: Institute.Error.self) {
+            try fixture.composition.compose(consumer: "consumer", dependency: "swift-dep")
+        }
+
+        // The transaction's unwind path: the manifest is back byte-for-byte.
+        #expect(try fixture.read() == original)
+    }
+
+    @Test
     func `a non-workspace repository throws`() throws {
         let fixture = try Institute.Composition.Test.Fixture()
         defer { fixture.remove() }
