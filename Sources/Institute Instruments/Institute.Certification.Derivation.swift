@@ -52,7 +52,9 @@ extension Institute.Certification {
             }
         }
 
-        private static func materializedHead(
+        // Internal rather than private: ``Institute/Certification/Execution``
+        // shares the same exact-head read for its materialization proof.
+        internal static func materializedHead(
             git: Git.Client,
             root: Institute.Root,
             repository: Institute.Repository
