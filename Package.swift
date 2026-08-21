@@ -159,6 +159,10 @@ let package = Package(
             dependencies: [
                 "Institute Model",
                 .product(
+                    name: "Institute Continuous Integration",
+                    package: "institute-continuous-integration"
+                ),
+                .product(
                     name: "Institute Continuous Integration Source",
                     package: "institute-continuous-integration"
                 ),
@@ -174,6 +178,7 @@ let package = Package(
                     name: "Linter Standards Rules",
                     package: "swift-standards-linter-rules"
                 ),
+                .product(name: "Source Measurement", package: "swift-source"),
                 .product(name: "Source Profile", package: "swift-source"),
             ]
         ),
