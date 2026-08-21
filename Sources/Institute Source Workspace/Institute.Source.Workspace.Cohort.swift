@@ -5,7 +5,7 @@ extension Institute.Source.Workspace {
         public let groupReferences: Swift.Int
         public let containerReferences: Swift.Int
         public let rows: [Row]
-        public let reasons: [Source.Reason]
+        public let reasons: [SourceDomain.Reason]
 
         public var admitted: [Row] { rows.filter { $0.repository != nil && $0.reason == nil } }
 
@@ -15,7 +15,7 @@ extension Institute.Source.Workspace {
             groupReferences: Swift.Int,
             containerReferences: Swift.Int,
             rows: [Row],
-            reasons: [Source.Reason]
+            reasons: [SourceDomain.Reason]
         ) {
             self.workspace = workspace
             self.references = references

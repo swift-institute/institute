@@ -29,7 +29,7 @@ extension Institute.Source.Workspace.Cohort {
         }
 
         var flattened: [(Xcode.Workspace.Location, File.Directory)] = []
-        var reasons: [Source.Reason] = []
+        var reasons: [SourceDomain.Reason] = []
         for reference in document.references {
             Self.flatten(
                 reference,
@@ -54,7 +54,10 @@ extension Institute.Source.Workspace.Cohort {
             do throws(File.System.Canonical.Error) {
                 canonical = try File.System.Canonical.resolve(entry.1.path)
             } catch {
-                let reason = Source.Reason(code: "unresolved-reference", detail: entry.0.rawValue)
+                let reason = SourceDomain.Reason(
+                    code: "unresolved-reference",
+                    detail: entry.0.rawValue
+                )
                 reasons.append(reason)
                 rows.append(
                     .init(
@@ -72,7 +75,7 @@ extension Institute.Source.Workspace.Cohort {
             let duplicate = !canonicalPaths.insert(canonical.description).inserted
             let manifest = File.Directory(canonical)[file: "Package.swift"].stat.isFile
             let repository = expected[canonical.description]
-            let reason: Source.Reason?
+            let reason: SourceDomain.Reason?
             if duplicate {
                 reason = .init(code: "duplicate-reference", detail: canonical.description)
             } else if !manifest {
@@ -112,7 +115,7 @@ extension Institute.Source.Workspace.Cohort {
         group: File.Directory,
         container: File.Directory,
         into entries: inout [(Xcode.Workspace.Location, File.Directory)],
-        reasons: inout [Source.Reason]
+        reasons: inout [SourceDomain.Reason]
     ) {
         switch reference {
         case .file(let location):

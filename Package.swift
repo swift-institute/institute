@@ -82,6 +82,18 @@ let package = Package(
         .package(url: "https://github.com/swift-foundations/swift-xcode.git", branch: "main"),
         .package(url: "https://github.com/swift-foundations/swift-source.git", branch: "main"),
         .package(
+            url: "https://github.com/swift-foundations/swift-institute-linter-rules.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-primitives/swift-primitives-linter-rules.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-standards/swift-standards-linter-rules.git",
+            branch: "main"
+        ),
+        .package(
             url: "https://github.com/swift-institute/institute-continuous-integration.git",
             branch: "main"
         ),
@@ -147,6 +159,18 @@ let package = Package(
                 .product(
                     name: "Institute Continuous Integration Source",
                     package: "institute-continuous-integration"
+                ),
+                .product(
+                    name: "Linter Institute Rules",
+                    package: "swift-institute-linter-rules"
+                ),
+                .product(
+                    name: "Linter Primitives Rules",
+                    package: "swift-primitives-linter-rules"
+                ),
+                .product(
+                    name: "Linter Standards Rules",
+                    package: "swift-standards-linter-rules"
                 ),
                 .product(name: "Source Profile", package: "swift-source"),
             ]

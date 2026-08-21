@@ -5,7 +5,7 @@ extension Institute.Source.Workspace {
         public let directory: Swift.String
         public let identity: Swift.String
         public let repository: Institute.Repository?
-        public let reason: Source.Reason?
+        public let reason: SourceDomain.Reason?
 
         public init(
             index: Swift.Int,
@@ -13,7 +13,7 @@ extension Institute.Source.Workspace {
             directory: Swift.String,
             identity: Swift.String,
             repository: Institute.Repository?,
-            reason: Source.Reason?
+            reason: SourceDomain.Reason?
         ) {
             self.index = index
             self.location = location
