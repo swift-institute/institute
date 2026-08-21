@@ -59,9 +59,11 @@ func `Institute repair plan rejects unknown wrapper fields`() throws {
 
     #expect(throws: JSON.Error.self) {
         _ = try Institute.Source.Repair.Plan(
-            json: .object(object.keys.sorted().compactMap { key in
-                object[key].map { (key, $0) }
-            })
+            json: .object(
+                object.keys.sorted().compactMap { key in
+                    object[key].map { (key, $0) }
+                }
+            )
         )
     }
 }
@@ -111,7 +113,7 @@ func `Institute source subject includes the package manifest and admitted Swift 
     let subject = try Institute.Source.Application().subject(for: row)
 
     #expect(
-        subject.files == [
+        subject.paths(of: .swift) == [
             "Package.swift",
             "Sources/A.swift",
             "Tests/Unit/A Tests.swift",

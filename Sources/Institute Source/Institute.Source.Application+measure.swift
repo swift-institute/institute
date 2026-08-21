@@ -18,32 +18,42 @@ extension Institute.Source.Application {
         let scope: SourceDomain.Report.Scope = selected == nil && engines == nil ? .workspace : .partial
         let policy = ContinuousIntegration.Source.Policy.current
         guard preparation.policyRevision == policy.revision else {
-            return .init(scope: scope, profile: .init("stale"), subjects: [], references: [.init(code: "stale-profile", detail: preparation.policyRevision)], measurements: [])
+            return Self.unmeasuredReport(
+                scope: scope,
+                reason: .init(code: "stale-profile", detail: preparation.policyRevision)
+            )
         }
         guard Self.matches(file: preparation.swiftFormatExecutable, digest: preparation.swiftFormatTool),
             Self.matches(file: preparation.linterExecutable, digest: preparation.linterTool)
         else {
-            return .init(scope: scope, profile: .init("stale"), subjects: [], references: [.init(code: "stale-tool", detail: preparation.directory)], measurements: [])
+            return Self.unmeasuredReport(
+                scope: scope,
+                reason: .init(code: "stale-tool", detail: preparation.directory)
+            )
         }
-        guard Self.matches(
-            file: "\(preparation.directory)/.swift-format",
-            digest: policy.swiftFormat.digest
-        )
+        guard
+            Self.matches(
+                file: "\(preparation.directory)/.swift-format",
+                digest: policy.swiftFormat.digest
+            )
         else {
-            return .init(scope: scope, profile: .init("stale"), subjects: [], references: [.init(code: "stale-configuration", detail: ".swift-format")], measurements: [])
+            return Self.unmeasuredReport(
+                scope: scope,
+                reason: .init(code: "stale-configuration", detail: ".swift-format")
+            )
         }
 
         let drivers: [SourceDomain.Engine.Driver] = [
             .swiftFormat(process: process), .linter(process: process),
         ]
         let execution: SourceDomain.Execution
-        do throws(SourceDomain.Execution.Error) { execution = try .init(drivers: drivers) }
-        catch { throw .configuration("cannot register source engines: \(error)") }
+        do throws(SourceDomain.Execution.Error) { execution = try .init(drivers: drivers) } catch { throw .configuration("cannot register source engines: \(error)") }
         var subjects: [SourceDomain.Subject] = []
-        var entries: [(
-            repository: Institute.Repository,
-            subject: SourceDomain.Subject
-        )] = []
+        var entries:
+            [(
+                repository: Institute.Repository,
+                subject: SourceDomain.Subject
+            )] = []
         for row in rows {
             guard let repository = row.repository else { continue }
             let subject = try subject(for: row)
@@ -59,7 +69,14 @@ extension Institute.Source.Application {
             let linterArtifact = policy.linter(bundle: bundle, rules: rules)
             guard Self.matches(file: linterConfiguration, digest: linterArtifact.digest) else {
                 return policy.requiredEngines.map {
-                    .init(engine: $0, subject: subject, activeRules: [], applicableRules: [], files: subject.files, verdict: .unmeasured([.init(code: "stale-configuration", detail: linterConfiguration)]))
+                    .init(
+                        engine: $0,
+                        subject: subject,
+                        activeRules: [],
+                        applicableRules: [],
+                        files: subject.paths(of: .swift),
+                        verdict: .unmeasured([.init(code: "stale-configuration", detail: linterConfiguration)])
+                    )
                 }
             }
             let profile = policy.profile(
@@ -74,7 +91,14 @@ extension Institute.Source.Application {
             )
             guard preparation.profiles[bundle.rawValue] == profile.digest else {
                 return profile.engines.map {
-                    .init(engine: $0.id, subject: subject, activeRules: $0.rules, applicableRules: [], files: subject.files, verdict: .unmeasured([.init(code: "stale-profile", detail: bundle.rawValue)]))
+                    .init(
+                        engine: $0.id,
+                        subject: subject,
+                        activeRules: $0.rules,
+                        applicableRules: [],
+                        files: subject.paths(of: .swift),
+                        verdict: .unmeasured([.init(code: "stale-profile", detail: bundle.rawValue)])
+                    )
                 }
             }
             return await execution.measure(subject, profile: profile, engines: engines)
@@ -86,9 +110,32 @@ extension Institute.Source.Application {
         return .init(
             scope: scope,
             profile: digest,
+            commitment: .init(
+                subjects: subjects,
+                engines: policy.requiredEngines.map {
+                    .init(id: $0, artifactKinds: [.swift])
+                },
+                predicates: []
+            ),
             subjects: subjects,
             references: cohort.reasons + references,
-            measurements: measurements
+            measurements: measurements,
+            artifactEvidence: []
+        )
+    }
+
+    private static func unmeasuredReport(
+        scope: SourceDomain.Report.Scope,
+        reason: SourceDomain.Reason
+    ) -> SourceDomain.Report {
+        .init(
+            scope: scope,
+            profile: .init("stale"),
+            commitment: .init(subjects: [], engines: [], predicates: []),
+            subjects: [],
+            references: [reason],
+            measurements: [],
+            artifactEvidence: []
         )
     }
 }

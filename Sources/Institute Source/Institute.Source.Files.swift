@@ -5,8 +5,7 @@ public import Source_Measurement
 extension Institute.Source.Application {
     public func subject(for row: Institute.Source.Workspace.Row) throws(Institute.Error) -> SourceDomain.Subject {
         let root: File.Directory
-        do throws(File.Path.Error) { root = File.Directory(try .init(row.directory)) }
-        catch { throw .configuration("invalid source member path \(row.directory)") }
+        do throws(File.Path.Error) { root = File.Directory(try .init(row.directory)) } catch { throw .configuration("invalid source member path \(row.directory)") }
 
         guard root[file: "Package.swift"].stat.isFile else {
             throw .configuration("source member manifest is missing at \(row.directory)")
@@ -27,7 +26,13 @@ extension Institute.Source.Application {
                 throw .filesystem("cannot enumerate Swift sources at \(directory): \(error)")
             }
         }
-        return .init(identity: row.identity, root: row.directory, files: files)
+        return .init(
+            identity: row.identity,
+            root: row.directory,
+            artifacts: files.map {
+                .init(path: $0, kind: .swift, provenance: .authored)
+            }
+        )
     }
 
     private static func relative(_ path: File.Path, to base: File.Path) -> [Swift.String] {

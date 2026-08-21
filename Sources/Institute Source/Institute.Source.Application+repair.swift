@@ -1,5 +1,5 @@
-public import File_System
 public import FIPS_180_4
+public import File_System
 public import Institute_Model
 public import JSON
 public import Source_Execution
@@ -72,8 +72,7 @@ extension Institute.Source.Application {
 
         let temporary = try Self.temporaryDirectory(beside: subject.root)
         defer {
-            do throws(File.System.Delete.Error) { try temporary.delete.recursive() }
-            catch {}
+            do throws(File.System.Delete.Error) { try temporary.delete.recursive() } catch {}
         }
         try Self.materialize(staging.files, at: temporary)
         let remapped = Self.remap(process, from: subject.root, to: temporary.description)
@@ -106,9 +105,11 @@ extension Institute.Source.Application {
             guard identities.insert(repair.subject.identity).inserted else {
                 throw .configuration("duplicate source repair subject: \(repair.subject.identity)")
             }
-            guard let row = cohort.admitted.first(where: {
-                $0.identity == repair.subject.identity
-            }) else {
+            guard
+                let row = cohort.admitted.first(where: {
+                    $0.identity == repair.subject.identity
+                })
+            else {
                 throw .configuration("source repair subject is no longer admitted")
             }
             let subject = try subject(for: row)
@@ -136,8 +137,7 @@ extension Institute.Source.Application {
     private static func execution(
         process: SourceDomain.Engine.Process
     ) throws(Institute.Error) -> SourceDomain.Execution {
-        do throws(SourceDomain.Execution.Error) { return try executionUnchecked(process: process) }
-        catch { throw .configuration("cannot register source engines: \(error)") }
+        do throws(SourceDomain.Execution.Error) { return try executionUnchecked(process: process) } catch { throw .configuration("cannot register source engines: \(error)") }
     }
 
     private static func executionUnchecked(
@@ -150,7 +150,7 @@ extension Institute.Source.Application {
         subject: SourceDomain.Subject,
         files: SourceDomain.Repair.FileSystem
     ) throws(Institute.Error) -> [SourceDomain.Repair.Staged.File] {
-        try subject.files.map { path in
+        try subject.paths(of: .swift).map { path in
             switch files.read(path) {
             case .success(let contents): return .init(path: path, contents: contents)
             case .failure(let reason):
@@ -161,8 +161,7 @@ extension Institute.Source.Application {
 
     private static func temporaryDirectory(beside root: Swift.String) throws(Institute.Error) -> File.Directory {
         let path: File.Path
-        do throws(File.Path.Error) { path = try .init(root) }
-        catch { throw .configuration("invalid source member root \(root)") }
+        do throws(File.Path.Error) { path = try .init(root) } catch { throw .configuration("invalid source member root \(root)") }
         let temporary: File.Path
         do throws(File.Path.Temporary.Error) {
             temporary = try File.Path.Temporary.sibling(
@@ -172,8 +171,7 @@ extension Institute.Source.Application {
             )
         } catch { throw .filesystem("cannot allocate source repair staging directory: \(error)") }
         let directory = File.Directory(temporary)
-        do throws(File.System.Create.Directory.Error) { try directory.create.recursive() }
-        catch { throw .filesystem("cannot create source repair staging directory: \(error)") }
+        do throws(File.System.Create.Directory.Error) { try directory.create.recursive() } catch { throw .filesystem("cannot create source repair staging directory: \(error)") }
         return directory
     }
 
