@@ -13,7 +13,7 @@ extension Institute.Source.Application {
     ) async throws(Institute.Error) -> SourceDomain.Report {
         let rows = selected ?? cohort.admitted
         let scope: SourceDomain.Report.Scope = selected == nil && engines == nil ? .workspace : .partial
-        let policy = Institute.ContinuousIntegration.Source.Policy.current
+        let policy = ContinuousIntegration.Source.Policy.current
         guard preparation.policyRevision == policy.revision else {
             return .init(scope: scope, profile: .init("stale"), subjects: [], references: [.init(code: "stale-profile", detail: preparation.policyRevision)], measurements: [])
         }

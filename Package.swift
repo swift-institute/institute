@@ -188,6 +188,10 @@ let package = Package(
                 "Institute Model",
                 "Institute Source Profile",
                 "Institute Source Workspace",
+                .product(
+                    name: "Institute Continuous Integration Source",
+                    package: "institute-continuous-integration"
+                ),
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "Process", package: "swift-process"),

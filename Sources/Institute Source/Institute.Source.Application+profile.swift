@@ -10,7 +10,7 @@ extension Institute.Source.Application {
         guard let repository = row.repository else {
             throw .configuration("source member is not admitted: \(row.identity)")
         }
-        let policy = Institute.ContinuousIntegration.Source.Policy.current
+        let policy = ContinuousIntegration.Source.Policy.current
         let owner = Institute.Source.Profile(policy: policy)
         let bundle = owner.bundle(for: repository)
         let rules = owner.rules(for: bundle)

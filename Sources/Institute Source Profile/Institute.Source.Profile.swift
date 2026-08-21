@@ -9,19 +9,16 @@ public import Source_Profile
 
 extension Institute_Model.Institute.Source {
     public struct Profile: Sendable {
-        public let policy:
-            Institute_Continuous_Integration.Institute.ContinuousIntegration.Source.Policy
+        public let policy: ContinuousIntegration.Source.Policy
 
         public init(
-            policy:
-                Institute_Continuous_Integration.Institute.ContinuousIntegration.Source.Policy = .current
+            policy: ContinuousIntegration.Source.Policy = .current
         ) {
             self.policy = policy
         }
 
         public func rules(
-            for bundle:
-                Institute_Continuous_Integration.Institute.ContinuousIntegration.Source.Bundle
+            for bundle: ContinuousIntegration.Source.Bundle
         ) -> [Source_Measurement.Source.Rule.ID] {
             let configurations: [Lint.Rule.Configuration]
             switch bundle {

@@ -10,7 +10,7 @@ extension Institute.Source.Application {
         swiftFormatExecutable: Swift.String,
         linterExecutable: Swift.String
     ) throws(Institute.Error) -> Institute.Source.Preparation {
-        let policy = Institute.ContinuousIntegration.Source.Policy.current
+        let policy = ContinuousIntegration.Source.Policy.current
         let directory = try Self.artifactDirectory(workspace: workspace)
         do throws(File.System.Create.Directory.Error) { try directory.create.recursive() }
         catch { throw .filesystem("cannot create source profile directory \(directory): \(error)") }
