@@ -181,7 +181,7 @@ extension Institute.Doctor.Test.Integration {
     {
         let fixture = try Institute.Doctor.Fixture(repositories: [])
         defer { fixture.remove() }
-        try Institute.Xcode.write([], at: fixture.directory)
+        try Institute.Xcode.write(try Institute.Xcode.specification([]), at: fixture.directory)
 
         let report = await fixture.doctor(environment: { variable in
             variable == "TOOLCHAINS" ? "com.example.toolchain" : nil
@@ -201,7 +201,7 @@ extension Institute.Doctor.Test.Integration {
     func `a clean toolchain measures all four assertions`() async throws {
         let fixture = try Institute.Doctor.Fixture(repositories: [])
         defer { fixture.remove() }
-        try Institute.Xcode.write([], at: fixture.directory)
+        try Institute.Xcode.write(try Institute.Xcode.specification([]), at: fixture.directory)
 
         let report = await fixture.doctor().run()
 
@@ -215,7 +215,7 @@ extension Institute.Doctor.Test.Integration {
     {
         let fixture = try Institute.Doctor.Fixture(repositories: [])
         defer { fixture.remove() }
-        try Institute.Xcode.write([], at: fixture.directory)
+        try Institute.Xcode.write(try Institute.Xcode.specification([]), at: fixture.directory)
 
         let report = await fixture.doctor(tool: {
             executable,

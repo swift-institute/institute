@@ -12,6 +12,7 @@ import Xcode_Workspace_Standard
 @testable import Institute_Lint
 @testable import Institute_Model
 @testable import Institute_Pages
+@testable import Institute_Source_Workspace
 
 extension Institute.Xcode {
     @Suite
@@ -24,8 +25,36 @@ extension Institute.Xcode {
 
 extension Institute.Xcode.Test.Unit {
     @Test
-    func `render terminates the workspace artifact with one line feed`() {
-        let rendered = Institute.Xcode.render([])
+    func `workspace membership roles round trip without path inference`() throws {
+        let specification = Institute.Workspace.Specification(members: [
+            .init(location: "group:.", role: .control(.application)),
+            .init(location: "group:../institute", role: .control(.institute)),
+            .init(
+                location: "group:../institute-continuous-integration",
+                role: .control(.continuousIntegration)
+            ),
+            .init(
+                location: "group:../swift-primitives/swift-example",
+                role: .subject(
+                    try #require(
+                        Institute.Repository.Key(identity: "swift-primitives/swift-example")
+                    )
+                )
+            ),
+        ])
+
+        let decoded = try Institute.Workspace.Specification(
+            jsonString: specification.jsonString(sortKeys: true)
+        )
+
+        #expect(decoded == specification)
+    }
+
+    @Test
+    func `render terminates the workspace artifact with one line feed`() throws {
+        let rendered = try Institute.Xcode.render(.init(members: [
+            .init(location: "group:.", role: .control(.application))
+        ]))
 
         #expect(Data(rendered.utf8).last == 0x0A)
         #expect(rendered.hasSuffix("</Workspace>\n"))
@@ -48,10 +77,13 @@ extension Institute.Xcode.Test.Unit {
             ),
         ]
 
-        let rendered = Institute.Xcode.render(repositories)
-        let document = Institute.Xcode.document(repositories)
+        let specification = try Institute.Xcode.specification(repositories)
+        let rendered = try Institute.Xcode.render(specification)
+        let document = try Institute.Xcode.document(specification)
 
         #expect(rendered.contains("group:."))
+        #expect(rendered.contains("group:../institute"))
+        #expect(rendered.contains("group:../institute-continuous-integration"))
         #expect(rendered.contains("group:../swift-primitives/swift-example"))
         #expect(rendered.contains("group:../swift-standards/swift-ietf/swift-rfc-0000"))
         #expect(!rendered.contains("/Users/"))
@@ -59,6 +91,8 @@ extension Institute.Xcode.Test.Unit {
         #expect(
             document.references.map(\.location) == [
                 .group("."),
+                .group("../institute"),
+                .group("../institute-continuous-integration"),
                 .group("../swift-primitives/swift-example"),
                 .group("../swift-standards/swift-ietf/swift-rfc-0000"),
             ]
@@ -73,7 +107,7 @@ extension Institute.Xcode.Test.Integration {
         throws
     {
         let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-        let checkout = base.appending(path: "Institute")
+        let checkout = base.appending(path: "institute-application")
         defer { try? FileManager.default.removeItem(at: base) }
         try FileManager.default.createDirectory(at: checkout, withIntermediateDirectories: true)
         let root = try File.Directory(validating: checkout.path)
@@ -86,17 +120,22 @@ extension Institute.Xcode.Test.Integration {
             )
         ]
 
-        try Institute.Xcode.write(repositories, at: root)
+        let specification = try Institute.Xcode.specification(repositories)
+        try Institute.Xcode.write(specification, at: root)
 
-        let generated = checkout.appending(path: "institute.xcworkspace/contents.xcworkspacedata")
+        let generated = checkout.appending(
+            path: "institute interim.xcworkspace/contents.xcworkspacedata"
+        )
         #expect(FileManager.default.fileExists(atPath: generated.path))
         #expect(
             !FileManager.default.fileExists(
                 atPath: base.appending(path: "institute.xcworkspace").path
             )
         )
-        #expect(try Data(contentsOf: generated) == Data(Institute.Xcode.render(repositories).utf8))
-        #expect(Institute.Xcode.current(repositories, at: root))
+        #expect(
+            try Data(contentsOf: generated) == Data(Institute.Xcode.render(specification).utf8)
+        )
+        #expect(Institute.Xcode.current(specification, at: root))
         #expect(
             try #require(Institute.Xcode.contents(at: root)).contains(
                 "../swift-foundations/swift-example"
@@ -116,7 +155,15 @@ extension Institute.Xcode.Test.Integration {
             at: base.appending(path: "swift-foundations/swift-example"),
             withIntermediateDirectories: true
         )
-        for reference in Institute.Xcode.document(repositories).references {
+        try FileManager.default.createDirectory(
+            at: base.appending(path: "institute"),
+            withIntermediateDirectories: true
+        )
+        try FileManager.default.createDirectory(
+            at: base.appending(path: "institute-continuous-integration"),
+            withIntermediateDirectories: true
+        )
+        for reference in try Institute.Xcode.document(specification).references {
             guard case .group(let location) = reference.location else {
                 Issue.record("unexpected non-group reference \(reference.location)")
                 continue
@@ -132,5 +179,54 @@ extension Institute.Xcode.Test.Integration {
                 "group \(location) resolves to \(resolved.path), which is not a directory"
             )
         }
+    }
+
+    @Test
+    func `typed control members never enter the source cohort`() throws {
+        let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        let application = base.appending(path: "institute-application")
+        defer { try? FileManager.default.removeItem(at: base) }
+        for directory in [
+            application,
+            base.appending(path: "institute"),
+            base.appending(path: "institute-continuous-integration"),
+            base.appending(path: "swift-primitives/swift-example"),
+        ] {
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            try Data("// swift-tools-version: 6.4\n".utf8).write(
+                to: directory.appending(path: "Package.swift")
+            )
+        }
+        let repository = Institute.Repository(
+            name: "swift-example",
+            url: "https://github.com/swift-primitives/swift-example.git",
+            organization: "swift-primitives",
+            layer: .primitives
+        )
+        let root = try Institute.Root(checkout: File.Directory(validating: application.path))
+        let specification = try Institute.Xcode.specification([repository])
+        try Institute.Xcode.write(specification, at: root.checkout)
+        let configuration = Institute.Configuration(
+            version: 1,
+            scope: "swift-institute",
+            swift: "6.4.0",
+            xcode: "27.0",
+            repositories: [repository]
+        )
+
+        let cohort = try Institute.Source.Workspace.Cohort.read(
+            from: Institute.Xcode.bundle(at: root.checkout).description,
+            configuration: configuration,
+            hierarchy: root.hierarchy
+        )
+
+        #expect(cohort.references == 4)
+        #expect(cohort.controls.map(\.identity) == [
+            "control:application",
+            "control:institute",
+            "control:continuous-integration",
+        ])
+        #expect(cohort.admitted.map(\.identity) == ["swift-primitives/swift-example"])
+        #expect(cohort.reasons.isEmpty)
     }
 }

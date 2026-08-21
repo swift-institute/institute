@@ -4,6 +4,7 @@ extension Institute.Source.Workspace {
         public let location: Xcode.Workspace.Location
         public let directory: Swift.String
         public let identity: Swift.String
+        public let role: Institute.Workspace.Role
         public let repository: Institute.Repository?
         public let reason: SourceDomain.Reason?
 
@@ -12,6 +13,7 @@ extension Institute.Source.Workspace {
             location: Xcode.Workspace.Location,
             directory: Swift.String,
             identity: Swift.String,
+            role: Institute.Workspace.Role,
             repository: Institute.Repository?,
             reason: SourceDomain.Reason?
         ) {
@@ -19,6 +21,7 @@ extension Institute.Source.Workspace {
             self.location = location
             self.directory = directory
             self.identity = identity
+            self.role = role
             self.repository = repository
             self.reason = reason
         }

@@ -116,7 +116,8 @@ extension Institute.Coherence.Run {
         guard diagnostics.isEmpty else {
             throw .configuration(diagnostics.joined(separator: "\n"))
         }
-        return try Institute.Xcode.Scheme.buildables(for: selection.repositories, at: root).count
+        let specification = try Institute.Xcode.specification(selection.repositories)
+        return try Institute.Xcode.Scheme.plan(for: specification, at: root).buildables.count
     }
 
     public static func realBuild(

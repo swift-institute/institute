@@ -227,7 +227,10 @@ extension Institute.Doctor.Test.Integration {
     {
         let fixture = try Institute.Doctor.Fixture(repositories: [Self.repository])
         defer { fixture.remove() }
-        try Institute.Xcode.write([Self.repository], at: fixture.directory)
+        try Institute.Xcode.write(
+            try Institute.Xcode.specification([Self.repository]),
+            at: fixture.directory
+        )
         try fixture.materialize("swift-example")
 
         let report = await fixture.doctor().run()

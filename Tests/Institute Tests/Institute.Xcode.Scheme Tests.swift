@@ -20,7 +20,7 @@ extension Institute.Xcode.Scheme {
 }
 
 extension Institute.Xcode.Scheme.Test.Unit {
-    private static let buildables = [
+    private static let plan = Institute.Xcode.Scheme.Plan(buildables: [
         Institute.Xcode.Scheme.Buildable(
             reference: "../swift-primitives/swift-dimension-primitives",
             target: "Dimension Primitives"
@@ -33,14 +33,19 @@ extension Institute.Xcode.Scheme.Test.Unit {
             reference: "../swift-standards/swift-color-standard",
             target: "Theme"
         ),
-    ]
+    ], testables: [
+        .init(
+            reference: "../swift-standards/swift-color-standard",
+            target: "Color Standard Tests"
+        )
+    ])
 
     @Test
     func `one scheme names buildables in more than one container`() {
         // This is the entire mechanism. Xcode autogenerates a scheme per
         // product and `xcodebuild` accepts exactly one `-scheme`, so without a
         // shared scheme spanning containers, N packages is N invocations.
-        let rendered = Institute.Xcode.Scheme.render(Self.buildables)
+        let rendered = Institute.Xcode.Scheme.render(Self.plan)
 
         #expect(
             rendered.contains(
@@ -60,12 +65,12 @@ extension Institute.Xcode.Scheme.Test.Unit {
         // Asserted at this layer as well as in swift-xcode, because it is this
         // consumer that dies of it: with a LaunchAction present, `xcodebuild
         // build` resolves the graph and then exits 139 with no diagnostic.
-        #expect(!Institute.Xcode.Scheme.render(Self.buildables).contains("LaunchAction"))
+        #expect(!Institute.Xcode.Scheme.render(Self.plan).contains("LaunchAction"))
     }
 
     @Test
     func `references are checkout relative, never absolute`() {
-        let rendered = Institute.Xcode.Scheme.render(Self.buildables)
+        let rendered = Institute.Xcode.Scheme.render(Self.plan)
 
         #expect(!rendered.contains("container:/"))
         #expect(!rendered.contains("/Users/"))
@@ -73,10 +78,10 @@ extension Institute.Xcode.Scheme.Test.Unit {
 
     @Test
     func `every buildable becomes one build action entry, in selection order`() {
-        let rendered = Institute.Xcode.Scheme.render(Self.buildables)
+        let rendered = Institute.Xcode.Scheme.render(Self.plan)
         let entries = rendered.components(separatedBy: "<BuildActionEntry").count - 1
 
-        #expect(entries == Self.buildables.count)
+        #expect(entries == Self.plan.buildables.count)
 
         let dimension = rendered.range(of: "Dimension Primitives")
         let theme = rendered.range(of: "Theme")
@@ -90,7 +95,10 @@ extension Institute.Xcode.Scheme.Test.Unit {
     @Test
     func `the blueprint is the target name, which is what xcodebuild matches on`() {
         let rendered = Institute.Xcode.Scheme.render(
-            [.init(reference: "../a/b", target: "Color Standard")]
+            .init(
+                buildables: [.init(reference: "../a/b", target: "Color Standard")],
+                testables: []
+            )
         )
 
         #expect(rendered.contains(#"BlueprintIdentifier="Color Standard""#))
@@ -99,13 +107,12 @@ extension Institute.Xcode.Scheme.Test.Unit {
     }
 
     @Test
-    func `no test target is ever a buildable`() {
-        // 813 of the fleet's 2,916 targets are test targets and none of them
-        // compile here, so a scheme that named them would fail for reasons
-        // that have nothing to do with the selection.
-        let rendered = Institute.Xcode.Scheme.render(Self.buildables)
+    func `test targets become real unskipped testables`() {
+        let rendered = Institute.Xcode.Scheme.render(Self.plan)
 
-        #expect(rendered.contains("<Testables/>"))
+        #expect(rendered.contains("<TestableReference"))
+        #expect(rendered.contains(#"skipped="NO""#))
+        #expect(rendered.contains("Color Standard Tests"))
     }
 }
 
@@ -122,10 +129,20 @@ extension Institute.Xcode.Scheme.Test.`Edge Case` {
         // in `current(_:at:)` would report a stale scheme as current and the
         // gate would be decorative.
         let declared = Institute.Xcode.Scheme.render(
-            [.init(reference: "../swift-foundations/swift-color", target: "Color")]
+            .init(
+                buildables: [
+                    .init(reference: "../swift-foundations/swift-color", target: "Color")
+                ],
+                testables: []
+            )
         )
         let renamed = Institute.Xcode.Scheme.render(
-            [.init(reference: "../swift-foundations/swift-color", target: "Colour")]
+            .init(
+                buildables: [
+                    .init(reference: "../swift-foundations/swift-color", target: "Colour")
+                ],
+                testables: []
+            )
         )
 
         #expect(declared != renamed)
@@ -134,19 +151,27 @@ extension Institute.Xcode.Scheme.Test.`Edge Case` {
     @Test
     func `a dropped package changes the rendering`() {
         let full = Institute.Xcode.Scheme.render(
-            [
-                .init(reference: "../a/one", target: "One"),
-                .init(reference: "../a/two", target: "Two"),
-            ]
+            .init(
+                buildables: [
+                    .init(reference: "../a/one", target: "One"),
+                    .init(reference: "../a/two", target: "Two"),
+                ],
+                testables: []
+            )
         )
-        let short = Institute.Xcode.Scheme.render([.init(reference: "../a/one", target: "One")])
+        let short = Institute.Xcode.Scheme.render(
+            .init(
+                buildables: [.init(reference: "../a/one", target: "One")],
+                testables: []
+            )
+        )
 
         #expect(full != short)
     }
 
     @Test
     func `an empty selection renders a scheme with no buildables rather than failing`() {
-        let rendered = Institute.Xcode.Scheme.render([])
+        let rendered = Institute.Xcode.Scheme.render(.init(buildables: [], testables: []))
 
         #expect(rendered.contains("<BuildActionEntries/>"))
     }

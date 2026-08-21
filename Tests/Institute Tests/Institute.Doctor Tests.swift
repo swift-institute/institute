@@ -253,7 +253,10 @@ extension Institute.Doctor.Test.Integration {
             encoding: .utf8
         )
         try Self.command(["remote", "add", "origin", repository.url], at: checkout)
-        try Institute.Xcode.write([repository], at: fixture.directory)
+        try Institute.Xcode.write(
+            try Institute.Xcode.specification([repository]),
+            at: fixture.directory
+        )
 
         let report = await fixture.doctor().run()
 
@@ -273,7 +276,10 @@ extension Institute.Doctor.Test.Integration {
         let fixture = try Institute.Doctor.Fixture(repositories: [repository])
         defer { fixture.remove() }
         try fixture.materializeLegacy(repository.name)
-        try Institute.Xcode.write([repository], at: fixture.directory)
+        try Institute.Xcode.write(
+            try Institute.Xcode.specification([repository]),
+            at: fixture.directory
+        )
 
         let report = await fixture.doctor().run()
 
@@ -298,7 +304,10 @@ extension Institute.Doctor.Test.Integration {
         defer { fixture.remove() }
         try fixture.materialize(repository.name)
         try fixture.materializeLegacy(repository.name)
-        try Institute.Xcode.write([repository], at: fixture.directory)
+        try Institute.Xcode.write(
+            try Institute.Xcode.specification([repository]),
+            at: fixture.directory
+        )
 
         let report = await fixture.doctor().run()
 
@@ -318,7 +327,10 @@ extension Institute.Doctor.Test.Integration {
         )
         let fixture = try Institute.Doctor.Fixture(repositories: [repository])
         defer { fixture.remove() }
-        try Institute.Xcode.write([repository], at: fixture.directory)
+        try Institute.Xcode.write(
+            try Institute.Xcode.specification([repository]),
+            at: fixture.directory
+        )
 
         let report = await fixture.doctor().run()
 
@@ -352,7 +364,10 @@ extension Institute.Doctor.Test.Integration {
             "not resolved-state JSON",
             to: "swift-foundations/swift-unselected/Package.resolved"
         )
-        try Institute.Xcode.write(fixture.selection.repositories, at: fixture.directory)
+        try Institute.Xcode.write(
+            try Institute.Xcode.specification(fixture.selection.repositories),
+            at: fixture.directory
+        )
 
         let report = await fixture.doctor().run()
 
@@ -411,7 +426,10 @@ extension Institute.Doctor.Test.Integration {
     {
         let fixture = try Institute.Doctor.Fixture(repositories: [])
         defer { fixture.remove() }
-        try Institute.Xcode.write([], at: fixture.directory)
+        try Institute.Xcode.write(
+            try Institute.Xcode.specification([]),
+            at: fixture.directory
+        )
 
         let report = await fixture.doctor().run(access: .contributor)
 
@@ -563,7 +581,10 @@ extension Institute.Doctor.Test.Integration {
     func `a failed discovery is unmeasured, not a clean result`() async throws {
         let fixture = try Institute.Doctor.Fixture(repositories: [])
         defer { fixture.remove() }
-        try Institute.Xcode.write([], at: fixture.directory)
+        try Institute.Xcode.write(
+            try Institute.Xcode.specification([]),
+            at: fixture.directory
+        )
 
         let report = await fixture.doctor().run(
             access: .institute(inventory: { () throws(Institute.Error) in
@@ -602,7 +623,10 @@ extension Institute.Doctor.Test.Integration {
         let fixture = try Institute.Doctor.Fixture(repositories: [repository])
         defer { fixture.remove() }
         try fixture.materialize(repository.name)
-        try Institute.Xcode.write([repository], at: fixture.directory)
+        try Institute.Xcode.write(
+            try Institute.Xcode.specification([repository]),
+            at: fixture.directory
+        )
         let transcript = Institute.Doctor.Transcript()
 
         let report = await fixture.doctor(progress: transcript.progress).run()
@@ -623,7 +647,10 @@ extension Institute.Doctor.Test.Integration {
         let fixture = try Institute.Doctor.Fixture(repositories: [repository])
         defer { fixture.remove() }
         try fixture.materialize(repository.name)
-        try Institute.Xcode.write([repository], at: fixture.directory)
+        try Institute.Xcode.write(
+            try Institute.Xcode.specification([repository]),
+            at: fixture.directory
+        )
         let transcript = Institute.Doctor.Transcript()
 
         let silent = await fixture.doctor().run()
@@ -645,7 +672,10 @@ extension Institute.Doctor.Test.Integration {
         for repository in repositories.dropLast() {
             try fixture.materialize(repository.name)
         }
-        try Institute.Xcode.write(repositories, at: fixture.directory)
+        try Institute.Xcode.write(
+            try Institute.Xcode.specification(repositories),
+            at: fixture.directory
+        )
 
         let report = await fixture.doctor().run()
 

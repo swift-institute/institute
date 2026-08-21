@@ -101,6 +101,9 @@ func `Institute source subject includes the package manifest and admitted Swift 
         location: .group("."),
         directory: root.path,
         identity: "swift-primitives/swift-example",
+        role: .subject(
+            try #require(Institute.Repository.Key(identity: "swift-primitives/swift-example"))
+        ),
         repository: nil,
         reason: nil
     )

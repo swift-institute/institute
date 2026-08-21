@@ -7,7 +7,19 @@ extension Institute.Source.Workspace {
         public let rows: [Row]
         public let reasons: [SourceDomain.Reason]
 
-        public var admitted: [Row] { rows.filter { $0.repository != nil && $0.reason == nil } }
+        public var admitted: [Row] {
+            rows.filter {
+                guard case .subject = $0.role else { return false }
+                return $0.repository != nil && $0.reason == nil
+            }
+        }
+
+        public var controls: [Row] {
+            rows.filter {
+                guard case .control = $0.role else { return false }
+                return $0.reason == nil
+            }
+        }
 
         public init(
             workspace: Swift.String,

@@ -5,7 +5,7 @@ public import Institute_Model
 
 extension Institute.Xcode {
     /// Builds the whole selection in one `xcodebuild` invocation, through the
-    /// generated `institute.xcworkspace`.
+    /// generated `institute interim.xcworkspace`.
     ///
     /// The alternative this replaces is N invocations of
     /// `institute package build`, one per selected package. Those cannot
@@ -41,7 +41,7 @@ extension Institute.Xcode {
 
 extension Institute.Xcode.Build {
     public var bundle: File.Directory {
-        root.checkout[directory: "institute.xcworkspace"]
+        Institute.Xcode.bundle(at: root.checkout)
     }
 
     /// Everything that must agree before a build can mean anything, or the
@@ -69,33 +69,39 @@ extension Institute.Xcode.Build {
     /// repository, so it happens once per command and both the gate and the
     /// reported target count are derived from that single read.
     private func preflight() throws(Institute.Error) -> (
-        buildables: [Institute.Xcode.Scheme.Buildable],
+        plan: Institute.Xcode.Scheme.Plan,
         diagnostics: [Swift.String]
     ) {
         guard bundle[file: "contents.xcworkspacedata"].stat.exists else {
-            return ([], ["institute.xcworkspace is not generated; run `institute sync`"])
-        }
-
-        var diagnostics = [Swift.String]()
-        if !Institute.Xcode.current(selection.repositories, at: root.checkout) {
-            diagnostics.append(
-                "institute.xcworkspace does not match the resolved selection; run `institute sync`"
+            return (
+                .init(buildables: [], testables: []),
+                ["\(Institute.Xcode.bundleName) is not generated; run `institute sync`"]
             )
         }
 
-        let buildables = try Institute.Xcode.Scheme.buildables(
-            for: selection.repositories,
+        let specification = try Institute.Xcode.specification(selection.repositories)
+        var diagnostics = [Swift.String]()
+        if !Institute.Xcode.current(specification, at: root.checkout) {
+            diagnostics.append(
+                "\(Institute.Xcode.bundleName) does not match the resolved selection; "
+                    + "run `institute sync`"
+            )
+        }
+
+        let plan = try Institute.Xcode.Scheme.plan(
+            for: specification,
             at: root
         )
-        if !Institute.Xcode.Scheme.current(buildables, at: root.checkout) {
+        if !Institute.Xcode.Scheme.current(plan, at: root.checkout) {
             diagnostics.append(
                 "\(Institute.Xcode.Scheme.name).xcscheme does not match the selected packages'"
-                    + " manifests (\(buildables.count) buildable targets); run `institute sync`."
+                    + " manifests (\(plan.buildables.count) buildable targets and "
+                    + "\(plan.testables.count) testables); run `institute sync`."
                     + " An out-of-date scheme does not fail the build — it silently builds less"
                     + " of the selection."
             )
         }
-        return (buildables, diagnostics)
+        return (plan, diagnostics)
     }
 
     /// Runs the build and returns `xcodebuild`'s exit status.
@@ -120,7 +126,7 @@ extension Institute.Xcode.Build {
         }
         print(
             "build: \(selection.repositories.count) packages,"
-                + " \(preflight.buildables.count) targets, one xcodebuild invocation"
+                + " \(preflight.plan.buildables.count) targets, one xcodebuild invocation"
         )
 
         let operation = Build_Coordinator.Build.Workspace(

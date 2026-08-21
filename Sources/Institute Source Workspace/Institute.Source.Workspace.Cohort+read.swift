@@ -4,6 +4,7 @@ extension Institute.Source.Workspace.Cohort {
         configuration: Institute.Configuration,
         hierarchy: File.Directory
     ) throws(Institute.Error) -> Self {
+        let specification = try Self.specification(from: workspace)
         let document: Xcode.Workspace
         do throws(Xcode.Workspace.Error) { document = try .read(from: workspace) }
         catch { throw .configuration("cannot read source workspace \(workspace): \(error)") }
@@ -39,12 +40,21 @@ extension Institute.Source.Workspace.Cohort {
                 reasons: &reasons
             )
         }
+        let actualLocations = flattened.map(\.0.rawValue)
+        let specifiedLocations = specification.members.map(\.location)
+        guard actualLocations == specifiedLocations else {
+            throw .configuration(
+                "source workspace XML and typed membership specification disagree"
+            )
+        }
 
         var rows: [Institute.Source.Workspace.Row] = []
         var canonicalPaths: Swift.Set<Swift.String> = []
         var groupCount = 0
         var containerCount = 0
-        for (index, entry) in flattened.enumerated() {
+        for (index, pair) in Swift.zip(flattened, specification.members).enumerated() {
+            let entry = pair.0
+            let member = pair.1
             switch entry.0.scheme {
             case .group: groupCount += 1
             case .container: containerCount += 1
@@ -64,23 +74,33 @@ extension Institute.Source.Workspace.Cohort {
                         index: index,
                         location: entry.0,
                         directory: entry.1.description,
-                        identity: Self.attemptedIdentity(entry.1.path, hierarchy: hierarchy),
+                        identity: Self.identity(member.role),
+                        role: member.role,
                         repository: nil,
                         reason: reason
                     )
                 )
                 continue
             }
-            let identity = Self.attemptedIdentity(canonical, hierarchy: hierarchy)
+            let identity = Self.identity(member.role)
             let duplicate = !canonicalPaths.insert(canonical.description).inserted
             let manifest = File.Directory(canonical)[file: "Package.swift"].stat.isFile
-            let repository = expected[canonical.description]
+            let repository: Institute.Repository?
+            switch member.role {
+            case .subject(let key):
+                let candidate = expected[canonical.description]
+                repository = candidate.flatMap {
+                    Institute.Repository.Key(repository: $0) == key ? $0 : nil
+                }
+            case .control:
+                repository = nil
+            }
             let reason: SourceDomain.Reason?
             if duplicate {
                 reason = .init(code: "duplicate-reference", detail: canonical.description)
             } else if !manifest {
                 reason = .init(code: "missing-manifest", detail: canonical.description)
-            } else if repository == nil {
+            } else if case .subject = member.role, repository == nil {
                 reason = .init(code: "inventory-identity", detail: identity)
             } else {
                 reason = nil
@@ -92,6 +112,7 @@ extension Institute.Source.Workspace.Cohort {
                     location: entry.0,
                     directory: canonical.description,
                     identity: identity,
+                    role: member.role,
                     repository: repository,
                     reason: reason
                 )
@@ -108,6 +129,40 @@ extension Institute.Source.Workspace.Cohort {
             rows: rows,
             reasons: reasons
         )
+    }
+
+    private static func specification(
+        from workspace: Swift.String
+    ) throws(Institute.Error) -> Institute.Workspace.Specification {
+        let bundle: File.Path
+        do throws(File.Path.Error) { bundle = try .init(workspace) }
+        catch { throw .configuration("invalid source workspace path \(workspace)") }
+        let file = File.Directory(bundle)[directory: "xcshareddata"][
+            file: "Institute.workspace.json"
+        ]
+        let contents: Swift.String
+        do throws(Either<File.System.Read.Full.Error, Never>) {
+            contents = try file.read.full { bytes in
+                var storage: [Byte] = []
+                storage.reserveCapacity(bytes.count)
+                for index in bytes.indices { storage.append(bytes[index]) }
+                return Swift.String(decoding: storage, as: Swift.UTF8.self)
+            }
+        } catch {
+            throw .configuration("source workspace membership specification is missing")
+        }
+        do throws(JSON.Error) {
+            return try .init(jsonString: contents)
+        } catch {
+            throw .configuration("source workspace membership specification is malformed: \(error)")
+        }
+    }
+
+    private static func identity(_ role: Institute.Workspace.Role) -> Swift.String {
+        switch role {
+        case .subject(let repository): return repository.identity
+        case .control(let control): return "control:\(control.rawValue)"
+        }
     }
 
     private static func flatten(
@@ -153,21 +208,4 @@ extension Institute.Source.Workspace.Cohort {
         return File.Directory(base.path / relative)
     }
 
-    private static func attemptedIdentity(
-        _ path: File.Path,
-        hierarchy: File.Directory
-    ) -> Swift.String {
-        let root = hierarchy.path.description
-        let value = path.description
-        let prefix = root.hasSuffix("/") ? root : root + "/"
-        guard value.hasPrefix(prefix) else { return value }
-        let components = value.dropFirst(prefix.count).split(separator: "/")
-        guard components.count >= 2 else { return value }
-        if components.count == 2 {
-            return "\(components[0])/\(components[1])"
-        }
-        let owner = components[components.count - 2]
-        let name = components[components.count - 1]
-        return "\(owner)/\(name)"
-    }
 }

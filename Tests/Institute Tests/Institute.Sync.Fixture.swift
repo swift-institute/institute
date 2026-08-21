@@ -48,7 +48,41 @@ extension Institute.Sync {
                 at: base.appending(path: "swift-foundations"),
                 withIntermediateDirectories: true
             )
+            try Self.package(
+                at: root,
+                name: "institute-application",
+                targets: [
+                    ("Institute Application Source", false),
+                    ("Institute Application Source Tests", true),
+                ]
+            )
+            try Self.package(
+                at: base.appending(path: "institute"),
+                name: "institute",
+                targets: [
+                    ("Institute Source Workspace", false),
+                    ("Institute Source Profile", false),
+                    ("Institute Source", false),
+                ]
+            )
+            try Self.package(
+                at: base.appending(path: "institute-continuous-integration"),
+                name: "institute-continuous-integration",
+                targets: [("Institute Continuous Integration Source", false)]
+            )
             try client.initialize(at: source.path, bare: false)
+            try Self.package(
+                at: source,
+                name: "swift-example",
+                targets: [
+                    ("Source Measurement", false),
+                    ("Source Profile", false),
+                    ("Source Execution", false),
+                    ("Source Report", false),
+                    ("Source Repair", false),
+                    ("Institute Linter Rule Manifest", false),
+                ]
+            )
             try command(["config", "user.email", "workspace@swift.institute"], at: source)
             try command(["config", "user.name", "Institute Tests"], at: source)
             try command(["branch", "-M", "main"], at: source)
@@ -119,7 +153,9 @@ extension Institute.Sync.Fixture {
             fetch: try? Data(contentsOf: local.appending(path: ".git/FETCH_HEAD")),
             status: try client.status(at: local.path),
             workspace: try? Data(
-                contentsOf: root.appending(path: "institute.xcworkspace/contents.xcworkspacedata")
+                contentsOf: root.appending(
+                    path: "institute interim.xcworkspace/contents.xcworkspacedata"
+                )
             ),
             ledger: try? Data(contentsOf: root.appending(path: ".workspace/compositions.json")),
             canonical: try entries(at: base.appending(path: "swift-foundations")),
@@ -150,7 +186,7 @@ extension Institute.Sync.Fixture {
             atomically: true,
             encoding: .utf8
         )
-        try command(["add", "Fixture.txt"], at: repository)
+        try command(["add", "--all"], at: repository)
         try command(["commit", "-m", message], at: repository)
     }
 
@@ -166,5 +202,40 @@ extension Institute.Sync.Fixture {
         guard process.terminationStatus == 0 else {
             throw CocoaError(.executableNotLoadable)
         }
+    }
+
+    private static func package(
+        at directory: URL,
+        name: Swift.String,
+        targets: [(name: Swift.String, test: Swift.Bool)]
+    ) throws {
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        var declarations: [Swift.String] = []
+        for (index, target) in targets.enumerated() {
+            let path = "Targets/\(index)"
+            let targetDirectory = directory.appending(path: path)
+            try FileManager.default.createDirectory(
+                at: targetDirectory,
+                withIntermediateDirectories: true
+            )
+            try Data("public enum Fixture\(index) {}\n".utf8).write(
+                to: targetDirectory.appending(path: "Fixture.swift")
+            )
+            declarations.append(
+                ".\(target.test ? "testTarget" : "target")(name: \"\(target.name)\", path: \"\(path)\")"
+            )
+        }
+        let manifest = """
+            // swift-tools-version: 6.4
+            import PackageDescription
+
+            let package = Package(
+                name: "\(name)",
+                targets: [
+                    \(declarations.joined(separator: ",\n        "))
+                ]
+            )
+            """
+        try Data(manifest.utf8).write(to: directory.appending(path: "Package.swift"))
     }
 }

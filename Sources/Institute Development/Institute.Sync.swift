@@ -27,7 +27,8 @@ extension Institute.Sync {
         for repository in selection.repositories {
             inspections.append(try inspect(repository, dry: dry))
         }
-        let workspace = Institute.Xcode.current(selection.repositories, at: root.checkout)
+        let specification = try Institute.Xcode.specification(selection.repositories)
+        let workspace = Institute.Xcode.current(specification, at: root.checkout)
 
         print(selection.origin)
         print("Institute sync plan")
@@ -36,7 +37,7 @@ extension Institute.Sync {
                 "  \(Institute.Layout.reference(for: inspection.repository)): \(inspection.action.text)"
             )
         }
-        print("  institute.xcworkspace: \(workspace ? "current" : "generate")")
+        print("  \(Institute.Xcode.bundleName): \(workspace ? "current" : "generate")")
         // The scheme's contents are the selected packages' target names, so
         // it cannot be planned here: a repository this run is about to clone
         // has no manifest to read yet. It is rendered and compared after
@@ -80,21 +81,14 @@ extension Institute.Sync {
             }
         }
 
-        if !workspace {
-            try Institute.Xcode.write(selection.repositories, at: root.checkout)
-        }
-
-        let buildables = try Institute.Xcode.Scheme.buildables(
-            for: selection.repositories,
-            at: root
-        )
-        let scheme = Institute.Xcode.Scheme.current(buildables, at: root.checkout)
-        if !scheme {
-            try Institute.Xcode.Scheme.write(buildables, at: root.checkout)
-        }
+        let schemePlan = try Institute.Xcode.Scheme.plan(for: specification, at: root)
+        let scheme = Institute.Xcode.Scheme.current(schemePlan, at: root.checkout)
+        try Institute.Xcode.materialize(specification, scheme: schemePlan, at: root)
         print(
             "  \(Institute.Xcode.Scheme.name).xcscheme: \(scheme ? "current" : "generated")"
-                + " — \(buildables.count) targets across \(selection.repositories.count) packages"
+                + " — \(schemePlan.buildables.count) buildables and "
+                + "\(schemePlan.testables.count) testables across "
+                + "\(specification.members.count) packages"
         )
         print("Sync complete.")
     }

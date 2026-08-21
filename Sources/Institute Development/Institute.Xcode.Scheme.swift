@@ -3,6 +3,7 @@ public import Institute_Inventory
 public import Institute_Model
 public import Package_Manager
 public import Xcode_Scheme
+public import Xcode_Workspace
 
 extension Institute.Xcode {
     /// The one generated shared scheme, which is what makes the whole
@@ -47,14 +48,14 @@ extension Institute.Xcode.Scheme {
 
 extension Institute.Xcode.Scheme {
     public static func document(
-        _ buildables: [Buildable]
+        _ plan: Plan
     ) -> Xcode_Scheme.Xcode.Scheme {
         // Module-qualified: inside `extension Institute.Xcode.Scheme` the
         // unqualified name `Xcode` rebinds to `Institute.Xcode`, so a bare
         // `Xcode.Scheme` would resolve to this very type. Same shadow, and
         // same resolution, as `Institute.Xcode.document(_:)` above.
         Xcode_Scheme.Xcode.Scheme(
-            build: buildables.map { buildable in
+            build: plan.buildables.map { buildable in
                 .init(
                     reference: .init(
                         blueprint: buildable.target,
@@ -63,16 +64,24 @@ extension Institute.Xcode.Scheme {
                     )
                 )
             },
-            test: []
+            test: plan.testables.map { testable in
+                .init(
+                    reference: .init(
+                        blueprint: testable.target,
+                        name: testable.target,
+                        container: "container:\(testable.reference)"
+                    )
+                )
+            }
         )
     }
 
-    public static func render(_ buildables: [Buildable]) -> Swift.String {
-        document(buildables).xml
+    public static func render(_ plan: Plan) -> Swift.String {
+        document(plan).xml
     }
 
     public static func path(at root: File.Directory) -> File {
-        root[directory: "institute.xcworkspace"][directory: "xcshareddata"][directory: "xcschemes"][
+        Institute.Xcode.bundle(at: root)[directory: "xcshareddata"][directory: "xcschemes"][
             file: "\(name).xcscheme"
         ]
     }
@@ -109,17 +118,17 @@ extension Institute.Xcode.Scheme {
     /// log" and "this package was never in the scheme" are the same
     /// observation. The only honest gate is to re-render from the manifests
     /// and compare before building, which is what this is for.
-    public static func current(_ buildables: [Buildable], at root: File.Directory) -> Swift.Bool {
-        contents(at: root) == render(buildables)
+    public static func current(_ plan: Plan, at root: File.Directory) -> Swift.Bool {
+        contents(at: root) == render(plan)
     }
 
     public static func write(
-        _ buildables: [Buildable],
+        _ plan: Plan,
         at root: File.Directory
     ) throws(Institute.Error) {
-        let bundle = root[directory: "institute.xcworkspace"]
+        let bundle = Institute.Xcode.bundle(at: root)
         do throws(Xcode_Scheme.Xcode.Scheme.Error) {
-            try document(buildables).write(name, to: bundle.description)
+            try document(plan).write(name, to: bundle.description)
         } catch {
             throw .filesystem("cannot write \(path(at: root)): \(error)")
         }
@@ -127,46 +136,49 @@ extension Institute.Xcode.Scheme {
 }
 
 extension Institute.Xcode.Scheme {
-    /// Every compilable target of every selected repository, in inventory
-    /// order, read from the manifests.
+    /// Every buildable and testable target of every typed workspace member,
+    /// in specification order, read from the manifests.
     ///
     /// Read, not guessed, because of the silent-drop behaviour documented on
     /// ``current(_:at:)``. The cost is one `swift package dump-package` per
     /// selected repository, which is the cost `Institute.Doctor` already pays
     /// for its manifest-identity check; this is not a new class of work.
     ///
-    /// Test targets are excluded because they are never in scope for a build
-    /// here. Plugin, macro, binary, and system targets are excluded because
+    /// Test targets populate the shared scheme's real `TestAction`. Plugin,
+    /// macro, binary, and system targets are excluded because
     /// they are not blueprints a consumer builds directly — whatever needs
     /// them pulls them in as dependencies of a target that is listed.
     ///
-    /// A repository with no `Package.swift` contributes nothing and is
-    /// skipped: the inventory holds specification and document repositories
-    /// too, and those have no targets to build. A repository that *does* carry
-    /// a manifest which then fails to evaluate is an error, not an omission —
-    /// skipping it would produce a scheme that builds less than the selection
-    /// while still reporting success, which is exactly the failure this whole
-    /// path is arranged to prevent. The distinction is the point: "not a
-    /// package" and "a package I could not read" must not reach the same
-    /// outcome.
-    public static func buildables(
-        for repositories: [Institute.Repository],
+    /// Every specified member must have a readable `Package.swift`; absence or
+    /// failed evaluation is an error, never an omission. The final structural
+    /// preflight proves a bijection between member containers and scheme
+    /// containers, exact V3 target coverage, and a nonempty `TestAction`.
+    public static func plan(
+        for specification: Institute.Workspace.Specification,
         at root: Institute.Root,
         packages: Package.Manager = .init()
-    ) throws(Institute.Error) -> [Buildable] {
+    ) throws(Institute.Error) -> Plan {
         var buildables = [Buildable]()
-        for repository in repositories {
-            let directory = try Institute.Layout.directory(for: repository, at: root.hierarchy)
-            guard directory[file: "Package.swift"].stat.exists else { continue }
+        var testables = [Testable]()
+        for member in specification.members {
+            let directory = try directory(for: member, at: root)
+            guard directory[file: "Package.swift"].stat.isFile else {
+                throw .configuration("workspace member has no Package.swift: \(member.location)")
+            }
             let evaluation: Package.Manifest.Evaluation
             do throws(Package.Manager.Error) {
                 evaluation = try packages.evaluation(at: directory.description)
             } catch {
                 throw .configuration(
-                    "cannot evaluate the manifest of \(repository.name) at \(directory): \(error)"
+                    "cannot evaluate the manifest at \(directory): \(error)"
                 )
             }
-            let reference = "../\(Institute.Layout.reference(for: repository))"
+            guard let location = Xcode_Workspace.Xcode.Workspace.Location(
+                rawValue: member.location
+            ) else {
+                throw .configuration("invalid workspace member location: \(member.location)")
+            }
+            let reference = location.path
             for target in evaluation.targets {
                 // Switched inline rather than through a helper taking a
                 // `Target.Kind`: naming that type here would resolve through
@@ -177,11 +189,75 @@ extension Institute.Xcode.Scheme {
                 case .regular, .executable:
                     buildables.append(.init(reference: reference, target: target.name.underlying))
 
-                case .test, .plugin, .binary, .system, .macro:
+                case .test:
+                    testables.append(.init(reference: reference, target: target.name.underlying))
+
+                case .plugin, .binary, .system, .macro:
                     continue
                 }
             }
         }
-        return buildables
+        let plan = Plan(buildables: buildables, testables: testables)
+        try preflight(plan, specification: specification)
+        return plan
     }
+
+    private static func directory(
+        for member: Institute.Workspace.Member,
+        at root: Institute.Root
+    ) throws(Institute.Error) -> File.Directory {
+        guard let location = Xcode_Workspace.Xcode.Workspace.Location(rawValue: member.location),
+            location.scheme == .group || location.scheme == .container,
+            let relative = try? File.Path(location.path)
+        else { throw .configuration("invalid workspace member location: \(member.location)") }
+        return File.Directory(root.checkout.path / relative)
+    }
+
+    private static func preflight(
+        _ plan: Plan,
+        specification: Institute.Workspace.Specification
+    ) throws(Institute.Error) {
+        let specified = Set(specification.members.compactMap {
+            Xcode_Workspace.Xcode.Workspace.Location(rawValue: $0.location)?.path
+        })
+        let containers = Set(plan.buildables.map(\.reference) + plan.testables.map(\.reference))
+        guard specified == containers else {
+            let absent = specified.subtracting(containers).sorted().joined(separator: ", ")
+            let extra = containers.subtracting(specified).sorted().joined(separator: ", ")
+            throw .configuration(
+                "workspace/scheme container mismatch; absent: [\(absent)]; extra: [\(extra)]"
+            )
+        }
+        guard !plan.testables.isEmpty else {
+            throw .configuration("Institute scheme has no testables")
+        }
+        let buildKeys = plan.buildables.map { $0.reference + "\u{0}" + $0.target }
+        let testKeys = plan.testables.map { $0.reference + "\u{0}" + $0.target }
+        guard Set(buildKeys).count == buildKeys.count,
+            Set(testKeys).count == testKeys.count
+        else { throw .configuration("Institute scheme contains duplicate targets") }
+
+        let targets = Set(plan.buildables.map(\.target) + plan.testables.map(\.target))
+        let missing = expectedTargets.subtracting(targets)
+        guard missing.isEmpty else {
+            throw .configuration(
+                "Institute scheme omits V3 targets: \(missing.sorted().joined(separator: ", "))"
+            )
+        }
+    }
+
+    private static let expectedTargets: Set<Swift.String> = [
+        "Source Measurement",
+        "Source Profile",
+        "Source Execution",
+        "Source Report",
+        "Source Repair",
+        "Institute Linter Rule Manifest",
+        "Institute Continuous Integration Source",
+        "Institute Source Workspace",
+        "Institute Source Profile",
+        "Institute Source",
+        "Institute Application Source",
+        "Institute Application Source Tests",
+    ]
 }

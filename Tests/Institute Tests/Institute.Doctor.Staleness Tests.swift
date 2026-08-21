@@ -166,7 +166,7 @@ extension Institute.Doctor.Test.Integration {
     func `resolution-currency reports contributor runs as not applicable`() async throws {
         let fixture = try Institute.Doctor.Fixture(repositories: [])
         defer { fixture.remove() }
-        try Institute.Xcode.write([], at: fixture.directory)
+        try Institute.Xcode.write(try Institute.Xcode.specification([]), at: fixture.directory)
 
         let report = await fixture.doctor().run(access: .contributor)
 
@@ -312,7 +312,7 @@ extension Institute.Doctor.Test.Integration {
     func `lint-config-currency reports contributor runs as not applicable`() async throws {
         let fixture = try Institute.Doctor.Fixture(repositories: [])
         defer { fixture.remove() }
-        try Institute.Xcode.write([], at: fixture.directory)
+        try Institute.Xcode.write(try Institute.Xcode.specification([]), at: fixture.directory)
 
         let report = await fixture.doctor().run(access: .contributor)
 

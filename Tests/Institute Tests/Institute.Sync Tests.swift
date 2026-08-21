@@ -93,7 +93,7 @@ extension Institute.Sync.Test.Integration {
         #expect(try Data(contentsOf: marker) == Data("collision".utf8))
         #expect(
             !FileManager.default.fileExists(
-                atPath: fixture.root.appending(path: "institute.xcworkspace").path
+                atPath: fixture.root.appending(path: "institute interim.xcworkspace").path
             )
         )
     }
@@ -120,7 +120,7 @@ extension Institute.Sync.Test.Integration {
         )
         #expect(
             !FileManager.default.fileExists(
-                atPath: fixture.root.appending(path: "institute.xcworkspace").path
+                atPath: fixture.root.appending(path: "institute interim.xcworkspace").path
             )
         )
     }
