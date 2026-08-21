@@ -125,7 +125,7 @@ extension Institute.Source.Workspace.Cohort {
                 )
             )
         }
-        guard !rows.isEmpty else {
+        if rows.isEmpty {
             reasons.append(.init(code: "empty-workspace", detail: workspace))
         }
         return .init(
