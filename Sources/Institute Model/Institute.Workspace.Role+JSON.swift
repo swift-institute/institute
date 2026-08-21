@@ -39,7 +39,7 @@ extension Institute.Workspace.Role: JSON.Serializable {
             }
             return .control(control)
         default:
-            throw .typeMismatch(expected: "subject|control", got: Swift.String(json: kind))
+            throw .typeMismatch(expected: "subject|control", got: try Swift.String(json: kind))
         }
     }
 }
