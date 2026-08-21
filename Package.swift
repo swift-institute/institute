@@ -147,7 +147,9 @@ let package = Package(
             name: "Institute Source Workspace",
             dependencies: [
                 "Institute Model",
+                .product(name: "Byte Primitives", package: "swift-byte-primitives"),
                 .product(name: "File System", package: "swift-file-system"),
+                .product(name: "JSON", package: "swift-json"),
                 .product(name: "Source Measurement", package: "swift-source"),
                 .product(name: "Xcode Workspace", package: "swift-xcode"),
             ]

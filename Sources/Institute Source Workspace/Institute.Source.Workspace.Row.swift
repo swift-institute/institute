@@ -1,3 +1,7 @@
+public import Institute_Model
+public import Source_Measurement
+public import Xcode_Workspace
+
 extension Institute.Source.Workspace {
     public struct Row: Sendable {
         public let index: Swift.Int
@@ -6,7 +10,7 @@ extension Institute.Source.Workspace {
         public let identity: Swift.String
         public let role: Institute.Workspace.Role
         public let repository: Institute.Repository?
-        public let reason: SourceDomain.Reason?
+        public let reason: Source_Measurement.Source.Reason?
 
         public init(
             index: Swift.Int,
@@ -15,7 +19,7 @@ extension Institute.Source.Workspace {
             identity: Swift.String,
             role: Institute.Workspace.Role,
             repository: Institute.Repository?,
-            reason: SourceDomain.Reason?
+            reason: Source_Measurement.Source.Reason?
         ) {
             self.index = index
             self.location = location

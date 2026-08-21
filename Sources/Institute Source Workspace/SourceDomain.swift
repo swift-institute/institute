@@ -1,1 +1,0 @@
-internal typealias SourceDomain = Source

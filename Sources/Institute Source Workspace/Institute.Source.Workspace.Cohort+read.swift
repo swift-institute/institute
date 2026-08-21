@@ -1,3 +1,10 @@
+internal import Byte_Primitives
+public import File_System
+public import Institute_Model
+internal import JSON
+internal import Source_Measurement
+internal import Xcode_Workspace
+
 extension Institute.Source.Workspace.Cohort {
     public static func read(
         from workspace: Swift.String,
@@ -30,7 +37,7 @@ extension Institute.Source.Workspace.Cohort {
         }
 
         var flattened: [(Xcode.Workspace.Location, File.Directory)] = []
-        var reasons: [SourceDomain.Reason] = []
+        var reasons: [Source_Measurement.Source.Reason] = []
         for reference in document.references {
             Self.flatten(
                 reference,
@@ -64,7 +71,7 @@ extension Institute.Source.Workspace.Cohort {
             do throws(File.System.Canonical.Error) {
                 canonical = try File.System.Canonical.resolve(entry.1.path)
             } catch {
-                let reason = SourceDomain.Reason(
+                let reason = Source_Measurement.Source.Reason(
                     code: "unresolved-reference",
                     detail: entry.0.rawValue
                 )
@@ -95,7 +102,7 @@ extension Institute.Source.Workspace.Cohort {
             case .control:
                 repository = nil
             }
-            let reason: SourceDomain.Reason?
+            let reason: Source_Measurement.Source.Reason?
             if duplicate {
                 reason = .init(code: "duplicate-reference", detail: canonical.description)
             } else if !manifest {
@@ -170,7 +177,7 @@ extension Institute.Source.Workspace.Cohort {
         group: File.Directory,
         container: File.Directory,
         into entries: inout [(Xcode.Workspace.Location, File.Directory)],
-        reasons: inout [SourceDomain.Reason]
+        reasons: inout [Source_Measurement.Source.Reason]
     ) {
         switch reference {
         case .file(let location):

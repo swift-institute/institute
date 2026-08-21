@@ -1,3 +1,6 @@
+public import Institute_Model
+public import Source_Measurement
+
 extension Institute.Source.Workspace {
     public struct Cohort: Sendable {
         public let workspace: Swift.String
@@ -5,7 +8,7 @@ extension Institute.Source.Workspace {
         public let groupReferences: Swift.Int
         public let containerReferences: Swift.Int
         public let rows: [Row]
-        public let reasons: [SourceDomain.Reason]
+        public let reasons: [Source_Measurement.Source.Reason]
 
         public var admitted: [Row] {
             rows.filter {
@@ -27,7 +30,7 @@ extension Institute.Source.Workspace {
             groupReferences: Swift.Int,
             containerReferences: Swift.Int,
             rows: [Row],
-            reasons: [SourceDomain.Reason]
+            reasons: [Source_Measurement.Source.Reason]
         ) {
             self.workspace = workspace
             self.references = references
