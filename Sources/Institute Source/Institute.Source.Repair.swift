@@ -14,20 +14,20 @@ extension Institute.Source.Repair {
         public let workspaceDigest: Swift.String
         public let inventoryDigest: Swift.String
         public let cohort: [Swift.String]
-        public let repair: SourceDomain.Repair.Plan
+        public let repairs: [SourceDomain.Repair.Plan]
 
         public init(
             workspace: Swift.String,
             workspaceDigest: Swift.String,
             inventoryDigest: Swift.String,
             cohort: [Swift.String],
-            repair: SourceDomain.Repair.Plan
+            repairs: [SourceDomain.Repair.Plan]
         ) {
             self.workspace = workspace
             self.workspaceDigest = workspaceDigest
             self.inventoryDigest = inventoryDigest
             self.cohort = cohort
-            self.repair = repair
+            self.repairs = repairs
         }
 
         public static func serialize(_ value: Self) -> JSON {
@@ -37,7 +37,7 @@ extension Institute.Source.Repair {
                 "workspaceDigest": value.workspaceDigest.json,
                 "inventoryDigest": value.inventoryDigest.json,
                 "cohort": value.cohort.json,
-                "repair": value.repair.json,
+                "repairs": value.repairs.json,
             ]
         }
 
@@ -46,7 +46,7 @@ extension Institute.Source.Repair {
                 throw .typeMismatch(expected: "object", got: "non-object")
             }
             let expected: Set<Swift.String> = [
-                "schema", "workspace", "workspaceDigest", "inventoryDigest", "cohort", "repair",
+                "schema", "workspace", "workspaceDigest", "inventoryDigest", "cohort", "repairs",
             ]
             guard Set(object.keys) == expected else {
                 throw .typeMismatch(
@@ -66,7 +66,7 @@ extension Institute.Source.Repair {
                 workspaceDigest: Swift.String(json: required("workspaceDigest")),
                 inventoryDigest: Swift.String(json: required("inventoryDigest")),
                 cohort: [Swift.String](json: required("cohort")),
-                repair: SourceDomain.Repair.Plan(json: required("repair"))
+                repairs: [SourceDomain.Repair.Plan](json: required("repairs"))
             )
         }
     }

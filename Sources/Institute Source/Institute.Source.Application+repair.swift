@@ -10,10 +10,41 @@ extension Institute.Source.Application {
         workspace: Swift.String,
         configuration: Institute.Configuration,
         cohort: Institute.Source.Workspace.Cohort,
-        member: Institute.Source.Workspace.Row,
+        members: [Institute.Source.Workspace.Row],
         rules: Set<SourceDomain.Rule.ID>?,
         preparation: Institute.Source.Preparation
     ) async throws(Institute.Error) -> Institute.Source.Repair.Plan {
+        guard !members.isEmpty else {
+            throw .configuration("source repair requires at least one admitted member")
+        }
+        var identities: Swift.Set<Swift.String> = []
+        var repairs: [SourceDomain.Repair.Plan] = []
+        for member in members {
+            guard identities.insert(member.identity).inserted else {
+                throw .configuration("duplicate source repair member: \(member.identity)")
+            }
+            repairs.append(
+                try await planRepair(
+                    member: member,
+                    rules: rules,
+                    preparation: preparation
+                )
+            )
+        }
+        return .init(
+            workspace: workspace,
+            workspaceDigest: try Self.workspaceDigest(workspace),
+            inventoryDigest: Self.inventoryDigest(configuration),
+            cohort: cohort.admitted.map(\.identity),
+            repairs: repairs
+        )
+    }
+
+    private func planRepair(
+        member: Institute.Source.Workspace.Row,
+        rules: Set<SourceDomain.Rule.ID>?,
+        preparation: Institute.Source.Preparation
+    ) async throws(Institute.Error) -> SourceDomain.Repair.Plan {
         let subject = try subject(for: member)
         let profile = try profile(for: member, preparation: preparation)
         if let rules {
@@ -51,14 +82,7 @@ extension Institute.Source.Application {
             subject,
             profile: profile
         )
-        let plan = staging.finish(remeasured: repeated)
-        return try .init(
-            workspace: workspace,
-            workspaceDigest: Self.workspaceDigest(workspace),
-            inventoryDigest: Self.inventoryDigest(configuration),
-            cohort: cohort.admitted.map(\.identity),
-            repair: plan
-        )
+        return staging.finish(remeasured: repeated)
     }
 
     public func applyRepair(
@@ -67,28 +91,45 @@ extension Institute.Source.Application {
         configuration: Institute.Configuration,
         cohort: Institute.Source.Workspace.Cohort,
         preparation: Institute.Source.Preparation
-    ) throws(Institute.Error) {
+    ) throws(Institute.Error) -> SourceDomain.Reason? {
         guard plan.workspace == workspace,
             plan.workspaceDigest == Self.workspaceDigest(workspace),
             plan.inventoryDigest == Self.inventoryDigest(configuration),
             plan.cohort == cohort.admitted.map(\.identity)
         else { throw .configuration("source repair workspace binding is stale") }
-        guard let row = cohort.admitted.first(where: { $0.identity == plan.repair.subject.identity }) else {
-            throw .configuration("source repair subject is no longer admitted")
+        guard !plan.repairs.isEmpty else {
+            throw .configuration("source repair plan contains no subjects")
         }
-        let subject = try subject(for: row)
-        let profile = try profile(for: row, preparation: preparation)
-        let files = Self.fileSystem(root: subject.root)
-        let sources = SourceDomain.SourceSet.digest(try Self.stagedFiles(subject: subject, files: files))
-        switch SourceDomain.Repair.Transaction(files: files).apply(
-            plan.repair,
-            subject: subject.binding,
-            profile: profile.digest,
-            sources: sources
-        ) {
-        case .success: return
-        case .failure(let reason):
-            throw .configuration("source repair apply refused: \(reason.code): \(reason.detail)")
+        var identities: Swift.Set<Swift.String> = []
+        var members: [SourceDomain.Repair.Transaction.Member] = []
+        for repair in plan.repairs {
+            guard identities.insert(repair.subject.identity).inserted else {
+                throw .configuration("duplicate source repair subject: \(repair.subject.identity)")
+            }
+            guard let row = cohort.admitted.first(where: {
+                $0.identity == repair.subject.identity
+            }) else {
+                throw .configuration("source repair subject is no longer admitted")
+            }
+            let subject = try subject(for: row)
+            let profile = try profile(for: row, preparation: preparation)
+            let files = Self.fileSystem(root: subject.root)
+            let sources = SourceDomain.SourceSet.digest(
+                try Self.stagedFiles(subject: subject, files: files)
+            )
+            members.append(
+                .init(
+                    plan: repair,
+                    subject: subject.binding,
+                    profile: profile.digest,
+                    sources: sources,
+                    files: files
+                )
+            )
+        }
+        switch SourceDomain.Repair.Transaction().apply(members) {
+        case .success: return nil
+        case .failure(let reason): return reason
         }
     }
 

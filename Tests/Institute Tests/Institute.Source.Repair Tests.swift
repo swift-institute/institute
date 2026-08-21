@@ -18,7 +18,7 @@ func `Institute repair plan round trips its complete workspace binding`() throws
         workspaceDigest: "workspace",
         inventoryDigest: "inventory",
         cohort: ["swift-standards/swift-zeta", "swift-primitives/swift-example"],
-        repair: repair
+        repairs: [repair]
     )
 
     let decoded = try Institute.Source.Repair.Plan(json: plan.json)
@@ -32,9 +32,9 @@ func `Institute repair plan round trips its complete workspace binding`() throws
             "swift-primitives/swift-example",
         ]
     )
-    #expect(decoded.repair.subject == repair.subject)
-    #expect(decoded.repair.profile == repair.profile)
-    #expect(decoded.repair.sources == repair.sources)
+    #expect(decoded.repairs.map(\.subject) == [repair.subject])
+    #expect(decoded.repairs.map(\.profile) == [repair.profile])
+    #expect(decoded.repairs.map(\.sources) == [repair.sources])
 }
 
 @Test
@@ -52,7 +52,7 @@ func `Institute repair plan rejects unknown wrapper fields`() throws {
         workspaceDigest: "workspace",
         inventoryDigest: "inventory",
         cohort: ["swift-primitives/swift-example"],
-        repair: repair
+        repairs: [repair]
     )
     var object = try #require(plan.json.dictionary)
     object["unknown"] = true.json
