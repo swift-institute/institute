@@ -1,3 +1,4 @@
+public import Async_Fanout
 public import FIPS_180_4
 public import Institute_Continuous_Integration_Source
 public import Institute_Model
@@ -9,6 +10,8 @@ extension Institute.Source.Application {
         cohort: Institute.Source.Workspace.Cohort,
         selected: [Institute.Source.Workspace.Row]? = nil,
         engines: Set<SourceDomain.Engine.ID>? = nil,
+        jobs: Swift.Int? = nil,
+        references: [SourceDomain.Reason] = [],
         preparation: Institute.Source.Preparation
     ) async throws(Institute.Error) -> SourceDomain.Report {
         let rows = selected ?? cohort.admitted
@@ -37,20 +40,27 @@ extension Institute.Source.Application {
         do throws(SourceDomain.Execution.Error) { execution = try .init(drivers: drivers) }
         catch { throw .configuration("cannot register source engines: \(error)") }
         var subjects: [SourceDomain.Subject] = []
-        var measurements: [SourceDomain.Measurement] = []
+        var entries: [(
+            repository: Institute.Repository,
+            subject: SourceDomain.Subject
+        )] = []
         for row in rows {
             guard let repository = row.repository else { continue }
             let subject = try subject(for: row)
             subjects.append(subject)
+            entries.append((repository: repository, subject: subject))
+        }
+        let measurements = await Async.Fanout(jobs: jobs).mapAsync(entries) { entry in
+            let subject = entry.subject
+            let repository = entry.repository
             let bundle = Institute.Source.Profile(policy: policy).bundle(for: repository)
             let rules = Institute.Source.Profile(policy: policy).rules(for: bundle)
             let linterConfiguration = "\(preparation.directory)/\(bundle.rawValue)-source-linter-profile.json"
             let linterArtifact = policy.linter(bundle: bundle, rules: rules)
             guard Self.matches(file: linterConfiguration, digest: linterArtifact.digest) else {
-                measurements.append(contentsOf: policy.requiredEngines.map {
+                return policy.requiredEngines.map {
                     .init(engine: $0, subject: subject, activeRules: [], applicableRules: [], files: subject.files, verdict: .unmeasured([.init(code: "stale-configuration", detail: linterConfiguration)]))
-                })
-                continue
+                }
             }
             let profile = policy.profile(
                 swiftFormatExecutable: preparation.swiftFormatExecutable,
@@ -63,13 +73,12 @@ extension Institute.Source.Application {
                 linterRules: rules
             )
             guard preparation.profiles[bundle.rawValue] == profile.digest else {
-                measurements.append(contentsOf: profile.engines.map {
+                return profile.engines.map {
                     .init(engine: $0.id, subject: subject, activeRules: $0.rules, applicableRules: [], files: subject.files, verdict: .unmeasured([.init(code: "stale-profile", detail: bundle.rawValue)]))
-                })
-                continue
+                }
             }
-            measurements.append(contentsOf: await execution.measure(subject, profile: profile, engines: engines))
-        }
+            return await execution.measure(subject, profile: profile, engines: engines)
+        }.flatMap { $0 }
         let profileBytes = preparation.profiles.keys.sorted()
             .compactMap { preparation.profiles[$0]?.hex }
             .joined(separator: ":").utf8.map(Byte.init)
@@ -78,7 +87,7 @@ extension Institute.Source.Application {
             scope: scope,
             profile: digest,
             subjects: subjects,
-            references: cohort.reasons,
+            references: cohort.reasons + references,
             measurements: measurements
         )
     }

@@ -147,8 +147,10 @@ let package = Package(
             name: "Institute Source Workspace",
             dependencies: [
                 "Institute Model",
+                .product(name: "Async Fanout", package: "swift-async"),
                 .product(name: "Byte Primitives", package: "swift-byte-primitives"),
                 .product(name: "File System", package: "swift-file-system"),
+                .product(name: "Git", package: "swift-git"),
                 .product(name: "JSON", package: "swift-json"),
                 .product(name: "Source Measurement", package: "swift-source"),
                 .product(name: "Xcode Workspace", package: "swift-xcode"),
@@ -188,6 +190,7 @@ let package = Package(
                 "Institute Model",
                 "Institute Source Profile",
                 "Institute Source Workspace",
+                .product(name: "Async Fanout", package: "swift-async"),
                 .product(
                     name: "Institute Continuous Integration Source",
                     package: "institute-continuous-integration"
