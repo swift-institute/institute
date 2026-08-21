@@ -81,4 +81,12 @@ extension Institute.Source.Application {
         } catch { throw .filesystem("cannot read source tool \(path): \(error)") }
         return .init(FIPS_180_4.SHA256.digest(bytes).hex)
     }
+
+    static func matches(
+        file path: Swift.String,
+        digest expected: SourceDomain.Profile.Digest
+    ) -> Swift.Bool {
+        do throws(Institute.Error) { return try Self.digest(file: path) == expected }
+        catch { return false }
+    }
 }
