@@ -62,6 +62,8 @@ extension Institute.Source.Application {
             subjects.append(subject)
             entries.append((row: row, subject: subject))
         }
+        let configuration = try Self.configuration(policy: policy, preparation: preparation)
+        subjects.append(configuration.subject)
         let owner = Institute.Source.Profile(policy: policy)
         var requirements: [SourceDomain.Report.Commitment.Requirement] = []
         for entry in entries {
@@ -190,9 +192,16 @@ extension Institute.Source.Application {
                 subjects: subjects,
                 engines: policy.requiredEngines.map {
                     .init(id: $0, artifactKinds: [.swift])
-                },
+                } + [
+                    .init(id: policy.configuration.engine, artifactKinds: [.configuration])
+                ],
                 requirements: requirements,
-                predicates: []
+                predicates: [
+                    .init(
+                        id: policy.configuration.predicate,
+                        artifactKinds: [.configuration]
+                    )
+                ]
             ),
             subjects: subjects,
             references: cohort.reasons
@@ -201,7 +210,7 @@ extension Institute.Source.Application {
                     policy: policy
                 ) + references,
             measurements: measurements,
-            artifactEvidence: []
+            artifactEvidence: configuration.evidence
         )
     }
 
