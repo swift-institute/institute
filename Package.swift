@@ -25,6 +25,18 @@ let package = Package(
             targets: ["Institute Inventory"]
         ),
         .library(
+            name: "Institute Source Workspace",
+            targets: ["Institute Source Workspace"]
+        ),
+        .library(
+            name: "Institute Source Profile",
+            targets: ["Institute Source Profile"]
+        ),
+        .library(
+            name: "Institute Source",
+            targets: ["Institute Source"]
+        ),
+        .library(
             name: "Institute Dependency",
             targets: ["Institute Dependency"]
         ),
@@ -68,6 +80,11 @@ let package = Package(
         .package(url: "https://github.com/swift-foundations/swift-posix.git", branch: "main"),
         .package(url: "https://github.com/swift-foundations/swift-process.git", branch: "main"),
         .package(url: "https://github.com/swift-foundations/swift-xcode.git", branch: "main"),
+        .package(url: "https://github.com/swift-foundations/swift-source.git", branch: "main"),
+        .package(
+            url: "https://github.com/swift-institute/institute-continuous-integration.git",
+            branch: "main"
+        ),
         .package(url: "https://github.com/swift-ietf/swift-rfc-3986.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-byte-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-standards/swift-fips-180-4.git", branch: "main"),
@@ -112,6 +129,39 @@ let package = Package(
                 .product(name: "JSON", package: "swift-json"),
                 .product(name: "Kernel", package: "swift-kernel"),
                 .product(name: "Process", package: "swift-process"),
+            ]
+        ),
+        .target(
+            name: "Institute Source Workspace",
+            dependencies: [
+                "Institute Model",
+                .product(name: "File System", package: "swift-file-system"),
+                .product(name: "Source Measurement", package: "swift-source"),
+                .product(name: "Xcode Workspace", package: "swift-xcode"),
+            ]
+        ),
+        .target(
+            name: "Institute Source Profile",
+            dependencies: [
+                "Institute Model",
+                .product(
+                    name: "Institute Continuous Integration Source",
+                    package: "institute-continuous-integration"
+                ),
+                .product(name: "Source Profile", package: "swift-source"),
+            ]
+        ),
+        .target(
+            name: "Institute Source",
+            dependencies: [
+                "Institute Model",
+                "Institute Source Profile",
+                "Institute Source Workspace",
+                .product(name: "File System", package: "swift-file-system"),
+                .product(name: "Process", package: "swift-process"),
+                .product(name: "Source Execution", package: "swift-source"),
+                .product(name: "Source Repair", package: "swift-source"),
+                .product(name: "Source Report", package: "swift-source"),
             ]
         ),
         .target(
@@ -200,6 +250,7 @@ let package = Package(
                 "Institute Pages",
                 "Institute Development",
                 "Institute Lint",
+                "Institute Source",
                 .product(name: "Async Fanout", package: "swift-async"),
                 .product(name: "Environment", package: "swift-environment"),
                 .product(name: "File System", package: "swift-file-system"),
@@ -229,6 +280,7 @@ let package = Package(
                 "Institute Development",
                 "Institute Doctor",
                 "Institute Lint",
+                "Institute Source",
                 .product(name: "Command", package: "swift-arguments"),
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "Git", package: "swift-git"),
@@ -245,6 +297,9 @@ let package = Package(
                 "Institute Inventory",
                 "Institute Dependency",
                 "Institute Development",
+                "Institute Source",
+                "Institute Source Profile",
+                "Institute Source Workspace",
                 "Institute Lint",
                 "Institute Pages",
                 "Institute Doctor",
