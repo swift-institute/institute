@@ -58,7 +58,7 @@ extension Institute.Source.Application {
         var subjects: [SourceDomain.Subject] = []
         var entries: [(row: Institute.Source.Workspace.Row, subject: SourceDomain.Subject)] = []
         for row in rows {
-            let subject = try subject(for: row)
+            let subject = try Institute.Source.Workspace.subject(for: row)
             subjects.append(subject)
             entries.append((row: row, subject: subject))
         }

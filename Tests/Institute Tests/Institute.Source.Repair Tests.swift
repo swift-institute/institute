@@ -81,7 +81,7 @@ func `Institute repair file system rejects path escape before IO`() {
 }
 
 @Test
-func `Institute source subject includes the package manifest and admitted Swift files`() throws {
+func `Institute source subject includes every Swift file outside build products`() throws {
     let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
     defer { try? FileManager.default.removeItem(at: root) }
     for directory in ["Sources", "Tests/Unit", "Tests/Support"] {
@@ -110,12 +110,21 @@ func `Institute source subject includes the package manifest and admitted Swift 
         reason: nil
     )
 
-    let subject = try Institute.Source.Application().subject(for: row)
+    let subject = try Institute.Source.Workspace.subject(
+        for: row,
+        paths: [
+            "Package.swift",
+            "Sources/A.swift",
+            "Tests/Unit/A Tests.swift",
+            "Tests/Support/Fixture.swift",
+        ]
+    )
 
     #expect(
         subject.paths(of: .swift) == [
             "Package.swift",
             "Sources/A.swift",
+            "Tests/Support/Fixture.swift",
             "Tests/Unit/A Tests.swift",
         ]
     )
