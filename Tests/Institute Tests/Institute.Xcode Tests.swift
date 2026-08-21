@@ -52,9 +52,11 @@ extension Institute.Xcode.Test.Unit {
 
     @Test
     func `render terminates the workspace artifact with one line feed`() throws {
-        let rendered = try Institute.Xcode.render(.init(members: [
-            .init(location: "group:.", role: .control(.application))
-        ]))
+        let rendered = try Institute.Xcode.render(
+            .init(members: [
+                .init(location: "group:.", role: .control(.application))
+            ])
+        )
 
         #expect(Data(rendered.utf8).last == 0x0A)
         #expect(rendered.hasSuffix("</Workspace>\n"))
@@ -182,7 +184,7 @@ extension Institute.Xcode.Test.Integration {
     }
 
     @Test
-    func `typed control members never enter the source cohort`() throws {
+    func `typed controls remain outside inventory admission and enter measurement`() throws {
         let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
         let application = base.appending(path: "institute-application")
         defer { try? FileManager.default.removeItem(at: base) }
@@ -192,7 +194,10 @@ extension Institute.Xcode.Test.Integration {
             base.appending(path: "institute-continuous-integration"),
             base.appending(path: "swift-primitives/swift-example"),
         ] {
-            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            try FileManager.default.createDirectory(
+                at: directory,
+                withIntermediateDirectories: true
+            )
             try Data("// swift-tools-version: 6.4\n".utf8).write(
                 to: directory.appending(path: "Package.swift")
             )
@@ -221,12 +226,22 @@ extension Institute.Xcode.Test.Integration {
         )
 
         #expect(cohort.references == 4)
-        #expect(cohort.controls.map(\.identity) == [
-            "control:application",
-            "control:institute",
-            "control:continuous-integration",
-        ])
+        #expect(
+            cohort.controls.map(\.identity) == [
+                "control:application",
+                "control:institute",
+                "control:continuous-integration",
+            ]
+        )
         #expect(cohort.admitted.map(\.identity) == ["swift-primitives/swift-example"])
+        #expect(
+            cohort.measurable.map(\.identity) == [
+                "control:application",
+                "control:institute",
+                "control:continuous-integration",
+                "swift-primitives/swift-example",
+            ]
+        )
         #expect(cohort.reasons.isEmpty)
     }
 }

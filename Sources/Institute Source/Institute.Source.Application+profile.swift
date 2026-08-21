@@ -7,12 +7,9 @@ extension Institute.Source.Application {
         for row: Institute.Source.Workspace.Row,
         preparation: Institute.Source.Preparation
     ) throws(Institute.Error) -> SourceDomain.Profile {
-        guard let repository = row.repository else {
-            throw .configuration("source member is not admitted: \(row.identity)")
-        }
         let policy = ContinuousIntegration.Source.Policy.current
         let owner = Institute.Source.Profile(policy: policy)
-        let bundle = owner.bundle(for: repository)
+        let bundle = try owner.bundle(for: row)
         let rules = owner.rules(for: bundle)
         let linterConfiguration =
             "\(preparation.directory)/\(bundle.rawValue)-source-linter-profile.json"

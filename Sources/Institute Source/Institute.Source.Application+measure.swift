@@ -14,8 +14,9 @@ extension Institute.Source.Application {
         references: [SourceDomain.Reason] = [],
         preparation: Institute.Source.Preparation
     ) async throws(Institute.Error) -> SourceDomain.Report {
-        let rows = selected ?? cohort.admitted
-        let scope: SourceDomain.Report.Scope = selected == nil && engines == nil ? .workspace : .partial
+        let rows = selected ?? cohort.measurable
+        let scope: SourceDomain.Report.Scope =
+            selected == nil && engines == nil ? .workspace : .partial
         let policy = ContinuousIntegration.Source.Policy.current
         guard preparation.policyRevision == policy.revision else {
             return Self.unmeasuredReport(
@@ -23,7 +24,11 @@ extension Institute.Source.Application {
                 reason: .init(code: "stale-profile", detail: preparation.policyRevision)
             )
         }
-        guard Self.matches(file: preparation.swiftFormatExecutable, digest: preparation.swiftFormatTool),
+        guard
+            Self.matches(
+                file: preparation.swiftFormatExecutable,
+                digest: preparation.swiftFormatTool
+            ),
             Self.matches(file: preparation.linterExecutable, digest: preparation.linterTool)
         else {
             return Self.unmeasuredReport(
@@ -47,25 +52,36 @@ extension Institute.Source.Application {
             .swiftFormat(process: process), .linter(process: process),
         ]
         let execution: SourceDomain.Execution
-        do throws(SourceDomain.Execution.Error) { execution = try .init(drivers: drivers) } catch { throw .configuration("cannot register source engines: \(error)") }
+        do throws(SourceDomain.Execution.Error) { execution = try .init(drivers: drivers) } catch {
+            throw .configuration("cannot register source engines: \(error)")
+        }
         var subjects: [SourceDomain.Subject] = []
-        var entries:
-            [(
-                repository: Institute.Repository,
-                subject: SourceDomain.Subject
-            )] = []
+        var entries: [(row: Institute.Source.Workspace.Row, subject: SourceDomain.Subject)] = []
         for row in rows {
-            guard let repository = row.repository else { continue }
             let subject = try subject(for: row)
             subjects.append(subject)
-            entries.append((repository: repository, subject: subject))
+            entries.append((row: row, subject: subject))
         }
         let measurements = await Async.Fanout(jobs: jobs).mapAsync(entries) { entry in
             let subject = entry.subject
-            let repository = entry.repository
-            let bundle = Institute.Source.Profile(policy: policy).bundle(for: repository)
+            let bundle: ContinuousIntegration.Source.Bundle
+            do throws(Institute.Error) {
+                bundle = try Institute.Source.Profile(policy: policy).bundle(for: entry.row)
+            } catch {
+                return policy.requiredEngines.map {
+                    .init(
+                        engine: $0,
+                        subject: subject,
+                        activeRules: [],
+                        applicableRules: [],
+                        files: subject.paths(of: .swift),
+                        verdict: .unmeasured([.init(code: "profile-binding", detail: "\(error)")])
+                    )
+                }
+            }
             let rules = Institute.Source.Profile(policy: policy).rules(for: bundle)
-            let linterConfiguration = "\(preparation.directory)/\(bundle.rawValue)-source-linter-profile.json"
+            let linterConfiguration =
+                "\(preparation.directory)/\(bundle.rawValue)-source-linter-profile.json"
             let linterArtifact = policy.linter(bundle: bundle, rules: rules)
             guard Self.matches(file: linterConfiguration, digest: linterArtifact.digest) else {
                 return policy.requiredEngines.map {
@@ -75,7 +91,9 @@ extension Institute.Source.Application {
                         activeRules: [],
                         applicableRules: [],
                         files: subject.paths(of: .swift),
-                        verdict: .unmeasured([.init(code: "stale-configuration", detail: linterConfiguration)])
+                        verdict: .unmeasured([
+                            .init(code: "stale-configuration", detail: linterConfiguration)
+                        ])
                     )
                 }
             }
@@ -97,7 +115,8 @@ extension Institute.Source.Application {
                         activeRules: $0.rules,
                         applicableRules: [],
                         files: subject.paths(of: .swift),
-                        verdict: .unmeasured([.init(code: "stale-profile", detail: bundle.rawValue)])
+                        verdict: .unmeasured([.init(code: "stale-profile", detail: bundle.rawValue)]
+                        )
                     )
                 }
             }
@@ -118,10 +137,48 @@ extension Institute.Source.Application {
                 predicates: []
             ),
             subjects: subjects,
-            references: cohort.reasons + references,
+            references: cohort.reasons
+                + Self.selfApplicationReasons(
+                    cohort: cohort,
+                    policy: policy
+                ) + references,
             measurements: measurements,
             artifactEvidence: []
         )
+    }
+
+    private static func selfApplicationReasons(
+        cohort: Institute.Source.Workspace.Cohort,
+        policy: ContinuousIntegration.Source.Policy
+    ) -> [SourceDomain.Reason] {
+        let admitted = Swift.Set(cohort.admitted.map(\.identity))
+        let controls = Swift.Set(
+            cohort.controls.compactMap { row -> Swift.String? in
+                guard case .control(let control) = row.role else { return nil }
+                return control.rawValue
+            }
+        )
+        var reasons: [SourceDomain.Reason] = []
+        for identity in policy.commitment.repositories where !admitted.contains(identity) {
+            reasons.append(.init(code: "self-application-repository", detail: identity))
+        }
+        for control in policy.commitment.controls where !controls.contains(control) {
+            reasons.append(.init(code: "self-application-control", detail: control))
+        }
+        let declaredRules = admitted.filter {
+            $0.split(separator: "/").last?.hasSuffix(
+                policy.commitment.rule.suffix
+            ) == true
+        }
+        if declaredRules.isEmpty {
+            reasons.append(
+                .init(
+                    code: "self-application-rule-family",
+                    detail: policy.commitment.rule.suffix
+                )
+            )
+        }
+        return reasons
     }
 
     private static func unmeasuredReport(

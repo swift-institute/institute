@@ -24,6 +24,16 @@ extension Institute.Source.Workspace {
             }
         }
 
+        public var measurable: [Row] {
+            rows.filter {
+                guard $0.reason == nil else { return false }
+                switch $0.role {
+                case .subject: return $0.repository != nil
+                case .control: return true
+                }
+            }
+        }
+
         public init(
             workspace: Swift.String,
             references: Swift.Int,
