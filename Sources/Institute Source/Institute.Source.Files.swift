@@ -8,7 +8,10 @@ extension Institute.Source.Application {
         do throws(File.Path.Error) { root = File.Directory(try .init(row.directory)) }
         catch { throw .configuration("invalid source member path \(row.directory)") }
 
-        var files: [Swift.String] = []
+        guard root[file: "Package.swift"].stat.isFile else {
+            throw .configuration("source member manifest is missing at \(row.directory)")
+        }
+        var files: [Swift.String] = ["Package.swift"]
         for component: File.Path.Component in ["Sources", "Tests"] {
             let directory = root[directory: component]
             guard directory.stat.isDirectory else { continue }
