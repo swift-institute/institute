@@ -56,7 +56,7 @@ extension Institute.Source.Application {
         return preparation
     }
 
-    static func artifactDirectory(workspace: Swift.String) throws(Institute.Error) -> File.Directory {
+    public static func artifactDirectory(workspace: Swift.String) throws(Institute.Error) -> File.Directory {
         let path: File.Path
         do throws(File.Path.Error) { path = try .init(workspace) }
         catch { throw .configuration("invalid source workspace path \(workspace)") }
