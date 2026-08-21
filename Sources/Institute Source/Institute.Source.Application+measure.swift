@@ -145,7 +145,39 @@ extension Institute.Source.Application {
                     )
                 }
             }
-            return await execution.measure(subject, profile: profile, engines: engines)
+            let measured = await execution.measure(subject, profile: profile, engines: engines)
+            let current: SourceDomain.Subject
+            do throws(Institute.Error) {
+                current = try Institute.Source.Workspace.subject(for: entry.row)
+            } catch {
+                return profile.engines.map {
+                    .init(
+                        engine: $0.id,
+                        subject: subject,
+                        activeRules: $0.rules,
+                        applicableRules: [],
+                        files: subject.paths(of: .swift),
+                        verdict: .unmeasured([
+                            .init(code: "source-changed", detail: "\(error)")
+                        ])
+                    )
+                }
+            }
+            guard current == subject else {
+                return profile.engines.map {
+                    .init(
+                        engine: $0.id,
+                        subject: subject,
+                        activeRules: $0.rules,
+                        applicableRules: [],
+                        files: subject.paths(of: .swift),
+                        verdict: .unmeasured([
+                            .init(code: "source-changed", detail: subject.identity)
+                        ])
+                    )
+                }
+            }
+            return measured
         }.flatMap { $0 }
         let profileBytes = preparation.profiles.keys.sorted()
             .compactMap { preparation.profiles[$0]?.hex }

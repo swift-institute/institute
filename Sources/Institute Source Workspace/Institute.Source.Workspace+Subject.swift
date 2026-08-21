@@ -1,3 +1,5 @@
+internal import Byte_Primitives
+internal import FIPS_180_4
 public import File_System
 public import Git_Foundation
 public import Institute_Model
@@ -74,7 +76,14 @@ extension Institute.Source.Workspace {
             guard canonicalFiles.insert(canonical.description).inserted else {
                 throw .configuration("duplicate canonical source artifact: \(path)")
             }
-            artifacts.append(.init(path: path, kind: .swift, provenance: .authored))
+            artifacts.append(
+                .init(
+                    path: path,
+                    kind: .swift,
+                    provenance: .authored,
+                    digest: try digest(file)
+                )
+            )
         }
         return .init(identity: row.identity, root: row.directory, artifacts: artifacts)
     }
@@ -86,6 +95,19 @@ extension Institute.Source.Workspace {
             return full.map(\.string)
         }
         return full.dropFirst(root.count).map(\.string)
+    }
+
+    private static func digest(_ file: File) throws(Institute.Error) -> Source.Artifact.Digest {
+        let bytes: [Byte]
+        do throws(Either<File.System.Read.Full.Error, Never>) {
+            bytes = try file.read.full { span in
+                var result: [Byte] = []
+                result.reserveCapacity(span.count)
+                for index in span.indices { result.append(span[index]) }
+                return result
+            }
+        } catch { throw .filesystem("cannot read source artifact \(file): \(error)") }
+        return .init(FIPS_180_4.SHA256.digest(bytes).hex)
     }
 
     private static func excluded(_ path: File.Path, root: File.Path) -> Swift.Bool {

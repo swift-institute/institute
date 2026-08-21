@@ -150,6 +150,7 @@ let package = Package(
                 .product(name: "Async Fanout", package: "swift-async"),
                 .product(name: "Byte Primitives", package: "swift-byte-primitives"),
                 .product(name: "File System", package: "swift-file-system"),
+                .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "Git", package: "swift-git"),
                 .product(name: "JSON", package: "swift-json"),
                 .product(name: "Source Measurement", package: "swift-source"),
