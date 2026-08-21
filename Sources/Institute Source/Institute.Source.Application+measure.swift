@@ -62,6 +62,31 @@ extension Institute.Source.Application {
             subjects.append(subject)
             entries.append((row: row, subject: subject))
         }
+        let owner = Institute.Source.Profile(policy: policy)
+        var requirements: [SourceDomain.Report.Commitment.Requirement] = []
+        for entry in entries {
+            let bundle = try owner.bundle(for: entry.row)
+            let artifacts = entry.subject.artifacts.filter { $0.kind == .swift }.map(\.path)
+            for engine in policy.requiredEngines where engines?.contains(engine) ?? true {
+                let rules: [SourceDomain.Rule.ID]
+                switch engine.token {
+                case "swift-format":
+                    rules = [.init(engine: engine, token: "format")]
+                case "swift-linter":
+                    rules = owner.rules(for: bundle)
+                default:
+                    rules = []
+                }
+                requirements.append(
+                    .init(
+                        subject: entry.subject.identity,
+                        engine: engine,
+                        artifacts: artifacts,
+                        rules: rules
+                    )
+                )
+            }
+        }
         let measurements = await Async.Fanout(jobs: jobs).mapAsync(entries) { entry in
             let subject = entry.subject
             let bundle: ContinuousIntegration.Source.Bundle
@@ -134,6 +159,7 @@ extension Institute.Source.Application {
                 engines: policy.requiredEngines.map {
                     .init(id: $0, artifactKinds: [.swift])
                 },
+                requirements: requirements,
                 predicates: []
             ),
             subjects: subjects,
@@ -188,7 +214,7 @@ extension Institute.Source.Application {
         .init(
             scope: scope,
             profile: .init("stale"),
-            commitment: .init(subjects: [], engines: [], predicates: []),
+            commitment: .init(subjects: [], engines: [], requirements: [], predicates: []),
             subjects: [],
             references: [reason],
             measurements: [],
