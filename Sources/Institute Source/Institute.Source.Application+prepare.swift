@@ -3,6 +3,7 @@ public import File_System
 internal import Institute_Continuous_Integration
 public import Institute_Continuous_Integration_Source
 public import Institute_Model
+internal import Institute_Source_Profile
 public import Source_Profile
 
 extension Institute.Source.Application {
@@ -19,7 +20,7 @@ extension Institute.Source.Application {
 
     let swiftFormatTool = try Self.digest(file: swiftFormatExecutable)
     let linterTool = try Self.digest(file: linterExecutable)
-    let format = directory[file: policy.swiftFormat.path]
+    let format = directory[file: try Self.component(policy.swiftFormat.path)]
     do throws(File.System.Write.Atomic.Error) {
       try format.write.atomic(policy.swiftFormat.contents)
     } catch { throw .filesystem("cannot render \(format): \(error)") }
@@ -29,7 +30,9 @@ extension Institute.Source.Application {
     for bundle in policy.bundles {
       let rules = instituteProfile.rules(for: bundle)
       let artifact = policy.linter(bundle: bundle, rules: rules)
-      let linter = directory[file: "\(bundle.rawValue)-\(artifact.path)"]
+      let linter = directory[
+        file: try Self.component("\(bundle.rawValue)-\(artifact.path)")
+      ]
       do throws(File.System.Write.Atomic.Error) { try linter.write.atomic(artifact.contents) } catch
       { throw .filesystem("cannot render \(linter): \(error)") }
       profiles[bundle.rawValue] =
@@ -98,6 +101,14 @@ extension Institute.Source.Application {
   ) -> Swift.Bool {
     do throws(Institute.Error) { return try Self.digest(file: path) == expected } catch {
       return false
+    }
+  }
+
+  private static func component(_ name: Swift.String) throws(Institute.Error)
+    -> File.Path.Component
+  {
+    do throws(File.Path.Component.Error) { return try .init(name) } catch {
+      throw .configuration("invalid source preparation artifact name \(name): \(error)")
     }
   }
 }

@@ -3,6 +3,7 @@ public import FIPS_180_4
 internal import Institute_Continuous_Integration
 public import Institute_Continuous_Integration_Source
 public import Institute_Model
+internal import Institute_Source_Profile
 public import Institute_Source_Workspace
 public import Source_Execution
 public import Source_Measurement
@@ -96,7 +97,9 @@ extension Institute.Source.Application {
         )
       }
     }
-    let measurements = await Async.Fanout(jobs: jobs).mapAsync(entries) { entry in
+    let measuredBySubject: [[Source_Measurement.Source.Measurement]] = await Async.Fanout(
+      jobs: jobs
+    ).mapAsync(entries) { entry in
       let subject = entry.subject
       let bundle: ContinuousIntegration.Source.Bundle
       do throws(Institute.Error) {
@@ -187,7 +190,8 @@ extension Institute.Source.Application {
         }
       }
       return measured
-    }.flatMap { $0 }
+    }
+    let measurements = measuredBySubject.flatMap { $0 }
     let profileBytes = preparation.profiles.keys.sorted()
       .compactMap { preparation.profiles[$0]?.hex }
       .joined(separator: ":").utf8.map(Byte.init)
