@@ -1,35 +1,36 @@
 public import Institute_Continuous_Integration
 public import Institute_Continuous_Integration_Source
 public import Institute_Model
-public import Linter_Institute_Rules
-public import Linter_Primitives_Rules
-public import Linter_Standards_Rules
+internal import Linter_Institute_Rules
+internal import Linter_Primitives
+internal import Linter_Primitives_Rules
+internal import Linter_Standards_Rules
 public import Source_Measurement
 public import Source_Profile
 
 extension Institute_Model.Institute.Source {
-    public struct Profile: Sendable {
-        public let policy: ContinuousIntegration.Source.Policy
+  public struct Profile: Sendable {
+    public let policy: ContinuousIntegration.Source.Policy
 
-        public init(
-            policy: ContinuousIntegration.Source.Policy = .current
-        ) {
-            self.policy = policy
-        }
-
-        public func rules(
-            for bundle: ContinuousIntegration.Source.Bundle
-        ) -> [Source_Measurement.Source.Rule.ID] {
-            let configurations: [Lint.Rule.Configuration]
-            switch bundle {
-            case .primitives: configurations = Lint.Rule.Bundle.primitives
-            case .standards: configurations = Lint.Rule.Bundle.standards
-            case .institute: configurations = Lint.Rule.Bundle.institute
-            }
-            let engine = Source_Measurement.Source.Engine.ID("swift-linter")
-            return configurations.map {
-                .init(engine: engine, token: $0.rule.id.underlying)
-            }.sorted(by: { $0.token < $1.token })
-        }
+    public init(
+      policy: ContinuousIntegration.Source.Policy = .current
+    ) {
+      self.policy = policy
     }
+
+    public func rules(
+      for bundle: ContinuousIntegration.Source.Bundle
+    ) -> [Source_Measurement.Source.Rule.ID] {
+      let configurations: [Lint.Rule.Configuration]
+      switch bundle {
+      case .primitives: configurations = Lint.Rule.Bundle.primitives
+      case .standards: configurations = Lint.Rule.Bundle.standards
+      case .institute: configurations = Lint.Rule.Bundle.institute
+      }
+      let engine = Source_Measurement.Source.Engine.ID("swift-linter")
+      return configurations.map {
+        .init(engine: engine, token: $0.rule.id.underlying)
+      }.sorted(by: { $0.token < $1.token })
+    }
+  }
 }
