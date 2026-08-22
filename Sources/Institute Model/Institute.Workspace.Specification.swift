@@ -26,9 +26,6 @@ extension Institute.Workspace {
                 throw .typeMismatch(expected: "workspace schema 1", got: "other schema")
             }
             let members = try [Member](json: membersValue)
-            guard !members.isEmpty else {
-                throw .typeMismatch(expected: "nonempty workspace members", got: "empty")
-            }
             guard Set(members.map(\.location)).count == members.count else {
                 throw .typeMismatch(expected: "unique workspace locations", got: "duplicates")
             }
@@ -45,9 +42,6 @@ extension Institute.Workspace {
             }
             guard Set(controls.map(\.rawValue)).count == controls.count else {
                 throw .typeMismatch(expected: "unique workspace controls", got: "duplicates")
-            }
-            guard Set(controls.map(\.rawValue)) == Set(Control.allCases.map(\.rawValue)) else {
-                throw .typeMismatch(expected: "complete workspace controls", got: "incomplete")
             }
             return .init(members: members)
         }

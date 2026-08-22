@@ -63,7 +63,7 @@ extension Institute.Xcode.Test.Unit {
     }
 
     @Test
-    func `render uses checkout relative application and sibling hierarchy package references`() {
+    func `render uses sibling hierarchy package references`() {
         let repositories = [
             Institute.Repository(
                 name: "swift-example",
@@ -83,18 +83,18 @@ extension Institute.Xcode.Test.Unit {
         let rendered = try Institute.Xcode.render(specification)
         let document = try Institute.Xcode.document(specification)
 
-        #expect(rendered.contains("group:."))
-        #expect(rendered.contains("group:../institute"))
-        #expect(rendered.contains("group:../institute-continuous-integration"))
+        #expect(specification.members.count == repositories.count)
+        #expect(
+            specification.members.allSatisfy { member in
+                if case .subject = member.role { true } else { false }
+            }
+        )
         #expect(rendered.contains("group:../swift-primitives/swift-example"))
         #expect(rendered.contains("group:../swift-standards/swift-ietf/swift-rfc-0000"))
         #expect(!rendered.contains("/Users/"))
         #expect(!rendered.contains("absolute:"))
         #expect(
             document.references.map(\.location) == [
-                .group("."),
-                .group("../institute"),
-                .group("../institute-continuous-integration"),
                 .group("../swift-primitives/swift-example"),
                 .group("../swift-standards/swift-ietf/swift-rfc-0000"),
             ]
@@ -157,14 +157,6 @@ extension Institute.Xcode.Test.Integration {
             at: base.appending(path: "swift-foundations/swift-example"),
             withIntermediateDirectories: true
         )
-        try FileManager.default.createDirectory(
-            at: base.appending(path: "institute"),
-            withIntermediateDirectories: true
-        )
-        try FileManager.default.createDirectory(
-            at: base.appending(path: "institute-continuous-integration"),
-            withIntermediateDirectories: true
-        )
         for reference in try Institute.Xcode.document(specification).references {
             guard case .group(let location) = reference.location else {
                 Issue.record("unexpected non-group reference \(reference.location)")
@@ -209,7 +201,22 @@ extension Institute.Xcode.Test.Integration {
             layer: .primitives
         )
         let root = try Institute.Root(checkout: File.Directory(validating: application.path))
-        let specification = try Institute.Xcode.specification([repository])
+        let specification = Institute.Workspace.Specification(members: [
+            .init(location: "group:.", role: .control(.application)),
+            .init(location: "group:../institute", role: .control(.institute)),
+            .init(
+                location: "group:../institute-continuous-integration",
+                role: .control(.continuousIntegration)
+            ),
+            .init(
+                location: "group:../swift-primitives/swift-example",
+                role: .subject(
+                    try #require(
+                        Institute.Repository.Key(identity: "swift-primitives/swift-example")
+                    )
+                )
+            ),
+        ])
         try Institute.Xcode.write(specification, at: root.checkout)
         let configuration = Institute.Configuration(
             version: 1,

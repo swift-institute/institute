@@ -14,15 +14,8 @@ extension Institute.Xcode {
   public static func specification(
     _ repositories: [Institute.Repository]
   ) throws(Institute.Error) -> Institute.Workspace.Specification {
-    var members: [Institute.Workspace.Member] = [
-      .init(location: "group:.", role: .control(.application)),
-      .init(location: "group:../institute", role: .control(.institute)),
-      .init(
-        location: "group:../institute-continuous-integration",
-        role: .control(.continuousIntegration)
-      ),
-    ]
-    var locations = Swift.Set(members.map(\.location))
+    var members: [Institute.Workspace.Member] = []
+    var locations = Swift.Set<Swift.String>()
     for repository in repositories {
       guard
         let key = Institute.Repository.Key(
