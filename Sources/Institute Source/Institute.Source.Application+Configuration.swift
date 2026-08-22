@@ -3,8 +3,10 @@ public import File_System
 internal import Institute_Continuous_Integration
 public import Institute_Continuous_Integration_Source
 internal import Institute_Model
+internal import Institute_Source_Profile
 internal import JSON
 public import Source_Measurement
+internal import Source_Profile
 
 extension Institute.Source.Application {
   static func configuration(
@@ -37,7 +39,11 @@ extension Institute.Source.Application {
     for entry in declared {
       let declaration = entry.artifact
       let path = entry.path
-      let file = directory[file: path]
+      let component: File.Path.Component
+      do throws(File.Path.Component.Error) { component = try .init(path) } catch {
+        throw .configuration("invalid source configuration artifact path \(path): \(error)")
+      }
+      let file = directory[file: component]
       let actual: Source.Profile.Digest
       let readReason: Source.Reason?
       do throws(Institute.Error) {
