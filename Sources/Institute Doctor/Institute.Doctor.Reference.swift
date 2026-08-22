@@ -92,7 +92,7 @@ extension Institute.Doctor {
       expected = "workspace specification error: \(error)"
       expectedMembership = expected
     }
-    Self.reference.run(
+    return Self.reference.run(
       population: [
         .init(
           expected: expected,
