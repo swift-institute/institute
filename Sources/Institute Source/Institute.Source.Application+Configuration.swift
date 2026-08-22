@@ -2,6 +2,7 @@ internal import Byte_Primitives
 public import File_System
 internal import Institute_Continuous_Integration
 public import Institute_Continuous_Integration_Source
+internal import Institute_Model
 internal import JSON
 public import Source_Measurement
 
