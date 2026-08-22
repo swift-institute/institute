@@ -48,7 +48,7 @@ extension Institute.Source.Application {
     rules: Set<Source_Measurement.Source.Rule.ID>?,
     preparation: Institute.Source.Preparation
   ) async throws(Institute.Error) -> Source_Repair.Source.Repair.Plan {
-    let subject = try self.subject(for: member)
+    let subject = try Institute.Source.Workspace.subject(for: member)
     let profile = try profile(for: member, preparation: preparation)
     if let rules {
       let available = Set(profile.engines.flatMap(\.rules))
@@ -117,7 +117,7 @@ extension Institute.Source.Application {
       else {
         throw .configuration("source repair subject is no longer admitted")
       }
-      let subject = try self.subject(for: row)
+      let subject = try Institute.Source.Workspace.subject(for: row)
       let profile = try profile(for: row, preparation: preparation)
       let files = Self.fileSystem(root: subject.root)
       let sources = Source_Repair.Source.SourceSet.digest(
