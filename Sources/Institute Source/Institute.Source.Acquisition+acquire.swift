@@ -125,7 +125,9 @@ extension Institute.Source.Acquisition {
     guard source.stat.isFile else {
       throw .configuration("pinned Xcode source asset is missing: \(source)")
     }
-    do throws(File.System.Copy.Error) { try source.copy.to(destination) } catch {
+    do throws(File.System.Copy.Error) {
+      try File.System.Copy.copy(from: source.path, to: destination.path)
+    } catch {
       throw .filesystem("cannot stage pinned Xcode source asset \(source): \(error)")
     }
   }
@@ -149,11 +151,15 @@ extension Institute.Source.Acquisition {
     }
   }
 
-  private static func component(_ name: Swift.String) throws(Institute.Error) -> Swift.String {
+  private static func component(_ name: Swift.String) throws(Institute.Error)
+    -> File.Path.Component
+  {
     guard !name.isEmpty, !name.contains("/"), name != ".", name != ".." else {
       throw .configuration("invalid source asset name \(name)")
     }
-    return name
+    do throws(File.Path.Component.Error) { return try .init(name) } catch {
+      throw .configuration("invalid source asset name \(name): \(error)")
+    }
   }
 
   private static func permissions(executable: Swift.Bool, file: File) throws(Institute.Error) {

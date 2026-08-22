@@ -38,7 +38,7 @@ extension Institute.Source.Application {
       workspace: workspace,
       workspaceDigest: try Self.workspaceDigest(workspace),
       inventoryDigest: Self.inventoryDigest(configuration),
-      cohort: cohort.admitted.map(\.identity),
+      cohort: cohort.measurable.map(\.identity),
       repairs: repairs
     )
   }
@@ -48,7 +48,7 @@ extension Institute.Source.Application {
     rules: Set<Source_Measurement.Source.Rule.ID>?,
     preparation: Institute.Source.Preparation
   ) async throws(Institute.Error) -> Source_Repair.Source.Repair.Plan {
-    let subject = try subject(for: member)
+    let subject = try self.subject(for: member)
     let profile = try profile(for: member, preparation: preparation)
     if let rules {
       let available = Set(profile.engines.flatMap(\.rules))
@@ -97,9 +97,9 @@ extension Institute.Source.Application {
     preparation: Institute.Source.Preparation
   ) throws(Institute.Error) -> Source_Measurement.Source.Reason? {
     guard plan.workspace == workspace,
-      plan.workspaceDigest == Self.workspaceDigest(workspace),
+      plan.workspaceDigest == (try Self.workspaceDigest(workspace)),
       plan.inventoryDigest == Self.inventoryDigest(configuration),
-      plan.cohort == cohort.admitted.map(\.identity)
+      plan.cohort == cohort.measurable.map(\.identity)
     else { throw .configuration("source repair workspace binding is stale") }
     guard !plan.repairs.isEmpty else {
       throw .configuration("source repair plan contains no subjects")
@@ -111,13 +111,13 @@ extension Institute.Source.Application {
         throw .configuration("duplicate source repair subject: \(repair.subject.identity)")
       }
       guard
-        let row = cohort.admitted.first(where: {
+        let row = cohort.measurable.first(where: {
           $0.identity == repair.subject.identity
         })
       else {
         throw .configuration("source repair subject is no longer admitted")
       }
-      let subject = try subject(for: row)
+      let subject = try self.subject(for: row)
       let profile = try profile(for: row, preparation: preparation)
       let files = Self.fileSystem(root: subject.root)
       let sources = Source_Repair.Source.SourceSet.digest(
@@ -157,13 +157,15 @@ extension Institute.Source.Application {
     subject: Source_Measurement.Source.Subject,
     files: Source_Repair.Source.Repair.FileSystem
   ) throws(Institute.Error) -> [Source_Repair.Source.Repair.Staged.File] {
-    try subject.paths(of: .swift).map { path in
+    var staged: [Source_Repair.Source.Repair.Staged.File] = []
+    for path in subject.paths(of: .swift) {
       switch files.read(path) {
-      case .success(let contents): return .init(path: path, contents: contents)
+      case .success(let contents): staged.append(.init(path: path, contents: contents))
       case .failure(let reason):
         throw .filesystem("cannot stage \(path): \(reason.code): \(reason.detail)")
       }
     }
+    return staged
   }
 
   private static func temporaryDirectory(beside root: Swift.String) throws(Institute.Error)
