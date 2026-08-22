@@ -19,7 +19,12 @@ extension Institute.Source.Acquisition {
       return destination
     }
 
-    do throws(File.System.Create.Directory.Error) { try directory.create.recursive() } catch {
+    do throws(File.System.Create.Directory.Error) {
+      try File.System.Create.Directory.create(
+        at: directory.path,
+        createIntermediates: true
+      )
+    } catch {
       throw .filesystem("cannot create source asset directory \(directory): \(error)")
     }
     let stagingPath: File.Path
@@ -60,7 +65,11 @@ extension Institute.Source.Acquisition {
     }
     try Self.permissions(executable: executable, file: staging)
     do throws(File.System.Move.Error) {
-      try staging.move.to(destination, options: .init(overwrite: true))
+      try File.System.Move.move(
+        from: staging.path,
+        to: destination.path,
+        options: .init(overwrite: true)
+      )
     } catch {
       throw .filesystem("cannot publish verified source asset \(destination): \(error)")
     }
