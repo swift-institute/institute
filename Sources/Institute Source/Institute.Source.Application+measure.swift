@@ -1,21 +1,25 @@
 public import Async_Fanout
 public import FIPS_180_4
+internal import Institute_Continuous_Integration
 public import Institute_Continuous_Integration_Source
 public import Institute_Model
+public import Institute_Source_Workspace
 public import Source_Execution
+public import Source_Measurement
+internal import Source_Profile
 public import Source_Report
 
 extension Institute.Source.Application {
   public func measure(
     cohort: Institute.Source.Workspace.Cohort,
     selected: [Institute.Source.Workspace.Row]? = nil,
-    engines: Set<SourceDomain.Engine.ID>? = nil,
+    engines: Set<Source_Measurement.Source.Engine.ID>? = nil,
     jobs: Swift.Int? = nil,
-    references: [SourceDomain.Reason] = [],
+    references: [Source_Measurement.Source.Reason] = [],
     preparation: Institute.Source.Preparation
-  ) async throws(Institute.Error) -> SourceDomain.Report {
+  ) async throws(Institute.Error) -> Source_Report.Source.Report {
     let rows = selected ?? cohort.measurable
-    let scope: SourceDomain.Report.Scope =
+    let scope: Source_Report.Source.Report.Scope =
       selected == nil && engines == nil ? .workspace : .partial
     let policy = ContinuousIntegration.Source.Policy.current
     guard preparation.policyRevision == policy.revision else {
@@ -48,15 +52,18 @@ extension Institute.Source.Application {
       )
     }
 
-    let drivers: [SourceDomain.Engine.Driver] = [
+    let drivers: [Source_Measurement.Source.Engine.Driver] = [
       .swiftFormat(process: process), .linter(process: process),
     ]
-    let execution: SourceDomain.Execution
-    do throws(SourceDomain.Execution.Error) { execution = try .init(drivers: drivers) } catch {
+    let execution: Source_Execution.Source.Execution
+    do throws(Source_Execution.Source.Execution.Error) {
+      execution = try .init(drivers: drivers)
+    } catch {
       throw .configuration("cannot register source engines: \(error)")
     }
-    var subjects: [SourceDomain.Subject] = []
-    var entries: [(row: Institute.Source.Workspace.Row, subject: SourceDomain.Subject)] = []
+    var subjects: [Source_Measurement.Source.Subject] = []
+    var entries:
+      [(row: Institute.Source.Workspace.Row, subject: Source_Measurement.Source.Subject)] = []
     for row in rows {
       let subject = try Institute.Source.Workspace.subject(for: row)
       subjects.append(subject)
@@ -65,12 +72,12 @@ extension Institute.Source.Application {
     let configuration = try Self.configuration(policy: policy, preparation: preparation)
     subjects.append(configuration.subject)
     let owner = Institute.Source.Profile(policy: policy)
-    var requirements: [SourceDomain.Report.Commitment.Requirement] = []
+    var requirements: [Source_Report.Source.Report.Commitment.Requirement] = []
     for entry in entries {
       let bundle = try owner.bundle(for: entry.row)
       let artifacts = entry.subject.artifacts.filter { $0.kind == .swift }.map(\.path)
       for engine in policy.requiredEngines where engines?.contains(engine) ?? true {
-        let rules: [SourceDomain.Rule.ID]
+        let rules: [Source_Measurement.Source.Rule.ID]
         switch engine.token {
         case "swift-format":
           rules = [.init(engine: engine, token: "format")]
@@ -148,7 +155,7 @@ extension Institute.Source.Application {
         }
       }
       let measured = await execution.measure(subject, profile: profile, engines: engines)
-      let current: SourceDomain.Subject
+      let current: Source_Measurement.Source.Subject
       do throws(Institute.Error) {
         current = try Institute.Source.Workspace.subject(for: entry.row)
       } catch {
@@ -184,7 +191,7 @@ extension Institute.Source.Application {
     let profileBytes = preparation.profiles.keys.sorted()
       .compactMap { preparation.profiles[$0]?.hex }
       .joined(separator: ":").utf8.map(Byte.init)
-    let digest = SourceDomain.Profile.Digest(FIPS_180_4.SHA256.digest(profileBytes).hex)
+    let digest = Source_Profile.Source.Profile.Digest(FIPS_180_4.SHA256.digest(profileBytes).hex)
     return .init(
       scope: scope,
       profile: digest,
@@ -228,7 +235,7 @@ extension Institute.Source.Application {
   private static func selfApplicationReasons(
     cohort: Institute.Source.Workspace.Cohort,
     policy: ContinuousIntegration.Source.Policy
-  ) -> [SourceDomain.Reason] {
+  ) -> [Source_Measurement.Source.Reason] {
     let admitted = Swift.Set(cohort.admitted.map(\.identity))
     let controls = Swift.Set(
       cohort.controls.compactMap { row -> Swift.String? in
@@ -236,7 +243,7 @@ extension Institute.Source.Application {
         return control.rawValue
       }
     )
-    var reasons: [SourceDomain.Reason] = []
+    var reasons: [Source_Measurement.Source.Reason] = []
     for identity in policy.commitment.repositories where !admitted.contains(identity) {
       reasons.append(.init(code: "self-application-repository", detail: identity))
     }
@@ -260,9 +267,9 @@ extension Institute.Source.Application {
   }
 
   private static func unmeasuredReport(
-    scope: SourceDomain.Report.Scope,
-    reason: SourceDomain.Reason
-  ) -> SourceDomain.Report {
+    scope: Source_Report.Source.Report.Scope,
+    reason: Source_Measurement.Source.Reason
+  ) -> Source_Report.Source.Report {
     .init(
       scope: scope,
       profile: .init("stale"),

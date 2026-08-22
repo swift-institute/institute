@@ -198,6 +198,10 @@ let package = Package(
         "Institute Source Workspace",
         .product(name: "Async Fanout", package: "swift-async"),
         .product(
+          name: "Institute Continuous Integration",
+          package: "institute-continuous-integration"
+        ),
+        .product(
           name: "Institute Continuous Integration Source",
           package: "institute-continuous-integration"
         ),
@@ -205,6 +209,8 @@ let package = Package(
         .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
         .product(name: "Process", package: "swift-process"),
         .product(name: "Source Execution", package: "swift-source"),
+        .product(name: "Source Measurement", package: "swift-source"),
+        .product(name: "Source Profile", package: "swift-source"),
         .product(name: "Source Repair", package: "swift-source"),
         .product(name: "Source Report", package: "swift-source"),
       ]
