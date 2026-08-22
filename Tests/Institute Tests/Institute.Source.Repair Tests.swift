@@ -1,5 +1,10 @@
 import Foundation
+import Institute_Model
+import Institute_Source_Workspace
+import JSON
+import Source_Repair
 import Testing
+import Xcode_Workspace_Standard
 
 @testable import Institute_Source
 
@@ -100,7 +105,7 @@ func `Institute source subject includes every Swift file outside build products`
     }
     let row = Institute.Source.Workspace.Row(
         index: 0,
-        location: .group("."),
+        location: .init(scheme: .group, path: "."),
         directory: root.path,
         identity: "swift-primitives/swift-example",
         role: .subject(

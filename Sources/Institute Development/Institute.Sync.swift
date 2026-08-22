@@ -22,12 +22,12 @@ extension Institute {
 }
 
 extension Institute.Sync {
-    public func run(dry: Bool) throws(Institute.Error) {
+    public func run(dry: Bool) async throws(Institute.Error) {
         var inspections = [Institute.Inspection]()
         for repository in selection.repositories {
             inspections.append(try inspect(repository, dry: dry))
         }
-        let specification = try Institute.Xcode.specification(selection.repositories)
+        let specification = try Institute.Xcode.integration(selection.repositories)
         let workspace = Institute.Xcode.current(specification, at: root.checkout)
 
         print(selection.origin)
@@ -62,7 +62,7 @@ extension Institute.Sync {
                 )
                 try root.preflight(parent, under: root.hierarchy)
                 do throws(File.System.Create.Directory.Error) {
-                    try parent.create.recursive()
+                    try create(parent)
                 } catch {
                     throw .filesystem("cannot create \(parent): \(error)")
                 }
@@ -81,16 +81,23 @@ extension Institute.Sync {
             }
         }
 
-        let schemePlan = try Institute.Xcode.Scheme.plan(for: specification, at: root)
-        let scheme = Institute.Xcode.Scheme.current(schemePlan, at: root.checkout)
-        try Institute.Xcode.materialize(specification, scheme: schemePlan, at: root)
+        let receipt = try await Institute.Workspace.Materialization(
+            root: root,
+            specification: specification
+        ).run()
         print(
-            "  \(Institute.Xcode.Scheme.name).xcscheme: \(scheme ? "current" : "generated")"
-                + " — \(schemePlan.buildables.count) buildables and "
-                + "\(schemePlan.testables.count) testables across "
+            "  \(Institute.Xcode.Scheme.name).xcscheme: generated"
+                + " — \(receipt.buildables.count) buildables and "
+                + "\(receipt.testables.values.count) testables across "
                 + "\(specification.members.count) packages"
         )
         print("Sync complete.")
+    }
+
+    private func create(
+        _ directory: File.Directory
+    ) throws(File.System.Create.Directory.Error) {
+        try directory.create.recursive()
     }
 
     /// A checkout of `repository` sitting somewhere in the hierarchy other

@@ -1,5 +1,5 @@
-public import Build_Coordinator
 public import File_System
+public import Institute_Build_Coordinator
 public import Institute_Inventory
 public import Institute_Model
 
@@ -22,12 +22,9 @@ extension Institute.Xcode {
     /// so this is the only path that builds the institute from the working
     /// copy. That, not speed, is the reason it exists.
     ///
-    /// The scheme covers the selected repositories only. `Application` is a
-    /// reference in the workspace document so the tool is editable beside the
-    /// packages, but it is Institute's own executable rather than an
-    /// inventory package, and `swift build --package-path .` is
-    /// what builds it. Putting it in the scheme would make every selection
-    /// build rebuild the tool that launched it.
+    /// The integration scheme covers the selected subjects plus the currently
+    /// admitted typed controls. Controls remain separate from the subject
+    /// cohort even though Xcode builds their exact targets in the same graph.
     public struct Build: Sendable {
         public let root: Institute.Root
         public let selection: Institute.Selection.Resolved
@@ -47,10 +44,11 @@ extension Institute.Xcode.Build {
     /// Everything that must agree before a build can mean anything, or the
     /// reasons it does not.
     ///
-    /// Both generated documents are re-rendered from their current sources
-    /// and byte-compared. Staleness is refused rather than repaired: `sync`
-    /// owns generation, and a build command that quietly regenerated its own
-    /// inputs would be reporting on a workspace nobody asked for.
+    /// Every generated document and the typed materialization receipt are
+    /// re-rendered from their current inputs and byte-compared. Staleness is
+    /// refused rather than repaired: `workspace materialize` owns publication,
+    /// and a build command that quietly regenerated its own inputs would be
+    /// reporting on a workspace nobody asked for.
     ///
     /// The scheme check is the load-bearing one. `xcodebuild` silently drops
     /// a `BuildableReference` whose blueprint matches no target in its
@@ -61,14 +59,14 @@ extension Institute.Xcode.Build {
     /// not break the build, it shrinks it, and the shrunken build still looks
     /// green. Comparing the rendered scheme against the manifests before
     /// building is what makes that reachable.
-    public func diagnostics() throws(Institute.Error) -> [Swift.String] {
-        try preflight().diagnostics
+    public func diagnostics() async throws(Institute.Error) -> [Swift.String] {
+        try await preflight().diagnostics
     }
 
     /// The manifest read is one `swift package dump-package` per selected
     /// repository, so it happens once per command and both the gate and the
     /// reported target count are derived from that single read.
-    private func preflight() throws(Institute.Error) -> (
+    private func preflight() async throws(Institute.Error) -> (
         plan: Institute.Xcode.Scheme.Plan,
         diagnostics: [Swift.String]
     ) {
@@ -79,24 +77,25 @@ extension Institute.Xcode.Build {
             )
         }
 
-        let specification = try Institute.Xcode.specification(selection.repositories)
+        let specification = try Institute.Xcode.integration(selection.repositories)
         var diagnostics = [Swift.String]()
-        if !Institute.Xcode.current(specification, at: root.checkout) {
-            diagnostics.append(
-                "\(Institute.Xcode.bundleName) does not match the resolved selection; "
-                    + "run `institute sync`"
-            )
-        }
-
-        let plan = try Institute.Xcode.Scheme.plan(
-            for: specification,
+        let catalog = try await Institute.Xcode.Acquisition.acquire(
+            specification,
             at: root
         )
-        if !Institute.Xcode.Scheme.current(plan, at: root.checkout) {
+        let plan = try Institute.Xcode.Scheme.plan(for: specification, catalog: catalog)
+        let prepared = try Institute.Xcode.Publication.plan(
+            specification: specification,
+            catalog: catalog,
+            scheme: plan,
+            at: root
+        )
+        if try !prepared.publication.current() {
             diagnostics.append(
-                "\(Institute.Xcode.Scheme.name).xcscheme does not match the selected packages'"
-                    + " manifests (\(plan.buildables.count) buildable targets and "
-                    + "\(plan.testables.count) testables); run `institute sync`."
+                "generated workspace state and its materialization receipt do not match the "
+                    + "selected packages' exact manifests (\(plan.buildables.count) buildable "
+                    + "targets and \(plan.testables.count) testables); run "
+                    + "`institute workspace materialize`."
                     + " An out-of-date scheme does not fail the build — it silently builds less"
                     + " of the selection."
             )
@@ -108,8 +107,12 @@ extension Institute.Xcode.Build {
     public func run(
         fresh: Swift.Bool,
         arguments: [Swift.String]
-    ) throws(Institute.Error) -> Swift.Int32 {
-        try run(fresh: fresh, arguments: arguments, capturingDiagnostics: false).exitCode
+    ) async throws(Institute.Error) -> Swift.Int32 {
+        try await run(
+            fresh: fresh,
+            arguments: arguments,
+            capturingDiagnostics: false
+        ).exitCode
     }
 
     /// Runs the build, optionally capturing `xcodebuild`'s `stdout`/`stderr`
@@ -119,8 +122,8 @@ extension Institute.Xcode.Build {
         fresh: Swift.Bool,
         arguments: [Swift.String],
         capturingDiagnostics: Swift.Bool
-    ) throws(Institute.Error) -> Build_Coordinator.Build.Coordinator.Result {
-        let preflight = try preflight()
+    ) async throws(Institute.Error) -> Institute_Build_Coordinator.Build.Coordinator.Result {
+        let preflight = try await preflight()
         guard preflight.diagnostics.isEmpty else {
             throw .configuration(preflight.diagnostics.joined(separator: "\n"))
         }
@@ -129,12 +132,12 @@ extension Institute.Xcode.Build {
                 + " \(preflight.plan.buildables.count) targets, one xcodebuild invocation"
         )
 
-        let operation = Build_Coordinator.Build.Workspace(
+        let operation = Institute_Build_Coordinator.Build.Workspace(
             bundle: bundle.description,
             scheme: Institute.Xcode.Scheme.name
         )
-        do throws(Build_Coordinator.Build.Error) {
-            return try Build_Coordinator.Build.Coordinator().run(
+        do throws(Institute_Build_Coordinator.Build.Error) {
+            return try Institute_Build_Coordinator.Build.Coordinator().run(
                 operation,
                 fresh: fresh,
                 arguments: arguments,

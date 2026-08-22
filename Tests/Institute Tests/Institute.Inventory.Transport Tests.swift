@@ -1,4 +1,4 @@
-import HTTP_Standard
+import Byte_Primitives_Standard_Library_Integration
 import Testing
 
 @testable import Institute_Conversion
@@ -28,9 +28,9 @@ struct `Institute Inventory Transport Tests` {
     func `parses the status line, headers, and body`() throws {
         let response = try Institute.Inventory.Transport.parse([UInt8](Self.sample.utf8))
 
-        #expect(response.status.code == 200)
+        #expect(response.status == 200)
         #expect(
-            response.headers.first("Content-Type")?.rawValue == "application/json; charset=utf-8"
+            response.header("Content-Type") == "application/json; charset=utf-8"
         )
         // The body must survive. An empty body here surfaces to the caller as
         // "empty input" from its JSON decoder, naming neither gh nor this
@@ -46,10 +46,10 @@ struct `Institute Inventory Transport Tests` {
     @Test
     func `carries the Link header that drives pagination`() throws {
         let response = try Institute.Inventory.Transport.parse([UInt8](Self.sample.utf8))
-        let link = try #require(response.headers.first("Link"))
+        let link = try #require(response.header("Link"))
         // Without rel="next" reaching the pagination witness, discovery stops
         // after page one and under-reports silently.
-        #expect(link.rawValue.contains(#"rel="next""#))
+        #expect(link.contains(#"rel="next""#))
     }
 
     @Test
@@ -58,11 +58,11 @@ struct `Institute Inventory Transport Tests` {
             .joined(separator: "\r\n")
         let response = try Institute.Inventory.Transport.parse([UInt8](crlf.utf8))
 
-        #expect(response.status.code == 200)
+        #expect(response.status == 200)
         // A stray \r left on a captured value silently corrupts the field; for
         // Link that ends pagination early.
         #expect(
-            response.headers.first("Content-Type")?.rawValue == "application/json; charset=utf-8"
+            response.header("Content-Type") == "application/json; charset=utf-8"
         )
         let body = try #require(response.body)
         #expect(

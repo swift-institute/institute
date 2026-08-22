@@ -39,13 +39,13 @@ extension Institute.Sync.Test.Integration {
     }
 
     @Test
-    func `Dry run changes neither canonical checkout metadata nor checkout owned files`() throws {
+    func `Dry run changes neither canonical checkout metadata nor checkout owned files`() async throws {
         let fixture = try Institute.Sync.Fixture()
         defer { fixture.remove() }
         try fixture.push("second", contents: "second\n")
         let before = try fixture.state()
 
-        try fixture.application().run(dry: true)
+        try await fixture.application().run(dry: true)
 
         #expect(try fixture.state() == before)
         #expect(try fixture.residue().isEmpty)
@@ -53,15 +53,15 @@ extension Institute.Sync.Test.Integration {
 
     @Test
     func
-        `Force pushed remote leaves local repository untouched while publishing the checkout workspace`()
-        throws
+        `Force pushed remote leaves local repository untouched while publishing the typed-control workspace`()
+        async throws
     {
         let fixture = try Institute.Sync.Fixture()
         defer { fixture.remove() }
         try fixture.replaceRemote()
         let before = try fixture.state()
 
-        try fixture.application().run(dry: false)
+        try await fixture.application().run(dry: false)
 
         let after = try fixture.state()
         #expect(after.head == before.head)
@@ -77,7 +77,7 @@ extension Institute.Sync.Test.Integration {
 
     @Test
     func `a regular directory at the canonical target stops sync before workspace publication`()
-        throws
+        async throws
     {
         let fixture = try Institute.Sync.Fixture()
         defer { fixture.remove() }
@@ -86,8 +86,8 @@ extension Institute.Sync.Test.Integration {
         let marker = collision.appending(path: "marker")
         try Data("collision".utf8).write(to: marker)
 
-        #expect(throws: Institute.Error.self) {
-            try Self.selectedAuthority(fixture).run(dry: false)
+        await #expect(throws: Institute.Error.self) {
+            try await Self.selectedAuthority(fixture).run(dry: false)
         }
 
         #expect(try Data(contentsOf: marker) == Data("collision".utf8))
@@ -99,7 +99,7 @@ extension Institute.Sync.Test.Integration {
     }
 
     @Test
-    func `a symbolic sibling prefix stops sync without writing through the link`() throws {
+    func `a symbolic sibling prefix stops sync without writing through the link`() async throws {
         let fixture = try Institute.Sync.Fixture()
         defer { fixture.remove() }
         let outside = fixture.base.appending(path: "outside")
@@ -109,8 +109,8 @@ extension Institute.Sync.Test.Integration {
             withDestinationURL: outside
         )
 
-        #expect(throws: Institute.Error.self) {
-            try Self.selectedAuthority(fixture).run(dry: false)
+        await #expect(throws: Institute.Error.self) {
+            try await Self.selectedAuthority(fixture).run(dry: false)
         }
 
         #expect(
@@ -127,8 +127,8 @@ extension Institute.Sync.Test.Integration {
 
     @Test
     func
-        `A resolved selection clones only its authority repository and renders only that reference`()
-        throws
+        `A resolved selection clones its subject and renders it beside the Institute control`()
+        async throws
     {
         let fixture = try Institute.Sync.Fixture()
         defer { fixture.remove() }
@@ -151,7 +151,7 @@ extension Institute.Sync.Test.Integration {
             client: fixture.client
         )
 
-        try sync.run(dry: false)
+        try await sync.run(dry: false)
 
         let cloned = fixture.base.appending(
             path: "swift-standards/swift-ietf/swift-rfc-0000/.git"
@@ -172,13 +172,13 @@ extension Institute.Sync.Test.Integration {
     }
 
     @Test
-    func `Proven descendant fast forwards local main`() throws {
+    func `Proven descendant fast forwards local main and regenerates the typed-control scheme`() async throws {
         let fixture = try Institute.Sync.Fixture()
         defer { fixture.remove() }
         try fixture.push("second", contents: "second\n")
         let before = try fixture.state()
 
-        try fixture.application().run(dry: false)
+        try await fixture.application().run(dry: false)
 
         let after = try fixture.state()
         #expect(after.head != before.head)
@@ -218,23 +218,23 @@ extension Institute.Sync.Test.Integration {
     }
 
     @Test
-    func `scp-style SSH origin against the canonical HTTPS URL is not a conflict`() throws {
+    func `scp-style SSH origin against the canonical HTTPS URL is not a conflict`() async throws {
         let sync = try Self.originCheck(
             origin: "git@github.com:swift-foundations/swift-example.git",
             canonical: "https://github.com/swift-foundations/swift-example.git"
         )
 
-        try sync.run(dry: true)
+        try await sync.run(dry: true)
     }
 
     @Test
-    func `ssh scheme origin against the canonical HTTPS URL is not a conflict`() throws {
+    func `ssh scheme origin against the canonical HTTPS URL is not a conflict`() async throws {
         let sync = try Self.originCheck(
             origin: "ssh://git@github.com/swift-foundations/swift-example.git",
             canonical: "https://github.com/swift-foundations/swift-example.git"
         )
 
-        try sync.run(dry: true)
+        try await sync.run(dry: true)
     }
 
     /// The negative control: a genuinely different repository must still
@@ -254,14 +254,34 @@ extension Institute.Sync.Test.Integration {
     /// genuinely different repositories is already covered directly by
     /// `Institute Sync Displaced Tests`.
     @Test
-    func `an origin naming a genuinely different repository still conflicts`() throws {
+    func `an origin naming a genuinely different repository still conflicts`() async throws {
         let sync = try Self.originCheck(
             origin: "git@github.com:swift-foundations/swift-other.git",
             canonical: "https://github.com/swift-foundations/swift-example.git"
         )
 
-        #expect(throws: Institute.Error.self) {
-            try sync.run(dry: true)
+        await #expect(throws: Institute.Error.self) {
+            try await sync.run(dry: true)
         }
+    }
+}
+
+extension Institute.Sync.Test.Unit {
+    @Test
+    func `fixture self-hosting controls expose their test targets to scheme planning`()
+        async throws
+    {
+        let fixture = try Institute.Sync.Fixture()
+        defer { fixture.remove() }
+        let sync = try fixture.application()
+        let specification = try Institute.Xcode.integration(sync.selection.repositories)
+
+        let plan = try await Institute.Xcode.Scheme.plan(for: specification, at: sync.root)
+
+        #expect(plan.testables.map(\.target) == [
+            "Institute Tests",
+            "Institute Application Source Tests",
+            "Source Tests",
+        ])
     }
 }

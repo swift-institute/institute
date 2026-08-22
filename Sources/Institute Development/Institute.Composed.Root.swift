@@ -1,4 +1,4 @@
-public import Build_Coordinator
+public import Institute_Build_Coordinator
 public import File_System
 public import Institute_Inventory
 public import Institute_Model
@@ -267,9 +267,9 @@ extension Institute.Composed.Root {
         fresh: Swift.Bool,
         arguments: [Swift.String],
         capturingDiagnostics: Swift.Bool,
-        coordinator: Build_Coordinator.Build.Coordinator = .init()
-    ) throws(Institute.Error) -> Build_Coordinator.Build.Coordinator.Result {
-        do throws(Build_Coordinator.Build.Error) {
+        coordinator: Institute_Build_Coordinator.Build.Coordinator = .init()
+    ) throws(Institute.Error) -> Institute_Build_Coordinator.Build.Coordinator.Result {
+        do throws(Institute_Build_Coordinator.Build.Error) {
             return try coordinator.run(
                 .build,
                 at: directory(in: workspace).description,
@@ -290,8 +290,8 @@ extension Institute.Composed.Root {
         fresh: Swift.Bool,
         arguments: [Swift.String],
         capturingDiagnostics: Swift.Bool,
-        coordinator: Build_Coordinator.Build.Coordinator = .init()
-    ) throws(Institute.Error) -> Build_Coordinator.Build.Coordinator.Result {
+        coordinator: Institute_Build_Coordinator.Build.Coordinator = .init()
+    ) throws(Institute.Error) -> Institute_Build_Coordinator.Build.Coordinator.Result {
         try build(
             in: .checkout(checkout),
             fresh: fresh,

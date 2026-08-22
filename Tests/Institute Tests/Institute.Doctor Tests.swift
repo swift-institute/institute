@@ -254,7 +254,7 @@ extension Institute.Doctor.Test.Integration {
         )
         try Self.command(["remote", "add", "origin", repository.url], at: checkout)
         try Institute.Xcode.write(
-            try Institute.Xcode.specification([repository]),
+            try Institute.Xcode.integration([repository]),
             at: fixture.directory
         )
 
@@ -277,7 +277,7 @@ extension Institute.Doctor.Test.Integration {
         defer { fixture.remove() }
         try fixture.materializeLegacy(repository.name)
         try Institute.Xcode.write(
-            try Institute.Xcode.specification([repository]),
+            try Institute.Xcode.integration([repository]),
             at: fixture.directory
         )
 
@@ -305,7 +305,7 @@ extension Institute.Doctor.Test.Integration {
         try fixture.materialize(repository.name)
         try fixture.materializeLegacy(repository.name)
         try Institute.Xcode.write(
-            try Institute.Xcode.specification([repository]),
+            try Institute.Xcode.integration([repository]),
             at: fixture.directory
         )
 
@@ -328,7 +328,7 @@ extension Institute.Doctor.Test.Integration {
         let fixture = try Institute.Doctor.Fixture(repositories: [repository])
         defer { fixture.remove() }
         try Institute.Xcode.write(
-            try Institute.Xcode.specification([repository]),
+            try Institute.Xcode.integration([repository]),
             at: fixture.directory
         )
 
@@ -365,7 +365,7 @@ extension Institute.Doctor.Test.Integration {
             to: "swift-foundations/swift-unselected/Package.resolved"
         )
         try Institute.Xcode.write(
-            try Institute.Xcode.specification(fixture.selection.repositories),
+            try Institute.Xcode.integration(fixture.selection.repositories),
             at: fixture.directory
         )
 
@@ -427,7 +427,7 @@ extension Institute.Doctor.Test.Integration {
         let fixture = try Institute.Doctor.Fixture(repositories: [])
         defer { fixture.remove() }
         try Institute.Xcode.write(
-            try Institute.Xcode.specification([]),
+            try Institute.Xcode.integration([]),
             at: fixture.directory
         )
 
@@ -582,7 +582,7 @@ extension Institute.Doctor.Test.Integration {
         let fixture = try Institute.Doctor.Fixture(repositories: [])
         defer { fixture.remove() }
         try Institute.Xcode.write(
-            try Institute.Xcode.specification([]),
+            try Institute.Xcode.integration([]),
             at: fixture.directory
         )
 
@@ -624,7 +624,7 @@ extension Institute.Doctor.Test.Integration {
         defer { fixture.remove() }
         try fixture.materialize(repository.name)
         try Institute.Xcode.write(
-            try Institute.Xcode.specification([repository]),
+            try Institute.Xcode.integration([repository]),
             at: fixture.directory
         )
         let transcript = Institute.Doctor.Transcript()
@@ -648,7 +648,7 @@ extension Institute.Doctor.Test.Integration {
         defer { fixture.remove() }
         try fixture.materialize(repository.name)
         try Institute.Xcode.write(
-            try Institute.Xcode.specification([repository]),
+            try Institute.Xcode.integration([repository]),
             at: fixture.directory
         )
         let transcript = Institute.Doctor.Transcript()
@@ -673,7 +673,7 @@ extension Institute.Doctor.Test.Integration {
             try fixture.materialize(repository.name)
         }
         try Institute.Xcode.write(
-            try Institute.Xcode.specification(repositories),
+            try Institute.Xcode.integration(repositories),
             at: fixture.directory
         )
 

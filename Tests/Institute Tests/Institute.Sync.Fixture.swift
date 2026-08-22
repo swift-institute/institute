@@ -36,7 +36,7 @@ extension Institute.Sync {
                     try File.System.Canonical.resolve(File.Path(temporary.path)).description,
                 isDirectory: true
             )
-            root = base.appending(path: "Institute")
+            root = base.appending(path: "institute-application")
             source = base.appending(path: "source")
             remote = base.appending(path: "remote.git")
             local = base.appending(path: "swift-foundations/swift-example")
@@ -63,6 +63,7 @@ extension Institute.Sync {
                     ("Institute Source Workspace", false),
                     ("Institute Source Profile", false),
                     ("Institute Source", false),
+                    ("Institute Tests", true),
                 ]
             )
             try Self.package(
@@ -81,6 +82,7 @@ extension Institute.Sync {
                     ("Source Report", false),
                     ("Source Repair", false),
                     ("Institute Linter Rule Manifest", false),
+                    ("Source Tests", true),
                 ]
             )
             try command(["config", "user.email", "workspace@swift.institute"], at: source)
@@ -124,6 +126,19 @@ extension Institute.Sync.Fixture {
     func replaceRemote() throws {
         let replacement = base.appending(path: "replacement")
         try client.initialize(at: replacement.path, bare: false)
+        try Self.package(
+            at: replacement,
+            name: "swift-example",
+            targets: [
+                ("Source Measurement", false),
+                ("Source Profile", false),
+                ("Source Execution", false),
+                ("Source Report", false),
+                ("Source Repair", false),
+                ("Institute Linter Rule Manifest", false),
+                ("Source Tests", true),
+            ]
+        )
         try command(["config", "user.email", "workspace@swift.institute"], at: replacement)
         try command(["config", "user.name", "Institute Tests"], at: replacement)
         try command(["branch", "-M", "main"], at: replacement)
@@ -212,7 +227,7 @@ extension Institute.Sync.Fixture {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         var declarations: [Swift.String] = []
         for (index, target) in targets.enumerated() {
-            let path = "Targets/\(index)"
+            let path = "\(target.test ? "Tests" : "Sources")/Fixture \(index)"
             let targetDirectory = directory.appending(path: path)
             try FileManager.default.createDirectory(
                 at: targetDirectory,

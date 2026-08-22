@@ -85,7 +85,7 @@ extension Institute.Doctor {
     let expected: Swift.String
     let expectedMembership: Swift.String
     do {
-      let specification = try Institute.Xcode.specification(selection.repositories)
+      let specification = try Institute.Xcode.integration(selection.repositories)
       expected = try Institute.Xcode.render(specification)
       expectedMembership = specification.jsonString(sortKeys: true) + "\n"
     } catch {

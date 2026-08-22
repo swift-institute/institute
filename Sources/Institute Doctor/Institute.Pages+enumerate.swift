@@ -22,7 +22,7 @@ extension Institute.Pages {
         root: Institute.Root,
         selection: Institute.Selection.Resolved,
         git: Git.Client = .init(),
-        fanout: Async.Fanout = .init()
+        fanout: Async.Fanout = .init(jobs: 32)
     ) async -> Inventory {
         let canonicalSelection: Swift.Bool
         if case .committed = selection.origin {

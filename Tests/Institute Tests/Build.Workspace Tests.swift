@@ -1,6 +1,6 @@
 import Testing
 
-@testable import Build_Coordinator
+@testable import Institute_Build_Coordinator
 @testable import Institute_Conversion
 @testable import Institute_Dependency
 @testable import Institute_Development

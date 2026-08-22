@@ -1,4 +1,4 @@
-import Build_Coordinator
+import Institute_Build_Coordinator
 import FIPS_180_4
 import File_System
 import Foundation
@@ -152,7 +152,7 @@ extension Institute.Coherence.Test {
         output: Swift.String = ""
     )
         -> @Sendable (Institute.Root, Institute.Selection.Resolved) throws(Institute.Error) ->
-        Build_Coordinator.Build.Coordinator.Result
+        Institute_Build_Coordinator.Build.Coordinator.Result
     {
         { _, _ throws(Institute.Error) in
             .init(

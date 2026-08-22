@@ -24,7 +24,7 @@ extension Institute.Dependency {
             inventoryReference: Swift.String,
             inventoryRevision: Swift.String,
             parser: Package.Dependency.Declaration.Parser = .init(),
-            fanout: Async.Fanout = .init()
+            fanout: Async.Fanout = .init(jobs: 32)
         ) {
             self.repositories = repositories
             self.policy = policy

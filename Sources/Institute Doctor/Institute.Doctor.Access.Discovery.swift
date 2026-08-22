@@ -1,4 +1,3 @@
-public import GitHub_HTTP
 public import Institute_Development
 public import Institute_Inventory
 public import Institute_Lint
@@ -37,20 +36,8 @@ extension Institute.Doctor.Access {
     /// that looked and found nothing.
     public static func institute(policy: Institute.Inventory.Policy = .institute()) -> Self {
         .institute(inventory: { () throws(Institute.Error) -> Institute.Inventory.Discovery in
-            let http = GitHub.HTTP.Client<
-                Institute.Inventory.Transport.Error,
-                GitHub.HTTP.Pagination.Error
-            >(
-                agent: .init(rawValue: "swift-institute-workspace"),
-                version: .init(rawValue: "2022-11-28"),
-                execute: Institute.Inventory.Transport.githubCLI()
-            )
             do {
-                return try await Institute.Inventory.client(
-                    http,
-                    // `gh` supplies the credential; see Institute.Inventory.Transport.
-                    authentication: .token(.init(rawValue: ""))
-                ).discover(policy)
+                return try await Institute.Inventory.client().discover(policy)
             } catch {
                 throw .configuration("\(error)")
             }

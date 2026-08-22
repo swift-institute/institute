@@ -8,7 +8,7 @@ extension Institute.Source.Workspace.Cohort {
         using git: Git.Client = .init(),
         jobs: Swift.Int? = nil
     ) async -> Institute.Source.Workspace.Selection {
-        let results = await Async.Fanout(jobs: jobs).map(measurable) { row in
+        let results = await Async.Fanout(jobs: jobs ?? 1).map(measurable) { row in
             Self.change(row, using: git)
         }
         var rows: [Institute.Source.Workspace.Row] = []

@@ -53,7 +53,7 @@ extension Institute {
             peers: [Institute.Peer] = [],
             git: Git.Client = .init(),
             packages: Package.Manager = .init(),
-            fanout: Async.Fanout = .init(),
+            fanout: Async.Fanout = .init(jobs: 32),
             progress: Progress = .silent,
             environment: @escaping @Sendable (_ variable: Swift.String) -> Swift.String? =
                 Self.variable,

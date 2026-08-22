@@ -1,4 +1,4 @@
-public import Build_Coordinator
+public import Institute_Build_Coordinator
 public import File_System
 public import Git_Foundation
 public import Institute_Development
@@ -33,7 +33,8 @@ extension Institute.Coherence {
         public let buildPath: Institute.Coherence.BuildPath
 
         public let sync:
-            @Sendable (Institute.Root, Institute.Selection.Resolved) throws(Institute.Error) -> Void
+            @Sendable (Institute.Root, Institute.Selection.Resolved) async throws(Institute.Error)
+                -> Void
         public let doctor:
             @Sendable (Institute.Root, Institute.Configuration, Institute.Selection.Resolved) async
                 ->
@@ -44,11 +45,11 @@ extension Institute.Coherence {
         /// ``Institute/Xcode/Build`` already performs, injectable so a test
         /// can substitute a count without a real `institute.xcworkspace`.
         public let graph:
-            @Sendable (Institute.Root, Institute.Selection.Resolved) throws(Institute.Error) ->
+            @Sendable (Institute.Root, Institute.Selection.Resolved) async throws(Institute.Error) ->
                 Swift.Int
         public let build:
-            @Sendable (Institute.Root, Institute.Selection.Resolved) throws(Institute.Error) ->
-                Build_Coordinator.Build.Coordinator.Result
+            @Sendable (Institute.Root, Institute.Selection.Resolved) async throws(Institute.Error) ->
+                Institute_Build_Coordinator.Build.Coordinator.Result
 
         public init(
             root: Institute.Root,
@@ -58,20 +59,21 @@ extension Institute.Coherence {
             priorGreen: Receipt? = nil,
             buildPath: Institute.Coherence.BuildPath = .xcodebuildMerged,
             sync:
-                @escaping @Sendable (Institute.Root, Institute.Selection.Resolved) throws(Institute
-                .Error)
+                @escaping @Sendable (Institute.Root, Institute.Selection.Resolved) async throws(
+                    Institute.Error
+                )
                 -> Void = Self.realSync,
             doctor:
                 @escaping @Sendable (
                     Institute.Root, Institute.Configuration, Institute.Selection.Resolved
                 ) async -> Institute.Doctor.Report = Self.realDoctor,
             graph: (
-                @Sendable (Institute.Root, Institute.Selection.Resolved) throws(Institute.Error) ->
+                @Sendable (Institute.Root, Institute.Selection.Resolved) async throws(Institute.Error) ->
                     Swift.Int
             )? = nil,
             build: (
-                @Sendable (Institute.Root, Institute.Selection.Resolved) throws(Institute.Error)
-                    -> Build_Coordinator.Build.Coordinator.Result
+                @Sendable (Institute.Root, Institute.Selection.Resolved) async throws(Institute.Error)
+                    -> Institute_Build_Coordinator.Build.Coordinator.Result
             )? = nil
         ) {
             self.root = root
@@ -92,8 +94,8 @@ extension Institute.Coherence.Run {
     public static func realSync(
         _ root: Institute.Root,
         _ selection: Institute.Selection.Resolved
-    ) throws(Institute.Error) {
-        try Institute.Sync(root: root, selection: selection).run(dry: false)
+    ) async throws(Institute.Error) {
+        try await Institute.Sync(root: root, selection: selection).run(dry: false)
     }
 
     public static func realDoctor(
@@ -111,20 +113,26 @@ extension Institute.Coherence.Run {
     public static func realGraph(
         _ root: Institute.Root,
         _ selection: Institute.Selection.Resolved
-    ) throws(Institute.Error) -> Swift.Int {
-        let diagnostics = try Institute.Xcode.Build(root: root, selection: selection).diagnostics()
+    ) async throws(Institute.Error) -> Swift.Int {
+        let diagnostics = try await Institute.Xcode.Build(
+            root: root,
+            selection: selection
+        ).diagnostics()
         guard diagnostics.isEmpty else {
             throw .configuration(diagnostics.joined(separator: "\n"))
         }
-        let specification = try Institute.Xcode.specification(selection.repositories)
-        return try Institute.Xcode.Scheme.plan(for: specification, at: root).buildables.count
+        let specification = try Institute.Xcode.integration(selection.repositories)
+        return try await Institute.Xcode.Scheme.plan(
+            for: specification,
+            at: root
+        ).buildables.count
     }
 
     public static func realBuild(
         _ root: Institute.Root,
         _ selection: Institute.Selection.Resolved
-    ) throws(Institute.Error) -> Build_Coordinator.Build.Coordinator.Result {
-        try Institute.Xcode.Build(root: root, selection: selection).run(
+    ) async throws(Institute.Error) -> Institute_Build_Coordinator.Build.Coordinator.Result {
+        try await Institute.Xcode.Build(root: root, selection: selection).run(
             fresh: false,
             arguments: [],
             capturingDiagnostics: true
@@ -140,7 +148,7 @@ extension Institute.Coherence.Run {
     public static func realComposedGraph(
         swift: Swift.String
     )
-        -> @Sendable (Institute.Root, Institute.Selection.Resolved) throws(Institute.Error) ->
+        -> @Sendable (Institute.Root, Institute.Selection.Resolved) async throws(Institute.Error) ->
         Swift.Int
     {
         { root, selection in
@@ -153,7 +161,7 @@ extension Institute.Coherence.Run {
     public static func realComposedBuild(
         _ root: Institute.Root,
         _ selection: Institute.Selection.Resolved
-    ) throws(Institute.Error) -> Build_Coordinator.Build.Coordinator.Result {
+    ) async throws(Institute.Error) -> Institute_Build_Coordinator.Build.Coordinator.Result {
         try Institute.Composed.Root.build(
             in: .checkout(root.checkout),
             fresh: false,
@@ -169,7 +177,7 @@ extension Institute.Coherence.Run {
         for buildPath: Institute.Coherence.BuildPath,
         swift: Swift.String
     )
-        -> @Sendable (Institute.Root, Institute.Selection.Resolved) throws(Institute.Error) ->
+        -> @Sendable (Institute.Root, Institute.Selection.Resolved) async throws(Institute.Error) ->
         Swift.Int
     {
         switch buildPath {
@@ -182,8 +190,8 @@ extension Institute.Coherence.Run {
     public static func realBuild(
         for buildPath: Institute.Coherence.BuildPath
     )
-        -> @Sendable (Institute.Root, Institute.Selection.Resolved) throws(Institute.Error) ->
-        Build_Coordinator.Build.Coordinator.Result
+        -> @Sendable (Institute.Root, Institute.Selection.Resolved) async throws(Institute.Error) ->
+        Institute_Build_Coordinator.Build.Coordinator.Result
     {
         switch buildPath {
         case .xcodebuildMerged: Self.realBuild
@@ -208,7 +216,7 @@ extension Institute.Coherence.Run {
         if proceed {
             let started = clock.now
             do throws(Institute.Error) {
-                try sync(root, selection)
+                try await sync(root, selection)
                 stages.append(
                     .init(
                         stage: .sync,
@@ -252,7 +260,7 @@ extension Institute.Coherence.Run {
         if proceed {
             let started = clock.now
             do throws(Institute.Error) {
-                expectedTargetCount = try graph(root, selection)
+                expectedTargetCount = try await graph(root, selection)
                 stages.append(
                     .init(
                         stage: .graph,
@@ -280,7 +288,7 @@ extension Institute.Coherence.Run {
         if proceed {
             let started = clock.now
             do throws(Institute.Error) {
-                let result = try build(root, selection)
+                let result = try await build(root, selection)
                 let elapsed = Self.seconds(clock.now - started)
                 if result.exitCode == 0 {
                     buildSucceeded = true

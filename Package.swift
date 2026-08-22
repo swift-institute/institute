@@ -1,4 +1,4 @@
-// swift-tools-version: 6.3.3
+// swift-tools-version: 6.4
 
 import PackageDescription
 
@@ -13,8 +13,8 @@ let package = Package(
   ],
   products: [
     .library(
-      name: "Build Coordinator",
-      targets: ["Build Coordinator"]
+      name: "Institute Build Coordinator",
+      targets: ["Institute Build Coordinator"]
     ),
     .library(
       name: "Institute Model",
@@ -72,7 +72,6 @@ let package = Package(
     .package(url: "https://github.com/swift-foundations/swift-environment.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-file-system.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-github.git", branch: "main"),
-    .package(url: "https://github.com/swift-foundations/swift-github-http.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-git.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-json.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-kernel.git", branch: "main"),
@@ -80,6 +79,7 @@ let package = Package(
     .package(url: "https://github.com/swift-foundations/swift-posix.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-process.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-xcode.git", branch: "main"),
+    .package(url: "https://github.com/swift-standards/swift-xcode-standard.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-source.git", branch: "main"),
     .package(
       url: "https://github.com/swift-primitives/swift-linter-primitives.git",
@@ -112,13 +112,14 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "Build Coordinator",
+      name: "Institute Build Coordinator",
       dependencies: [
         .product(name: "Environment", package: "swift-environment"),
         .product(name: "File System", package: "swift-file-system"),
         .product(name: "Kernel", package: "swift-kernel"),
         .product(name: "Process", package: "swift-process"),
-      ]
+      ],
+      path: "Sources/Build Coordinator"
     ),
     .target(
       name: "Institute Model",
@@ -138,10 +139,10 @@ let package = Package(
       name: "Institute Inventory",
       dependencies: [
         "Institute Model",
+        .product(name: "Byte Primitives", package: "swift-byte-primitives"),
         .product(name: "File System", package: "swift-file-system"),
         .product(name: "Git", package: "swift-git"),
         .product(name: "GitHub", package: "swift-github"),
-        .product(name: "GitHub HTTP", package: "swift-github-http"),
         .product(name: "JSON", package: "swift-json"),
         .product(name: "Kernel", package: "swift-kernel"),
         .product(name: "Process", package: "swift-process"),
@@ -235,13 +236,16 @@ let package = Package(
     .target(
       name: "Institute Development",
       dependencies: [
-        "Build Coordinator",
+        "Institute Build Coordinator",
         "Institute Model",
         "Institute Inventory",
+        "Institute Source Workspace",
         .product(name: "Async Fanout", package: "swift-async"),
+        .product(name: "Byte Primitives", package: "swift-byte-primitives"),
         .product(name: "Command", package: "swift-arguments"),
         .product(name: "Environment", package: "swift-environment"),
         .product(name: "File System", package: "swift-file-system"),
+        .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
         .product(name: "Git", package: "swift-git"),
         .product(name: "JSON", package: "swift-json"),
         // TEMPORARY (institute#10): exec-replace has no cross-platform
@@ -268,7 +272,7 @@ let package = Package(
     .target(
       name: "Institute Lint",
       dependencies: [
-        "Build Coordinator",
+        "Institute Build Coordinator",
         "Institute Model",
         "Institute Development",
         .product(name: "Async Fanout", package: "swift-async"),
@@ -306,7 +310,6 @@ let package = Package(
         .product(name: "Environment", package: "swift-environment"),
         .product(name: "File System", package: "swift-file-system"),
         .product(name: "Git", package: "swift-git"),
-        .product(name: "GitHub HTTP", package: "swift-github-http"),
         .product(name: "JSON", package: "swift-json"),
         .product(name: "Package Manager", package: "swift-package-manager"),
         .product(name: "Process", package: "swift-process"),
@@ -325,7 +328,7 @@ let package = Package(
     .target(
       name: "Institute Instruments",
       dependencies: [
-        "Build Coordinator",
+        "Institute Build Coordinator",
         "Institute Model",
         "Institute Inventory",
         "Institute Development",
@@ -343,7 +346,7 @@ let package = Package(
     .testTarget(
       name: "Institute Tests",
       dependencies: [
-        "Build Coordinator",
+        "Institute Build Coordinator",
         "Institute Model",
         "Institute Inventory",
         "Institute Dependency",
@@ -367,15 +370,17 @@ let package = Package(
         .product(name: "File System", package: "swift-file-system"),
         .product(name: "Git", package: "swift-git"),
         .product(name: "GitHub", package: "swift-github"),
-        .product(name: "GitHub HTTP", package: "swift-github-http"),
         .product(name: "JSON", package: "swift-json"),
         .product(name: "Package Manager", package: "swift-package-manager"),
+        .product(name: "Source Measurement", package: "swift-source"),
+        .product(name: "Source Repair", package: "swift-source"),
         .product(name: "SPM Standard", package: "swift-spm-standard"),
         .product(name: "Skill Validation", package: "swift-agent-skills"),
         .product(
           name: "Standard Library Extensions",
           package: "swift-standard-library-extensions"
         ),
+        .product(name: "Xcode Workspace Standard", package: "swift-xcode-standard"),
       ],
       path: "Tests/Institute Tests"
     ),
@@ -398,7 +403,7 @@ let package = Package(
         .product(name: "JSON", package: "swift-json"),
         .product(name: "Package Manager", package: "swift-package-manager"),
         .product(name: "SPM Standard", package: "swift-spm-standard"),
-        "Build Coordinator",
+        "Institute Build Coordinator",
       ],
       path: "Tests/Institute Development Tests",
       exclude: ["Fixtures"]

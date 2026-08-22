@@ -1,5 +1,8 @@
 import File_System
 import Foundation
+import JSON
+import Source_Measurement
+import Synchronization
 import Testing
 import Xcode_Workspace_Standard
 
@@ -24,6 +27,142 @@ extension Institute.Xcode {
 }
 
 extension Institute.Xcode.Test.Unit {
+    @Test
+    func `materialization keeps input commitment separate from artifact digests`() throws {
+        let member = Institute.Workspace.Member(
+            location: "group:../institute",
+            role: .control(.institute)
+        )
+        let input = Institute.Workspace.Materialization.Input(
+            toolchain: Swift.String(repeating: "a", count: 64),
+            packages: [
+                .init(
+                    member: member,
+                    reference: "../institute",
+                    manifest: Swift.String(repeating: "b", count: 64),
+                    sources: [
+                        .init(
+                            path: "Sources/Institute.swift",
+                            kind: .swift,
+                            purpose: .governedSource,
+                            provenance: .authored,
+                            digest: .init(Swift.String(repeating: "c", count: 64))
+                        )
+                    ]
+                )
+            ]
+        )
+        let first = Institute.Workspace.Materialization.Receipt(
+            input: input,
+            artifacts: [
+                .init(
+                    name: "scheme",
+                    path: "Institute.xcscheme",
+                    digest: Institute.Workspace.Materialization.digest("first")
+                )
+            ],
+            buildables: [.init(reference: "../institute", name: "Institute Model")],
+            testables: .init(
+                values: [.init(reference: "../institute", name: "Institute Tests")]
+            )
+        )
+        let second = Institute.Workspace.Materialization.Receipt(
+            input: input,
+            artifacts: [
+                .init(
+                    name: "scheme",
+                    path: "Institute.xcscheme",
+                    digest: Institute.Workspace.Materialization.digest("second")
+                )
+            ],
+            buildables: first.buildables,
+            testables: first.testables
+        )
+
+        #expect(first.input.digest == second.input.digest)
+        #expect(first.artifacts.map(\.digest) != second.artifacts.map(\.digest))
+        let changedSource = Institute.Workspace.Materialization.Input(
+            toolchain: input.toolchain,
+            packages: [
+                .init(
+                    member: member,
+                    reference: "../institute",
+                    manifest: Swift.String(repeating: "b", count: 64),
+                    sources: [
+                        .init(
+                            path: "Sources/Institute.swift",
+                            kind: .swift,
+                            purpose: .governedSource,
+                            provenance: .authored,
+                            digest: .init(Swift.String(repeating: "d", count: 64))
+                        )
+                    ]
+                )
+            ]
+        )
+        #expect(input.digest != changedSource.digest)
+        #expect(
+            try Institute.Workspace.Materialization.Receipt(
+                jsonString: first.jsonString(sortKeys: true))
+                == first
+        )
+    }
+
+    private struct PublicationState: Sendable {
+        var files: [Swift.String: Swift.String]
+        var writes = 0
+        var failed = false
+    }
+
+    @Test
+    func `publication restores every preimage when one document cannot be written`() throws {
+        let directory = try File.Directory(
+            validating: FileManager.default.temporaryDirectory
+                .appending(path: UUID().uuidString).path
+        )
+        let documents = ["workspace", "membership", "scheme"].map { name in
+            Institute.Xcode.Publication.Document(
+                file: directory[file: name],
+                contents: "new-\(name)"
+            )
+        }
+        let initial = Dictionary(
+            uniqueKeysWithValues: documents.map {
+                ($0.file.description, "old-\($0.file.description)")
+            }
+        )
+        let state = Mutex(PublicationState(files: initial))
+        let client = Institute.Xcode.Publication.Client(
+            read: { file in state.withLock { $0.files[file.description] } },
+            write: { file, contents throws(Institute.Error) in
+                do {
+                    try state.withLock { state throws(Institute.Error) in
+                        if !state.failed && state.writes == 1 {
+                            state.failed = true
+                            throw .filesystem("injected publication failure")
+                        }
+                        state.writes += 1
+                        state.files[file.description] = contents
+                    }
+                } catch let error as Institute.Error {
+                    throw error
+                } catch {
+                    throw Institute.Error.filesystem(
+                        "unexpected publication fixture failure: \(error)"
+                    )
+                }
+            },
+            delete: { file in state.withLock { _ = $0.files.removeValue(forKey: file.description) }
+            }
+        )
+        let publication = try Institute.Xcode.Publication(documents: documents)
+
+        #expect(throws: Institute.Error.self) {
+            try publication.apply(client: client)
+        }
+        #expect(state.withLock { $0.files } == initial)
+    }
+
     @Test
     func `workspace membership roles round trip without path inference`() throws {
         let specification = Institute.Workspace.Specification(members: [
@@ -63,7 +202,7 @@ extension Institute.Xcode.Test.Unit {
     }
 
     @Test
-    func `render uses sibling hierarchy package references`() {
+    func `render uses sibling hierarchy package references`() throws {
         let repositories = [
             Institute.Repository(
                 name: "swift-example",
@@ -93,11 +232,49 @@ extension Institute.Xcode.Test.Unit {
         #expect(rendered.contains("group:../swift-standards/swift-ietf/swift-rfc-0000"))
         #expect(!rendered.contains("/Users/"))
         #expect(!rendered.contains("absolute:"))
+        let locations = document.references.compactMap { reference in
+            if case .file(let location) = reference { location } else { nil }
+        }
+        #expect(locations.count == document.references.count)
         #expect(
-            document.references.map(\.location) == [
-                .group("../swift-primitives/swift-example"),
-                .group("../swift-standards/swift-ietf/swift-rfc-0000"),
+            locations.map(\.rawValue) == [
+                "group:../swift-primitives/swift-example",
+                "group:../swift-standards/swift-ietf/swift-rfc-0000",
             ]
+        )
+    }
+
+    @Test
+    func `integration composes both self-hosting controls without changing the subject cohort`()
+        throws
+    {
+        let repositories = [
+            Institute.Repository(
+                name: "swift-example",
+                url: "https://github.com/swift-primitives/swift-example.git",
+                organization: "swift-primitives",
+                layer: .primitives
+            )
+        ]
+
+        let generic = try Institute.Xcode.specification(repositories)
+        let integration = try Institute.Xcode.integration(repositories)
+
+        #expect(
+            generic.members.map(\.role).allSatisfy { role in
+                if case .subject = role { true } else { false }
+            })
+        #expect(integration.members.first?.location == "group:../institute")
+        #expect(integration.members.first?.role == .control(.institute))
+        #expect(integration.members[1].location == "group:.")
+        #expect(integration.members[1].role == .control(.application))
+        #expect(
+            integration.members.compactMap { member in
+                if case .subject(let repository) = member.role { repository } else { nil }
+            }
+                == generic.members.compactMap { member in
+                    if case .subject(let repository) = member.role { repository } else { nil }
+                }
         )
     }
 }
@@ -158,11 +335,11 @@ extension Institute.Xcode.Test.Integration {
             withIntermediateDirectories: true
         )
         for reference in try Institute.Xcode.document(specification).references {
-            guard case .group(let location) = reference.location else {
-                Issue.record("unexpected non-group reference \(reference.location)")
+            guard case .file(let location) = reference, location.scheme == .group else {
+                Issue.record("unexpected non-group file reference \(reference)")
                 continue
             }
-            let resolved = checkout.appending(path: location).standardizedFileURL
+            let resolved = checkout.appending(path: location.path).standardizedFileURL
             var isDirectory: ObjCBool = false
             let exists = FileManager.default.fileExists(
                 atPath: resolved.path,

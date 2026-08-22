@@ -1,5 +1,4 @@
 import GitHub
-import GitHub_HTTP
 import Tagged_Primitives_Standard_Library_Integration
 import Testing
 
@@ -15,20 +14,15 @@ import Testing
 
 extension Institute.Inventory.Test.Unit {
     @Test
-    func `Published GitHub HTTP client executes without a networking package type`() async throws {
-        let http = GitHub.HTTP.Client<Never, Never>(
-            agent: .init(rawValue: "Institute Tests"),
-            version: .init(rawValue: "2022-11-28"),
-            execute: { request async throws(Never) in
-                #expect(
-                    request.target.rawValue
-                        == "https://api.github.com/repos/swift-foundations/swift-github/contents/Package.swift"
-                )
-                return .init(status: .init(404))
-            },
-            pagination: .none
-        )
-        let client = Institute.Inventory.client(http, authentication: .none)
+    func `Published GitHub client executes without an HTTP package type`() async throws {
+        let client = Institute.Inventory.client { request in
+            #expect(
+                request == [
+                    "repos/swift-foundations/swift-github/contents/Package.swift"
+                ]
+            )
+            return .init(status: 404)
+        }
         guard let path = GitHub.Repository.Content.Path(segments: ["Package.swift"]) else {
             Issue.record("Expected Package.swift to be a valid GitHub content path")
             return

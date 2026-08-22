@@ -98,7 +98,7 @@ extension Institute.Source.Application {
       }
     }
     let measuredBySubject: [[Source_Measurement.Source.Measurement]] = await Async.Fanout(
-      jobs: jobs
+      jobs: jobs ?? 1
     ).mapAsync(entries) { entry in
       let subject = entry.subject
       let bundle: ContinuousIntegration.Source.Bundle

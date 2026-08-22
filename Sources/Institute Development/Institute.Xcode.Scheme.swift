@@ -1,7 +1,9 @@
+public import Async_Fanout
 public import File_System
 public import Institute_Inventory
 public import Institute_Model
 public import Package_Manager
+internal import Source_Measurement
 public import Xcode_Scheme
 public import Xcode_Workspace
 
@@ -156,70 +158,85 @@ extension Institute.Xcode.Scheme {
     public static func plan(
         for specification: Institute.Workspace.Specification,
         at root: Institute.Root,
-        packages: Package.Manager = .init()
+        packages: Package.Manager = .init(),
+        fanout: Async.Fanout = .init(jobs: 32),
+        timeout: Swift.Duration = .seconds(120)
+    ) async throws(Institute.Error) -> Plan {
+        let catalog = try await Institute.Xcode.Acquisition.acquire(
+            specification,
+            at: root,
+            packages: packages,
+            fanout: fanout,
+            timeout: timeout
+        )
+        return try plan(for: specification, catalog: catalog)
+    }
+
+    /// Pure scheme planning from a complete, manifest- and toolchain-bound catalog.
+    public static func plan(
+        for specification: Institute.Workspace.Specification,
+        catalog: Institute.Xcode.Catalog
     ) throws(Institute.Error) -> Plan {
-        var buildables = [Buildable]()
-        var testables = [Testable]()
-        for member in specification.members {
-            let directory = try directory(for: member, at: root)
-            guard directory[file: "Package.swift"].stat.isFile else {
-                throw .configuration("workspace member has no Package.swift: \(member.location)")
-            }
-            let evaluation: Package.Manifest.Evaluation
-            do throws(Package.Manager.Error) {
-                evaluation = try packages.evaluation(at: directory.description)
-            } catch {
+        guard catalog.entries.map(\.member) == specification.members else {
+            throw .configuration("target catalog does not exactly match workspace specification")
+        }
+        guard Set(catalog.entries.map(\.toolchain)).count == 1,
+            catalog.entries.allSatisfy({ $0.manifest.count == 64 && $0.toolchain.count == 64 })
+        else {
+            throw .configuration("target catalog is not bound to exact manifests and one toolchain")
+        }
+        for entry in catalog.entries {
+            let paths = entry.sources.map(\.path)
+            guard paths.contains("Package.swift"),
+                Set(paths).count == paths.count,
+                entry.sources.allSatisfy({ $0.digest.hex.count == 64 })
+            else {
                 throw .configuration(
-                    "cannot evaluate the manifest at \(directory): \(error)"
+                    "target catalog is not bound to exact source/package inputs at "
+                        + entry.reference
                 )
             }
-            guard let location = Xcode_Workspace.Xcode.Workspace.Location(
-                rawValue: member.location
-            ) else {
-                throw .configuration("invalid workspace member location: \(member.location)")
+        }
+
+        var buildables = [Buildable]()
+        var testables = [Testable]()
+        for entry in catalog.entries {
+            guard
+                let location = Xcode_Workspace.Xcode.Workspace.Location(
+                    rawValue: entry.member.location
+                ), location.path == entry.reference
+            else {
+                throw .configuration(
+                    "target catalog location mismatch for \(entry.member.location): \(entry.reference)"
+                )
             }
-            let reference = location.path
-            for target in evaluation.targets {
-                // Switched inline rather than through a helper taking a
-                // `Target.Kind`: naming that type here would resolve through
-                // the enclosing `Institute` scopes first, and an exhaustive
-                // switch makes a newly added kind a compile error rather than
-                // a target that silently stops being built.
+            for target in entry.targets {
                 switch target.kind {
                 case .regular, .executable:
-                    buildables.append(.init(reference: reference, target: target.name.underlying))
-
+                    buildables.append(
+                        .init(reference: entry.reference, target: target.name.underlying))
                 case .test:
-                    testables.append(.init(reference: reference, target: target.name.underlying))
-
+                    testables.append(
+                        .init(reference: entry.reference, target: target.name.underlying))
                 case .plugin, .binary, .system, .macro:
                     continue
                 }
             }
         }
-        let plan = Plan(buildables: buildables, testables: testables)
-        try preflight(plan, specification: specification)
-        return plan
-    }
-
-    private static func directory(
-        for member: Institute.Workspace.Member,
-        at root: Institute.Root
-    ) throws(Institute.Error) -> File.Directory {
-        guard let location = Xcode_Workspace.Xcode.Workspace.Location(rawValue: member.location),
-            location.scheme == .group || location.scheme == .container,
-            let relative = try? File.Path(location.path)
-        else { throw .configuration("invalid workspace member location: \(member.location)") }
-        return File.Directory(root.checkout.path / relative)
+        let result = Plan(buildables: buildables, testables: testables)
+        try preflight(result, specification: specification, catalog: catalog)
+        return result
     }
 
     private static func preflight(
         _ plan: Plan,
-        specification: Institute.Workspace.Specification
+        specification: Institute.Workspace.Specification,
+        catalog: Institute.Xcode.Catalog
     ) throws(Institute.Error) {
-        let specified = Set(specification.members.compactMap {
-            Xcode_Workspace.Xcode.Workspace.Location(rawValue: $0.location)?.path
-        })
+        let specified = Set(
+            specification.members.compactMap {
+                Xcode_Workspace.Xcode.Workspace.Location(rawValue: $0.location)?.path
+            })
         let containers = Set(plan.buildables.map(\.reference) + plan.testables.map(\.reference))
         guard specified == containers else {
             let absent = specified.subtracting(containers).sorted().joined(separator: ", ")
@@ -229,7 +246,12 @@ extension Institute.Xcode.Scheme {
             )
         }
         guard !plan.testables.isEmpty else {
-            throw .configuration("Institute scheme has no testables")
+            let buildables = plan.buildables
+                .map { "\($0.reference):\($0.target)" }
+                .joined(separator: ", ")
+            throw .configuration(
+                "Institute scheme evaluated buildables [\(buildables)] but has no testables"
+            )
         }
         let buildKeys = plan.buildables.map { $0.reference + "\u{0}" + $0.target }
         let testKeys = plan.testables.map { $0.reference + "\u{0}" + $0.target }
@@ -237,8 +259,40 @@ extension Institute.Xcode.Scheme {
             Set(testKeys).count == testKeys.count
         else { throw .configuration("Institute scheme contains duplicate targets") }
 
+        for entry in catalog.entries {
+            guard case .control(let control) = entry.member.role else { continue }
+            let actualBuildables = Set(
+                entry.targets.compactMap { target -> Swift.String? in
+                    switch target.kind {
+                    case .regular, .executable: target.name.underlying
+                    case .test, .plugin, .binary, .system, .macro: nil
+                    }
+                })
+            let actualTestables = Set(
+                entry.targets.compactMap { target -> Swift.String? in
+                    switch target.kind {
+                    case .test: target.name.underlying
+                    case .regular, .executable, .plugin, .binary, .system, .macro: nil
+                    }
+                })
+            let expected = exactTargets(for: control)
+            guard actualBuildables == expected.buildables,
+                actualTestables == expected.testables
+            else {
+                let missingBuildables = expected.buildables.subtracting(actualBuildables).sorted()
+                let extraBuildables = actualBuildables.subtracting(expected.buildables).sorted()
+                let missingTestables = expected.testables.subtracting(actualTestables).sorted()
+                let extraTestables = actualTestables.subtracting(expected.testables).sorted()
+                throw .configuration(
+                    "control target mismatch for \(control.rawValue) at \(entry.reference); "
+                        + "missing buildables: \(missingBuildables); extra buildables: \(extraBuildables); "
+                        + "missing testables: \(missingTestables); extra testables: \(extraTestables)"
+                )
+            }
+        }
+
         let targets = Set(plan.buildables.map(\.target) + plan.testables.map(\.target))
-        let missing = expectedTargets.subtracting(targets)
+        let missing = expectedTargets(for: specification).subtracting(targets)
         guard missing.isEmpty else {
             throw .configuration(
                 "Institute scheme omits V3 targets: \(missing.sorted().joined(separator: ", "))"
@@ -246,18 +300,65 @@ extension Institute.Xcode.Scheme {
         }
     }
 
-    private static let expectedTargets: Set<Swift.String> = [
+    private static func expectedTargets(
+        for specification: Institute.Workspace.Specification
+    ) -> Set<Swift.String> {
+        var targets = subjectTargets
+        for member in specification.members {
+            guard case .control(let control) = member.role else { continue }
+            let expected = exactTargets(for: control)
+            targets.formUnion(expected.buildables)
+            targets.formUnion(expected.testables)
+        }
+        return targets
+    }
+
+    private static let subjectTargets: Set<Swift.String> = [
         "Source Measurement",
         "Source Profile",
         "Source Execution",
         "Source Report",
         "Source Repair",
-        "Institute Linter Rule Manifest",
-        "Institute Continuous Integration Source",
-        "Institute Source Workspace",
-        "Institute Source Profile",
-        "Institute Source",
-        "Institute Application Source",
-        "Institute Application Source Tests",
     ]
+
+    private static func exactTargets(
+        for control: Institute.Workspace.Control
+    ) -> (buildables: Set<Swift.String>, testables: Set<Swift.String>) {
+        switch control {
+        case .institute:
+            (
+                buildables: [
+                    "Institute Build Coordinator", "Institute Model", "Institute Inventory",
+                    "Institute Source Workspace", "Institute Source Profile", "Institute Source",
+                    "Institute Dependency", "Institute Development", "Institute Lint",
+                    "Institute Pages", "Institute Doctor", "Institute Conversion",
+                    "Institute Instruments",
+                ],
+                testables: [
+                    "Institute Tests", "Institute Instruments Tests", "Institute Development Tests",
+                ]
+            )
+        case .application:
+            (
+                buildables: [
+                    "InstituteArchitectureModel", "InstituteArchitectureFacts",
+                    "InstituteArchitectureGraph", "InstituteArchitectureIndex",
+                    "InstituteArchitectureValidation", "InstituteArchitectureCandidates",
+                    "InstituteArchitectureMigration", "InstituteArchitectureCLI",
+                    "Institute GitHub",
+                    "Institute Application Source", "Institute Application",
+                    "Institute Application CLI",
+                ],
+                testables: [
+                    "InstituteArchitectureTests", "Institute Application Source Tests",
+                    "Institute Application Tests",
+                ]
+            )
+        case .continuousIntegration:
+            (
+                buildables: ["Institute Continuous Integration Source"],
+                testables: []
+            )
+        }
+    }
 }

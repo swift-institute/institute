@@ -1,5 +1,4 @@
 import GitHub
-import GitHub_HTTP
 import Tagged_Primitives_Standard_Library_Integration
 import Testing
 

@@ -1,9 +1,7 @@
 public import Async_Fanout
-public import HTTP_Standard
 public import Institute_Inventory
 public import Institute_Model
 public import JSON
-public import RFC_3986
 
 extension Institute.Context.Packet {
     public enum Remote: Sendable {}
@@ -35,7 +33,7 @@ extension Institute.Context.Packet.Remote {
                 let labels = try strings(document["labels"], key: "name")
                 let parent = await parent(of: key)
                 let children = await children(of: key)
-                let included = await Async.Fanout().mapAsync(comments) {
+                let included = await Async.Fanout(jobs: comments.count).mapAsync(comments) {
                     await Self.comment(at: $0)
                 }
                 var diagnostics = parent.diagnostics + children.diagnostics
@@ -239,20 +237,14 @@ extension Institute.Context.Packet.Remote {
     ) async
         -> Institute.Context.Packet.Fetch<JSON>
     {
-        let uri: RFC_3986.URI
-        do { uri = try .init("https://api.github.com/\(endpoint)") } catch {
-            return .malformed("invalid GitHub endpoint \(endpoint): \(error)")
-        }
-        let response: HTTP.Response
+        let response: Institute.Inventory.Transport.Response
         do {
-            response = try await Institute.Inventory.Transport.githubCLI()(
-                .init(method: .get, target: .absolute(uri))
-            )
+            response = try await Institute.Inventory.Transport.githubCLI([endpoint])
         } catch {
             return .unmeasured("GitHub transport failed for \(endpoint): \(error)")
         }
-        if absent, response.status.code == 404 { return .unavailable("native parent absent") }
-        switch response.status.code {
+        if absent, response.status == 404 { return .unavailable("native parent absent") }
+        switch response.status {
         case 200..<300:
             guard let body = response.body else {
                 return .malformed("GitHub returned an empty response for \(endpoint)")
@@ -262,9 +254,9 @@ extension Institute.Context.Packet.Remote {
             }
 
         case 401, 404:
-            return .unavailable("GitHub cannot provide \(endpoint) (HTTP \(response.status.code))")
+            return .unavailable("GitHub cannot provide \(endpoint) (HTTP \(response.status))")
 
-        default: return .unmeasured("GitHub returned HTTP \(response.status.code) for \(endpoint)")
+        default: return .unmeasured("GitHub returned HTTP \(response.status) for \(endpoint)")
         }
     }
 }
