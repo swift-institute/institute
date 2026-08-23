@@ -1,5 +1,5 @@
 public import Institute_Model
-public import Foundation
+public import Byte_Primitives
 
 extension Institute.Repository.Policy.Caller.Wave {
     public static func run<C: Client>(
@@ -459,8 +459,8 @@ extension Institute.Repository.Policy.Caller.Wave {
     static func transitionRuleset<C: Client>(
         client: C,
         snapshot: RulesetSnapshot,
-        from previous: Data,
-        to intended: Data,
+        from previous: [Byte],
+        to intended: [Byte],
         phase: String
     ) async throws(Error) {
         var last: Institute.Repository.Policy.Caller.Wave.Error?
@@ -476,7 +476,7 @@ extension Institute.Repository.Policy.Caller.Wave {
             } catch let mutation {
                 last = mutation
             }
-            let live: Data
+            let live: [Byte]
             do throws(Error) {
                 live = try await calling {
                     try await client.ruleset(snapshot.repository, id: snapshot.id)

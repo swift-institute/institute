@@ -1,4 +1,6 @@
-extension Build {
+public import Institute_Model
+
+extension Institute.Build {
     /// One `xcodebuild` operation over a generated Xcode workspace bundle.
     ///
     /// Deliberately *not* a case of ``Build/Action``. An action names a
@@ -44,7 +46,7 @@ extension Build {
     }
 }
 
-extension Build.Workspace {
+extension Institute.Build.Workspace {
     public enum Operation: Swift.String, CaseIterable, Sendable {
         case build
         /// Enumerates the workspace's schemes and resolved packages without
@@ -53,12 +55,12 @@ extension Build.Workspace {
     }
 }
 
-extension Build.Workspace {
+extension Institute.Build.Workspace {
     /// The argument vector, including the coordinator-owned options.
     ///
     /// `jobs` is accepted and deliberately not forwarded.
     ///
-    /// `Build.Coordinator.jobs` is SwiftPM's `-j`, and `xcodebuild` schedules
+    /// `Institute.Build.Coordinator.jobs` is SwiftPM's `-j`, and `xcodebuild` schedules
     /// the merged graph across the machine on its own — measured, it chose
     /// `-j8` on this 8-core host without being told. Forwarding a SwiftPM job
     /// count would substitute a second opinion for the one the tool already
@@ -76,7 +78,7 @@ extension Build.Workspace {
     func invocation(
         jobs: Swift.Int,
         arguments: [Swift.String]
-    ) throws(Build.Error) -> [Swift.String] {
+    ) throws(Institute.Build.Error) -> [Swift.String] {
         // Trailing separators trimmed first: whether a rendered directory
         // path carries one is the filesystem layer's business, and a guard
         // that silently depends on the answer would reject a correct bundle.

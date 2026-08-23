@@ -1,5 +1,6 @@
 public import Institute_Model
-public import Foundation
+public import Byte_Primitives
+import Byte_Primitives_Standard_Library_Integration
 
 extension Institute.Repository.Policy.Uniformity.Wave {
     /// The ratified canonical package shape policy, embedded byte-exact.
@@ -17,9 +18,9 @@ extension Institute.Repository.Policy.Uniformity.Wave {
         public static let digest =
             "8e37977a3b8f0a0d9e028e6089172d811eea21e6868a878ab43a1d4875df02f7"
 
-        public static let bytes = Data(text.utf8)
+        public static let bytes = [Byte](text.utf8)
 
-        public static func canonical() throws(Institute.Repository.Policy.Uniformity.Wave.Error) -> Data {
+        public static func canonical() throws(Institute.Repository.Policy.Uniformity.Wave.Error) -> [Byte] {
             guard Institute.Repository.Policy.Caller.Wave.digest(bytes) == digest else {
                 throw .verification(
                     "embedded shape policy does not hash to the ratified digest \(digest)"

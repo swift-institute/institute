@@ -1,9 +1,10 @@
+public import Institute_Model
 private import Environment
 internal import File_System
 private import Kernel
 internal import Process
 
-extension Build.Coordinator {
+extension Institute.Build.Coordinator {
     /// Runs one external command while holding the machine-wide coordination
     /// lock, and maps its termination onto an exit status.
     ///
@@ -54,8 +55,8 @@ extension Build.Coordinator {
         in directory: Swift.String,
         describing description: Swift.String,
         capture: Swift.Bool = false,
-        cleanup: (Build.Error?) -> Build.Error?
-    ) throws(Build.Error) -> Process.Output {
+        cleanup: (Institute.Build.Error?) -> Institute.Build.Error?
+    ) throws(Institute.Build.Error) -> Process.Output {
         // A coordinator-spawned child — a test run invoking a fixture
         // build, most concretely — already executes inside its
         // ancestor's critical section: the ancestor institute process
@@ -68,7 +69,7 @@ extension Build.Coordinator {
         // other way.
         if Environment.read(Self.heldMarker) != nil {
             var output: Process.Output?
-            var failure: Build.Error?
+            var failure: Institute.Build.Error?
             do throws(Process.Error) {
                 output = try Process.Spawn.run(
                     .init(
@@ -125,7 +126,7 @@ extension Build.Coordinator {
         }
 
         var output: Process.Output?
-        var failure: Build.Error?
+        var failure: Institute.Build.Error?
         do throws(Process.Error) {
             output = try Process.Spawn.run(
                 .init(
@@ -171,7 +172,7 @@ extension Build.Coordinator {
     private static func exited(
         _ output: Process.Output,
         describing description: Swift.String
-    ) throws(Build.Error) -> Process.Output {
+    ) throws(Institute.Build.Error) -> Process.Output {
         switch output.status {
         case .exited:
             return output

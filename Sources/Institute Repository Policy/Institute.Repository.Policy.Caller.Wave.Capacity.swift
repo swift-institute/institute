@@ -1,4 +1,5 @@
 public import Institute_Model
+public import JSON
 
 extension Institute.Repository.Policy.Caller.Wave.Capacity {
     /// REST requests one wave subject may spend across all three phases
@@ -38,7 +39,7 @@ extension Institute.Repository.Policy.Caller.Wave.Capacity {
 }
 
 extension Institute.Repository.Policy.Caller.Wave {
-    public struct Capacity: Codable, Sendable, Equatable {
+    public struct Capacity: Sendable, Equatable {
         public let remaining: Int
         public let required: Int
         public let resetAt: Int
@@ -50,5 +51,24 @@ extension Institute.Repository.Policy.Caller.Wave {
             self.resetAt = resetAt
             self.accepted = remaining >= required
         }
+    }
+}
+
+extension Institute.Repository.Policy.Caller.Wave.Capacity: JSON.Serializable {
+    public static func serialize(_ value: Self) -> JSON {
+        [
+            "remaining": value.remaining.json,
+            "required": value.required.json,
+            "resetAt": value.resetAt.json,
+            "accepted": value.accepted.json,
+        ]
+    }
+
+    public static func deserialize(_ json: JSON) throws(JSON.Error) -> Self {
+        Self(
+            remaining: try Swift.Int(json: json["remaining"]),
+            required: try Swift.Int(json: json["required"]),
+            resetAt: try Swift.Int(json: json["resetAt"])
+        )
     }
 }

@@ -95,7 +95,7 @@ extension Institute.Repository.Policy.Uniformity.Wave {
             repository: request.repository,
             population: request.population,
             recoveryDigest: Institute.Repository.Policy.Caller.Wave.digest(
-                try Institute.Repository.Policy.Caller.Wave.evidenceData(recovery)
+                Institute.Repository.Policy.Caller.Wave.evidenceBytes(recovery)
             ),
             attestationDigest: attestationDigest,
             accepted: true

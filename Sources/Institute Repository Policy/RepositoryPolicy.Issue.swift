@@ -1,6 +1,5 @@
 public import Institute_Model
 import Byte_Primitives
-import Foundation
 import FIPS_180_4
 
 extension RepositoryPolicy {
@@ -233,7 +232,7 @@ extension RepositoryPolicy.Issue {
                 index += 1
                 var value = ""
                 while index < lines.count, !lines[index].hasPrefix("### ") {
-                    let line = lines[index].trimmingCharacters(in: .whitespacesAndNewlines)
+                    let line = lines[index].trimmedWhitespaceAndNewlines
                     if !line.isEmpty {
                         guard value.isEmpty else { throw Error.duplicateField(name) }
                         value = String(line)
@@ -443,5 +442,21 @@ extension RepositoryPolicy.Issue {
             \(checkpoint.digest)
             """
         }
+    }
+}
+
+extension StringProtocol {
+    /// The receiver without leading and trailing ASCII whitespace —
+    /// spaces, tabs, newlines, and carriage returns — matching the
+    /// field-normalization the issue-form parser has always applied.
+    fileprivate var trimmedWhitespaceAndNewlines: String {
+        var value = self[...]
+        while let first = value.first, first == " " || first == "\t" || first == "\n" || first == "\r" {
+            value = value.dropFirst()
+        }
+        while let last = value.last, last == " " || last == "\t" || last == "\n" || last == "\r" {
+            value = value.dropLast()
+        }
+        return String(value)
     }
 }

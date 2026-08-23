@@ -1,5 +1,5 @@
 public import Institute_Model
-public import Foundation
+public import Byte_Primitives
 
 extension Institute.Repository.Policy.Caller.Wave {
     public struct Request: Sendable {
@@ -8,9 +8,9 @@ extension Institute.Repository.Policy.Caller.Wave {
         public let expectedHead: String
         public let expectedManifest: Manifest
         public let expectedBlob: String
-        public let caller: Data
+        public let caller: [Byte]
         public let callerDigest: String
-        public let canonicalRuleset: Data
+        public let canonicalRuleset: [Byte]
         public let integrationID: Int64
         public let population: Commitment
         public let policyDigest: String
@@ -23,8 +23,8 @@ extension Institute.Repository.Policy.Caller.Wave {
             expectedHead: String,
             expectedManifest: Manifest,
             expectedBlob: String,
-            caller: Data,
-            canonicalRuleset: Data,
+            caller: [Byte],
+            canonicalRuleset: [Byte],
             integrationID: Int64,
             population: Commitment,
             policyDigest: String,

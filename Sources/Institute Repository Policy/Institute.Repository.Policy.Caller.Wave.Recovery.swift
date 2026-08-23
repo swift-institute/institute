@@ -1,8 +1,10 @@
 public import Institute_Model
-public import Foundation
+public import Byte_Primitives
+import Byte_Primitives_Standard_Library_Integration
+public import JSON
 
 extension Institute.Repository.Policy.Caller.Wave {
-    public struct Recovery: Codable, Sendable, Equatable {
+    public struct Recovery: Sendable, Equatable {
         public let repository: String
         public let repositoryID: Int64
         public let rollbackHead: String
@@ -10,7 +12,7 @@ extension Institute.Repository.Policy.Caller.Wave {
         public let caller: CallerSource
         public let callerDigest: String
         public let population: Commitment
-        public let canonicalRuleset: Data
+        public let canonicalRuleset: [Byte]
         public let integrationID: Int64
         public let policyDigest: String
         public let policySource: String
@@ -25,7 +27,7 @@ extension Institute.Repository.Policy.Caller.Wave {
             caller: CallerSource,
             callerDigest: String,
             population: Commitment,
-            canonicalRuleset: Data,
+            canonicalRuleset: [Byte],
             integrationID: Int64,
             policyDigest: String,
             policySource: String,
@@ -46,5 +48,43 @@ extension Institute.Repository.Policy.Caller.Wave {
             self.priorRuleset = priorRuleset
             self.ruleset = ruleset
         }
+    }
+}
+
+extension Institute.Repository.Policy.Caller.Wave.Recovery: JSON.Serializable {
+    public static func serialize(_ value: Self) -> JSON {
+        [
+            "repository": value.repository.json,
+            "repositoryID": value.repositoryID.json,
+            "rollbackHead": value.rollbackHead.json,
+            "manifest": value.manifest.json,
+            "caller": value.caller.json,
+            "callerDigest": value.callerDigest.json,
+            "population": value.population.json,
+            "canonicalRuleset": Swift.String(value.canonicalRuleset).json,
+            "integrationID": value.integrationID.json,
+            "policyDigest": value.policyDigest.json,
+            "policySource": value.policySource.json,
+            "priorRuleset": value.priorRuleset.json,
+            "ruleset": value.ruleset.json,
+        ]
+    }
+
+    public static func deserialize(_ json: JSON) throws(JSON.Error) -> Self {
+        Self(
+            repository: try Swift.String(json: json["repository"]),
+            repositoryID: try Swift.Int64(json: json["repositoryID"]),
+            rollbackHead: try Swift.String(json: json["rollbackHead"]),
+            manifest: try Institute.Repository.Policy.Caller.Wave.Manifest(json: json["manifest"]),
+            caller: try Institute.Repository.Policy.Caller.Wave.CallerSource(json: json["caller"]),
+            callerDigest: try Swift.String(json: json["callerDigest"]),
+            population: try Institute.Repository.Policy.Caller.Wave.Commitment(json: json["population"]),
+            canonicalRuleset: [Byte](try Swift.String(json: json["canonicalRuleset"]).utf8),
+            integrationID: try Swift.Int64(json: json["integrationID"]),
+            policyDigest: try Swift.String(json: json["policyDigest"]),
+            policySource: try Swift.String(json: json["policySource"]),
+            priorRuleset: try Institute.Repository.Policy.Caller.Wave.RulesetSnapshot?(json: json["priorRuleset"]),
+            ruleset: try Institute.Repository.Policy.Caller.Wave.RulesetSnapshot?(json: json["ruleset"])
+        )
     }
 }

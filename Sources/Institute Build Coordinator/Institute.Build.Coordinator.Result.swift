@@ -1,4 +1,6 @@
-extension Build.Coordinator {
+public import Institute_Model
+
+extension Institute.Build.Coordinator {
     /// The outcome of one coordinated `xcodebuild` operation.
     ///
     /// `standardOutput`/`standardError` are populated only when the caller

@@ -1,7 +1,8 @@
 public import Institute_Model
+public import JSON
 
 extension Institute.Repository.Policy.Uniformity.Wave {
-    public struct Population: Codable, Sendable, Equatable {
+    public struct Population: Sendable, Equatable {
         public let organizations: [String]
         /// The organizations with at least one subject — the exact
         /// preflight/apply/closure matrix. Derived, never supplied: a
@@ -137,5 +138,57 @@ extension Institute.Repository.Policy.Uniformity.Wave {
                 stateDigest: Institute.Repository.Policy.Caller.Wave.digest(state)
             )
         }
+    }
+}
+
+extension Institute.Repository.Policy.Uniformity.Wave.Population: JSON.Serializable {
+    public static func serialize(_ value: Self) -> JSON {
+        [
+            "organizations": value.organizations.json,
+            "subjectOrganizations": value.subjectOrganizations.json,
+            "organizationExclusions": value.organizationExclusions.json,
+            "examined": value.examined.json,
+            "repositoryCounts": value.repositoryCounts.json,
+            "repositories": value.repositories.json,
+            "excluded": value.excluded.json,
+            "subjects": value.subjects.json,
+            "commitment": value.commitment.json,
+        ]
+    }
+
+    public static func deserialize(_ json: JSON) throws(JSON.Error) -> Self {
+        Self(
+            organizations: try [Swift.String](json: json["organizations"]),
+            subjectOrganizations: try [Swift.String](json: json["subjectOrganizations"]),
+            organizationExclusions: try [Institute.Repository.Policy.Caller.Wave.Population.OrganizationExclusion](json: json["organizationExclusions"]),
+            examined: try Swift.Int(json: json["examined"]),
+            repositoryCounts: try [Swift.String: Swift.Int](json: json["repositoryCounts"]),
+            repositories: try [Swift.String](json: json["repositories"]),
+            excluded: try [Swift.String: Swift.Int](json: json["excluded"]),
+            subjects: try [Institute.Repository.Policy.Uniformity.Wave.Subject](json: json["subjects"]),
+            commitment: try Institute.Repository.Policy.Caller.Wave.Commitment(json: json["commitment"])
+        )
+    }
+
+    private init(
+        organizations: [Swift.String],
+        subjectOrganizations: [Swift.String],
+        organizationExclusions: [Institute.Repository.Policy.Caller.Wave.Population.OrganizationExclusion],
+        examined: Swift.Int,
+        repositoryCounts: [Swift.String: Swift.Int],
+        repositories: [Swift.String],
+        excluded: [Swift.String: Swift.Int],
+        subjects: [Institute.Repository.Policy.Uniformity.Wave.Subject],
+        commitment: Institute.Repository.Policy.Caller.Wave.Commitment
+    ) {
+        self.organizations = organizations
+        self.subjectOrganizations = subjectOrganizations
+        self.organizationExclusions = organizationExclusions
+        self.examined = examined
+        self.repositoryCounts = repositoryCounts
+        self.repositories = repositories
+        self.excluded = excluded
+        self.subjects = subjects
+        self.commitment = commitment
     }
 }

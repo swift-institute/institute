@@ -1,11 +1,12 @@
 // Internal rather than private: `remove(_:after:)` is shared with the
 // workspace operation in another file, and its parameter is a `File` type.
+public import Institute_Model
 internal import File_System
 private import Kernel_System
 private import Kernel_Thread
 internal import Process
 
-extension Build {
+extension Institute.Build {
     /// Runs SwiftPM operations with one owned interface and isolated evidence builds.
     public struct Coordinator: Sendable {
         /// How many compile jobs SwiftPM is given.
@@ -33,17 +34,17 @@ extension Build {
     }
 }
 
-extension Build.Coordinator {
+extension Institute.Build.Coordinator {
     /// Runs one operation at a Swift package root.
     ///
     /// A fresh build or test uses a unique scratch directory and removes that
     /// generated state afterward. It never mutates `Package.resolved`.
     public func run(
-        _ action: Build.Action,
+        _ action: Institute.Build.Action,
         at path: Swift.String,
         fresh: Swift.Bool = false,
         arguments: [Swift.String] = []
-    ) throws(Build.Error) -> Swift.Int32 {
+    ) throws(Institute.Build.Error) -> Swift.Int32 {
         try run(action, at: path, fresh: fresh, arguments: arguments, capturingDiagnostics: false)
             .exitCode
     }
@@ -60,12 +61,12 @@ extension Build.Coordinator {
     /// streams is the point of a potentially long-running build. A caller
     /// that needs the first diagnostic's text opts in here explicitly.
     public func run(
-        _ action: Build.Action,
+        _ action: Institute.Build.Action,
         at path: Swift.String,
         fresh: Swift.Bool = false,
         arguments: [Swift.String] = [],
         capturingDiagnostics: Swift.Bool
-    ) throws(Build.Error) -> Build.Coordinator.Result {
+    ) throws(Institute.Build.Error) -> Institute.Build.Coordinator.Result {
         let candidate: File.Directory
         do throws(File.Path.Error) {
             candidate = try File.Directory(validating: path)
@@ -103,7 +104,7 @@ extension Build.Coordinator {
             describing: "\(action.rawValue) at \(package)",
             capture: capturingDiagnostics
         ) { failure in
-            do throws(Build.Error) {
+            do throws(Institute.Build.Error) {
                 try remove(scratch, after: failure)
                 return failure
             } catch {
@@ -121,8 +122,8 @@ extension Build.Coordinator {
     /// fresh derived data through the same failure-folding path.
     func remove(
         _ scratch: File.Directory?,
-        after failure: Build.Error?
-    ) throws(Build.Error) {
+        after failure: Institute.Build.Error?
+    ) throws(Institute.Build.Error) {
         guard let scratch else { return }
         do throws(File.System.Delete.Error) {
             try scratch.delete.recursive()
@@ -135,10 +136,10 @@ extension Build.Coordinator {
     }
 
     private func freshScratch(
-        for action: Build.Action,
+        for action: Institute.Build.Action,
         package: File.Directory,
         enabled: Swift.Bool
-    ) throws(Build.Error) -> File.Directory? {
+    ) throws(Institute.Build.Error) -> File.Directory? {
         guard enabled else { return nil }
 
         let path: File.Path

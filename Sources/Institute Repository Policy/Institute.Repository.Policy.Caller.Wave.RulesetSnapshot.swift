@@ -1,26 +1,28 @@
 public import Institute_Model
-public import Foundation
+public import Byte_Primitives
+import Byte_Primitives_Standard_Library_Integration
+public import JSON
 
 extension Institute.Repository.Policy.Caller.Wave {
-    public struct RulesetSnapshot: Codable, Sendable, Equatable {
+    public struct RulesetSnapshot: Sendable, Equatable {
         private static let payloadKeys = [
             "name", "target", "enforcement", "bypass_actors", "conditions", "rules",
         ]
 
         public let repository: String
         public let id: Int64
-        public let restore: Data
-        public let opened: Data
+        public let restore: [Byte]
+        public let opened: [Byte]
 
         public init(
             repository: String,
             id: Int64,
-            live: Data,
-            canonical: Data,
+            live: [Byte],
+            canonical: [Byte],
             integrationID: Int64
         ) throws(Error) {
-            let liveObject = try Self.object(live, label: "live ruleset")
-            let canonicalObject = try Self.object(canonical, label: "canonical ruleset")
+            let liveObject = try Self.members(live, label: "live ruleset")
+            let canonicalObject = try Self.members(canonical, label: "canonical ruleset")
             let restoreObject = Dictionary(
                 uniqueKeysWithValues: Self.payloadKeys.compactMap { key in
                     liveObject[key].map { (key, $0) }
@@ -31,8 +33,8 @@ extension Institute.Repository.Policy.Caller.Wave {
                     canonicalObject[key].map { (key, $0) }
                 }
             )
-            let restore = try Self.data(restoreObject)
-            let expected = try Self.data(expectedObject)
+            let restore = Self.bytes(restoreObject)
+            let expected = Self.bytes(expectedObject)
             guard restore == expected else {
                 throw .ruleset(
                     "\(repository): protected-main read-back differs from canonical policy"
@@ -41,7 +43,7 @@ extension Institute.Repository.Policy.Caller.Wave {
             var openedObject = restoreObject
             openedObject["bypass_actors"] = [
                 [
-                    "actor_id": integrationID,
+                    "actor_id": .number(Int(integrationID)),
                     "actor_type": "Integration",
                     "bypass_mode": "always",
                 ]
@@ -49,20 +51,20 @@ extension Institute.Repository.Policy.Caller.Wave {
             self.repository = repository
             self.id = id
             self.restore = restore
-            self.opened = try Self.data(openedObject)
+            self.opened = Self.bytes(openedObject)
         }
 
-        public func verifiesClosed(_ live: Data) -> Bool {
+        public func verifiesClosed(_ live: [Byte]) -> Bool {
             Self.matches(live, expected: restore)
         }
 
-        public func verifiesOpened(_ live: Data) -> Bool {
+        public func verifiesOpened(_ live: [Byte]) -> Bool {
             Self.matches(live, expected: opened)
         }
 
-        public static func normalized(_ live: Data) throws(Error) -> Data {
-            let object = try Self.object(live, label: "ruleset")
-            return try Self.data(
+        public static func normalized(_ live: [Byte]) throws(Error) -> [Byte] {
+            let object = try Self.members(live, label: "ruleset")
+            return Self.bytes(
                 Dictionary(
                     uniqueKeysWithValues: payloadKeys.compactMap { key in
                         object[key].map { (key, $0) }
@@ -71,7 +73,7 @@ extension Institute.Repository.Policy.Caller.Wave {
             )
         }
 
-        public static func matches(_ live: Data, expected: Data) -> Bool {
+        public static func matches(_ live: [Byte], expected: [Byte]) -> Bool {
             do throws(Error) {
                 return try normalized(live) == normalized(expected)
             } catch {
@@ -80,14 +82,14 @@ extension Institute.Repository.Policy.Caller.Wave {
         }
 
         public static func containsIntegration(
-            _ live: Data,
+            _ live: [Byte],
             integrationID: Int64
         ) -> Bool {
             do throws(Error) {
-                let object = try Self.object(live, label: "ruleset")
+                let object = try Self.members(live, label: "ruleset")
                 return Self.actors(object).contains {
-                    ($0["actor_id"] as? NSNumber)?.int64Value == integrationID
-                        && ($0["actor_type"] as? String) == "Integration"
+                    Int64($0["actor_id"]) == integrationID
+                        && Swift.String($0["actor_type"]) == "Integration"
                 }
             } catch {
                 return false
@@ -95,44 +97,77 @@ extension Institute.Repository.Policy.Caller.Wave {
         }
 
         public static func removingIntegration(
-            _ live: Data,
+            _ live: [Byte],
             integrationID: Int64
-        ) throws(Error) -> Data {
-            var object = try Self.object(live, label: "ruleset")
-            object["bypass_actors"] = Self.actors(object).filter {
-                ($0["actor_id"] as? NSNumber)?.int64Value != integrationID
-                    || ($0["actor_type"] as? String) != "Integration"
-            }
-            return try normalized(Self.data(object))
-        }
-
-        private static func actors(_ object: [String: Any]) -> [[String: Any]] {
-            (object["bypass_actors"] as? [[String: Any]]) ?? []
-        }
-
-        private static func object(
-            _ data: Data,
-            label: String
-        ) throws(Error) -> [String: Any] {
-            do {
-                guard let object = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-                else {
-                    throw Error.ruleset("\(label) is not a JSON object")
+        ) throws(Error) -> [Byte] {
+            var object = try Self.members(live, label: "ruleset")
+            object["bypass_actors"] = .array(
+                Self.actors(object).filter {
+                    Int64($0["actor_id"]) != integrationID
+                        || Swift.String($0["actor_type"]) != "Integration"
                 }
-                return object
-            } catch let error as Institute.Repository.Policy.Caller.Wave.Error {
-                throw error
+            )
+            return try normalized(Self.bytes(object))
+        }
+
+        private static func actors(_ object: [Swift.String: JSON]) -> [JSON] {
+            object["bypass_actors"]?.array ?? []
+        }
+
+        private static func members(
+            _ bytes: [Byte],
+            label: Swift.String
+        ) throws(Error) -> [Swift.String: JSON] {
+            let value: JSON
+            do throws(JSON.Error) {
+                value = try JSON.parse(bytes)
             } catch {
                 throw .ruleset("\(label) did not decode: \(error)")
             }
+            guard let object = value.dictionary else {
+                throw .ruleset("\(label) is not a JSON object")
+            }
+            return object
         }
 
-        private static func data(_ object: [String: Any]) throws(Error) -> Data {
-            do {
-                return try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
-            } catch {
-                throw .ruleset("ruleset payload did not encode: \(error)")
-            }
+        private static func bytes(_ object: [Swift.String: JSON]) -> [Byte] {
+            [Byte](
+                JSON.object(object.map { ($0.key, $0.value) })
+                    .serialize(sortKeys: true)
+                    .utf8
+            )
         }
+    }
+}
+
+extension Institute.Repository.Policy.Caller.Wave.RulesetSnapshot: JSON.Serializable {
+    public static func serialize(_ value: Self) -> JSON {
+        [
+            "repository": value.repository.json,
+            "id": value.id.json,
+            "restore": Swift.String(value.restore).json,
+            "opened": Swift.String(value.opened).json,
+        ]
+    }
+
+    public static func deserialize(_ json: JSON) throws(JSON.Error) -> Self {
+        Self(
+            repository: try Swift.String(json: json["repository"]),
+            id: try Swift.Int64(json: json["id"]),
+            restore: [Byte](try Swift.String(json: json["restore"]).utf8),
+            opened: [Byte](try Swift.String(json: json["opened"]).utf8)
+        )
+    }
+
+    private init(
+        repository: Swift.String,
+        id: Swift.Int64,
+        restore: [Byte],
+        opened: [Byte]
+    ) {
+        self.repository = repository
+        self.id = id
+        self.restore = restore
+        self.opened = opened
     }
 }

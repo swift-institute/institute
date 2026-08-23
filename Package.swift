@@ -144,6 +144,7 @@ let package = Package(
     .target(
       name: "Institute Build Coordinator",
       dependencies: [
+        "Institute Model",
         .product(name: "Environment", package: "swift-environment"),
         .product(name: "File System", package: "swift-file-system"),
         .product(name: "Kernel", package: "swift-kernel"),
@@ -268,7 +269,13 @@ let package = Package(
       dependencies: [
         "Institute Model",
         .product(name: "Byte Primitives", package: "swift-byte-primitives"),
+        .product(
+          name: "Byte Primitives Standard Library Integration",
+          package: "swift-byte-primitives"
+        ),
         .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
+        .product(name: "File System", package: "swift-file-system"),
+        .product(name: "JSON", package: "swift-json"),
         .product(name: "Package Manager", package: "swift-package-manager"),
       ]
     ),

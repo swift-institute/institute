@@ -1,5 +1,5 @@
 public import Institute_Model
-public import Foundation
+public import Byte_Primitives
 
 extension Institute.Repository.Policy.Uniformity.Wave {
     public struct Request: Sendable {
@@ -8,9 +8,9 @@ extension Institute.Repository.Policy.Uniformity.Wave {
         public let expectedHead: String
         public let expectedManifest: Manifest
         public let expectedShape: Shape
-        public let payload: Data
+        public let payload: [Byte]
         public let payloadDigest: String
-        public let canonicalRuleset: Data
+        public let canonicalRuleset: [Byte]
         public let integrationID: Int64
         public let population: Commitment
         public let policyDigest: String
@@ -23,8 +23,8 @@ extension Institute.Repository.Policy.Uniformity.Wave {
             expectedHead: String,
             expectedManifest: Manifest,
             expectedShape: Shape,
-            payload: Data,
-            canonicalRuleset: Data,
+            payload: [Byte],
+            canonicalRuleset: [Byte],
             integrationID: Int64,
             population: Commitment,
             policyDigest: String,

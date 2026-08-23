@@ -1,7 +1,8 @@
 public import Institute_Model
+public import JSON
 
 extension Institute.Repository.Policy.Uniformity.Wave {
-    public struct Event: Codable, Sendable, Equatable {
+    public struct Event: Sendable, Equatable {
         public let phase: String
         public let repository: String
         public let oldHead: String?
@@ -42,5 +43,41 @@ extension Institute.Repository.Policy.Uniformity.Wave {
             self.policyDigest = policyDigest
             self.policySource = policySource
         }
+    }
+}
+
+extension Institute.Repository.Policy.Uniformity.Wave.Event: JSON.Serializable {
+    public static func serialize(_ value: Self) -> JSON {
+        [
+            "phase": value.phase.json,
+            "repository": value.repository.json,
+            "oldHead": value.oldHead.json,
+            "newHead": value.newHead.json,
+            "oldGitignore": value.oldGitignore.json,
+            "newGitignore": value.newGitignore.json,
+            "deletions": value.deletions.json,
+            "ruleset": value.ruleset.json,
+            "bypassClosed": value.bypassClosed.json,
+            "populationDigest": value.populationDigest.json,
+            "policyDigest": value.policyDigest.json,
+            "policySource": value.policySource.json,
+        ]
+    }
+
+    public static func deserialize(_ json: JSON) throws(JSON.Error) -> Self {
+        Self(
+            phase: try Swift.String(json: json["phase"]),
+            repository: try Swift.String(json: json["repository"]),
+            oldHead: try Swift.String?(json: json["oldHead"]),
+            newHead: try Swift.String?(json: json["newHead"]),
+            oldGitignore: try Swift.String?(json: json["oldGitignore"]),
+            newGitignore: try Swift.String?(json: json["newGitignore"]),
+            deletions: try [Swift.String]?(json: json["deletions"]),
+            ruleset: try Swift.Int64?(json: json["ruleset"]),
+            bypassClosed: try Swift.Bool?(json: json["bypassClosed"]),
+            populationDigest: try Swift.String?(json: json["populationDigest"]),
+            policyDigest: try Swift.String?(json: json["policyDigest"]),
+            policySource: try Swift.String?(json: json["policySource"])
+        )
     }
 }

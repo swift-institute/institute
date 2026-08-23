@@ -1,23 +1,37 @@
 public import Institute_Model
-public import Foundation
+import struct Swift.String
+import Byte_Primitives
+import Byte_Primitives_Standard_Library_Integration
+import File_System
+import JSON
 
 extension Institute.Repository.Policy.Caller.Wave.Attestation {
     public static func read(
         at path: String
     ) throws(Institute.Repository.Policy.Caller.Wave.Error) -> (attestation: Self, digest: String) {
-        let data: Data
-        do {
-            data = try Data(contentsOf: URL(filePath: path))
+        guard let filePath = try? File.Path(path) else {
+            throw .attestation("token issuance attestation path is invalid: \(path)")
+        }
+        let bytes: [Byte]
+        do throws(Either<File.System.Read.Full.Error, Never>) {
+            bytes = try File(filePath).read.full { view in
+                var storage = [Byte]()
+                storage.reserveCapacity(view.count)
+                for index in view.indices {
+                    storage.append(view[index])
+                }
+                return storage
+            }
         } catch {
             throw .attestation("token issuance attestation is missing at \(path): \(error)")
         }
         let attestation: Self
-        do {
-            attestation = try JSONDecoder().decode(Self.self, from: data)
+        do throws(JSON.Error) {
+            attestation = try Self(jsonBytes: bytes)
         } catch {
             throw .attestation("token issuance attestation at \(path) is malformed: \(error)")
         }
-        return (attestation, Institute.Repository.Policy.Caller.Wave.digest(data))
+        return (attestation, Institute.Repository.Policy.Caller.Wave.digest(bytes))
     }
 
     public func authorize(

@@ -1,5 +1,5 @@
 public import Institute_Model
-public import Foundation
+public import Byte_Primitives
 
 extension Institute.Repository.Policy.Caller.Wave {
     public protocol Client: Sendable {
@@ -32,19 +32,19 @@ extension Institute.Repository.Policy.Caller.Wave {
         func ruleset(
             _ repository: String,
             id: Int64
-        ) async throws(Institute.Repository.Policy.Client.Error) -> Data
+        ) async throws(Institute.Repository.Policy.Client.Error) -> [Byte]
         func replaceRuleset(
             _ repository: String,
             id: Int64,
-            payload: Data
+            payload: [Byte]
         ) async throws(Institute.Repository.Policy.Client.Error)
         func createRuleset(
             _ repository: String,
-            payload: Data
+            payload: [Byte]
         ) async throws(Institute.Repository.Policy.Client.Error) -> Int64
         func createBlob(
             _ repository: String,
-            content: Data
+            content: [Byte]
         ) async throws(Institute.Repository.Policy.Client.Error) -> String
         func createCommit(
             _ repository: String,

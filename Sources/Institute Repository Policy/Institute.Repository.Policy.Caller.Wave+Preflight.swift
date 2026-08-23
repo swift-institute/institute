@@ -86,7 +86,7 @@ extension Institute.Repository.Policy.Caller.Wave {
             organization: String(components[0]),
             repository: request.repository,
             population: request.population,
-            recoveryDigest: digest(try evidenceData(recovery)),
+            recoveryDigest: digest(evidenceBytes(recovery)),
             attestationDigest: attestationDigest,
             accepted: true
         )

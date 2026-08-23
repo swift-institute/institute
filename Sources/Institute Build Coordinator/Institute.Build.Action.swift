@@ -1,4 +1,6 @@
-extension Build {
+public import Institute_Model
+
+extension Institute.Build {
     /// A SwiftPM operation supported by the build coordinator.
     public enum Action: Swift.String, CaseIterable, Sendable {
         case build
@@ -11,7 +13,7 @@ extension Build {
     }
 }
 
-extension Build.Action {
+extension Institute.Build.Action {
     var command: [Swift.String] {
         switch self {
         case .build, .test, .run:
@@ -40,7 +42,7 @@ extension Build.Action {
         jobs: Swift.Int,
         scratchPath: Swift.String?,
         arguments: [Swift.String]
-    ) throws(Build.Error) -> [Swift.String] {
+    ) throws(Institute.Build.Error) -> [Swift.String] {
         guard jobs > 0 else {
             throw .configuration("jobs must be greater than zero")
         }

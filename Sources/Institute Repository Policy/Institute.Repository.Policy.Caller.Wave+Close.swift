@@ -1,11 +1,11 @@
 public import Institute_Model
-public import Foundation
+public import Byte_Primitives
 
 extension Institute.Repository.Policy.Caller.Wave {
     public static func close<C: Client>(
         client: C,
         recovery: Recovery,
-        caller: Data
+        caller: [Byte]
     ) async throws(Error) -> Closure {
         guard digest(caller) == recovery.callerDigest else {
             throw .verification("\(recovery.repository): closure caller digest moved")
@@ -30,7 +30,7 @@ extension Institute.Repository.Policy.Caller.Wave {
                 integrationID: recovery.integrationID
             )
         }
-        let finalRuleset: Data?
+        let finalRuleset: [Byte]?
         if let rulesetID {
             finalRuleset = try await calling {
                 try await client.ruleset(recovery.repository, id: rulesetID)

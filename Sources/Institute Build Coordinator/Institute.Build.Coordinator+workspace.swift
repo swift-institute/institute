@@ -1,7 +1,8 @@
+public import Institute_Model
 private import File_System
 internal import Process
 
-extension Build.Coordinator {
+extension Institute.Build.Coordinator {
     /// Runs one `xcodebuild` operation over a generated Xcode workspace.
     ///
     /// The whole selection compiles in this one process. That is the
@@ -23,10 +24,10 @@ extension Build.Coordinator {
     /// workspace and removes it afterward, mirroring the SwiftPM path's fresh
     /// scratch. It is the isolated-evidence build, not the fast one.
     public func run(
-        _ workspace: Build.Workspace,
+        _ workspace: Institute.Build.Workspace,
         fresh: Swift.Bool = false,
         arguments: [Swift.String] = []
-    ) throws(Build.Error) -> Swift.Int32 {
+    ) throws(Institute.Build.Error) -> Swift.Int32 {
         try run(
             workspace,
             fresh: fresh,
@@ -45,11 +46,11 @@ extension Build.Coordinator {
     /// coherence instrument's `build`-stage attribution, not human
     /// progress) opts in here explicitly.
     public func run(
-        _ workspace: Build.Workspace,
+        _ workspace: Institute.Build.Workspace,
         fresh: Swift.Bool,
         arguments: [Swift.String],
         capturingDiagnostics: Swift.Bool
-    ) throws(Build.Error) -> Build.Coordinator.Result {
+    ) throws(Institute.Build.Error) -> Institute.Build.Coordinator.Result {
         let candidate: File.Directory
         do throws(File.Path.Error) {
             candidate = try File.Directory(validating: workspace.bundle)
@@ -89,7 +90,7 @@ extension Build.Coordinator {
             describing: "xcodebuild \(described.operation.rawValue) on \(bundle)",
             capture: capturingDiagnostics
         ) { failure in
-            do throws(Build.Error) {
+            do throws(Institute.Build.Error) {
                 try remove(derived, after: failure)
                 return failure
             } catch {
@@ -106,7 +107,7 @@ extension Build.Coordinator {
     private func freshDerivedData(
         for bundle: File.Directory,
         enabled: Swift.Bool
-    ) throws(Build.Error) -> File.Directory? {
+    ) throws(Institute.Build.Error) -> File.Directory? {
         guard enabled else { return nil }
 
         let path: File.Path

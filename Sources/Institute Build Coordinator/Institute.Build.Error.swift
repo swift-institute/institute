@@ -1,4 +1,6 @@
-extension Build {
+public import Institute_Model
+
+extension Institute.Build {
     /// A failure to configure or execute one coordinated build operation.
     public enum Error: Swift.Error, CustomStringConvertible, Equatable, Sendable {
         case configuration(Swift.String)
@@ -7,7 +9,7 @@ extension Build {
     }
 }
 
-extension Build.Error {
+extension Institute.Build.Error {
     public var description: Swift.String {
         switch self {
         case .configuration(let message): message
