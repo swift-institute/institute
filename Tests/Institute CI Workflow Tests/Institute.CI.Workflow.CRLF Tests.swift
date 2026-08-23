@@ -41,7 +41,7 @@ struct CIWorkflowCRLFTests {
 
     @Test func `CRLF document parses the same jobs as its LF original`() throws {
         let lf = Self.caller
-        let crlf = lf.replacingOccurrences(of: "\n", with: "\r\n")
+        let crlf = lf.replacing("\n", with: "\r\n")
 
         let lfDocument = try Institute.CI.Workflow.Document(
             name: "ci.yml", text: lf)
@@ -54,7 +54,7 @@ struct CIWorkflowCRLFTests {
 
     @Test func `a lone CR line ending is also normalised`() throws {
         let lf = Self.caller
-        let cr = lf.replacingOccurrences(of: "\n", with: "\r")
+        let cr = lf.replacing("\n", with: "\r")
 
         let document = try Institute.CI.Workflow.Document(
             name: "ci.yml", text: cr)
