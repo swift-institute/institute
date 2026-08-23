@@ -521,7 +521,11 @@ let package = Package(
     ),
     .testTarget(
       name: "Institute Source Policy Tests",
-      dependencies: ["Institute Source Policy"]
+      dependencies: [
+        "Institute Source Policy",
+        "Institute Model",
+        .product(name: "Source Profile", package: "swift-source"),
+      ]
     ),
     .testTarget(
       name: "Institute CI Inventory Tests",

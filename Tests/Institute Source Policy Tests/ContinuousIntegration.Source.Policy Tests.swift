@@ -1,4 +1,6 @@
+public import Institute_Model
 import Institute_Source_Policy
+import Source_Profile
 import Testing
 
 @Suite
@@ -38,13 +40,18 @@ struct `Institute source policy` {
             bundle: .institute,
             linterRules: rules
         )
+        // The profile canonicalizes engine order by identifier; the
+        // policy's own required-engine order is asserted separately above.
         #expect(
-            profile.engines.map(\.id.token)
-                == ["swift-format", "swiftlint", "swift-linter"]
+            profile.engines.map(\.id.token).sorted()
+                == ["swift-format", "swift-linter", "swiftlint"]
         )
-        #expect(profile.engines[0].rules.map(\.token) == ["format"])
-        #expect(profile.engines[1].rules == swiftLintRules)
-        #expect(profile.engines[2].rules == rules)
+        func engine(_ token: String) -> Source.Profile.Engine? {
+            profile.engines.first { $0.id.token == token }
+        }
+        #expect(engine("swift-format")?.rules.map(\.token) == ["format"])
+        #expect(engine("swiftlint")?.rules == swiftLintRules)
+        #expect(engine("swift-linter")?.rules == rules)
         #expect(
             profile.digest
                 == policy.profile(
