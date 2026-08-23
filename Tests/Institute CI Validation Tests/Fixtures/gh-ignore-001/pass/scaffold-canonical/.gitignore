@@ -1,0 +1,47 @@
+# ========== CANONICAL (auto-synced, do not edit) ==========
+# This file is generated - do not edit by hand.
+
+*~
+.DS_Store
+
+Thumbs.db
+
+# Top-level entries (opt-in only)
+# A scaffold holds a reserved name and its uniform CI caller, nothing
+# else. First ignore everything at root; then whitelist the admitted
+# entries. Whitelists come AFTER /* so they take effect. A scaffold
+# that needs Sources/ needs a Package.swift first, and with it the
+# package class.
+/*
+!/.github/
+!/LICENSE
+!/LICENSE.md
+!/README.md
+!/.gitignore
+!/.swift-format
+!/.swift-format-ignore
+!/.swiftformat
+!/.swiftlint.yml
+!/.swiftlint/
+
+# Documentation: README only. A scaffold has no work to document.
+*.md
+!README.md
+!LICENSE.md
+!**/.github/**/*.md
+
+# Tool state: dot-directories are denied at EVERY depth, not just the
+# root. /.github is the sole legitimate dot-directory and is
+# re-included after.
+**/.*/
+!/.github/
+
+# Closed semantic capability admissions
+!**/.benchmarks/
+!**/.snapshots/
+!/.env.example
+!/canon/
+!**/Fixtures/MANIFEST.md
+!/.editorconfig
+
+# ========== END CANONICAL ==========

@@ -1,29 +1,48 @@
 public import FIPS_180_4
 public import File_System
-internal import Institute_Continuous_Integration
-public import Institute_Continuous_Integration_Source
+public import Institute_Source_Policy
 public import Institute_Model
 internal import Institute_Source_Profile
 public import Source_Profile
 
 extension Institute.Source.Application {
   public func prepare(
-    workspace: Swift.String,
-    swiftFormatExecutable: Swift.String,
-    linterExecutable: Swift.String
-  ) throws(Institute.Error) -> Institute.Source.Preparation {
-    let policy = ContinuousIntegration.Source.Policy.current
+    workspace: Swift.String
+  ) async throws(Institute.Error) -> Institute.Source.Preparation {
+    let policy = Institute.Source.Policy.current
     let directory = try Self.artifactDirectory(workspace: workspace)
     do throws(File.System.Create.Directory.Error) { try directory.create.recursive() } catch {
       throw .filesystem("cannot create source profile directory \(directory): \(error)")
     }
 
-    let swiftFormatTool = try Self.digest(file: swiftFormatExecutable)
-    let linterTool = try Self.digest(file: linterExecutable)
+    let tools = directory[directory: "tools"]
+    let acquisition = Institute.Source.Acquisition(process: process)
+    let swiftFormatAsset = try Self.engine("swift-format", policy: policy).executable
+    let swiftLintAsset = try Self.engine("swiftlint", policy: policy).executable
+    let linterAsset = try Self.engine("swift-linter", policy: policy).executable
+    let swiftFormat = try await acquisition.acquire(swiftFormatAsset, executable: true, into: tools)
+    let swiftLint = try await acquisition.acquire(swiftLintAsset, executable: true, into: tools)
+    let linterToolFile = try await acquisition.acquire(linterAsset, executable: true, into: tools)
+    let swiftFormatExecutable = swiftFormat.description
+    let swiftLintExecutable = swiftLint.description
+    let linterExecutable = linterToolFile.description
+    let swiftFormatTool = swiftFormatAsset.digest
+    let swiftLintTool = swiftLintAsset.digest
+    let linterTool = linterAsset.digest
     let format = directory[file: try Self.component(policy.swiftFormat.path)]
     do throws(File.System.Write.Atomic.Error) {
       try format.write.atomic(policy.swiftFormat.contents)
     } catch { throw .filesystem("cannot render \(format): \(error)") }
+    let swiftLintConfiguration = directory[file: try Self.component(policy.swiftLint.path)]
+    do throws(File.System.Write.Atomic.Error) {
+      try swiftLintConfiguration.write.atomic(policy.swiftLint.contents)
+    } catch { throw .filesystem("cannot render \(swiftLintConfiguration): \(error)") }
+    let swiftLintRules = try await Self.swiftLintRules(
+      executable: swiftLintExecutable,
+      configuration: swiftLintConfiguration.description,
+      directory: directory.description,
+      process: process
+    )
 
     let instituteProfile = Institute.Source.Profile(policy: policy)
     var profiles: [Swift.String: Source_Profile.Source.Profile.Digest] = [:]
@@ -40,6 +59,10 @@ extension Institute.Source.Application {
           swiftFormatExecutable: swiftFormatExecutable,
           swiftFormatTool: swiftFormatTool,
           swiftFormatConfigurationPath: format.description,
+          swiftLintExecutable: swiftLintExecutable,
+          swiftLintTool: swiftLintTool,
+          swiftLintConfigurationPath: swiftLintConfiguration.description,
+          swiftLintRules: swiftLintRules,
           linterExecutable: linterExecutable,
           linterTool: linterTool,
           linterConfigurationPath: linter.description,
@@ -51,6 +74,9 @@ extension Institute.Source.Application {
       policyRevision: policy.revision,
       swiftFormatExecutable: swiftFormatExecutable,
       swiftFormatTool: swiftFormatTool,
+      swiftLintExecutable: swiftLintExecutable,
+      swiftLintTool: swiftLintTool,
+      swiftLintRules: swiftLintRules,
       linterExecutable: linterExecutable,
       linterTool: linterTool,
       directory: directory.description,
@@ -61,6 +87,19 @@ extension Institute.Source.Application {
       try receipt.write.atomic(preparation.jsonString(sortKeys: true) + "\n")
     } catch { throw .filesystem("cannot write source preparation receipt \(receipt): \(error)") }
     return preparation
+  }
+
+  private static func engine(
+    _ token: Swift.String,
+    policy: Institute.Source.Policy
+  ) throws(Institute.Error) -> Institute.Source.Policy.Engine {
+    let matches = policy.engines.filter {
+      $0.id.token == token && $0.platform.token == "macos-arm64"
+    }
+    guard matches.count == 1, let engine = matches.first else {
+      throw .configuration("source policy must declare exactly one macos-arm64 \(token) engine")
+    }
+    return engine
   }
 
   public static func artifactDirectory(workspace: Swift.String) throws(Institute.Error)

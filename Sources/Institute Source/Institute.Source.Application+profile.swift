@@ -1,5 +1,4 @@
-internal import Institute_Continuous_Integration
-public import Institute_Continuous_Integration_Source
+public import Institute_Source_Policy
 public import Institute_Model
 internal import Institute_Source_Profile
 internal import Institute_Source_Workspace
@@ -10,7 +9,25 @@ extension Institute.Source.Application {
     for row: Institute.Source.Workspace.Row,
     preparation: Institute.Source.Preparation
   ) throws(Institute.Error) -> Source_Profile.Source.Profile {
-    let policy = ContinuousIntegration.Source.Policy.current
+    let policy = Institute.Source.Policy.current
+    guard preparation.policyRevision == policy.revision else {
+      throw .configuration("source preparation policy is stale")
+    }
+    guard
+      Self.matches(file: preparation.swiftFormatExecutable, digest: preparation.swiftFormatTool),
+      Self.matches(file: preparation.swiftLintExecutable, digest: preparation.swiftLintTool),
+      Self.matches(file: preparation.linterExecutable, digest: preparation.linterTool)
+    else { throw .configuration("source preparation tool is stale") }
+    guard
+      Self.matches(
+        file: "\(preparation.directory)/.swift-format",
+        digest: policy.swiftFormat.digest
+      ),
+      Self.matches(
+        file: "\(preparation.directory)/.swiftlint.yml",
+        digest: policy.swiftLint.digest
+      )
+    else { throw .configuration("source preparation configuration is stale") }
     let owner = Institute.Source.Profile(policy: policy)
     let bundle = try owner.bundle(for: row)
     let rules = owner.rules(for: bundle)
@@ -24,6 +41,10 @@ extension Institute.Source.Application {
       swiftFormatExecutable: preparation.swiftFormatExecutable,
       swiftFormatTool: preparation.swiftFormatTool,
       swiftFormatConfigurationPath: "\(preparation.directory)/.swift-format",
+      swiftLintExecutable: preparation.swiftLintExecutable,
+      swiftLintTool: preparation.swiftLintTool,
+      swiftLintConfigurationPath: "\(preparation.directory)/.swiftlint.yml",
+      swiftLintRules: preparation.swiftLintRules,
       linterExecutable: preparation.linterExecutable,
       linterTool: preparation.linterTool,
       linterConfigurationPath: linterConfiguration,

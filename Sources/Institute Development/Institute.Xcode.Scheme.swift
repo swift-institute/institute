@@ -341,10 +341,10 @@ extension Institute.Xcode.Scheme {
         case .application:
             (
                 buildables: [
-                    "InstituteArchitectureModel", "InstituteArchitectureFacts",
-                    "InstituteArchitectureGraph", "InstituteArchitectureIndex",
-                    "InstituteArchitectureValidation", "InstituteArchitectureCandidates",
-                    "InstituteArchitectureMigration", "InstituteArchitectureCLI",
+                    "Institute Architecture Model", "Institute Architecture Facts",
+                    "Institute Architecture Graph", "Institute_Architecture_Index",
+                    "Institute Architecture Validation", "Institute_Architecture_Candidates",
+                    "Institute Architecture Migration", "InstituteArchitectureCLI",
                     "Institute GitHub",
                     "Institute Application Source", "Institute Application",
                     "Institute Application CLI",

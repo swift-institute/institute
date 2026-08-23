@@ -1,5 +1,4 @@
-public import Institute_Continuous_Integration
-public import Institute_Continuous_Integration_Source
+public import Institute_Source_Policy
 public import Institute_Model
 internal import Linter_Institute_Rules
 internal import Linter_Primitives
@@ -10,16 +9,16 @@ public import Source_Profile
 
 extension Institute_Model.Institute.Source {
   public struct Profile: Sendable {
-    public let policy: ContinuousIntegration.Source.Policy
+    public let policy: Institute.Source.Policy
 
     public init(
-      policy: ContinuousIntegration.Source.Policy = .current
+      policy: Institute.Source.Policy = .current
     ) {
       self.policy = policy
     }
 
     public func rules(
-      for bundle: ContinuousIntegration.Source.Bundle
+      for bundle: Institute.Source.Bundle
     ) -> [Source_Measurement.Source.Rule.ID] {
       let configurations: [Lint.Rule.Configuration]
       switch bundle {

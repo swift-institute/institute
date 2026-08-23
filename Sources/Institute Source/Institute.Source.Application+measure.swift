@@ -1,7 +1,6 @@
 public import Async_Fanout
 public import FIPS_180_4
-internal import Institute_Continuous_Integration
-public import Institute_Continuous_Integration_Source
+public import Institute_Source_Policy
 public import Institute_Model
 internal import Institute_Source_Profile
 public import Institute_Source_Workspace
@@ -22,7 +21,7 @@ extension Institute.Source.Application {
     let rows = selected ?? cohort.measurable
     let scope: Source_Report.Source.Report.Scope =
       selected == nil && engines == nil ? .workspace : .partial
-    let policy = ContinuousIntegration.Source.Policy.current
+    let policy = Institute.Source.Policy.current
     guard preparation.policyRevision == policy.revision else {
       return Self.unmeasuredReport(
         scope: scope,
@@ -34,6 +33,7 @@ extension Institute.Source.Application {
         file: preparation.swiftFormatExecutable,
         digest: preparation.swiftFormatTool
       ),
+      Self.matches(file: preparation.swiftLintExecutable, digest: preparation.swiftLintTool),
       Self.matches(file: preparation.linterExecutable, digest: preparation.linterTool)
     else {
       return Self.unmeasuredReport(
@@ -45,6 +45,10 @@ extension Institute.Source.Application {
       Self.matches(
         file: "\(preparation.directory)/.swift-format",
         digest: policy.swiftFormat.digest
+      ),
+      Self.matches(
+        file: "\(preparation.directory)/.swiftlint.yml",
+        digest: policy.swiftLint.digest
       )
     else {
       return Self.unmeasuredReport(
@@ -54,7 +58,7 @@ extension Institute.Source.Application {
     }
 
     let drivers: [Source_Measurement.Source.Engine.Driver] = [
-      .swiftFormat(process: process), .linter(process: process),
+      .swiftFormat(process: process), .swiftLint(process: process), .linter(process: process),
     ]
     let execution: Source_Execution.Source.Execution
     do throws(Source_Execution.Source.Execution.Error) {
@@ -82,6 +86,8 @@ extension Institute.Source.Application {
         switch engine.token {
         case "swift-format":
           rules = [.init(engine: engine, token: "format")]
+        case "swiftlint":
+          rules = preparation.swiftLintRules
         case "swift-linter":
           rules = owner.rules(for: bundle)
         default:
@@ -101,7 +107,7 @@ extension Institute.Source.Application {
       jobs: jobs ?? 1
     ).mapAsync(entries) { entry in
       let subject = entry.subject
-      let bundle: ContinuousIntegration.Source.Bundle
+      let bundle: Institute.Source.Bundle
       do throws(Institute.Error) {
         bundle = try Institute.Source.Profile(policy: policy).bundle(for: entry.row)
       } catch {
@@ -138,6 +144,10 @@ extension Institute.Source.Application {
         swiftFormatExecutable: preparation.swiftFormatExecutable,
         swiftFormatTool: preparation.swiftFormatTool,
         swiftFormatConfigurationPath: "\(preparation.directory)/.swift-format",
+        swiftLintExecutable: preparation.swiftLintExecutable,
+        swiftLintTool: preparation.swiftLintTool,
+        swiftLintConfigurationPath: "\(preparation.directory)/.swiftlint.yml",
+        swiftLintRules: preparation.swiftLintRules,
         linterExecutable: preparation.linterExecutable,
         linterTool: preparation.linterTool,
         linterConfigurationPath: linterConfiguration,
@@ -238,7 +248,7 @@ extension Institute.Source.Application {
 
   private static func selfApplicationReasons(
     cohort: Institute.Source.Workspace.Cohort,
-    policy: ContinuousIntegration.Source.Policy
+    policy: Institute.Source.Policy
   ) -> [Source_Measurement.Source.Reason] {
     let admitted = Swift.Set(cohort.admitted.map(\.identity))
     let controls = Swift.Set(

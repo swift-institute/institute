@@ -1,4 +1,4 @@
-public import Institute_Continuous_Integration_Source
+public import Institute_Source_Policy
 public import Institute_Model
 public import Source_Profile
 

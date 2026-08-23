@@ -1,7 +1,6 @@
 internal import Byte_Primitives
 public import File_System
-internal import Institute_Continuous_Integration
-public import Institute_Continuous_Integration_Source
+public import Institute_Source_Policy
 internal import Institute_Model
 internal import Institute_Source_Profile
 internal import JSON
@@ -10,7 +9,7 @@ internal import Source_Profile
 
 extension Institute.Source.Application {
   static func configuration(
-    policy: ContinuousIntegration.Source.Policy,
+    policy: Institute.Source.Policy,
     preparation: Institute.Source.Preparation
   ) throws(Institute.Error) -> (
     subject: Source.Subject,
@@ -20,7 +19,7 @@ extension Institute.Source.Application {
     do throws(File.Path.Error) {
       directory = File.Directory(try .init(preparation.directory))
     } catch { throw .configuration("invalid source preparation directory") }
-    let declared: [(artifact: ContinuousIntegration.Source.Artifact, path: Swift.String)] =
+    let declared: [(artifact: Institute.Source.Artifact, path: Swift.String)] =
       [
         (policy.swiftFormat, policy.swiftFormat.path)
       ]
@@ -60,7 +59,7 @@ extension Institute.Source.Application {
         provenance: .generated(
           .init(
             owner: .init("control:continuous-integration"),
-            input: "ContinuousIntegration.Source.Policy",
+            input: "Institute.Source.Policy",
             revision: policy.revision,
             digest: declaration.digest.hex
           )

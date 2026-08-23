@@ -150,7 +150,11 @@ extension Institute.Source.Application {
   private static func executionUnchecked(
     process: Source_Measurement.Source.Engine.Process
   ) throws(Source_Execution.Source.Execution.Error) -> Source_Execution.Source.Execution {
-    try .init(drivers: [.linter(process: process), .swiftFormat(process: process)])
+    try .init(
+      drivers: [
+        .linter(process: process), .swiftLint(process: process), .swiftFormat(process: process),
+      ]
+    )
   }
 
   private static func stagedFiles(

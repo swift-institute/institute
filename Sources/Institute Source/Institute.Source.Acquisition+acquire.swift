@@ -1,12 +1,11 @@
 public import File_System
-internal import Institute_Continuous_Integration
-public import Institute_Continuous_Integration_Source
+public import Institute_Source_Policy
 public import Institute_Model
 public import Source_Profile
 
 extension Institute.Source.Acquisition {
   func acquire(
-    _ asset: ContinuousIntegration.Source.Policy.Asset,
+    _ asset: Institute.Source.Policy.Asset,
     executable: Swift.Bool,
     into directory: File.Directory
   ) async throws(Institute.Error) -> File {
@@ -47,6 +46,16 @@ extension Institute.Source.Acquisition {
     switch asset.origin {
     case .release(let base):
       try await download(asset: asset, base: base, to: staging, under: directory)
+    case .releaseArchive(let base, let archive, let digest, let member):
+      try await extract(
+        asset: asset,
+        base: base,
+        archive: archive,
+        archiveDigest: digest,
+        member: member,
+        to: staging,
+        under: directory
+      )
     case .xcode(let application, let version, let build, let relativePath):
       try await copyXcode(
         application: application,
@@ -78,8 +87,74 @@ extension Institute.Source.Acquisition {
 }
 
 extension Institute.Source.Acquisition {
+  private func extract(
+    asset: Institute.Source.Policy.Asset,
+    base: Swift.String,
+    archive: Swift.String,
+    archiveDigest: Source_Profile.Source.Profile.Digest,
+    member: Swift.String,
+    to destination: File,
+    under directory: File.Directory
+  ) async throws(Institute.Error) {
+    guard !archive.isEmpty, !archive.contains("/"), !member.isEmpty, !member.contains("/")
+    else { throw .configuration("source archive identity is not canonical") }
+    let temporaryPath: File.Path
+    do throws(File.Path.Temporary.Error) {
+      temporaryPath = try File.Path.Temporary.sibling(
+        of: destination.path,
+        prefix: ".source-archive-",
+        suffix: ".staged"
+      )
+    } catch { throw .filesystem("cannot allocate source archive directory: \(error)") }
+    let temporary = File.Directory(temporaryPath)
+    do throws(Either<Kernel.Thread.Pool.Error, File.System.Create.Directory.Error>) {
+      try await temporary.create.recursive()
+    } catch {
+      throw .filesystem("cannot create source archive directory: \(error)")
+    }
+    defer {
+      do throws(File.System.Delete.Error) {
+        if temporary.stat.exists { try temporary.delete.recursive() }
+      } catch {}
+    }
+    let archiveFile = temporary[file: try Self.component(archive)]
+    let archiveAsset = Institute.Source.Policy.Asset(
+      name: archive,
+      digest: archiveDigest,
+      origin: .release(base: base)
+    )
+    try await download(asset: archiveAsset, base: base, to: archiveFile, under: directory)
+    let actualArchive = try Institute.Source.Application.digest(file: archiveFile.description)
+    guard actualArchive == archiveDigest else {
+      throw .configuration(
+        "source archive \(archive) hashes to \(actualArchive.hex), expected \(archiveDigest.hex)"
+      )
+    }
+    let extracted = temporary[directory: "contents"]
+    do throws(Either<Kernel.Thread.Pool.Error, File.System.Create.Directory.Error>) {
+      try await extracted.create.recursive()
+    } catch {
+      throw .filesystem("cannot create source archive extraction directory: \(error)")
+    }
+    let result = await process.run(
+      "/usr/bin/ditto",
+      ["-x", "-k", archiveFile.description, extracted.description],
+      directory.description,
+      [:]
+    )
+    let source = extracted[file: try Self.component(member)]
+    guard result.status == 0, source.stat.isFile else {
+      throw .process("cannot extract source asset \(asset.name): \(result.diagnostics)")
+    }
+    do throws(File.System.Copy.Error) {
+      try File.System.Copy.copy(from: source.path, to: destination.path)
+    } catch {
+      throw .filesystem("cannot stage source archive member \(member): \(error)")
+    }
+  }
+
   private func download(
-    asset: ContinuousIntegration.Source.Policy.Asset,
+    asset: Institute.Source.Policy.Asset,
     base: Swift.String,
     to destination: File,
     under directory: File.Directory
