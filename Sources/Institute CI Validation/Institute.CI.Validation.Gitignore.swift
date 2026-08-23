@@ -116,6 +116,11 @@ extension Institute.CI.Validation {
                     Probe("Tools/tool/Package.swift"),
                     Probe("profile/README.md"),
                     Probe("RULINGS.md"),
+                    Probe("Institute.json"),
+                    Probe("Peers.json"),
+                    Probe("Selection.json"),
+                    Probe("Context/AGENTS.md"),
+                    Probe("institute control.xcworkspace/contents.xcworkspacedata"),
                 ]
 
             case .application:
@@ -142,6 +147,8 @@ extension Institute.CI.Validation {
             Probe(".swift-lint/eval/Package.swift"),
             Probe("Sources/.swift-lint/manifest.json"),
             Probe(".build/debug/thing.o"),
+            Probe("institute control.xcworkspace/xcuserdata/user.xcuserdatad/state.plist"),
+            Probe("institute control.xcworkspace/xcshareddata/swiftpm/Package.resolved"),
         ]
 
         /// Paths no class admits. Each must come back ignored, or the

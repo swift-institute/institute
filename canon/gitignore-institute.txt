@@ -48,6 +48,16 @@ Thumbs.db
 !/Workspace.json
 !/metadata.yaml
 !/metadata-schema.json
+!/Institute.json
+!/Peers.json
+!/Selection.json
+
+# The control workspace ships exactly one document: its membership file.
+# Xcode writes per-user and shared state (xcuserdata/, xcshareddata/)
+# into the bundle; only contents.xcworkspacedata is work.
+!/institute control.xcworkspace
+/institute control.xcworkspace/*
+!/institute control.xcworkspace/contents.xcworkspacedata
 
 # Documentation (opt-in for whitelisted .md files and .docc catalogs only)
 # Blocks all .md files by default to prevent AI-generated content from being committed
@@ -60,6 +70,7 @@ Thumbs.db
 !CODE_OF_CONDUCT.md
 !SECURITY.md
 !CLAUDE.md
+!AGENTS.md
 !**/*.docc/**/*.md
 !**/Research/**/*.md
 !**/Experiments/**/*.md
