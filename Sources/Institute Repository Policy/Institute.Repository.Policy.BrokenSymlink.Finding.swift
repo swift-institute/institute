@@ -1,6 +1,6 @@
 public import Institute_Model
 
-extension RepositoryPolicy.BrokenSymlink {
+extension Institute.Repository.Policy.BrokenSymlink {
     public struct Finding: Sendable, Hashable {
         public let path: String
 

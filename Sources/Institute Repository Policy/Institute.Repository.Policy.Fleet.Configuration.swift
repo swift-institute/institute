@@ -1,6 +1,6 @@
 public import Institute_Model
 
-extension RepositoryPolicy.Fleet {
+extension Institute.Repository.Policy.Fleet {
     /// Effective package-CI policy resolved centrally from authored fleet
     /// desired state. These values never ride the generated leaf caller.
     public struct Configuration: Swift.Sendable, Swift.Equatable {

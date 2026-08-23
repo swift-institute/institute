@@ -4,7 +4,7 @@ public import Institute_Model
 extension Institute.Repository.Policy.Uniformity.Wave {
     public static func enumerate<C: Client>(
         client: C,
-        fleet: RepositoryPolicy.Fleet
+        fleet: Institute.Repository.Policy.Fleet
     ) async throws(Error) -> Population {
         let organizations = fleet.activeOrganizationNames.sorted()
         guard !organizations.isEmpty else {
@@ -13,7 +13,7 @@ extension Institute.Repository.Policy.Uniformity.Wave {
         var examined = 0
         var excluded: [String: Int] = [:]
         var seen: Set<String> = []
-        var candidates: [RepositoryPolicy.Repository] = []
+        var candidates: [Institute.Repository.Policy.Repository] = []
         var repositoryCounts: [String: Int] = [:]
         var repositoryNames: [String] = []
         var notPublicCounts: [String: Int] = [:]
@@ -43,7 +43,7 @@ extension Institute.Repository.Policy.Uniformity.Wave {
                     throw .population("duplicate repository \(repository.fullName)")
                 }
                 repositoryNames.append(repository.fullName)
-                if let reason = RepositoryPolicy.staticExclusion(of: repository) {
+                if let reason = Institute.Repository.Policy.staticExclusion(of: repository) {
                     excluded[reason.rawValue, default: 0] += 1
                     if reason == .notPublic {
                         notPublicCounts[organization, default: 0] += 1
@@ -115,7 +115,7 @@ extension Institute.Repository.Policy.Uniformity.Wave {
 
     private static func boundedMeasurements<C: Client>(
         client: C,
-        candidates: [RepositoryPolicy.Repository]
+        candidates: [Institute.Repository.Policy.Repository]
     ) async throws(Error) -> [Measurement] {
         do {
             return try await withThrowingTaskGroup(of: Measurement.self) { group in
@@ -142,7 +142,7 @@ extension Institute.Repository.Policy.Uniformity.Wave {
 
     private static func measure<C: Client>(
         client: C,
-        repository: RepositoryPolicy.Repository
+        repository: Institute.Repository.Policy.Repository
     ) async throws(Error) -> Measurement {
         let live = try await calling {
             try await client.waveRepository(repository.fullName)

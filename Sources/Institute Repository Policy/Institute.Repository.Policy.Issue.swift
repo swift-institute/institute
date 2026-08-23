@@ -2,13 +2,13 @@ public import Institute_Model
 import Byte_Primitives
 import FIPS_180_4
 
-extension RepositoryPolicy {
+extension Institute.Repository.Policy {
     /// The versioned, body-owned portion of an Issue record. Native GitHub
     /// state and relationships are deliberately supplied separately.
     public enum Issue {}
 }
 
-extension RepositoryPolicy.Issue {
+extension Institute.Repository.Policy.Issue {
     public enum Kind: String, Codable, CaseIterable, Sendable {
         case goal = "Goal"
         case task = "Task"

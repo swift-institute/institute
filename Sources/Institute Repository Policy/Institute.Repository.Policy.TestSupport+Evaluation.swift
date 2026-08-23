@@ -1,7 +1,7 @@
 public import Institute_Model
 public import Package_Manager
 
-extension RepositoryPolicy.TestSupport {
+extension Institute.Repository.Policy.TestSupport {
     public static func findings(
         in evaluation: Package.Manifest.Evaluation
     ) -> [Finding] {

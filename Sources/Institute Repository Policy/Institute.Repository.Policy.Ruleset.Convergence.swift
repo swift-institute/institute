@@ -2,7 +2,7 @@ public import Institute_Model
 public import JSON
 
 
-extension RepositoryPolicy.Ruleset {
+extension Institute.Repository.Policy.Ruleset {
     /// Which posture the `rulesets` job runs under when an Institute ruleset
     /// (of either class) is absent from a target repository
     /// (swift-institute/.github#204).
@@ -88,7 +88,7 @@ extension RepositoryPolicy.Ruleset {
     }
 }
 
-extension RepositoryPolicy.Ruleset.ConvergenceDecision: JSON.Serializable {
+extension Institute.Repository.Policy.Ruleset.ConvergenceDecision: JSON.Serializable {
     public static func serialize(_ value: Self) -> JSON {
         [
             "action": value.action.rawValue.json,
@@ -98,7 +98,7 @@ extension RepositoryPolicy.Ruleset.ConvergenceDecision: JSON.Serializable {
 
     public static func deserialize(_ json: JSON) throws(JSON.Error) -> Self {
         guard
-            let action = RepositoryPolicy.Ruleset.ConvergenceAction(
+            let action = Institute.Repository.Policy.Ruleset.ConvergenceAction(
                 rawValue: try Swift.String(json: json["action"])
             )
         else {

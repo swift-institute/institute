@@ -1,6 +1,6 @@
 public import Institute_Model
 
-extension RepositoryPolicy {
+extension Institute.Repository.Policy {
     /// Institute policy over source-control dependency branch facts.
     public enum BranchPin {}
 }

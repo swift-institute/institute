@@ -1,6 +1,6 @@
 public import Institute_Model
 
-extension RepositoryPolicy.Fleet {
+extension Institute.Repository.Policy.Fleet {
     public func configuration(
         for repository: Swift.String
     ) throws(Error) -> Configuration {

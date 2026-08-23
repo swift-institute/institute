@@ -1,7 +1,7 @@
 public import Institute_Model
 public import Package_Manager
 
-extension RepositoryPolicy.BranchPin {
+extension Institute.Repository.Policy.BranchPin {
     public static func findings(
         in dependencies: [Package.Manifest.Dependency.SourceControl],
         organizations: Swift.Set<Swift.String>

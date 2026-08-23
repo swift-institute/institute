@@ -1,9 +1,6 @@
 public import Institute_Model
 
-
-public enum RepositoryPolicy {}
-
-extension RepositoryPolicy {
+extension Institute.Repository.Policy {
     public struct Repository: Codable, Equatable, Sendable {
         public let id: Int64
         public let name: String

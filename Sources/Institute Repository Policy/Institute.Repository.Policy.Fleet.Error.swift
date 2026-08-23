@@ -1,6 +1,6 @@
 public import Institute_Model
 
-extension RepositoryPolicy.Fleet {
+extension Institute.Repository.Policy.Fleet {
     public enum Error: Swift.Error, Swift.Sendable, Swift.Equatable {
         case unreadable
         case invalid

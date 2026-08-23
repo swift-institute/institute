@@ -1,6 +1,6 @@
 public import Institute_Model
 
-extension RepositoryPolicy.BranchPin {
+extension Institute.Repository.Policy.BranchPin {
     public struct Finding: Swift.Sendable, Swift.Hashable {
         public let document: Swift.String
         public let url: Swift.String

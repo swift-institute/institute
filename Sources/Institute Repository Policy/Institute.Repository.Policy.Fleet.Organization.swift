@@ -1,6 +1,6 @@
 public import Institute_Model
 
-extension RepositoryPolicy.Fleet {
+extension Institute.Repository.Policy.Fleet {
     public struct Organization: Swift.Decodable, Swift.Sendable, Swift.Equatable {
         public let name: Swift.String
         public let layer: Swift.String

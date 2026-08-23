@@ -1,6 +1,6 @@
 public import Institute_Model
 
-extension RepositoryPolicy {
+extension Institute.Repository.Policy {
     /// Authored fleet membership decoded from the control-plane policy document.
     public struct Fleet: Swift.Decodable, Swift.Sendable, Swift.Equatable {
         public let schemaVersion: Swift.Int

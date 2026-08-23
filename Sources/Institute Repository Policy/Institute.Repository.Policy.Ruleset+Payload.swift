@@ -25,7 +25,7 @@ public import JSON
 // repository. This bypass requires a durable receipt comment on the
 // owning issue; once over, the ruleset is re-applied by dispatch, never
 // left deleted or hand-recreated.
-extension RepositoryPolicy.Ruleset {
+extension Institute.Repository.Policy.Ruleset {
     public struct Error: Swift.Error, Sendable, Equatable, CustomStringConvertible {
         public let description: String
 

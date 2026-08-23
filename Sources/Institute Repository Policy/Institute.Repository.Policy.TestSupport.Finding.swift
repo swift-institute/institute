@@ -1,6 +1,6 @@
 public import Institute_Model
 
-extension RepositoryPolicy.TestSupport {
+extension Institute.Repository.Policy.TestSupport {
     public struct Finding: Sendable, Equatable {
         public let target: Swift.String
         public let dependency: Swift.String

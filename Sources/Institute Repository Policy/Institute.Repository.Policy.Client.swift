@@ -19,7 +19,7 @@ extension Institute.Repository.Policy.Client {
         case transport(path: String, message: String)
         case decoding(path: String, message: String)
         case precondition(String)
-        case issue(RepositoryPolicy.Issue.Error)
+        case issue(Institute.Repository.Policy.Issue.Error)
 
         public var description: String {
             switch self {
