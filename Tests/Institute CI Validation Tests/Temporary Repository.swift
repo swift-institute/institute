@@ -1,8 +1,8 @@
+public import Institute_Model
 import Foundation
-import GitHub_Continuous_Integration
-import GitHub_Continuous_Integration_Validation
+import Institute_CI_Model
+import Institute_CI_Validation
 import GitHub_Standard
-import ContinuousIntegration
 
 @testable import Institute_CI_Validation
 
@@ -28,8 +28,8 @@ struct TemporaryRepository: ~Copyable {
         )
     }
 
-    var subject: GitHub.ContinuousIntegration.Validation.Subject {
-        GitHub.ContinuousIntegration.Validation.Subject(repository: repository, root: root)
+    var subject: Institute.CI.Validation.Subject {
+        Institute.CI.Validation.Subject(repository: repository, root: root)
     }
 
     /// Write `contents` at a path relative to the root, creating
@@ -43,13 +43,13 @@ struct TemporaryRepository: ~Copyable {
         // `Void` and this fixture's callers already assume success, so
         // a still-losing retry fails the same way it always has
         // (silently) rather than gaining new behavior.
-        try? ContinuousIntegration.Validation.Gitignore.retryingTransientWindowsFailures {
+        try? Institute.CI.Validation.Gitignore.retryingTransientWindowsFailures {
             try FileManager.default.createDirectory(
                 atPath: (path as NSString).deletingLastPathComponent,
                 withIntermediateDirectories: true
             )
         }
-        try? ContinuousIntegration.Validation.Gitignore.retryingTransientWindowsFailures {
+        try? Institute.CI.Validation.Gitignore.retryingTransientWindowsFailures {
             try Data(contents.utf8).write(to: URL(fileURLWithPath: path))
         }
     }
@@ -62,7 +62,7 @@ struct TemporaryRepository: ~Copyable {
     @discardableResult
     func git(_ arguments: [String], environment: [String: String]? = nil) throws -> Int32 {
         guard
-            let executable = ContinuousIntegration.Validation.Gitignore.gitExecutable(
+            let executable = Institute.CI.Validation.Gitignore.gitExecutable(
                 in: ProcessInfo.processInfo.environment
             )
         else {

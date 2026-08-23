@@ -246,11 +246,21 @@ let package = Package(
         "Institute CI Workflow",
         "Institute Model",
         .product(name: "ASCII", package: "swift-ascii"),
+        .product(name: "Byte Primitives", package: "swift-byte-primitives"),
+        .product(
+          name: "Byte Primitives Standard Library Integration",
+          package: "swift-byte-primitives"
+        ),
+        .product(name: "Environment", package: "swift-environment"),
         .product(name: "File System", package: "swift-file-system"),
         .product(name: "GitHub Standard", package: "swift-github-standard"),
         .product(name: "JSON", package: "swift-json"),
         .product(name: "Package Manager", package: "swift-package-manager"),
         .product(name: "Process", package: "swift-process"),
+        .product(
+          name: "Standard Library Extensions",
+          package: "swift-standard-library-extensions"
+        ),
       ]
     ),
     .target(
