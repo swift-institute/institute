@@ -41,10 +41,10 @@ extension Institute.Xcode.Scheme.Test.Unit {
                 ("Institute Architecture Validation", false),
                 ("Institute_Architecture_Candidates", false),
                 ("Institute Architecture Migration", false), ("InstituteArchitectureCLI", false),
-                ("Institute GitHub", false), ("Institute Application Source", false),
+                ("Institute GitHub", false), ("Institute Source Application", false),
                 ("Institute Application", false), ("Institute Application CLI", false),
                 ("InstituteArchitectureTests", true),
-                ("Institute Application Source Tests", true),
+                ("Institute Source Application Tests", true),
                 ("Institute Application Tests", true),
             ]
         )
@@ -103,7 +103,7 @@ extension Institute.Xcode.Scheme.Test.Unit {
                 "Institute Instruments Tests",
                 "Institute Development Tests",
                 "InstituteArchitectureTests",
-                "Institute Application Source Tests",
+                "Institute Source Application Tests",
                 "Institute Application Tests",
                 "Slow Tests",
                 "Fast Tests",
