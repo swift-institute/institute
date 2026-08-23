@@ -13,7 +13,7 @@ import Testing
 
 @Suite
 struct `Build Institute Tests` {
-    private static let workspace = Build.Workspace(
+    private static let workspace = Institute.Build.Workspace(
         bundle: "/checkout/institute.xcworkspace",
         scheme: "Institute"
     )
@@ -98,7 +98,7 @@ struct `Build Institute Tests` {
     ])
     func `forwarded arguments cannot override coordinator state`(argument: Swift.String) {
         #expect(
-            throws: Build.Error.configuration(
+            throws: Institute.Build.Error.configuration(
                 "xcodebuild argument \(argument) is owned by the build coordinator"
             )
         ) {
@@ -112,7 +112,7 @@ struct `Build Institute Tests` {
         workspace.bundle = "/checkout/Application"
 
         #expect(
-            throws: Build.Error.configuration(
+            throws: Institute.Build.Error.configuration(
                 "not an Xcode workspace bundle: /checkout/Application"
             )
         ) {
@@ -129,7 +129,7 @@ struct `Build Institute Tests` {
         workspace.scheme = ""
 
         #expect(
-            throws: Build.Error.configuration("an xcodebuild operation requires a scheme")
+            throws: Institute.Build.Error.configuration("an xcodebuild operation requires a scheme")
         ) {
             _ = try workspace.invocation(jobs: 3, arguments: [])
         }
@@ -148,7 +148,7 @@ extension `Build Institute Tests` {
         // Whether a rendered `File.Directory` carries a trailing separator is
         // the filesystem layer's business; a guard that depended on the answer
         // would reject a correct bundle at runtime and never in a test.
-        var workspace = Build.Workspace(bundle: bundle, scheme: "Institute")
+        var workspace = Institute.Build.Workspace(bundle: bundle, scheme: "Institute")
         workspace.operation = .build
 
         #expect(try workspace.invocation(jobs: 3, arguments: []).contains(bundle))

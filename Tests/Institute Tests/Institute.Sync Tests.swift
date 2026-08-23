@@ -279,8 +279,20 @@ extension Institute.Sync.Test.Unit {
         let plan = try await Institute.Xcode.Scheme.plan(for: specification, at: sync.root)
 
         #expect(plan.testables.map(\.target) == [
+            "Institute CI Canon Tests",
+            "Institute CI Inventory Tests",
+            "Institute CI Model Tests",
+            "Institute CI Validation Tests",
+            "Institute CI Workflow Tests",
+            "Institute Development Tests",
+            "Institute Instruments Tests",
+            "Institute Source Policy Tests",
             "Institute Tests",
+            "Institute Application CI Tests",
+            "Institute Application Repository Tests",
             "Institute Application Source Tests",
+            "Institute Application Tests",
+            "Institute Architecture Tests",
             "Source Tests",
         ])
     }

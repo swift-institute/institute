@@ -70,7 +70,7 @@ extension Institute.Composed.Root.Integration {
         process.waitUntilExit()
     }
 
-    private static func text(_ result: Build.Coordinator.Result) -> Swift.String {
+    private static func text(_ result: Institute.Build.Coordinator.Result) -> Swift.String {
         let out = result.standardOutput.map { Swift.String(decoding: $0, as: Swift.UTF8.self) }
         let err = result.standardError.map { Swift.String(decoding: $0, as: Swift.UTF8.self) }
         return (out ?? "") + (err ?? "")
@@ -108,7 +108,7 @@ extension Institute.Composed.Root.Integration {
             ]
         )
 
-        let coordinator = Build.Coordinator()
+        let coordinator = Institute.Build.Coordinator()
         let result = try coordinator.run(
             .build,
             at: fixture.appending(path: "C").path,
@@ -160,7 +160,7 @@ extension Institute.Composed.Root.Integration {
             ]
         )
 
-        let result = try Build.Coordinator().run(
+        let result = try Institute.Build.Coordinator().run(
             .build,
             at: fixture.appending(path: "Root").path,
             fresh: false,
@@ -259,7 +259,7 @@ extension Institute.Composed.Root.Integration {
             ]
         )
 
-        let result = try Build.Coordinator().run(
+        let result = try Institute.Build.Coordinator().run(
             .build,
             at: consumer.path,
             fresh: false,
@@ -315,7 +315,7 @@ extension Institute.Composed.Root.Integration {
         )
         try Institute.Composed.Root.write(plan, swift: "6.3.3", in: workspace)
 
-        let result = try Build.Coordinator().run(
+        let result = try Institute.Build.Coordinator().run(
             .build,
             at: Institute.Composed.Root.directory(in: workspace).description,
             fresh: false,

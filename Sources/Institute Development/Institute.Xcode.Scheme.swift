@@ -328,30 +328,45 @@ extension Institute.Xcode.Scheme {
         case .institute:
             (
                 buildables: [
-                    "Institute Build Coordinator", "Institute Model", "Institute Inventory",
-                    "Institute Source Workspace", "Institute Source Profile", "Institute Source",
-                    "Institute Dependency", "Institute Development", "Institute Lint",
-                    "Institute Pages", "Institute Doctor", "Institute Conversion",
-                    "Institute Instruments",
+                    "Institute Build Coordinator", "Institute CI Canon", "Institute CI Contract",
+                    "Institute CI Inventory", "Institute CI Model", "Institute CI Validation",
+                    "Institute CI Workflow", "Institute Conversion", "Institute Dependency",
+                    "Institute Development", "Institute Doctor", "Institute Instruments",
+                    "Institute Inventory", "Institute Lint", "Institute Model",
+                    "Institute Pages", "Institute Repository Policy", "Institute Source",
+                    "Institute Source Policy", "Institute Source Profile",
+                    "Institute Source Workspace",
                 ],
                 testables: [
-                    "Institute Tests", "Institute Instruments Tests", "Institute Development Tests",
+                    "Institute CI Canon Tests", "Institute CI Inventory Tests",
+                    "Institute CI Model Tests", "Institute CI Validation Tests",
+                    "Institute CI Workflow Tests", "Institute Development Tests",
+                    "Institute Instruments Tests", "Institute Source Policy Tests",
+                    "Institute Tests",
                 ]
             )
         case .application:
             (
                 buildables: [
-                    "Institute Architecture Model", "Institute Architecture Facts",
-                    "Institute Architecture Graph", "Institute_Architecture_Index",
-                    "Institute Architecture Validation", "Institute_Architecture_Candidates",
-                    "Institute Architecture Migration", "InstituteArchitectureCLI",
-                    "Institute GitHub",
-                    "Institute Application Source", "Institute Application",
-                    "Institute Application CLI",
+                    "Institute Application", "Institute Application CI",
+                    "Institute Application CLI", "Institute Application Certification",
+                    "Institute Application Coherence", "Institute Application Composition",
+                    "Institute Application Context", "Institute Application Conversion",
+                    "Institute Application Dependency", "Institute Application Doctor",
+                    "Institute Application GitHub", "Institute Application Inventory",
+                    "Institute Application Lint", "Institute Application Navigation",
+                    "Institute Application Package", "Institute Application Repository",
+                    "Institute Application Source", "Institute Application Verification",
+                    "Institute Application Workspace", "Institute Architecture CLI",
+                    "Institute Architecture Candidates", "Institute Architecture Facts",
+                    "Institute Architecture Graph", "Institute Architecture Index",
+                    "Institute Architecture Migration", "Institute Architecture Model",
+                    "Institute Architecture Validation", "Institute GitHub",
                 ],
                 testables: [
-                    "InstituteArchitectureTests", "Institute Application Source Tests",
-                    "Institute Application Tests",
+                    "Institute Application CI Tests", "Institute Application Repository Tests",
+                    "Institute Application Source Tests", "Institute Application Tests",
+                    "Institute Architecture Tests",
                 ]
             )
         case .continuousIntegration:

@@ -15,22 +15,22 @@ import Testing
 struct `Build Action Tests` {
     @Test
     func `build and test are direct Swift operations with isolated scratch support`() {
-        #expect(Build.Action.build.command == ["swift", "build"])
-        #expect(Build.Action.test.command == ["swift", "test"])
-        #expect(Build.Action.build.acceptsFreshScratch)
-        #expect(Build.Action.test.acceptsFreshScratch)
+        #expect(Institute.Build.Action.build.command == ["swift", "build"])
+        #expect(Institute.Build.Action.test.command == ["swift", "test"])
+        #expect(Institute.Build.Action.build.acceptsFreshScratch)
+        #expect(Institute.Build.Action.test.acceptsFreshScratch)
     }
 
     @Test
     func `package administration operations use the Swift package namespace`() {
-        #expect(Build.Action.resolve.command == ["swift", "package", "resolve"])
-        #expect(Build.Action.dumpPackage.command == ["swift", "package", "dump-package"])
-        #expect(!Build.Action.resolve.acceptsFreshScratch)
+        #expect(Institute.Build.Action.resolve.command == ["swift", "package", "resolve"])
+        #expect(Institute.Build.Action.dumpPackage.command == ["swift", "package", "dump-package"])
+        #expect(!Institute.Build.Action.resolve.acceptsFreshScratch)
     }
 
     @Test
     func `invocation owns concurrency and fresh build state`() throws {
-        let invocation = try Build.Action.test.invocation(
+        let invocation = try Institute.Build.Action.test.invocation(
             jobs: 3,
             scratchPath: "/tmp/workspace-scratch",
             arguments: ["--filter", "Unit"]
@@ -62,11 +62,11 @@ struct `Build Action Tests` {
         argument: Swift.String
     ) {
         #expect(
-            throws: Build.Error.configuration(
+            throws: Institute.Build.Error.configuration(
                 "SwiftPM argument \(argument) is owned by the build coordinator"
             )
         ) {
-            _ = try Build.Action.test.invocation(
+            _ = try Institute.Build.Action.test.invocation(
                 jobs: 3,
                 scratchPath: nil,
                 arguments: [argument]

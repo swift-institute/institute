@@ -18,13 +18,13 @@ struct `Build Coordinator Tests` {
         // It was hard-wired to 3. On this fleet's 8-core machines that ran
         // every coordinated build at ~37% of the host while holding a
         // machine-wide exclusive lock over the other five cores.
-        #expect(Build.Coordinator().jobs == Build.Coordinator.processors)
-        #expect(Build.Coordinator.processors >= 1)
+        #expect(Institute.Build.Coordinator().jobs == Institute.Build.Coordinator.processors)
+        #expect(Institute.Build.Coordinator.processors >= 1)
     }
 
     @Test
     func `an explicit job count still wins`() {
-        #expect(Build.Coordinator(jobs: 2).jobs == 2)
+        #expect(Institute.Build.Coordinator(jobs: 2).jobs == 2)
     }
 
     @Test(arguments: [0, -1, Swift.Int.min])
@@ -34,13 +34,13 @@ struct `Build Coordinator Tests` {
         // Clamped at construction so the invariant lives in one place. The
         // runner used to re-check this; it cannot fire now that no
         // `Coordinator` can hold a nonpositive count.
-        #expect(Build.Coordinator(jobs: jobs).jobs == 1)
+        #expect(Institute.Build.Coordinator(jobs: jobs).jobs == 1)
     }
 
     @Test
     func `the job count reaches SwiftPM`() throws {
-        let invocation = try Build.Action.build.invocation(
-            jobs: Build.Coordinator(jobs: 8).jobs,
+        let invocation = try Institute.Build.Action.build.invocation(
+            jobs: Institute.Build.Coordinator(jobs: 8).jobs,
             scratchPath: nil,
             arguments: []
         )
@@ -56,8 +56,8 @@ struct `Build Coordinator Tests` {
         // workaround: `--argument -j8` does not override the coordinator, it
         // is rejected. Before this change there was no way to run a
         // coordinated build at anything other than 3.
-        #expect(throws: Build.Error.self) {
-            _ = try Build.Action.build.invocation(
+        #expect(throws: Institute.Build.Error.self) {
+            _ = try Institute.Build.Action.build.invocation(
                 jobs: 3,
                 scratchPath: nil,
                 arguments: [argument]

@@ -152,7 +152,7 @@ extension Institute.Coherence.Test {
         output: Swift.String = ""
     )
         -> @Sendable (Institute.Root, Institute.Selection.Resolved) throws(Institute.Error) ->
-        Institute_Build_Coordinator.Build.Coordinator.Result
+        Institute_Model.Institute.Build.Coordinator.Result
     {
         { _, _ throws(Institute.Error) in
             .init(
