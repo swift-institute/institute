@@ -4,6 +4,7 @@ public import Institute_Source_Policy
 public import Institute_Model
 internal import Institute_Source_Profile
 public import Source_Profile
+import Thread_Pool
 
 extension Institute.Source.Application {
   public func prepare(
@@ -11,7 +12,9 @@ extension Institute.Source.Application {
   ) async throws(Institute.Error) -> Institute.Source.Preparation {
     let policy = Institute.Source.Policy.current
     let directory = try Self.artifactDirectory(workspace: workspace)
-    do throws(File.System.Create.Directory.Error) { try directory.create.recursive() } catch {
+    do throws(Either<Kernel.Thread.Pool.Error, File.System.Create.Directory.Error>) {
+      try await directory.create.recursive()
+    } catch {
       throw .filesystem("cannot create source profile directory \(directory): \(error)")
     }
 
@@ -30,12 +33,12 @@ extension Institute.Source.Application {
     let swiftLintTool = swiftLintAsset.digest
     let linterTool = linterAsset.digest
     let format = directory[file: try Self.component(policy.swiftFormat.path)]
-    do throws(File.System.Write.Atomic.Error) {
-      try format.write.atomic(policy.swiftFormat.contents)
+    do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
+      try await format.write.atomic(policy.swiftFormat.contents)
     } catch { throw .filesystem("cannot render \(format): \(error)") }
     let swiftLintConfiguration = directory[file: try Self.component(policy.swiftLint.path)]
-    do throws(File.System.Write.Atomic.Error) {
-      try swiftLintConfiguration.write.atomic(policy.swiftLint.contents)
+    do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
+      try await swiftLintConfiguration.write.atomic(policy.swiftLint.contents)
     } catch { throw .filesystem("cannot render \(swiftLintConfiguration): \(error)") }
     let swiftLintRules = try await Self.swiftLintRules(
       executable: swiftLintExecutable,
@@ -52,7 +55,9 @@ extension Institute.Source.Application {
       let linter = directory[
         file: try Self.component("\(bundle.rawValue)-\(artifact.path)")
       ]
-      do throws(File.System.Write.Atomic.Error) { try linter.write.atomic(artifact.contents) } catch
+      do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
+        try await linter.write.atomic(artifact.contents)
+      } catch
       { throw .filesystem("cannot render \(linter): \(error)") }
       profiles[bundle.rawValue] =
         policy.profile(
@@ -83,8 +88,8 @@ extension Institute.Source.Application {
       profiles: profiles
     )
     let receipt = directory[file: "receipt.json"]
-    do throws(File.System.Write.Atomic.Error) {
-      try receipt.write.atomic(preparation.jsonString(sortKeys: true) + "\n")
+    do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
+      try await receipt.write.atomic(preparation.jsonString(sortKeys: true) + "\n")
     } catch { throw .filesystem("cannot write source preparation receipt \(receipt): \(error)") }
     return preparation
   }

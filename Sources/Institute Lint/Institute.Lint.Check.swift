@@ -477,9 +477,9 @@ extension Institute.Lint.Check {
             steps.append(.init(name: "swift-linter", verdict: .unmeasured(reason: "\(error)")))
         }
 
-        let coordinator = Build.Coordinator(jobs: jobs)
-        for (name, action) in [("build", Build.Action.build), ("test", Build.Action.test)] {
-            do throws(Build.Error) {
+        let coordinator = Institute.Build.Coordinator(jobs: jobs)
+        for (name, action) in [("build", Institute.Build.Action.build), ("test", Institute.Build.Action.test)] {
+            do throws(Institute.Build.Error) {
                 let status = try coordinator.run(
                     action,
                     at: target.package.description,

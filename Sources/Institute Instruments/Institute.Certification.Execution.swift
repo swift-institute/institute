@@ -34,7 +34,7 @@ extension Institute.Certification {
             root: Institute.Root,
             configuration: Institute.Configuration,
             platform: Platform,
-            coordinator: Build.Coordinator = .init(),
+            coordinator: Institute.Build.Coordinator = .init(),
             git: Git.Client = .init(),
             head: (
                 @Sendable (Institute.Root, Institute.Repository) throws(Institute.Error) ->
@@ -70,11 +70,11 @@ extension Institute.Certification {
         }
 
         private static func coordinated(
-            coordinator: Build.Coordinator,
+            coordinator: Institute.Build.Coordinator,
             kind: Obligation.Kind,
             directory: File.Directory
         ) -> Account.Outcome {
-            let action: Build.Action
+            let action: Institute.Build.Action
             switch kind {
             case .build: action = .build
 
@@ -86,8 +86,8 @@ extension Institute.Certification {
                         + "instruments, not the package execution instrument"
                 )
             }
-            let result: Build.Coordinator.Result
-            do throws(Build.Error) {
+            let result: Institute.Build.Coordinator.Result
+            do throws(Institute.Build.Error) {
                 result = try coordinator.run(
                     action,
                     at: directory.description,

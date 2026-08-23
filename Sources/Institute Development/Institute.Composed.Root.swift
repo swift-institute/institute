@@ -267,9 +267,9 @@ extension Institute.Composed.Root {
         fresh: Swift.Bool,
         arguments: [Swift.String],
         capturingDiagnostics: Swift.Bool,
-        coordinator: Institute_Build_Coordinator.Build.Coordinator = .init()
-    ) throws(Institute.Error) -> Institute_Build_Coordinator.Build.Coordinator.Result {
-        do throws(Institute_Build_Coordinator.Build.Error) {
+        coordinator: Institute_Model.Institute.Build.Coordinator = .init()
+    ) throws(Institute.Error) -> Institute_Model.Institute.Build.Coordinator.Result {
+        do throws(Institute_Model.Institute.Build.Error) {
             return try coordinator.run(
                 .build,
                 at: directory(in: workspace).description,
@@ -290,8 +290,8 @@ extension Institute.Composed.Root {
         fresh: Swift.Bool,
         arguments: [Swift.String],
         capturingDiagnostics: Swift.Bool,
-        coordinator: Institute_Build_Coordinator.Build.Coordinator = .init()
-    ) throws(Institute.Error) -> Institute_Build_Coordinator.Build.Coordinator.Result {
+        coordinator: Institute_Model.Institute.Build.Coordinator = .init()
+    ) throws(Institute.Error) -> Institute_Model.Institute.Build.Coordinator.Result {
         try build(
             in: .checkout(checkout),
             fresh: fresh,

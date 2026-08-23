@@ -2,6 +2,7 @@ public import File_System
 public import Institute_Source_Policy
 public import Institute_Model
 public import Source_Profile
+import Thread_Pool
 
 extension Institute.Source.Acquisition {
   func acquire(

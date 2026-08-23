@@ -111,6 +111,7 @@ let package = Package(
     .package(url: "https://github.com/swift-foundations/swift-package-manager.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-posix.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-process.git", branch: "main"),
+    .package(url: "https://github.com/swift-foundations/swift-threads.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-xcode.git", branch: "main"),
     .package(url: "https://github.com/swift-standards/swift-xcode-standard.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-source.git", branch: "main"),
@@ -322,7 +323,10 @@ let package = Package(
         .product(name: "Source Measurement", package: "swift-source"),
         .product(name: "Source Profile", package: "swift-source"),
         .product(name: "Source Repair", package: "swift-source"),
+        .product(name: "Source Linter", package: "swift-source"),
         .product(name: "Source Report", package: "swift-source"),
+        .product(name: "Source Swift Format", package: "swift-source"),
+        .product(name: "Thread Pool", package: "swift-threads"),
       ]
     ),
     .target(

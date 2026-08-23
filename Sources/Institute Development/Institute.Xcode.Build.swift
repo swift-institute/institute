@@ -122,7 +122,7 @@ extension Institute.Xcode.Build {
         fresh: Swift.Bool,
         arguments: [Swift.String],
         capturingDiagnostics: Swift.Bool
-    ) async throws(Institute.Error) -> Institute_Build_Coordinator.Build.Coordinator.Result {
+    ) async throws(Institute.Error) -> Institute_Model.Institute.Build.Coordinator.Result {
         let preflight = try await preflight()
         guard preflight.diagnostics.isEmpty else {
             throw .configuration(preflight.diagnostics.joined(separator: "\n"))
@@ -132,12 +132,12 @@ extension Institute.Xcode.Build {
                 + " \(preflight.plan.buildables.count) targets, one xcodebuild invocation"
         )
 
-        let operation = Institute_Build_Coordinator.Build.Workspace(
+        let operation = Institute_Model.Institute.Build.Workspace(
             bundle: bundle.description,
             scheme: Institute.Xcode.Scheme.name
         )
-        do throws(Institute_Build_Coordinator.Build.Error) {
-            return try Institute_Build_Coordinator.Build.Coordinator().run(
+        do throws(Institute_Model.Institute.Build.Error) {
+            return try Institute_Model.Institute.Build.Coordinator().run(
                 operation,
                 fresh: fresh,
                 arguments: arguments,

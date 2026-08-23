@@ -4,7 +4,9 @@ public import Institute_Model
 public import Institute_Source_Workspace
 public import JSON
 public import Source_Execution
+import Source_Linter
 public import Source_Measurement
+import Source_Swift_Format
 internal import Source_Profile
 public import Source_Repair
 
@@ -152,7 +154,7 @@ extension Institute.Source.Application {
   ) throws(Source_Execution.Source.Execution.Error) -> Source_Execution.Source.Execution {
     try .init(
       drivers: [
-        .linter(process: process), .swiftLint(process: process), .swiftFormat(process: process),
+        .linter(process: process), .swiftFormat(process: process),
       ]
     )
   }

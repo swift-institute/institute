@@ -49,7 +49,7 @@ extension Institute.Coherence {
                 Swift.Int
         public let build:
             @Sendable (Institute.Root, Institute.Selection.Resolved) async throws(Institute.Error) ->
-                Institute_Build_Coordinator.Build.Coordinator.Result
+                Institute_Model.Institute.Build.Coordinator.Result
 
         public init(
             root: Institute.Root,
@@ -73,7 +73,7 @@ extension Institute.Coherence {
             )? = nil,
             build: (
                 @Sendable (Institute.Root, Institute.Selection.Resolved) async throws(Institute.Error)
-                    -> Institute_Build_Coordinator.Build.Coordinator.Result
+                    -> Institute_Model.Institute.Build.Coordinator.Result
             )? = nil
         ) {
             self.root = root
@@ -131,7 +131,7 @@ extension Institute.Coherence.Run {
     public static func realBuild(
         _ root: Institute.Root,
         _ selection: Institute.Selection.Resolved
-    ) async throws(Institute.Error) -> Institute_Build_Coordinator.Build.Coordinator.Result {
+    ) async throws(Institute.Error) -> Institute_Model.Institute.Build.Coordinator.Result {
         try await Institute.Xcode.Build(root: root, selection: selection).run(
             fresh: false,
             arguments: [],
@@ -161,7 +161,7 @@ extension Institute.Coherence.Run {
     public static func realComposedBuild(
         _ root: Institute.Root,
         _ selection: Institute.Selection.Resolved
-    ) async throws(Institute.Error) -> Institute_Build_Coordinator.Build.Coordinator.Result {
+    ) async throws(Institute.Error) -> Institute_Model.Institute.Build.Coordinator.Result {
         try Institute.Composed.Root.build(
             in: .checkout(root.checkout),
             fresh: false,
@@ -191,7 +191,7 @@ extension Institute.Coherence.Run {
         for buildPath: Institute.Coherence.BuildPath
     )
         -> @Sendable (Institute.Root, Institute.Selection.Resolved) async throws(Institute.Error) ->
-        Institute_Build_Coordinator.Build.Coordinator.Result
+        Institute_Model.Institute.Build.Coordinator.Result
     {
         switch buildPath {
         case .xcodebuildMerged: Self.realBuild

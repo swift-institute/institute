@@ -266,17 +266,17 @@ extension Institute.Verification.Run {
     /// ``realNestedTests`` discovers.
     static func run(
         _ operation: Institute.Verification.Operation.Kind,
-        action: Build.Action,
+        action: Institute.Build.Action,
         invocation: Invocation
     ) -> Institute.Verification.Operation.Result {
         let clock = Swift.ContinuousClock()
         let clockStart = clock.now
-        let coordinator = Build.Coordinator(jobs: invocation.jobs)
+        let coordinator = Institute.Build.Coordinator(jobs: invocation.jobs)
         let outcome: Institute.Verification.Operation.Outcome
         let exitCode: Swift.Int32?
         var compileEvidence: Swift.String?
         var testCounts: Institute.Verification.Operation.TestCounts?
-        do throws(Build.Error) {
+        do throws(Institute.Build.Error) {
             let result = try coordinator.run(
                 action,
                 at: invocation.path,
