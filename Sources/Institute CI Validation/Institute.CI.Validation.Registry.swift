@@ -23,7 +23,6 @@ extension Institute.CI.Validation {
             Anchor(),
             BinaryInstallChecksum(),
             BranchPins(),
-            CIMatrix(),
             CachePolicy(),
             CompositeActionDescriptions(),
             CompositeActionPins(),

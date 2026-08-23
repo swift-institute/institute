@@ -72,9 +72,13 @@ extension Institute.CI.Validation.SkillHygiene.Pattern {
     /// `/Users/runner` and `/home/runner` are the shared GitHub-hosted
     /// runner paths — generic infrastructure, not anyone's machine — so
     /// they are excluded rather than reported.
+    // Swift Regex does not support lookbehind, so the word boundary is
+    // consumed as an alternation instead and the path itself is capture
+    // group 1. Adjacent matches cannot share the boundary character, but
+    // no line carries two machine paths with zero separation.
     static let machinePath = Self(
-        #"(?<![A-Za-z0-9_])(?:/Users/|/home/)(?!runner(?:[/\s]|$))[A-Za-z0-9._-]+/"#
-            + #"|[A-Za-z]:\\Users\\[A-Za-z0-9._-]+\\"#
+        #"(?:^|[^A-Za-z0-9_])((?:/Users/|/home/)(?!runner(?:[/\s]|$))[A-Za-z0-9._-]+/"#
+            + #"|[A-Za-z]:\\Users\\[A-Za-z0-9._-]+\\)"#
     )
 
     /// Internal rule-ID citations.
@@ -106,8 +110,11 @@ extension Institute.CI.Validation.SkillHygiene.Pattern {
     /// list entry — a check that fires on correctly sanctioned text is
     /// worse than one that misses, because it teaches people the list
     /// does not work.
+    // Swift Regex does not support lookbehind; the boundary character is
+    // consumed by a non-capturing alternation, leaving the owner and name
+    // captures at their original indices.
     static let reference = Self(
-        #"(?<![A-Za-z0-9._/-])([A-Za-z][A-Za-z0-9._-]*)/(\.?[A-Za-z][A-Za-z0-9._-]*)"#
+        #"(?:^|[^A-Za-z0-9._/-])([A-Za-z][A-Za-z0-9._-]*)/(\.?[A-Za-z][A-Za-z0-9._-]*)"#
     )
 
     /// Namespaces the Institute owns, by shape rather than by

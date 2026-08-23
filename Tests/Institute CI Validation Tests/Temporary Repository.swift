@@ -1,8 +1,10 @@
 public import Institute_Model
+import struct Swift.String
 import Foundation
 import Institute_CI_Model
 import Institute_CI_Validation
 import GitHub_Standard
+import Process
 
 @testable import Institute_CI_Validation
 
@@ -57,32 +59,30 @@ struct TemporaryRepository: ~Copyable {
     /// The absolute path of a file written into this repository.
     func path(_ relative: String) -> String { root + "/" + relative }
 
-    /// Run Git inside the temporary repository. Test setup failures are
-    /// surfaced through the returned status rather than hidden.
+    /// Run Git inside the temporary repository with the ambient
+    /// environment plus the caller's overrides — the setup seam stays
+    /// ambient on purpose, so the validator's own environment isolation
+    /// remains the thing under test. Setup failures surface through the
+    /// returned status rather than hidden.
     @discardableResult
     func git(_ arguments: [String], environment: [String: String]? = nil) throws -> Int32 {
-        guard
-            let executable = Institute.CI.Validation.Gitignore.gitExecutable(
-                in: ProcessInfo.processInfo.environment
-            )
-        else {
-            throw CocoaError(.fileNoSuchFile)
-        }
-        let process = Process()
-        process.executableURL = executable
-        process.arguments = arguments
-        process.currentDirectoryURL = URL(filePath: root)
+        let executable = try Process.Spawn.Executable.resolve("git")
+        var merged = ProcessInfo.processInfo.environment
         if let environment {
-            process.environment = ProcessInfo.processInfo.environment.merging(environment) {
-                _,
-                value in value
-            }
+            merged.merge(environment) { _, value in value }
         }
-        process.standardOutput = FileHandle.nullDevice
-        process.standardError = FileHandle.nullDevice
-        try process.run()
-        process.waitUntilExit()
-        return process.terminationStatus
+        let output = try Process.Spawn.run(
+            .init(
+                executable: executable,
+                arguments: ["-C", root] + arguments,
+                environment: merged,
+                stdin: .inherit,
+                stdout: .pipe,
+                stderr: .pipe
+            )
+        )
+        guard case .exited(let code) = output.status else { return -1 }
+        return code
     }
 
     deinit {

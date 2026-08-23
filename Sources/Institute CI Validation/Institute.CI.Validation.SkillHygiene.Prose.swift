@@ -84,11 +84,12 @@ extension Institute.CI.Validation.SkillHygiene {
             ).enumerated() {
                 let number = offset + 1
                 for match in Pattern.machinePath.matches(in: line) {
+                    let path = (match.groups.count > 1 ? match.groups[1] : nil) ?? match.whole
                     findings.append(
                         finding(
                             Rules.machinePath,
                             subject,
-                            "\(relative):\(number): machine-local path '\(match.whole)' "
+                            "\(relative):\(number): machine-local path '\(path)' "
                                 + "in a public file"
                         )
                     )

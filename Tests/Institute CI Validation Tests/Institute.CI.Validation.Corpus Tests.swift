@@ -79,15 +79,13 @@ struct InstituteValidationCorpusTests {
                     guard
                         try Institute.CI.Validation.Gitignore.git(
                             ["init", "-q", "."],
-                            in: subject,
-                            input: nil
+                            in: subject.path
                         ).status == 0
                     else { throw CocoaError(.fileWriteUnknown) }
                     guard
                         try Institute.CI.Validation.Gitignore.git(
                             ["add", "-f", "--all"],
-                            in: subject,
-                            input: nil
+                            in: subject.path
                         ).status == 0
                     else { throw CocoaError(.fileWriteUnknown) }
                 }

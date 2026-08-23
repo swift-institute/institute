@@ -24,7 +24,9 @@ extension Institute.Source {
               executable: executable,
               arguments: arguments,
               environment: environment.isEmpty ? nil : environment,
-              stdin: .pipe,
+              // The capture runner supports no stdin pipe, and the source
+              // commands feed none; the stream is inherited.
+              stdin: .inherit,
               stdout: .pipe,
               stderr: .pipe,
               workingDirectory: directory,

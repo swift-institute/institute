@@ -646,10 +646,18 @@ extension Institute.CI.Validation.Gitignore {
     /// `--no-index` flag is load-bearing: without it Git suppresses exactly
     /// the force-added path this rule exists to detect.
     ///
-    /// The path list rides the argument vector in bounded batches rather
-    /// than stdin: the process seam feeds no stdin, and `check-ignore`
-    /// evaluates each pathname independently, so batching preserves the
-    /// verdict exactly.
+    /// The path list rides `check-ignore -z --stdin` so a pathname
+    /// containing a space, a quote, or a newline is never re-encoded by
+    /// Git's path quoting — `-z` is refused outside `--stdin`, and the
+    /// non-`z` output re-quotes exactly the names this transport must
+    /// carry byte-exactly. The capture seam cannot feed a stdin pipe, so
+    /// on POSIX the NUL-delimited batch rides a private temporary file
+    /// and `sh` performs only the redirection: every operand — the git
+    /// executable, the repository, the batch file — passes positionally
+    /// or through the environment, never through shell text. Windows has
+    /// no such redirector in this seam and probes per path with `-q`,
+    /// where the exit status alone is the verdict and no output is
+    /// parsed at all.
     static func ignoredIndexedPaths(
         _ paths: [String],
         in root: String,
@@ -658,27 +666,100 @@ extension Institute.CI.Validation.Gitignore {
         guard !paths.isEmpty else { return [] }
         try validateRepositoryEnvironment(root)
 
-        var ignored: [String] = []
-        var remaining = paths[...]
-        while !remaining.isEmpty {
-            let batch = Array(remaining.prefix(200))
-            remaining = remaining.dropFirst(200)
-            var arguments = ["-c", "core.excludesFile=/dev/null", "check-ignore"]
-            if noIndex { arguments.append("--no-index") }
-            arguments += ["-z", "--"] + batch
-            let result = try git(arguments, in: root)
-            guard result.status == 0 || result.status == 1,
-                result.output.last == 0 || result.output.isEmpty
-            else {
+        #if os(Windows)
+            var ignored: [String] = []
+            for path in paths {
+                var arguments = ["-c", "core.excludesFile=/dev/null", "check-ignore", "-q"]
+                if noIndex { arguments.append("--no-index") }
+                arguments += ["--", path]
+                let result = try git(arguments, in: root)
+                if result.status == 0 {
+                    ignored.append(path)
+                } else if result.status != 1 {
+                    throw .unreadableSubject(root: root)
+                }
+            }
+            return ignored
+        #else
+            let executable: String
+            do throws(Process.Error) {
+                executable = try Process.Spawn.Executable.resolve(gitName)
+            } catch {
+                throw .missingSupportFile(path: "git")
+            }
+            var batch: [Byte] = []
+            for path in paths {
+                batch.append(contentsOf: [Byte](path.utf8))
+                batch.append(Byte(0))
+            }
+            let batchFile: File.Path
+            do {
+                let anchor = try File.Path.Temporary.deterministic(
+                    prefix: "institute-check-ignore",
+                    key: "",
+                    suffix: ""
+                )
+                let staged = try File.Path.Temporary.sibling(
+                    of: anchor,
+                    prefix: "institute-check-ignore-",
+                    suffix: ".z"
+                )
+                try File(staged).write.atomic(contentsOf: batch)
+                batchFile = staged
+            } catch {
                 throw .unreadableSubject(root: root)
             }
-            for record in result.output.split(separator: 0) {
+            defer {
+                // swift-linter:disable:next try optional
+                // REASON: cleanup of a private temporary file; a failed
+                // delete leaves only tmpdir residue and must not mask the
+                // check's own outcome.
+                try? File.System.Delete.delete(at: batchFile)
+            }
+
+            var arguments = [
+                executable, "-C", root, "-c", "core.excludesFile=/dev/null", "check-ignore",
+            ]
+            if noIndex { arguments.append("--no-index") }
+            arguments += ["-z", "--stdin"]
+            var environment = controlledGitEnvironment(
+                Environment.Snapshot.current().values,
+                executable: executable
+            )
+            environment["INSTITUTE_CHECK_IGNORE_BATCH"] = batchFile.description
+            let output: Process.Output
+            do {
+                output = try Self.retryingTransientWindowsFailures {
+                    try Process.Spawn.run(
+                        .init(
+                            executable: "/bin/sh",
+                            arguments: ["-c", #"exec "$0" "$@" < "$INSTITUTE_CHECK_IGNORE_BATCH""#]
+                                + arguments,
+                            environment: environment,
+                            stdin: .inherit,
+                            stdout: .pipe,
+                            stderr: .pipe
+                        )
+                    )
+                }
+            } catch {
+                throw .unreadableSubject(root: root)
+            }
+            guard case .exited(let code) = output.status, code == 0 || code == 1 else {
+                throw .unreadableSubject(root: root)
+            }
+            let bytes = output.stdout ?? []
+            guard bytes.last == 0 || bytes.isEmpty else {
+                throw .unreadableSubject(root: root)
+            }
+            var ignored: [String] = []
+            for record in bytes.split(separator: 0) {
                 let path = Swift.String(decoding: record, as: Swift.UTF8.self)
                 guard !path.isEmpty else { throw .unreadableSubject(root: root) }
                 ignored.append(path)
             }
-        }
-        return ignored
+            return ignored
+        #endif
     }
 
     private static func validateRepositoryEnvironment(
@@ -724,7 +805,11 @@ extension Institute.CI.Validation.Gitignore {
                         // trying to maintain a partial deny-list of Git
                         // variables.
                         environment: controlledGitEnvironment(environment, executable: executable),
-                        stdin: .pipe,
+                        // The seam feeds no stdin and none of the invoked
+                        // subcommands (`init`, `check-ignore` without
+                        // `--stdin`, `ls-files`) read it; the capture runner
+                        // supports no stdin pipe, so the stream is inherited.
+                        stdin: .inherit,
                         stdout: .pipe,
                         stderr: .pipe
                     )
