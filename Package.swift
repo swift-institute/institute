@@ -33,6 +33,10 @@ let package = Package(
       targets: ["Institute Source Policy"]
     ),
     .library(
+      name: "Institute CI Model",
+      targets: ["Institute CI Model"]
+    ),
+    .library(
       name: "Institute CI Canon",
       targets: ["Institute CI Canon"]
     ),
@@ -47,6 +51,10 @@ let package = Package(
     .library(
       name: "Institute CI Validation",
       targets: ["Institute CI Validation"]
+    ),
+    .library(
+      name: "Institute CI Workflow",
+      targets: ["Institute CI Workflow"]
     ),
     .library(
       name: "Institute Repository Policy",
@@ -94,17 +102,9 @@ let package = Package(
     .package(url: "https://github.com/swift-foundations/swift-arguments.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-ascii.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-async.git", branch: "main"),
-    .package(
-      url: "https://github.com/swift-foundations/swift-continuous-integration.git",
-      branch: "main"
-    ),
     .package(url: "https://github.com/swift-foundations/swift-environment.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-file-system.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-github.git", branch: "main"),
-    .package(
-      url: "https://github.com/swift-foundations/swift-github-continuous-integration.git",
-      branch: "main"
-    ),
     .package(url: "https://github.com/swift-foundations/swift-git.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-json.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-kernel.git", branch: "main"),
@@ -148,8 +148,7 @@ let package = Package(
         .product(name: "File System", package: "swift-file-system"),
         .product(name: "Kernel", package: "swift-kernel"),
         .product(name: "Process", package: "swift-process"),
-      ],
-      path: "Sources/Build Coordinator"
+      ]
     ),
     .target(
       name: "Institute Model",
@@ -202,30 +201,40 @@ let package = Package(
       ]
     ),
     .target(
+      name: "Institute CI Model",
+      dependencies: [
+        "Institute Model"
+      ]
+    ),
+    .target(
       name: "Institute CI Canon",
       dependencies: [
+        "Institute CI Model",
+        "Institute Model",
         .product(name: "ASCII", package: "swift-ascii"),
-        .product(name: "Continuous Integration", package: "swift-continuous-integration"),
       ]
     ),
     .target(
       name: "Institute CI Contract",
       dependencies: [
-        .product(name: "Continuous Integration", package: "swift-continuous-integration")
+        "Institute CI Model",
+        "Institute Model",
+      ]
+    ),
+    .target(
+      name: "Institute CI Workflow",
+      dependencies: [
+        "Institute CI Model",
+        "Institute Model",
       ]
     ),
     .target(
       name: "Institute CI Inventory",
       dependencies: [
-        .product(name: "Continuous Integration", package: "swift-continuous-integration"),
-        .product(
-          name: "GitHub Continuous Integration",
-          package: "swift-github-continuous-integration"
-        ),
-        .product(
-          name: "GitHub Continuous Integration Workflow",
-          package: "swift-github-continuous-integration"
-        ),
+        "Institute CI Model",
+        "Institute CI Workflow",
+        "Institute Model",
+        .product(name: "File System", package: "swift-file-system"),
       ]
     ),
     .target(
@@ -233,27 +242,21 @@ let package = Package(
       dependencies: [
         "Institute CI Canon",
         "Institute CI Inventory",
+        "Institute CI Model",
+        "Institute CI Workflow",
+        "Institute Model",
         .product(name: "ASCII", package: "swift-ascii"),
-        .product(name: "Continuous Integration", package: "swift-continuous-integration"),
-        .product(
-          name: "GitHub Continuous Integration",
-          package: "swift-github-continuous-integration"
-        ),
-        .product(
-          name: "GitHub Continuous Integration Validation",
-          package: "swift-github-continuous-integration"
-        ),
-        .product(
-          name: "GitHub Continuous Integration Workflow",
-          package: "swift-github-continuous-integration"
-        ),
+        .product(name: "File System", package: "swift-file-system"),
         .product(name: "GitHub Standard", package: "swift-github-standard"),
+        .product(name: "JSON", package: "swift-json"),
         .product(name: "Package Manager", package: "swift-package-manager"),
+        .product(name: "Process", package: "swift-process"),
       ]
     ),
     .target(
       name: "Institute Repository Policy",
       dependencies: [
+        "Institute Model",
         .product(name: "Byte Primitives", package: "swift-byte-primitives"),
         .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
         .product(name: "Package Manager", package: "swift-package-manager"),
@@ -479,8 +482,19 @@ let package = Package(
       path: "Tests/Institute Instruments Tests"
     ),
     .testTarget(
+      name: "Institute CI Model Tests",
+      dependencies: ["Institute CI Model"]
+    ),
+    .testTarget(
       name: "Institute CI Canon Tests",
       dependencies: ["Institute CI Canon"]
+    ),
+    .testTarget(
+      name: "Institute CI Workflow Tests",
+      dependencies: [
+        "Institute CI Model",
+        "Institute CI Workflow",
+      ]
     ),
     .testTarget(
       name: "Institute Source Policy Tests",
@@ -496,10 +510,6 @@ let package = Package(
       dependencies: [
         "Institute CI Inventory",
         "Institute CI Validation",
-        .product(
-          name: "GitHub Continuous Integration Validation",
-          package: "swift-github-continuous-integration"
-        ),
       ],
       exclude: ["Fixtures"]
     ),
