@@ -1,9 +1,10 @@
 public import Institute_Model
+public import JSON
 
 extension Institute.Repository.Policy {
     /// The FT1-frozen concept/sole-owner capability records (PROGRAMME.md
     /// §9/§11, spellings per naming-annex-nest-name.md).
-    public struct Capability: Codable, Sendable, Equatable {
+    public struct Capability: Sendable, Equatable {
         public let id: String
         public let concept: String
         public let domainOwner: String
@@ -128,5 +129,29 @@ extension Institute.Repository.Policy {
             ),
         ]
 
+    }
+}
+
+extension Institute.Repository.Policy.Capability: JSON.Serializable {
+    public static func serialize(_ value: Self) -> JSON {
+        [
+            "id": value.id.json,
+            "concept": value.concept.json,
+            "domainOwner": value.domainOwner.json,
+            "target": value.target.json,
+            "namespace": value.namespace.json,
+            "forbiddenDuplicate": value.forbiddenDuplicate.json,
+        ]
+    }
+
+    public static func deserialize(_ json: JSON) throws(JSON.Error) -> Self {
+        Self(
+            id: try Swift.String(json: json["id"]),
+            concept: try Swift.String(json: json["concept"]),
+            domainOwner: try Swift.String(json: json["domainOwner"]),
+            target: try Swift.String(json: json["target"]),
+            namespace: try Swift.String(json: json["namespace"]),
+            forbiddenDuplicate: try Swift.String(json: json["forbiddenDuplicate"])
+        )
     }
 }

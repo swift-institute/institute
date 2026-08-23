@@ -1,4 +1,5 @@
 public import Institute_Model
+public import JSON
 
 
 extension RepositoryPolicy.Ruleset {
@@ -41,7 +42,7 @@ extension RepositoryPolicy.Ruleset {
     }
 
     /// A typed report of the convergence decision for one repository.
-    public struct ConvergenceDecision: Codable, Equatable, Sendable {
+    public struct ConvergenceDecision: Equatable, Sendable {
         public let action: ConvergenceAction
         public let reason: String
 
@@ -84,5 +85,25 @@ extension RepositoryPolicy.Ruleset {
             action: .reapply,
             reason: "an Institute ruleset already exists; re-applying the class-correct contract"
         )
+    }
+}
+
+extension RepositoryPolicy.Ruleset.ConvergenceDecision: JSON.Serializable {
+    public static func serialize(_ value: Self) -> JSON {
+        [
+            "action": value.action.rawValue.json,
+            "reason": value.reason.json,
+        ]
+    }
+
+    public static func deserialize(_ json: JSON) throws(JSON.Error) -> Self {
+        guard
+            let action = RepositoryPolicy.Ruleset.ConvergenceAction(
+                rawValue: try Swift.String(json: json["action"])
+            )
+        else {
+            throw .typeMismatch(expected: "a convergence action", got: "other")
+        }
+        return Self(action: action, reason: try Swift.String(json: json["reason"]))
     }
 }

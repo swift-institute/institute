@@ -220,6 +220,12 @@ let package = Package(
       dependencies: [
         "Institute CI Model",
         "Institute Model",
+        .product(name: "Byte Primitives", package: "swift-byte-primitives"),
+        .product(
+          name: "Byte Primitives Standard Library Integration",
+          package: "swift-byte-primitives"
+        ),
+        .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
       ]
     ),
     .target(
