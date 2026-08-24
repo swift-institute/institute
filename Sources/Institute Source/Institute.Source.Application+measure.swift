@@ -7,9 +7,9 @@ public import Institute_Source_Workspace
 public import Source_Execution
 import Source_Linter
 public import Source_Measurement
-import Source_Swift_Format
 internal import Source_Profile
 public import Source_Report
+import Source_Swift_Format
 
 extension Institute.Source.Application {
   public func measure(
@@ -35,6 +35,10 @@ extension Institute.Source.Application {
         file: preparation.swiftFormatExecutable,
         digest: preparation.swiftFormatTool
       ),
+      Self.matches(
+        file: preparation.swiftLintExecutable,
+        digest: preparation.swiftLintTool
+      ),
       Self.matches(file: preparation.linterExecutable, digest: preparation.linterTool)
     else {
       return Self.unmeasuredReport(
@@ -46,6 +50,10 @@ extension Institute.Source.Application {
       Self.matches(
         file: "\(preparation.directory)/.swift-format",
         digest: policy.swiftFormat.digest
+      ),
+      Self.matches(
+        file: "\(preparation.directory)/.swiftlint.yml",
+        digest: policy.swiftLint.digest
       )
     else {
       return Self.unmeasuredReport(
@@ -54,12 +62,9 @@ extension Institute.Source.Application {
       )
     }
 
-    let drivers: [Source_Measurement.Source.Engine.Driver] = [
-      .swiftFormat(process: process), .linter(process: process),
-    ]
     let execution: Source_Execution.Source.Execution
     do throws(Source_Execution.Source.Execution.Error) {
-      execution = try .init(drivers: drivers)
+      execution = try .init(process: process)
     } catch {
       throw .configuration("cannot register source engines: \(error)")
     }
@@ -83,6 +88,8 @@ extension Institute.Source.Application {
         switch engine.token {
         case "swift-format":
           rules = [.init(engine: engine, token: "format")]
+        case "swiftlint":
+          rules = policy.swiftLintRules
         case "swift-linter":
           rules = owner.rules(for: bundle)
         default:
@@ -153,6 +160,9 @@ extension Institute.Source.Application {
         swiftFormatExecutable: preparation.swiftFormatExecutable,
         swiftFormatTool: preparation.swiftFormatTool,
         swiftFormatConfigurationPath: "\(preparation.directory)/.swift-format",
+        swiftLintExecutable: preparation.swiftLintExecutable,
+        swiftLintTool: preparation.swiftLintTool,
+        swiftLintConfigurationPath: "\(preparation.directory)/.swiftlint.yml",
         linterExecutable: preparation.linterExecutable,
         linterTool: preparation.linterTool,
         linterConfigurationPath: linterConfiguration,

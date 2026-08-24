@@ -21,7 +21,8 @@ extension Institute.Source.Application {
     } catch { throw .configuration("invalid source preparation directory") }
     let declared: [(artifact: Institute.Source.Artifact, path: Swift.String)] =
       [
-        (policy.swiftFormat, policy.swiftFormat.path)
+        (policy.swiftFormat, policy.swiftFormat.path),
+        (policy.swiftLint, policy.swiftLint.path),
       ]
       + policy.bundles.map { bundle in
         let artifact = policy.linter(
@@ -121,6 +122,9 @@ extension Institute.Source.Application {
       }
     } catch {
       return ("unreadable", .init(code: "configuration-read", detail: file.description))
+    }
+    if expected.hasPrefix("swiftlint:") {
+      return (expected, nil)
     }
     let document: JSON
     do throws(JSON.Error) { document = try JSON.parse(contents) } catch {

@@ -1,5 +1,6 @@
 import File_System
 import Foundation
+import Institute_Source_Policy
 import SPM_Standard
 import Testing
 
@@ -188,7 +189,7 @@ extension Institute.Lint.Check.Test.`Edge Case` {
         let swiftLintContents = try Institute.Lint.read(rendered.swiftLint)
         let swiftFormatContents = try Institute.Lint.read(rendered.swiftFormat)
 
-        #expect(swiftLintContents == Institute.Lint.Profile.swiftLint)
+        #expect(swiftLintContents == Institute.Source.Policy.current.swiftLint.contents)
         #expect(swiftFormatContents == Institute.Lint.Profile.swiftFormat)
     }
 }

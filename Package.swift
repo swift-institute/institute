@@ -388,6 +388,7 @@ let package = Package(
         "Institute Build Coordinator",
         "Institute Model",
         "Institute Development",
+        "Institute Source Policy",
         .product(name: "Async Fanout", package: "swift-async"),
         .product(name: "Environment", package: "swift-environment"),
         .product(name: "FIPS 180-4", package: "swift-fips-180-4"),

@@ -3,6 +3,7 @@ public import Environment
 public import File_System
 public import Institute_Development
 public import Institute_Model
+internal import Institute_Source_Policy
 public import Process
 
 extension Institute.Lint {
@@ -147,7 +148,7 @@ extension Institute.Lint.Check {
         let swiftLintFile = directory[file: ".swiftlint.yml"]
         let swiftFormatFile = directory[file: ".swift-format"]
         do throws(File.System.Write.Atomic.Error) {
-            try swiftLintFile.write.atomic(Institute.Lint.Profile.swiftLint)
+            try swiftLintFile.write.atomic(Institute.Source.Policy.current.swiftLint.contents)
         } catch {
             throw .filesystem("cannot render \(swiftLintFile): \(error)")
         }

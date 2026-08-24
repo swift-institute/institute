@@ -7,18 +7,26 @@ import Testing
 @Suite
 struct `Institute source policy` {
     @Test
-    func `terminal policy requires exactly swift-format and swift-linter`() {
+    func `transitional policy requires all three source engines`() {
         let policy = Institute.Source.Policy.current
         #expect(
             policy.requiredEngines.map(\.token)
-                == ["swift-format", "swift-linter"]
+                == ["swift-format", "swiftlint", "swift-linter"]
         )
         #expect(!policy.swiftFormat.contents.isEmpty)
         #expect(policy.swiftFormat.path == ".swift-format")
         #expect(!policy.swiftFormatRepair.contents.isEmpty)
         #expect(policy.swiftFormatRepair.path == ".swift-format-repair")
+        #expect(!policy.swiftLint.contents.isEmpty)
+        #expect(policy.swiftLint.path == ".swiftlint.yml")
+        #expect(policy.swiftLintRules.count == 117)
+        #expect(policy.swiftLintRules.contains { $0.token == "typed_throws_required" })
+        #expect(!policy.swiftLintRules.contains { $0.token == "custom_rules" })
         #expect(policy.bundles == [.primitives, .standards, .institute])
-        #expect(policy.engines.map(\.id.token) == ["swift-format", "swift-linter"])
+        #expect(
+            policy.engines.map(\.id.token)
+                == ["swift-format", "swiftlint", "swift-linter"]
+        )
     }
 
     @Test
@@ -102,6 +110,9 @@ struct `Institute source policy` {
             swiftFormatExecutable: "/swift-format",
             swiftFormatTool: .init("format-tool"),
             swiftFormatConfigurationPath: "/.swift-format",
+            swiftLintExecutable: "/swiftlint",
+            swiftLintTool: .init("swiftlint-tool"),
+            swiftLintConfigurationPath: "/.swiftlint.yml",
             linterExecutable: "/swift-linter",
             linterTool: .init("linter-tool"),
             linterConfigurationPath: "/source-linter-profile.json",
@@ -112,12 +123,13 @@ struct `Institute source policy` {
         // policy's own required-engine order is asserted separately above.
         #expect(
             profile.engines.map(\.id.token).sorted()
-                == ["swift-format", "swift-linter"]
+                == ["swift-format", "swift-linter", "swiftlint"]
         )
         func engine(_ token: String) -> Source.Profile.Engine? {
             profile.engines.first { $0.id.token == token }
         }
         #expect(engine("swift-format")?.rules.map(\.token) == ["format"])
+        #expect(engine("swiftlint")?.rules == policy.swiftLintRules)
         #expect(engine("swift-linter")?.rules == rules)
         #expect(
             profile.digest
@@ -125,6 +137,9 @@ struct `Institute source policy` {
                     swiftFormatExecutable: "/swift-format",
                     swiftFormatTool: .init("format-tool"),
                     swiftFormatConfigurationPath: "/.swift-format",
+                    swiftLintExecutable: "/swiftlint",
+                    swiftLintTool: .init("swiftlint-tool"),
+                    swiftLintConfigurationPath: "/.swiftlint.yml",
                     linterExecutable: "/swift-linter",
                     linterTool: .init("linter-tool"),
                     linterConfigurationPath: "/source-linter-profile.json",
@@ -144,6 +159,9 @@ struct `Institute source policy` {
                 swiftFormatExecutable: "/swift-format",
                 swiftFormatTool: .init("format-tool"),
                 swiftFormatConfigurationPath: "/.swift-format",
+                swiftLintExecutable: "/swiftlint",
+                swiftLintTool: .init("swiftlint-tool"),
+                swiftLintConfigurationPath: "/.swiftlint.yml",
                 linterExecutable: "/swift-linter",
                 linterTool: .init("linter-tool"),
                 linterConfigurationPath: "/source-linter-profile.json",

@@ -4,14 +4,16 @@ public import Source_Profile
 
 extension Institute.Source {
   public struct Preparation: Sendable, JSON.Serializable {
-    public static let schema = 4
+    public static let schema = 5
 
     public let policyRevision: Swift.String
     public let workspaceDigest: Swift.String
     public let swiftFormatExecutable: Swift.String
     public let swiftFormatTool: Source_Profile.Source.Profile.Digest
+    public let swiftLintExecutable: Swift.String
+    public let swiftLint: Tool
     public let linterExecutable: Swift.String
-    public let linter: Linter
+    public let linter: Tool
     public let directory: Swift.String
     public let profiles: [Swift.String: Source_Profile.Source.Profile.Digest]
     public let verifiedProfiles: [Swift.String]
@@ -21,8 +23,10 @@ extension Institute.Source {
       workspaceDigest: Swift.String,
       swiftFormatExecutable: Swift.String,
       swiftFormatTool: Source_Profile.Source.Profile.Digest,
+      swiftLintExecutable: Swift.String,
+      swiftLint: Tool,
       linterExecutable: Swift.String,
-      linter: Linter,
+      linter: Tool,
       directory: Swift.String,
       profiles: [Swift.String: Source_Profile.Source.Profile.Digest],
       verifiedProfiles: [Swift.String]
@@ -31,6 +35,8 @@ extension Institute.Source {
       self.workspaceDigest = workspaceDigest
       self.swiftFormatExecutable = swiftFormatExecutable
       self.swiftFormatTool = swiftFormatTool
+      self.swiftLintExecutable = swiftLintExecutable
+      self.swiftLint = swiftLint
       self.linterExecutable = linterExecutable
       self.linter = linter
       self.directory = directory
@@ -45,6 +51,8 @@ extension Institute.Source {
         "workspaceDigest": value.workspaceDigest.json,
         "swiftFormatExecutable": value.swiftFormatExecutable.json,
         "swiftFormatTool": value.swiftFormatTool.json,
+        "swiftLintExecutable": value.swiftLintExecutable.json,
+        "swiftLint": value.swiftLint.json,
         "linterExecutable": value.linterExecutable.json,
         "linter": value.linter.json,
         "directory": value.directory.json,
@@ -60,6 +68,7 @@ extension Institute.Source {
       let expected: Set<Swift.String> = [
         "schema", "policyRevision", "workspaceDigest",
         "swiftFormatExecutable", "swiftFormatTool",
+        "swiftLintExecutable", "swiftLint",
         "linterExecutable", "linter", "directory", "profiles",
         "verifiedProfiles",
       ]
@@ -69,12 +78,14 @@ extension Institute.Source {
           got: object.keys.sorted().joined(separator: ","))
       }
       guard let schema = object["schema"], try Swift.Int(json: schema) == Self.schema else {
-        throw .typeMismatch(expected: "source preparation schema 4", got: "other schema")
+        throw .typeMismatch(expected: "source preparation schema 5", got: "other schema")
       }
       guard let policyRevision = object["policyRevision"],
         let workspaceDigest = object["workspaceDigest"],
         let swiftFormatExecutable = object["swiftFormatExecutable"],
         let swiftFormatTool = object["swiftFormatTool"],
+        let swiftLintExecutable = object["swiftLintExecutable"],
+        let swiftLint = object["swiftLint"],
         let linterExecutable = object["linterExecutable"],
         let linter = object["linter"], let directory = object["directory"],
         let profiles = object["profiles"],
@@ -85,8 +96,10 @@ extension Institute.Source {
         workspaceDigest: Swift.String(json: workspaceDigest),
         swiftFormatExecutable: Swift.String(json: swiftFormatExecutable),
         swiftFormatTool: Source_Profile.Source.Profile.Digest(json: swiftFormatTool),
+        swiftLintExecutable: Swift.String(json: swiftLintExecutable),
+        swiftLint: Tool(json: swiftLint),
         linterExecutable: Swift.String(json: linterExecutable),
-        linter: Linter(json: linter),
+        linter: Tool(json: linter),
         directory: Swift.String(json: directory),
         profiles: [Swift.String: Source_Profile.Source.Profile.Digest](json: profiles),
         verifiedProfiles: [Swift.String](json: verifiedProfiles)
@@ -96,9 +109,10 @@ extension Institute.Source {
 }
 
 extension Institute.Source.Preparation {
+  public var swiftLintTool: Source_Profile.Source.Profile.Digest { swiftLint.digest }
   public var linterTool: Source_Profile.Source.Profile.Digest { linter.digest }
 
-  public struct Linter: Sendable, JSON.Serializable {
+  public struct Tool: Sendable, JSON.Serializable {
     public let origin: Origin
     public let digest: Source_Profile.Source.Profile.Digest
 
@@ -122,7 +136,7 @@ extension Institute.Source.Preparation {
         throw .typeMismatch(expected: "object", got: "non-object")
       }
       guard Set(object.keys) == ["origin", "digest"] else {
-        throw .typeMismatch(expected: "source linter binding keys", got: "foreign keys")
+        throw .typeMismatch(expected: "source tool binding keys", got: "foreign keys")
       }
       guard let origin = object["origin"] else { throw .missingKey("origin") }
       guard let digest = object["digest"] else { throw .missingKey("digest") }
@@ -134,7 +148,7 @@ extension Institute.Source.Preparation {
   }
 }
 
-extension Institute.Source.Preparation.Linter {
+extension Institute.Source.Preparation.Tool {
   public enum Origin: Sendable, Equatable, JSON.Serializable {
     case published(asset: Swift.String)
     case local
@@ -150,21 +164,21 @@ extension Institute.Source.Preparation.Linter {
 
     public static func deserialize(_ json: JSON) throws(JSON.Error) -> Self {
       guard let object = json.dictionary, let kind = object["kind"] else {
-        throw .typeMismatch(expected: "source linter origin", got: "other")
+        throw .typeMismatch(expected: "source tool origin", got: "other")
       }
       switch try Swift.String(json: kind) {
       case "published":
         guard Set(object.keys) == ["kind", "asset"], let asset = object["asset"] else {
-          throw .typeMismatch(expected: "published source linter origin", got: "other")
+          throw .typeMismatch(expected: "published source tool origin", got: "other")
         }
         return try .published(asset: Swift.String(json: asset))
       case "local":
         guard Set(object.keys) == ["kind"] else {
-          throw .typeMismatch(expected: "local source linter origin", got: "other")
+          throw .typeMismatch(expected: "local source tool origin", got: "other")
         }
         return .local
       default:
-        throw .typeMismatch(expected: "published or local source linter origin", got: "other")
+        throw .typeMismatch(expected: "published or local source tool origin", got: "other")
       }
     }
   }

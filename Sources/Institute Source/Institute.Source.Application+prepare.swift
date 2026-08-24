@@ -7,14 +7,15 @@ public import Source_Profile
 import Thread_Pool
 
 extension Institute.Source.Application {
-  public enum Linter: Sendable, Equatable {
+  public enum Executable: Sendable, Equatable {
     case published
     case local(executable: Swift.String)
   }
 
   public func prepare(
     workspace: Swift.String,
-    linter selection: Linter = .published
+    swiftLint swiftLintSelection: Executable = .published,
+    linter linterSelection: Executable = .published
   ) async throws(Institute.Error) -> Institute.Source.Preparation {
     let policy = Institute.Source.Policy.current
     let directory = try Self.artifactDirectory(workspace: workspace)
@@ -28,21 +29,43 @@ extension Institute.Source.Application {
     let acquisition = Institute.Source.Acquisition(process: process)
     let swiftFormatAsset = try Self.engine("swift-format", policy: policy).executable
     let swiftFormat = try await acquisition.acquire(swiftFormatAsset, executable: true, into: tools)
+    let swiftLintToolFile: File
+    let swiftLint: Institute.Source.Preparation.Tool
+    switch swiftLintSelection {
+    case .published:
+      let asset = try Self.engine("swiftlint", policy: policy).executable
+      swiftLintToolFile = try await acquisition.acquire(asset, executable: true, into: tools)
+      swiftLint = .init(origin: .published(asset: asset.name), digest: asset.digest)
+    case .local(let executable):
+      let snapshot = try acquisition.snapshot(
+        executable: executable,
+        name: "swiftlint",
+        into: tools
+      )
+      swiftLintToolFile = snapshot.file
+      swiftLint = .init(origin: .local, digest: snapshot.digest)
+    }
     let linterToolFile: File
-    let linter: Institute.Source.Preparation.Linter
-    switch selection {
+    let linter: Institute.Source.Preparation.Tool
+    switch linterSelection {
     case .published:
       let asset = try Self.engine("swift-linter", policy: policy).executable
       linterToolFile = try await acquisition.acquire(asset, executable: true, into: tools)
       linter = .init(origin: .published(asset: asset.name), digest: asset.digest)
     case .local(let executable):
-      let snapshot = try acquisition.snapshot(executable: executable, into: tools)
+      let snapshot = try acquisition.snapshot(
+        executable: executable,
+        name: "swift-linter",
+        into: tools
+      )
       linterToolFile = snapshot.file
       linter = .init(origin: .local, digest: snapshot.digest)
     }
     let swiftFormatExecutable = swiftFormat.description
+    let swiftLintExecutable = swiftLintToolFile.description
     let linterExecutable = linterToolFile.description
     let swiftFormatTool = swiftFormatAsset.digest
+    let swiftLintTool = swiftLint.digest
     let linterTool = linter.digest
     let format = directory[file: try Self.component(policy.swiftFormat.path)]
     do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
@@ -52,6 +75,10 @@ extension Institute.Source.Application {
     do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
       try await formatRepair.write.atomic(policy.swiftFormatRepair.contents)
     } catch { throw .filesystem("cannot render \(formatRepair): \(error)") }
+    let swiftLintConfiguration = directory[file: try Self.component(policy.swiftLint.path)]
+    do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
+      try await swiftLintConfiguration.write.atomic(policy.swiftLint.contents)
+    } catch { throw .filesystem("cannot render \(swiftLintConfiguration): \(error)") }
 
     let instituteProfile = Institute.Source.Profile(policy: policy)
     var profiles: [Swift.String: Source_Profile.Source.Profile.Digest] = [:]
@@ -79,6 +106,9 @@ extension Institute.Source.Application {
           swiftFormatExecutable: swiftFormatExecutable,
           swiftFormatTool: swiftFormatTool,
           swiftFormatConfigurationPath: format.description,
+          swiftLintExecutable: swiftLintExecutable,
+          swiftLintTool: swiftLintTool,
+          swiftLintConfigurationPath: swiftLintConfiguration.description,
           linterExecutable: linterExecutable,
           linterTool: linterTool,
           linterConfigurationPath: linter.description,
@@ -91,6 +121,8 @@ extension Institute.Source.Application {
       workspaceDigest: try Self.digest(file: workspace + "/contents.xcworkspacedata").hex,
       swiftFormatExecutable: swiftFormatExecutable,
       swiftFormatTool: swiftFormatTool,
+      swiftLintExecutable: swiftLintExecutable,
+      swiftLint: swiftLint,
       linterExecutable: linterExecutable,
       linter: linter,
       directory: directory.description,

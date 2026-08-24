@@ -16,6 +16,7 @@ extension Institute.Source.Application {
     }
     guard
       Self.matches(file: preparation.swiftFormatExecutable, digest: preparation.swiftFormatTool),
+      Self.matches(file: preparation.swiftLintExecutable, digest: preparation.swiftLintTool),
       Self.matches(file: preparation.linterExecutable, digest: preparation.linterTool)
     else { throw .configuration("source preparation tool is stale") }
     let formatArtifact = repair ? policy.swiftFormatRepair : policy.swiftFormat
@@ -26,6 +27,10 @@ extension Institute.Source.Application {
         digest: formatArtifact.digest
       )
     else { throw .configuration("source preparation configuration is stale") }
+    let swiftLintConfiguration = "\(preparation.directory)/\(policy.swiftLint.path)"
+    guard Self.matches(file: swiftLintConfiguration, digest: policy.swiftLint.digest) else {
+      throw .configuration("source SwiftLint configuration is stale")
+    }
     let owner = Institute.Source.Profile(policy: policy)
     let bundle = try owner.bundle(for: row)
     guard preparation.verifiedProfiles.contains(bundle.rawValue) else {
@@ -44,6 +49,9 @@ extension Institute.Source.Application {
       swiftFormatExecutable: preparation.swiftFormatExecutable,
       swiftFormatTool: preparation.swiftFormatTool,
       swiftFormatConfigurationPath: formatConfiguration,
+      swiftLintExecutable: preparation.swiftLintExecutable,
+      swiftLintTool: preparation.swiftLintTool,
+      swiftLintConfigurationPath: swiftLintConfiguration,
       linterExecutable: preparation.linterExecutable,
       linterTool: preparation.linterTool,
       linterConfigurationPath: linterConfiguration,

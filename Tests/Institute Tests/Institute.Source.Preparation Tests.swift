@@ -19,6 +19,11 @@ func `Institute source preparation round trips its parse receipt`() throws {
         workspaceDigest: "workspace-digest",
         swiftFormatExecutable: "/tools/swift-format",
         swiftFormatTool: .init("format-tool"),
+        swiftLintExecutable: "/tools/swiftlint",
+        swiftLint: .init(
+            origin: .published(asset: "swiftlint"),
+            digest: .init("swiftlint-tool")
+        ),
         linterExecutable: "/tools/swift-linter",
         linter: .init(
             origin: .published(asset: "swift-linter-macos-arm64"),
@@ -37,6 +42,9 @@ func `Institute source preparation round trips its parse receipt`() throws {
     #expect(decoded.workspaceDigest == preparation.workspaceDigest)
     #expect(decoded.swiftFormatExecutable == preparation.swiftFormatExecutable)
     #expect(decoded.swiftFormatTool == preparation.swiftFormatTool)
+    #expect(decoded.swiftLintExecutable == preparation.swiftLintExecutable)
+    #expect(decoded.swiftLintTool == preparation.swiftLintTool)
+    #expect(decoded.swiftLint.origin == .published(asset: "swiftlint"))
     #expect(decoded.linterExecutable == preparation.linterExecutable)
     #expect(decoded.linterTool == preparation.linterTool)
     #expect(decoded.linter.origin == .published(asset: "swift-linter-macos-arm64"))
@@ -52,6 +60,8 @@ func `Institute source preparation rejects receipts without a parse verdict`() t
         workspaceDigest: "workspace-digest",
         swiftFormatExecutable: "/tools/swift-format",
         swiftFormatTool: .init("format-tool"),
+        swiftLintExecutable: "/tools/swiftlint",
+        swiftLint: .init(origin: .local, digest: .init("swiftlint-tool")),
         linterExecutable: "/tools/swift-linter",
         linter: .init(origin: .local, digest: .init("linter-tool")),
         directory: "/artifacts/.source",
@@ -133,6 +143,7 @@ func `Local source linter snapshot is content addressed and omits its input path
     let acquisition = Institute.Source.Acquisition(process: process)
     let snapshot = try acquisition.snapshot(
         executable: input.path,
+        name: "swift-linter",
         into: try File.Directory(validating: tools.path)
     )
     let preparation = Institute.Source.Preparation(
@@ -140,6 +151,8 @@ func `Local source linter snapshot is content addressed and omits its input path
         workspaceDigest: "workspace-digest",
         swiftFormatExecutable: "/tools/swift-format",
         swiftFormatTool: .init("format-tool"),
+        swiftLintExecutable: "/tools/swiftlint",
+        swiftLint: .init(origin: .local, digest: .init("swiftlint-tool")),
         linterExecutable: snapshot.file.description,
         linter: .init(origin: .local, digest: snapshot.digest),
         directory: root.path,
@@ -186,14 +199,23 @@ func `Local source linter snapshot refuses missing non-file and non-executable i
     #expect(throws: Institute.Error.self) {
         _ = try acquisition.snapshot(
             executable: root.appending(path: "missing").path,
+            name: "swift-linter",
             into: destination
         )
     }
     #expect(throws: Institute.Error.self) {
-        _ = try acquisition.snapshot(executable: directoryInput.path, into: destination)
+        _ = try acquisition.snapshot(
+            executable: directoryInput.path,
+            name: "swift-linter",
+            into: destination
+        )
     }
     #expect(throws: Institute.Error.self) {
-        _ = try acquisition.snapshot(executable: nonExecutable.path, into: destination)
+        _ = try acquisition.snapshot(
+            executable: nonExecutable.path,
+            name: "swift-linter",
+            into: destination
+        )
     }
 }
 
@@ -215,14 +237,25 @@ func `Different local source linter bytes change tool and profile identity`() th
     }
     let acquisition = Institute.Source.Acquisition(process: process)
     let destination = try File.Directory(validating: tools.path)
-    let firstSnapshot = try acquisition.snapshot(executable: first.path, into: destination)
-    let secondSnapshot = try acquisition.snapshot(executable: second.path, into: destination)
+    let firstSnapshot = try acquisition.snapshot(
+        executable: first.path,
+        name: "swift-linter",
+        into: destination
+    )
+    let secondSnapshot = try acquisition.snapshot(
+        executable: second.path,
+        name: "swift-linter",
+        into: destination
+    )
     let policy = Institute.Source.Policy.current
     let rules = Institute.Source.Profile(policy: policy).rules(for: .institute)
     let firstProfile = policy.profile(
         swiftFormatExecutable: "/tools/swift-format",
         swiftFormatTool: .init("format"),
         swiftFormatConfigurationPath: "/profile/.swift-format",
+        swiftLintExecutable: "/tools/swiftlint",
+        swiftLintTool: .init("swiftlint"),
+        swiftLintConfigurationPath: "/profile/.swiftlint.yml",
         linterExecutable: firstSnapshot.file.description,
         linterTool: firstSnapshot.digest,
         linterConfigurationPath: "/profile/institute-source-linter-profile.json",
@@ -233,6 +266,9 @@ func `Different local source linter bytes change tool and profile identity`() th
         swiftFormatExecutable: "/tools/swift-format",
         swiftFormatTool: .init("format"),
         swiftFormatConfigurationPath: "/profile/.swift-format",
+        swiftLintExecutable: "/tools/swiftlint",
+        swiftLintTool: .init("swiftlint"),
+        swiftLintConfigurationPath: "/profile/.swiftlint.yml",
         linterExecutable: secondSnapshot.file.description,
         linterTool: secondSnapshot.digest,
         linterConfigurationPath: "/profile/institute-source-linter-profile.json",
@@ -249,9 +285,11 @@ func `Different local source linter bytes change tool and profile identity`() th
 func `Source measurement refuses a tampered local linter snapshot`() async throws {
     let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
     let format = root.appending(path: "swift-format")
+    let swiftLint = root.appending(path: "swiftlint")
     let linter = root.appending(path: "swift-linter-local")
     try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
     try Data("format".utf8).write(to: format)
+    try Data("swiftlint".utf8).write(to: swiftLint)
     try Data("linter".utf8).write(to: linter)
     defer { try? FileManager.default.removeItem(at: root) }
 
@@ -260,6 +298,11 @@ func `Source measurement refuses a tampered local linter snapshot`() async throw
         workspaceDigest: "workspace",
         swiftFormatExecutable: format.path,
         swiftFormatTool: try Institute.Source.Application.digest(file: format.path),
+        swiftLintExecutable: swiftLint.path,
+        swiftLint: .init(
+            origin: .local,
+            digest: try Institute.Source.Application.digest(file: swiftLint.path)
+        ),
         linterExecutable: linter.path,
         linter: .init(
             origin: .local,

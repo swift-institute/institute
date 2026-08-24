@@ -7,6 +7,7 @@ import Thread_Pool
 extension Institute.Source.Acquisition {
   func snapshot(
     executable path: Swift.String,
+    name: Swift.String,
     into directory: File.Directory
   ) throws(Institute.Error) -> (
     file: File,
@@ -14,26 +15,26 @@ extension Institute.Source.Acquisition {
   ) {
     let source: File
     do throws(File.Path.Error) { source = File(try .init(path)) } catch {
-      throw .configuration("invalid local source linter path")
+      throw .configuration("invalid local source tool path")
     }
     guard source.stat.isFile, !source.stat.isSymlink else {
-      throw .configuration("local source linter is not a regular file")
+      throw .configuration("local source tool is not a regular file")
     }
     let sourcePermissions: File.System.Metadata.Permissions
     do throws(Kernel.File.Stats.Error) { sourcePermissions = try source.stat.permissions } catch {
-      throw .filesystem("cannot inspect local source linter permissions: \(error)")
+      throw .filesystem("cannot inspect local source tool permissions: \(error)")
     }
     guard
       sourcePermissions.contains(.ownerExecute)
         || sourcePermissions.contains(.groupExecute)
         || sourcePermissions.contains(.otherExecute)
     else {
-      throw .configuration("local source linter is not executable")
+      throw .configuration("local source tool is not executable")
     }
 
     let digest = try Institute.Source.Application.digest(file: source.description)
     let destination = directory[
-      file: try Self.component("swift-linter-local-\(digest.hex)")
+      file: try Self.component("\(name)-local-\(digest.hex)")
     ]
     if destination.stat.isFile,
       try Institute.Source.Application.digest(file: destination.description) == digest
@@ -58,7 +59,7 @@ extension Institute.Source.Acquisition {
         suffix: ".staging"
       )
     } catch {
-      throw .filesystem("cannot allocate local source linter staging path: \(error)")
+      throw .filesystem("cannot allocate local source tool staging path: \(error)")
     }
     let staging = File(stagingPath)
     defer {
@@ -69,11 +70,11 @@ extension Institute.Source.Acquisition {
     do throws(File.System.Copy.Error) {
       try File.System.Copy.copy(from: source.path, to: staging.path)
     } catch {
-      throw .filesystem("cannot snapshot local source linter: \(error)")
+      throw .filesystem("cannot snapshot local source tool: \(error)")
     }
     let copied = try Institute.Source.Application.digest(file: staging.description)
     guard copied == digest else {
-      throw .configuration("local source linter changed while being snapshotted")
+      throw .configuration("local source tool changed while being snapshotted")
     }
     try Self.permissions(executable: true, file: staging)
     do throws(File.System.Move.Error) {
@@ -83,7 +84,7 @@ extension Institute.Source.Acquisition {
         options: .init(overwrite: true)
       )
     } catch {
-      throw .filesystem("cannot publish local source linter snapshot: \(error)")
+      throw .filesystem("cannot publish local source tool snapshot: \(error)")
     }
     return (destination, digest)
   }
