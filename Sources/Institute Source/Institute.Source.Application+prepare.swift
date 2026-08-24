@@ -21,34 +21,25 @@ extension Institute.Source.Application {
     let tools = directory[directory: "tools"]
     let acquisition = Institute.Source.Acquisition(process: process)
     let swiftFormatAsset = try Self.engine("swift-format", policy: policy).executable
-    let swiftLintAsset = try Self.engine("swiftlint", policy: policy).executable
     let linterAsset = try Self.engine("swift-linter", policy: policy).executable
     let swiftFormat = try await acquisition.acquire(swiftFormatAsset, executable: true, into: tools)
-    let swiftLint = try await acquisition.acquire(swiftLintAsset, executable: true, into: tools)
     let linterToolFile = try await acquisition.acquire(linterAsset, executable: true, into: tools)
     let swiftFormatExecutable = swiftFormat.description
-    let swiftLintExecutable = swiftLint.description
     let linterExecutable = linterToolFile.description
     let swiftFormatTool = swiftFormatAsset.digest
-    let swiftLintTool = swiftLintAsset.digest
     let linterTool = linterAsset.digest
     let format = directory[file: try Self.component(policy.swiftFormat.path)]
     do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
       try await format.write.atomic(policy.swiftFormat.contents)
     } catch { throw .filesystem("cannot render \(format): \(error)") }
-    let swiftLintConfiguration = directory[file: try Self.component(policy.swiftLint.path)]
+    let formatRepair = directory[file: try Self.component(policy.swiftFormatRepair.path)]
     do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
-      try await swiftLintConfiguration.write.atomic(policy.swiftLint.contents)
-    } catch { throw .filesystem("cannot render \(swiftLintConfiguration): \(error)") }
-    let swiftLintRules = try await Self.swiftLintRules(
-      executable: swiftLintExecutable,
-      configuration: swiftLintConfiguration.description,
-      directory: directory.description,
-      process: process
-    )
+      try await formatRepair.write.atomic(policy.swiftFormatRepair.contents)
+    } catch { throw .filesystem("cannot render \(formatRepair): \(error)") }
 
     let instituteProfile = Institute.Source.Profile(policy: policy)
     var profiles: [Swift.String: Source_Profile.Source.Profile.Digest] = [:]
+    var verifiedProfiles: [Swift.String] = []
     for bundle in policy.bundles {
       let rules = instituteProfile.rules(for: bundle)
       let artifact = policy.linter(bundle: bundle, rules: rules)
@@ -59,15 +50,19 @@ extension Institute.Source.Application {
         try await linter.write.atomic(artifact.contents)
       } catch
       { throw .filesystem("cannot render \(linter): \(error)") }
+      try await Self.verify(
+        profile: linter.description,
+        bundle: bundle,
+        linterExecutable: linterExecutable,
+        directory: directory.description,
+        process: process
+      )
+      verifiedProfiles.append(bundle.rawValue)
       profiles[bundle.rawValue] =
         policy.profile(
           swiftFormatExecutable: swiftFormatExecutable,
           swiftFormatTool: swiftFormatTool,
           swiftFormatConfigurationPath: format.description,
-          swiftLintExecutable: swiftLintExecutable,
-          swiftLintTool: swiftLintTool,
-          swiftLintConfigurationPath: swiftLintConfiguration.description,
-          swiftLintRules: swiftLintRules,
           linterExecutable: linterExecutable,
           linterTool: linterTool,
           linterConfigurationPath: linter.description,
@@ -77,21 +72,41 @@ extension Institute.Source.Application {
     }
     let preparation = Institute.Source.Preparation(
       policyRevision: policy.revision,
+      workspaceDigest: try Self.digest(file: workspace + "/contents.xcworkspacedata").hex,
       swiftFormatExecutable: swiftFormatExecutable,
       swiftFormatTool: swiftFormatTool,
-      swiftLintExecutable: swiftLintExecutable,
-      swiftLintTool: swiftLintTool,
-      swiftLintRules: swiftLintRules,
       linterExecutable: linterExecutable,
       linterTool: linterTool,
       directory: directory.description,
-      profiles: profiles
+      profiles: profiles,
+      verifiedProfiles: verifiedProfiles.sorted()
     )
     let receipt = directory[file: "receipt.json"]
     do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
       try await receipt.write.atomic(preparation.jsonString(sortKeys: true) + "\n")
     } catch { throw .filesystem("cannot write source preparation receipt \(receipt): \(error)") }
     return preparation
+  }
+
+  static func verify(
+    profile: Swift.String,
+    bundle: Institute.Source.Bundle,
+    linterExecutable: Swift.String,
+    directory: Swift.String,
+    process: Source_Profile.Source.Engine.Process
+  ) async throws(Institute.Error) {
+    let result = await process.run(
+      linterExecutable,
+      ["--profile-check", profile],
+      directory,
+      ["SWIFT_LINTER_BUNDLE": bundle.token]
+    )
+    guard result.status == 0 else {
+      throw .configuration(
+        "rendered source linter profile for \(bundle.rawValue) does not parse "
+          + "under the pinned engine: \(result.diagnostics)\(result.output)"
+      )
+    }
   }
 
   private static func engine(

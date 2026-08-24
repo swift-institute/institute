@@ -17,7 +17,7 @@ extension Institute.Xcode {
         guard Set(members.map(\.location)).count == members.count else {
             throw .configuration("workspace integration contains duplicate locations")
         }
-        return .init(members: members)
+        return .init(dependency: .localInstituteClosure, members: members)
     }
 
     public static func integration(
@@ -41,7 +41,7 @@ extension Institute.Xcode {
             }
             members.append(member)
         }
-        return .init(members: members)
+        return .init(dependency: .localInstituteClosure, members: members)
     }
 
     private static func locations(

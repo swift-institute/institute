@@ -33,24 +33,7 @@ extension Institute.Source.Workspace {
       rootCanonical = try File.System.Canonical.resolve(root.path)
     } catch { throw .filesystem("cannot canonicalize source root \(row.directory): \(error)") }
 
-    var present: Swift.Set<Swift.String> = []
-    var pending: [File.Directory] = [root]
-    while let directory = pending.popLast() {
-      do throws(File.Directory.Contents.Error) {
-        for file in try directory.files() where file.path.description.hasSuffix(".swift") {
-          present.insert(relative(file.path, to: root.path).joined(separator: "/"))
-        }
-        for child in try directory.directories() {
-          guard !excluded(child.path, root: root.path) else { continue }
-          pending.append(child)
-        }
-      } catch {
-        throw .filesystem("cannot enumerate source paths at \(directory): \(error)")
-      }
-    }
-
-    var candidates = present
-    candidates.insert("Package.swift")
+    var candidates: Swift.Set<Swift.String> = ["Package.swift"]
     for path in paths where path.hasSuffix(".swift") { candidates.insert(path) }
     var canonicalFiles: Swift.Set<Swift.String> = []
     var artifacts: [Source.Artifact] = []
@@ -89,15 +72,6 @@ extension Institute.Source.Workspace {
     return .init(identity: row.identity, root: row.directory, artifacts: artifacts)
   }
 
-  private static func relative(_ path: File.Path, to base: File.Path) -> [Swift.String] {
-    let root = Array(base.components)
-    let full = Array(path.components)
-    guard full.count > root.count, full.prefix(root.count).elementsEqual(root) else {
-      return full.map(\.string)
-    }
-    return full.dropFirst(root.count).map(\.string)
-  }
-
   private static func digest(_ file: File) throws(Institute.Error) -> Source.Artifact.Digest {
     let bytes: [Byte]
     do throws(Either<File.System.Read.Full.Error, Never>) {
@@ -109,11 +83,6 @@ extension Institute.Source.Workspace {
       }
     } catch { throw .filesystem("cannot read source artifact \(file): \(error)") }
     return .init(FIPS_180_4.SHA256.digest(bytes).hex)
-  }
-
-  private static func excluded(_ path: File.Path, root: File.Path) -> Swift.Bool {
-    let components = relative(path, to: root)
-    return components.contains { [".git", ".build", ".swiftpm"].contains($0) }
   }
 
   private static func valid(_ path: Swift.String) -> Swift.Bool {

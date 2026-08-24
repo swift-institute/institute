@@ -89,7 +89,7 @@ func `Institute repair file system rejects path escape before IO`() {
 func `Institute source subject includes every Swift file outside build products`() throws {
     let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
     defer { try? FileManager.default.removeItem(at: root) }
-    for directory in ["Sources", "Tests/Unit", "Tests/Support"] {
+    for directory in ["Sources", "Tests/Unit", "Tests/Support", ".workspace/Member/Sources"] {
         try FileManager.default.createDirectory(
             at: root.appending(path: directory),
             withIntermediateDirectories: true
@@ -100,6 +100,7 @@ func `Institute source subject includes every Swift file outside build products`
         ("Sources/A.swift", "public enum A {}\n"),
         ("Tests/Unit/A Tests.swift", "import Testing\n"),
         ("Tests/Support/Fixture.swift", "struct Fixture {}\n"),
+        (".workspace/Member/Sources/Residue.swift", "public enum Residue {}\n"),
     ] {
         try Data(contents.utf8).write(to: root.appending(path: path))
     }

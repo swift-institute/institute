@@ -35,7 +35,6 @@ extension Institute.Source.Application {
         file: preparation.swiftFormatExecutable,
         digest: preparation.swiftFormatTool
       ),
-      Self.matches(file: preparation.swiftLintExecutable, digest: preparation.swiftLintTool),
       Self.matches(file: preparation.linterExecutable, digest: preparation.linterTool)
     else {
       return Self.unmeasuredReport(
@@ -47,10 +46,6 @@ extension Institute.Source.Application {
       Self.matches(
         file: "\(preparation.directory)/.swift-format",
         digest: policy.swiftFormat.digest
-      ),
-      Self.matches(
-        file: "\(preparation.directory)/.swiftlint.yml",
-        digest: policy.swiftLint.digest
       )
     else {
       return Self.unmeasuredReport(
@@ -88,8 +83,6 @@ extension Institute.Source.Application {
         switch engine.token {
         case "swift-format":
           rules = [.init(engine: engine, token: "format")]
-        case "swiftlint":
-          rules = preparation.swiftLintRules
         case "swift-linter":
           rules = owner.rules(for: bundle)
         default:
@@ -128,6 +121,20 @@ extension Institute.Source.Application {
       let linterConfiguration =
         "\(preparation.directory)/\(bundle.rawValue)-source-linter-profile.json"
       let linterArtifact = policy.linter(bundle: bundle, rules: rules)
+      guard preparation.verifiedProfiles.contains(bundle.rawValue) else {
+        return policy.requiredEngines.map {
+          .init(
+            engine: $0,
+            subject: subject,
+            activeRules: [],
+            applicableRules: [],
+            files: subject.paths(of: .swift),
+            verdict: .unmeasured([
+              .init(code: "unverified-profile", detail: bundle.rawValue)
+            ])
+          )
+        }
+      }
       guard Self.matches(file: linterConfiguration, digest: linterArtifact.digest) else {
         return policy.requiredEngines.map {
           .init(
@@ -146,10 +153,6 @@ extension Institute.Source.Application {
         swiftFormatExecutable: preparation.swiftFormatExecutable,
         swiftFormatTool: preparation.swiftFormatTool,
         swiftFormatConfigurationPath: "\(preparation.directory)/.swift-format",
-        swiftLintExecutable: preparation.swiftLintExecutable,
-        swiftLintTool: preparation.swiftLintTool,
-        swiftLintConfigurationPath: "\(preparation.directory)/.swiftlint.yml",
-        swiftLintRules: preparation.swiftLintRules,
         linterExecutable: preparation.linterExecutable,
         linterTool: preparation.linterTool,
         linterConfigurationPath: linterConfiguration,

@@ -121,6 +121,14 @@ extension Institute.Xcode.Acquisition {
                         reference: observation.reference,
                         manifest: payload.catalog.manifest,
                         toolchain: payload.catalog.toolchain,
+                        dependencies: payload.catalog.evaluation.dependencies.compactMap {
+                            dependency in
+                            guard
+                                case .sourceControl(_, .remote(let location), _) =
+                                    dependency.source
+                            else { return nil }
+                            return "\(location)"
+                        },
                         targets: payload.catalog.evaluation.targets,
                         sources: payload.sources
                     )

@@ -35,6 +35,7 @@ extension Institute.Xcode.Test.Unit {
             role: .control(.institute)
         )
         let input = Institute.Workspace.Materialization.Input(
+            dependency: .localInstituteClosure,
             toolchain: Swift.String(repeating: "a", count: 64),
             packages: [
                 .init(
@@ -81,8 +82,16 @@ extension Institute.Xcode.Test.Unit {
         )
 
         #expect(first.input.digest == second.input.digest)
+        #expect(first.input.dependency == .localInstituteClosure)
         #expect(first.artifacts.map(\.digest) != second.artifacts.map(\.digest))
+        let changedDependency = Institute.Workspace.Materialization.Input(
+            dependency: .remoteAllowed,
+            toolchain: input.toolchain,
+            packages: input.packages
+        )
+        #expect(input.digest != changedDependency.digest)
         let changedSource = Institute.Workspace.Materialization.Input(
+            dependency: input.dependency,
             toolchain: input.toolchain,
             packages: [
                 .init(
@@ -166,7 +175,9 @@ extension Institute.Xcode.Test.Unit {
 
     @Test
     func `workspace membership roles round trip without path inference`() throws {
-        let specification = Institute.Workspace.Specification(members: [
+        let specification = Institute.Workspace.Specification(
+            dependency: .localInstituteClosure,
+            members: [
             .init(location: "group:.", role: .control(.application)),
             .init(location: "group:../institute", role: .control(.institute)),
             .init(
@@ -181,19 +192,117 @@ extension Institute.Xcode.Test.Unit {
                     )
                 )
             ),
-        ])
+            ]
+        )
 
         let decoded = try Institute.Workspace.Specification(
             jsonString: specification.jsonString(sortKeys: true)
         )
 
         #expect(decoded == specification)
+        #expect(decoded.dependency == .localInstituteClosure)
+    }
+
+    @Test
+    func `local closure reports every missing Institute dependency in identity order`() throws {
+        let selected = Self.repository(owner: "swift-foundations", name: "swift-selected")
+        let first = Self.repository(owner: "swift-primitives", name: "swift-first")
+        let second = Self.repository(owner: "swift-foundations", name: "swift-second")
+        let specification = Self.specification(
+            dependency: .localInstituteClosure,
+            repositories: [selected]
+        )
+        let configuration = Self.configuration([selected, first, second])
+
+        do throws(Institute.Error) {
+            try Institute.Workspace.Materialization.validate(
+                specification: specification,
+                catalog: Self.catalog(specification, dependencies: [first.url]),
+                configuration: configuration
+            )
+            Issue.record("expected one missing Institute dependency")
+        } catch {
+            #expect(
+                error.description
+                    == "workspace local Institute dependency closure is incomplete; missing: "
+                    + "[swift-primitives/swift-first]"
+            )
+        }
+
+        do throws(Institute.Error) {
+            try Institute.Workspace.Materialization.validate(
+                specification: specification,
+                catalog: Self.catalog(
+                    specification,
+                    dependencies: [first.url, second.url]
+                ),
+                configuration: configuration
+            )
+            Issue.record("expected two missing Institute dependencies")
+        } catch {
+            #expect(
+                error.description
+                    == "workspace local Institute dependency closure is incomplete; missing: "
+                    + "[swift-foundations/swift-second, swift-primitives/swift-first]"
+            )
+        }
+    }
+
+    @Test
+    func `local closure admits selected Institute dependencies and external remotes`() throws {
+        let selected = Self.repository(owner: "swift-foundations", name: "swift-selected")
+        let dependency = Self.repository(owner: "swift-primitives", name: "swift-dependency")
+        let specification = Self.specification(
+            dependency: .localInstituteClosure,
+            repositories: [selected, dependency]
+        )
+
+        try Institute.Workspace.Materialization.validate(
+            specification: specification,
+            catalog: Self.catalog(
+                specification,
+                dependencies: [
+                    dependency.url,
+                    "https://github.com/external/swift-external.git",
+                ]
+            ),
+            configuration: Self.configuration([selected, dependency])
+        )
+    }
+
+    @Test
+    func `dependency binding rather than a workspace name selects closure enforcement`() throws {
+        let selected = Self.repository(owner: "swift-foundations", name: "swift-selected")
+        let dependency = Self.repository(owner: "swift-primitives", name: "swift-dependency")
+        let local = Self.specification(
+            dependency: .localInstituteClosure,
+            repositories: [selected]
+        )
+        let remote = Self.specification(
+            dependency: .remoteAllowed,
+            repositories: [selected]
+        )
+        let configuration = Self.configuration([selected, dependency])
+        let catalog = Self.catalog(remote, dependencies: [dependency.url])
+
+        try Institute.Workspace.Materialization.validate(
+            specification: remote,
+            catalog: catalog,
+            configuration: configuration
+        )
+        #expect(throws: Institute.Error.self) {
+            try Institute.Workspace.Materialization.validate(
+                specification: local,
+                catalog: catalog,
+                configuration: configuration
+            )
+        }
     }
 
     @Test
     func `render terminates the workspace artifact with one line feed`() throws {
         let rendered = try Institute.Xcode.render(
-            .init(members: [
+            .init(dependency: .remoteAllowed, members: [
                 .init(location: "group:.", role: .control(.application))
             ])
         )
@@ -306,6 +415,68 @@ extension Institute.Xcode.Test.Unit {
     }
 }
 
+extension Institute.Xcode.Test.Unit {
+    private static func repository(
+        owner: Swift.String,
+        name: Swift.String
+    ) -> Institute.Repository {
+        .init(
+            name: name,
+            url: "https://github.com/\(owner)/\(name).git",
+            organization: owner,
+            layer: owner == "swift-primitives" ? .primitives : .foundations
+        )
+    }
+
+    private static func configuration(
+        _ repositories: [Institute.Repository]
+    ) -> Institute.Configuration {
+        .init(
+            version: 1,
+            scope: "swift-institute",
+            swift: "6.4.0",
+            xcode: "27.0",
+            repositories: repositories
+        )
+    }
+
+    private static func specification(
+        dependency: Institute.Workspace.Dependency.Binding,
+        repositories: [Institute.Repository]
+    ) -> Institute.Workspace.Specification {
+        .init(
+            dependency: dependency,
+            members: repositories.compactMap { repository in
+                Institute.Repository.Key(repository: repository).map { key in
+                    .init(
+                        location: "group:../\(repository.organization)/\(repository.name)",
+                        role: .subject(key)
+                    )
+                }
+            }
+        )
+    }
+
+    private static func catalog(
+        _ specification: Institute.Workspace.Specification,
+        dependencies: [Swift.String]
+    ) -> Institute.Xcode.Catalog {
+        .init(
+            entries: specification.members.enumerated().map { index, member in
+                .init(
+                    member: member,
+                    reference: "../fixture-\(index)",
+                    manifest: Swift.String(repeating: "a", count: 64),
+                    toolchain: Swift.String(repeating: "b", count: 64),
+                    dependencies: index == 0 ? dependencies : [],
+                    targets: [],
+                    sources: []
+                )
+            }
+        )
+    }
+}
+
 extension Institute.Xcode.Test.Integration {
     @Test
     func
@@ -405,7 +576,7 @@ extension Institute.Xcode.Test.Integration {
             layer: .primitives
         )
         let root = try Institute.Root(checkout: File.Directory(validating: application.path))
-        let specification = Institute.Workspace.Specification(members: [
+        let specification = Institute.Workspace.Specification(dependency: .remoteAllowed, members: [
             .init(location: "group:.", role: .control(.application)),
             .init(location: "group:../institute", role: .control(.institute)),
             .init(

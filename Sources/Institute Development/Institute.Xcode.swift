@@ -30,7 +30,7 @@ extension Institute.Xcode {
       }
       members.append(.init(location: location, role: .subject(key)))
     }
-    return .init(members: members)
+    return .init(dependency: .remoteAllowed, members: members)
   }
 
   public static func document(

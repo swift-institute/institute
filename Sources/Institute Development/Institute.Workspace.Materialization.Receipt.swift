@@ -4,7 +4,7 @@ public import JSON
 
 extension Institute.Workspace.Materialization {
     public struct Receipt: Sendable, Equatable, JSON.Serializable {
-        public static let schema = 1
+        public static let schema = 2
 
         public let input: Input
         public let artifacts: [Artifact]
@@ -37,7 +37,7 @@ extension Institute.Workspace.Materialization {
 
         public static func deserialize(_ json: JSON) throws(JSON.Error) -> Self {
             guard try Swift.Int(json: json["schema"]) == schema else {
-                throw .typeMismatch(expected: "materialization receipt schema 1", got: "other")
+                throw .typeMismatch(expected: "materialization receipt schema 2", got: "other")
             }
             let input = try Input(json: json["input"])
             guard try Swift.String(json: json["inputDigest"]) == input.digest else {

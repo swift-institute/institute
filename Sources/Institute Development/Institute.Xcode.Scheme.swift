@@ -72,8 +72,7 @@ extension Institute.Xcode.Scheme {
                         blueprint: testable.target,
                         name: testable.target,
                         container: "container:\(testable.reference)"
-                    ),
-                    parallelizable: true
+                    )
                 )
             }
         )

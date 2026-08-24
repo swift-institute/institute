@@ -2,28 +2,35 @@ public import JSON
 
 extension Institute.Workspace {
     public struct Specification: Sendable, Equatable, JSON.Serializable {
-        public static let schema = 1
+        public static let schema = 2
 
+        public let dependency: Dependency.Binding
         public let members: [Member]
 
-        public init(members: [Member]) {
+        public init(dependency: Dependency.Binding, members: [Member]) {
+            self.dependency = dependency
             self.members = members
         }
 
         public static func serialize(_ value: Self) -> JSON {
-            ["schema": schema.json, "members": value.members.json]
+            [
+                "schema": schema.json,
+                "dependencyBinding": value.dependency.json,
+                "members": value.members.json,
+            ]
         }
 
         public static func deserialize(_ json: JSON) throws(JSON.Error) -> Self {
             guard let object = json.dictionary,
-                Set(object.keys) == ["schema", "members"],
+                Set(object.keys) == ["schema", "dependencyBinding", "members"],
                 let schemaValue = object["schema"],
+                let dependencyValue = object["dependencyBinding"],
                 let membersValue = object["members"]
             else {
                 throw .typeMismatch(expected: "workspace specification", got: "other JSON")
             }
             guard try Swift.Int(json: schemaValue) == schema else {
-                throw .typeMismatch(expected: "workspace schema 1", got: "other schema")
+                throw .typeMismatch(expected: "workspace schema 2", got: "other schema")
             }
             let members = try [Member](json: membersValue)
             guard Set(members.map(\.location)).count == members.count else {
@@ -43,7 +50,10 @@ extension Institute.Workspace {
             guard Set(controls.map(\.rawValue)).count == controls.count else {
                 throw .typeMismatch(expected: "unique workspace controls", got: "duplicates")
             }
-            return .init(members: members)
+            return try .init(
+                dependency: Dependency.Binding(json: dependencyValue),
+                members: members
+            )
         }
     }
 }

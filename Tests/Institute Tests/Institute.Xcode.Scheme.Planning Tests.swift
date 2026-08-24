@@ -99,7 +99,7 @@ extension Institute.Xcode.Scheme.Test.Unit {
             name: "fast",
             targets: [("Fast", false), ("Fast Tests", true)]
         )
-        let specification = Institute.Workspace.Specification(members: [
+        let specification = Institute.Workspace.Specification(dependency: .remoteAllowed, members: [
             .init(location: "group:../institute", role: .control(.institute)),
             .init(location: "group:.", role: .control(.application)),
             .init(
@@ -164,7 +164,7 @@ extension Institute.Xcode.Scheme.Test.Unit {
             [.posixPermissions: 0o755],
             ofItemAtPath: executable.path
         )
-        let specification = Institute.Workspace.Specification(members: [
+        let specification = Institute.Workspace.Specification(dependency: .remoteAllowed, members: [
             .init(
                 location: "group:../hung",
                 role: .subject(

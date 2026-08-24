@@ -8,7 +8,7 @@ extension Institute.Source {
         public let revision: Swift.String
         public let requiredEngines: [Source_Profile.Source.Engine.ID]
         public let swiftFormat: Artifact
-        public let swiftLint: Artifact
+        public let swiftFormatRepair: Artifact
         public let engines: [Engine]
         public let bundles: [Bundle]
         public let commitment: Commitment
@@ -18,7 +18,6 @@ extension Institute.Source {
             self.revision = revision
             self.requiredEngines = [
                 .init("swift-format"),
-                .init("swiftlint"),
                 .init("swift-linter"),
             ]
             self.swiftFormat = .init(
@@ -26,10 +25,10 @@ extension Institute.Source {
                 contents: Self.swiftFormatConfiguration,
                 schema: "swift-format:1"
             )
-            self.swiftLint = .init(
-                path: ".swiftlint.yml",
-                contents: Self.swiftLintConfiguration,
-                schema: "swiftlint:0.65.0"
+            self.swiftFormatRepair = .init(
+                path: ".swift-format-repair",
+                contents: Self.swiftFormatRepairConfiguration,
+                schema: "swift-format:1"
             )
             self.engines = [
                 .init(
@@ -50,31 +49,6 @@ extension Institute.Source {
                             build: "27A5237l",
                             relativePath:
                                 "Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-format"
-                        )
-                    ),
-                    manifest: nil,
-                    inventory: nil,
-                    checksums: nil
-                ),
-                .init(
-                    id: .init("swiftlint"),
-                    platform: .macOSARM64,
-                    version: "0.65.0",
-                    revision: "0.65.0",
-                    toolchain: "portable SwiftLint release",
-                    schema: "swiftlint-json:0.65.0",
-                    executable: .init(
-                        name: "swiftlint",
-                        digest: .init(
-                            "06bdd57b59087dde8680ba6a62452defd71babd0513023f19ddfc6773708ba34"
-                        ),
-                        origin: .releaseArchive(
-                            base: "https://github.com/realm/SwiftLint/releases/download/0.65.0",
-                            archive: "portable_swiftlint.zip",
-                            digest: .init(
-                                "d6cb0aa7a2f5f1ef306fc9e37bcb54dc9a26facc8f7784ac0c3dd3eccf5c6ba6"
-                            ),
-                            member: "swiftlint"
                         )
                     ),
                     manifest: nil,
@@ -133,7 +107,12 @@ extension Institute.Source {
                 ("schema", 1),
                 ("revision", JSON(stringLiteral: revision)),
                 ("bundle", JSON(stringLiteral: bundle.token)),
-                ("rules", rules.sorted(by: { $0.token < $1.token }).json),
+                (
+                    "rules",
+                    .array(
+                        rules.map(\.token).sorted().map(JSON.init(stringLiteral:))
+                    )
+                ),
             ])
             return .init(
                 path: "source-linter-profile.json",
@@ -146,19 +125,16 @@ extension Institute.Source {
             swiftFormatExecutable: Swift.String,
             swiftFormatTool: Source_Profile.Source.Profile.Digest,
             swiftFormatConfigurationPath: Swift.String,
-            swiftLintExecutable: Swift.String,
-            swiftLintTool: Source_Profile.Source.Profile.Digest,
-            swiftLintConfigurationPath: Swift.String,
-            swiftLintRules: [Source_Profile.Source.Rule.ID],
             linterExecutable: Swift.String,
             linterTool: Source_Profile.Source.Profile.Digest,
             linterConfigurationPath: Swift.String,
             bundle: Bundle,
-            linterRules: [Source_Profile.Source.Rule.ID]
+            linterRules: [Source_Profile.Source.Rule.ID],
+            repair: Swift.Bool = false
         ) -> Source_Profile.Source.Profile {
             let swiftFormatID = Source_Profile.Source.Engine.ID("swift-format")
-            let swiftLintID = Source_Profile.Source.Engine.ID("swiftlint")
             let linterID = Source_Profile.Source.Engine.ID("swift-linter")
+            let formatConfiguration = repair ? swiftFormatRepair : swiftFormat
             return Source_Profile.Source.Profile(
                 revision: revision,
                 engines: [
@@ -166,19 +142,10 @@ extension Institute.Source {
                         id: swiftFormatID,
                         executable: swiftFormatExecutable,
                         tool: swiftFormatTool,
-                        configuration: swiftFormat.digest,
+                        configuration: formatConfiguration.digest,
                         configurationPath: swiftFormatConfigurationPath,
                         artifactKinds: [.swift],
                         rules: [.init(engine: swiftFormatID, token: "format")]
-                    ),
-                    .init(
-                        id: swiftLintID,
-                        executable: swiftLintExecutable,
-                        tool: swiftLintTool,
-                        configuration: swiftLint.digest,
-                        configurationPath: swiftLintConfigurationPath,
-                        artifactKinds: [.swift],
-                        rules: swiftLintRules
                     ),
                     .init(
                         id: linterID,

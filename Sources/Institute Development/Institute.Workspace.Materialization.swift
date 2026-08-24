@@ -35,6 +35,11 @@ extension Institute.Workspace {
                 fanout: .init(jobs: jobs),
                 timeout: timeout
             )
+            try Self.validate(
+                specification: specification,
+                catalog: catalog,
+                configuration: Institute.Configuration.load(at: root.checkout)
+            )
             let scheme = try Institute.Xcode.Scheme.plan(
                 for: specification,
                 catalog: catalog

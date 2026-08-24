@@ -51,7 +51,7 @@ extension Institute.Source.Application {
     preparation: Institute.Source.Preparation
   ) async throws(Institute.Error) -> Source_Repair.Source.Repair.Plan {
     let subject = try Institute.Source.Workspace.subject(for: member)
-    let profile = try profile(for: member, preparation: preparation)
+    let profile = try profile(for: member, preparation: preparation, repair: true)
     if let rules {
       let available = Set(profile.engines.flatMap(\.rules))
       guard !rules.isEmpty, rules.isSubset(of: available) else {
@@ -59,7 +59,8 @@ extension Institute.Source.Application {
       }
     }
     let execution = try Self.execution(process: process)
-    let measurements = await execution.measure(subject, profile: profile)
+    let engines = rules.map { Set($0.map(\.engine)) }
+    let measurements = await execution.plan(subject, profile: profile, engines: engines)
     let files = Self.fileSystem(root: subject.root)
     let sourceFiles = try Self.stagedFiles(subject: subject, files: files)
     let sources = Source_Repair.Source.SourceSet.digest(sourceFiles)
@@ -86,7 +87,8 @@ extension Institute.Source.Application {
     let stagedExecution = try Self.execution(process: remapped)
     let repeated = await stagedExecution.measure(
       subject,
-      profile: profile
+      profile: profile,
+      engines: engines
     )
     return staging.finish(remeasured: repeated)
   }
@@ -120,7 +122,7 @@ extension Institute.Source.Application {
         throw .configuration("source repair subject is no longer admitted")
       }
       let subject = try Institute.Source.Workspace.subject(for: row)
-      let profile = try profile(for: row, preparation: preparation)
+      let profile = try profile(for: row, preparation: preparation, repair: true)
       let files = Self.fileSystem(root: subject.root)
       let sources = Source_Repair.Source.SourceSet.digest(
         try Self.stagedFiles(subject: subject, files: files)
@@ -215,13 +217,23 @@ extension Institute.Source.Application {
     to staging: Swift.String
   ) -> Source_Measurement.Source.Engine.Process {
     .init { executable, arguments, _, environment in
+      let prefix = source.hasSuffix("/") ? source : source + "/"
+      let stagingPrefix = staging.hasSuffix("/") ? staging : staging + "/"
       let rewritten = arguments.map { argument in
         if argument == source { return staging }
-        let prefix = source.hasSuffix("/") ? source : source + "/"
         guard argument.hasPrefix(prefix) else { return argument }
-        return staging + "/" + argument.dropFirst(prefix.count)
+        return stagingPrefix + argument.dropFirst(prefix.count)
       }
-      return await process.run(executable, rewritten, staging, environment)
+      let result = await process.run(executable, rewritten, staging, environment)
+      return .init(
+        status: result.status,
+        output: result.output
+          .replacing(stagingPrefix, with: prefix)
+          .replacing(staging, with: source),
+        diagnostics: result.diagnostics
+          .replacing(stagingPrefix, with: prefix)
+          .replacing(staging, with: source)
+      )
     }
   }
 

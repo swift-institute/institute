@@ -7,7 +7,8 @@ public import Source_Profile
 extension Institute.Source.Application {
   func profile(
     for row: Institute.Source.Workspace.Row,
-    preparation: Institute.Source.Preparation
+    preparation: Institute.Source.Preparation,
+    repair: Swift.Bool = false
   ) throws(Institute.Error) -> Source_Profile.Source.Profile {
     let policy = Institute.Source.Policy.current
     guard preparation.policyRevision == policy.revision else {
@@ -15,21 +16,23 @@ extension Institute.Source.Application {
     }
     guard
       Self.matches(file: preparation.swiftFormatExecutable, digest: preparation.swiftFormatTool),
-      Self.matches(file: preparation.swiftLintExecutable, digest: preparation.swiftLintTool),
       Self.matches(file: preparation.linterExecutable, digest: preparation.linterTool)
     else { throw .configuration("source preparation tool is stale") }
+    let formatArtifact = repair ? policy.swiftFormatRepair : policy.swiftFormat
+    let formatConfiguration = "\(preparation.directory)/\(formatArtifact.path)"
     guard
       Self.matches(
-        file: "\(preparation.directory)/.swift-format",
-        digest: policy.swiftFormat.digest
-      ),
-      Self.matches(
-        file: "\(preparation.directory)/.swiftlint.yml",
-        digest: policy.swiftLint.digest
+        file: formatConfiguration,
+        digest: formatArtifact.digest
       )
     else { throw .configuration("source preparation configuration is stale") }
     let owner = Institute.Source.Profile(policy: policy)
     let bundle = try owner.bundle(for: row)
+    guard preparation.verifiedProfiles.contains(bundle.rawValue) else {
+      throw .configuration(
+        "source linter profile for \(bundle.rawValue) has no parse receipt"
+      )
+    }
     let rules = owner.rules(for: bundle)
     let linterConfiguration =
       "\(preparation.directory)/\(bundle.rawValue)-source-linter-profile.json"
@@ -40,19 +43,18 @@ extension Institute.Source.Application {
     let profile = policy.profile(
       swiftFormatExecutable: preparation.swiftFormatExecutable,
       swiftFormatTool: preparation.swiftFormatTool,
-      swiftFormatConfigurationPath: "\(preparation.directory)/.swift-format",
-      swiftLintExecutable: preparation.swiftLintExecutable,
-      swiftLintTool: preparation.swiftLintTool,
-      swiftLintConfigurationPath: "\(preparation.directory)/.swiftlint.yml",
-      swiftLintRules: preparation.swiftLintRules,
+      swiftFormatConfigurationPath: formatConfiguration,
       linterExecutable: preparation.linterExecutable,
       linterTool: preparation.linterTool,
       linterConfigurationPath: linterConfiguration,
       bundle: bundle,
-      linterRules: rules
+      linterRules: rules,
+      repair: repair
     )
-    guard preparation.profiles[bundle.rawValue] == profile.digest else {
-      throw .configuration("source profile is stale for \(bundle.rawValue)")
+    if !repair {
+      guard preparation.profiles[bundle.rawValue] == profile.digest else {
+        throw .configuration("source profile is stale for \(bundle.rawValue)")
+      }
     }
     return profile
   }

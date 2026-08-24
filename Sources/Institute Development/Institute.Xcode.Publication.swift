@@ -41,6 +41,7 @@ extension Institute.Xcode.Publication {
             throw .configuration("cannot publish an empty target catalog")
         }
         let input = Institute.Workspace.Materialization.Input(
+            dependency: specification.dependency,
             toolchain: toolchain,
             packages: catalog.entries.map { entry in
                 .init(
