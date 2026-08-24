@@ -59,7 +59,7 @@ struct `Institute source policy` {
     }
 
     @Test
-    func `rendered linter profile carries schema-1 string rules`() throws {
+    func `rendered linter profile carries schema two rules without unrelated applicability`() throws {
         let policy = Institute.Source.Policy.current
         let linter = Source.Engine.ID("swift-linter")
         let rules = [
@@ -69,10 +69,28 @@ struct `Institute source policy` {
         let artifact = policy.linter(bundle: .institute, rules: rules)
         let document = try JSON.parse(artifact.contents)
         let object = try #require(document.dictionary)
-        #expect(try Swift.Int(json: #require(object["schema"])) == 1)
+        #expect(try Swift.Int(json: #require(object["schema"])) == 2)
         #expect(try Swift.String(json: #require(object["bundle"])) == "institute")
         let rendered = try [Swift.String](json: #require(object["rules"]))
         #expect(rendered == ["a rule", "b rule"])
+        #expect(try [JSON](json: #require(object["applicability"])).isEmpty)
+    }
+
+    @Test
+    func `compound identifier profile carries exact externally standardized target identity`() throws {
+        let policy = Institute.Source.Policy.current
+        let linter = Source.Engine.ID("swift-linter")
+        let rules = [Source.Rule.ID(engine: linter, token: "compound identifier")]
+        let artifact = policy.linter(bundle: .institute, rules: rules)
+        let document = try JSON.parse(artifact.contents)
+        let object = try #require(document.dictionary)
+        let applications = try [JSON](json: #require(object["applicability"]))
+        let application = try #require(applications.first?.dictionary)
+        #expect(try Swift.String(json: #require(application["rule"])) == "compound identifier")
+        let targets = try [JSON](json: #require(application["excludedTargets"]))
+        let target = try #require(targets.first?.dictionary)
+        #expect(try Swift.String(json: #require(target["identity"])) == "CSS")
+        #expect(try Swift.String(json: #require(target["sourceRoot"])) == "Sources/CSS/")
     }
 
     @Test

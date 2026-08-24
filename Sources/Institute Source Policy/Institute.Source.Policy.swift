@@ -11,6 +11,7 @@ extension Institute.Source {
         public let swiftFormatRepair: Artifact
         public let engines: [Engine]
         public let bundles: [Bundle]
+        public let externallyStandardizedTargets: [ExternallyStandardizedTarget]
         public let commitment: Commitment
         public let configuration: Configuration
 
@@ -78,6 +79,7 @@ extension Institute.Source {
                 ),
             ]
             self.bundles = Bundle.allCases
+            self.externallyStandardizedTargets = [.init("CSS")]
             self.commitment = .init(
                 repositories: [
                     "swift-foundations/swift-linter",
@@ -103,10 +105,37 @@ extension Institute.Source {
             bundle: Bundle,
             rules: [Source_Profile.Source.Rule.ID]
         ) -> Artifact {
+            let compoundIdentifier = Source_Profile.Source.Rule.ID(
+                engine: .init("swift-linter"),
+                token: "compound identifier"
+            )
+            let applicability: JSON = if rules.contains(compoundIdentifier) {
+                .array([
+                    .object([
+                        ("rule", JSON(stringLiteral: compoundIdentifier.token)),
+                        (
+                            "excludedTargets",
+                            .array(
+                                externallyStandardizedTargets.sorted {
+                                    $0.identity < $1.identity
+                                }.map { target in
+                                    .object([
+                                        ("identity", JSON(stringLiteral: target.identity)),
+                                        ("sourceRoot", JSON(stringLiteral: target.sourceRoot)),
+                                    ])
+                                }
+                            )
+                        ),
+                    ])
+                ])
+            } else {
+                .array([])
+            }
             let document = JSON.object([
-                ("schema", 1),
+                ("schema", 2),
                 ("revision", JSON(stringLiteral: revision)),
                 ("bundle", JSON(stringLiteral: bundle.token)),
+                ("applicability", applicability),
                 (
                     "rules",
                     .array(
@@ -117,7 +146,7 @@ extension Institute.Source {
             return .init(
                 path: "source-linter-profile.json",
                 contents: document.serialize(pretty: false) + "\n",
-                schema: "swift-linter-profile:1"
+                schema: "swift-linter-profile:2"
             )
         }
 

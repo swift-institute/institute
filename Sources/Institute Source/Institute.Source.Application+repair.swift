@@ -71,7 +71,7 @@ extension Institute.Source.Application {
         profile: profile.digest,
         sources: sources,
         measurements: measurements,
-        rules: rules,
+        selection: .init(automaticRules: rules),
         fileSystem: files
       )
     } catch {
