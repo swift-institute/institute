@@ -12,6 +12,8 @@ extension Institute.Workspace.Control {
                 owner: .init("swift-institute"),
                 name: .init("institute-continuous-integration")
             )
+        case .linter:
+            .init(owner: .init("swift-foundations"), name: .init("swift-linter"))
         }
     }
 }

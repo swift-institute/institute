@@ -33,8 +33,20 @@ extension Institute.Source.Workspace {
       rootCanonical = try File.System.Canonical.resolve(root.path)
     } catch { throw .filesystem("cannot canonicalize source root \(row.directory): \(error)") }
 
+    var sources: [Swift.String] = []
+    var packages: [[Swift.Substring]] = []
+    for path in paths where path.hasSuffix(".swift") {
+      guard valid(path) else { throw .configuration("invalid source artifact path \(path)") }
+      sources.append(path)
+      if path != "Package.swift", path.hasSuffix("/Package.swift") {
+        packages.append(Array(path.split(separator: "/").dropLast()))
+      }
+    }
     var candidates: Swift.Set<Swift.String> = ["Package.swift"]
-    for path in paths where path.hasSuffix(".swift") { candidates.insert(path) }
+    for path in sources
+    where !packages.contains(where: { path.split(separator: "/").starts(with: $0) }) {
+      candidates.insert(path)
+    }
     var canonicalFiles: Swift.Set<Swift.String> = []
     var artifacts: [Source.Artifact] = []
     for path in candidates.sorted() {

@@ -392,6 +392,8 @@ extension Institute.Xcode.Scheme {
                 buildables: ["Institute Continuous Integration Source"],
                 testables: []
             )
+        case .linter:
+            (buildables: ["runner"], testables: [])
         }
     }
 }

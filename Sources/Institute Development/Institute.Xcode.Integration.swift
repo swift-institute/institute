@@ -62,6 +62,7 @@ extension Institute.Xcode {
     private static let integrationControls: [Institute.Workspace.Control] = [
         .institute,
         .application,
+        .linter,
     ]
 }
 
@@ -74,6 +75,8 @@ extension Institute.Workspace.Control {
             "group:../institute"
         case .continuousIntegration:
             "group:../institute-continuous-integration"
+        case .linter:
+            "group:../swift-foundations/swift-linter/Runner"
         }
     }
 }

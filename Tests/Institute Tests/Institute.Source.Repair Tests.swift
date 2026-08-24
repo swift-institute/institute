@@ -135,3 +135,57 @@ func `Institute source subject includes every Swift file outside build products`
         ]
     )
 }
+
+@Test
+func `Institute source subject excludes descendant package ownership`() throws {
+    let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+    defer { try? FileManager.default.removeItem(at: root) }
+    for directory in ["Sources", "Tests/Nested", "TestsSibling"] {
+        try FileManager.default.createDirectory(
+            at: root.appending(path: directory),
+            withIntermediateDirectories: true
+        )
+    }
+    for (path, contents) in [
+        ("Package.swift", "// swift-tools-version: 6.4\n"),
+        ("Package@swift-6.4.swift", "// swift-tools-version: 6.4\n"),
+        ("Sources/Owned.swift", "public enum Owned {}\n"),
+        ("Tests/Package.swift", "// swift-tools-version: 6.4\n"),
+        ("Tests/Nested/Nested.swift", "public enum Nested {}\n"),
+        ("TestsSibling/Owned.swift", "public enum Sibling {}\n"),
+    ] {
+        try Data(contents.utf8).write(to: root.appending(path: path))
+    }
+    let row = Institute.Source.Workspace.Row(
+        index: 0,
+        location: .init(scheme: .group, path: "."),
+        directory: root.path,
+        identity: "swift-foundations/swift-example",
+        role: .subject(
+            try #require(Institute.Repository.Key(identity: "swift-foundations/swift-example"))
+        ),
+        repository: nil,
+        reason: nil
+    )
+
+    let subject = try Institute.Source.Workspace.subject(
+        for: row,
+        paths: [
+            "Package.swift",
+            "Package@swift-6.4.swift",
+            "Sources/Owned.swift",
+            "Tests/Package.swift",
+            "Tests/Nested/Nested.swift",
+            "TestsSibling/Owned.swift",
+        ]
+    )
+
+    #expect(
+        subject.paths(of: .swift) == [
+            "Package.swift",
+            "Package@swift-6.4.swift",
+            "Sources/Owned.swift",
+            "TestsSibling/Owned.swift",
+        ]
+    )
+}

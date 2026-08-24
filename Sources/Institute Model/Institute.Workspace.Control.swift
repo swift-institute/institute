@@ -3,5 +3,6 @@ extension Institute.Workspace {
         case application
         case institute
         case continuousIntegration = "continuous-integration"
+        case linter
     }
 }

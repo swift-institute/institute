@@ -185,6 +185,10 @@ extension Institute.Xcode.Test.Unit {
                 role: .control(.continuousIntegration)
             ),
             .init(
+                location: "group:../swift-foundations/swift-linter/Runner",
+                role: .control(.linter)
+            ),
+            .init(
                 location: "group:../swift-primitives/swift-example",
                 role: .subject(
                     try #require(
@@ -355,7 +359,7 @@ extension Institute.Xcode.Test.Unit {
     }
 
     @Test
-    func `integration composes both self-hosting controls without changing the subject cohort`()
+    func `integration composes self-hosting controls without changing subjects`()
         throws
     {
         let repositories = [
@@ -378,6 +382,11 @@ extension Institute.Xcode.Test.Unit {
         #expect(integration.members.first?.role == .control(.institute))
         #expect(integration.members[1].location == "group:.")
         #expect(integration.members[1].role == .control(.application))
+        #expect(
+            integration.members[2].location
+                == "group:../swift-foundations/swift-linter/Runner"
+        )
+        #expect(integration.members[2].role == .control(.linter))
         #expect(
             integration.members.compactMap { member in
                 if case .subject(let repository) = member.role { repository } else { nil }
@@ -551,7 +560,7 @@ extension Institute.Xcode.Test.Integration {
     }
 
     @Test
-    func `typed controls remain outside inventory admission and enter measurement`() throws {
+    func `typed nonmeasurement control remains outside source measurement`() throws {
         let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
         let application = base.appending(path: "institute-application")
         defer { try? FileManager.default.removeItem(at: base) }
@@ -559,6 +568,7 @@ extension Institute.Xcode.Test.Integration {
             application,
             base.appending(path: "institute"),
             base.appending(path: "institute-continuous-integration"),
+            base.appending(path: "swift-foundations/swift-linter/Runner"),
             base.appending(path: "swift-primitives/swift-example"),
         ] {
             try FileManager.default.createDirectory(
@@ -584,6 +594,10 @@ extension Institute.Xcode.Test.Integration {
                 role: .control(.continuousIntegration)
             ),
             .init(
+                location: "group:../swift-foundations/swift-linter/Runner",
+                role: .control(.linter)
+            ),
+            .init(
                 location: "group:../swift-primitives/swift-example",
                 role: .subject(
                     try #require(
@@ -607,15 +621,17 @@ extension Institute.Xcode.Test.Integration {
             hierarchy: root.hierarchy
         )
 
-        #expect(cohort.references == 4)
+        #expect(cohort.references == 5)
         #expect(
             cohort.controls.map(\.identity) == [
                 "control:application",
                 "control:institute",
                 "control:continuous-integration",
+                "control:linter",
             ]
         )
         #expect(cohort.admitted.map(\.identity) == ["swift-primitives/swift-example"])
+        #expect(cohort.controls.map(\.identity).contains("control:linter"))
         #expect(
             cohort.measurable.map(\.identity) == [
                 "control:application",
