@@ -494,6 +494,7 @@ let package = Package(
           name: "Standard Library Extensions",
           package: "swift-standard-library-extensions"
         ),
+        .product(name: "Xcode Workspace", package: "swift-xcode"),
         .product(name: "Xcode Workspace Standard", package: "swift-xcode-standard"),
       ],
       path: "Tests/Institute Tests"

@@ -72,7 +72,8 @@ extension Institute.Xcode.Scheme {
                         blueprint: testable.target,
                         name: testable.target,
                         container: "container:\(testable.reference)"
-                    )
+                    ),
+                    parallelizable: true
                 )
             }
         )
@@ -83,14 +84,22 @@ extension Institute.Xcode.Scheme {
     }
 
     public static func path(at root: File.Directory) -> File {
-        Institute.Xcode.bundle(at: root)[directory: "xcshareddata"][directory: "xcschemes"][
+        path(in: Institute.Xcode.bundle(at: root))
+    }
+
+    public static func path(in bundle: File.Directory) -> File {
+        bundle[directory: "xcshareddata"][directory: "xcschemes"][
             file: "\(name).xcscheme"
         ]
     }
 
     public static func contents(at root: File.Directory) -> Swift.String? {
+        contents(in: Institute.Xcode.bundle(at: root))
+    }
+
+    public static func contents(in bundle: File.Directory) -> Swift.String? {
         do throws(Either<File.System.Read.Full.Error, Never>) {
-            return try path(at: root).read.full { bytes in
+            return try path(in: bundle).read.full { bytes in
                 var storage = [Byte]()
                 storage.reserveCapacity(bytes.count)
                 for index in bytes.indices {
@@ -121,18 +130,28 @@ extension Institute.Xcode.Scheme {
     /// observation. The only honest gate is to re-render from the manifests
     /// and compare before building, which is what this is for.
     public static func current(_ plan: Plan, at root: File.Directory) -> Swift.Bool {
-        contents(at: root) == render(plan)
+        current(plan, in: Institute.Xcode.bundle(at: root))
+    }
+
+    public static func current(_ plan: Plan, in bundle: File.Directory) -> Swift.Bool {
+        contents(in: bundle) == render(plan)
     }
 
     public static func write(
         _ plan: Plan,
         at root: File.Directory
     ) throws(Institute.Error) {
-        let bundle = Institute.Xcode.bundle(at: root)
+        try write(plan, to: Institute.Xcode.bundle(at: root))
+    }
+
+    public static func write(
+        _ plan: Plan,
+        to bundle: File.Directory
+    ) throws(Institute.Error) {
         do throws(Xcode_Scheme.Xcode.Scheme.Error) {
             try document(plan).write(name, to: bundle.description)
         } catch {
-            throw .filesystem("cannot write \(path(at: root)): \(error)")
+            throw .filesystem("cannot write \(path(in: bundle)): \(error)")
         }
     }
 }

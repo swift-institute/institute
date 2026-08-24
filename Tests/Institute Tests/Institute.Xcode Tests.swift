@@ -4,6 +4,7 @@ import JSON
 import Source_Measurement
 import Synchronization
 import Testing
+import Xcode_Workspace
 import Xcode_Workspace_Standard
 
 @testable import Institute_Conversion
@@ -276,6 +277,32 @@ extension Institute.Xcode.Test.Unit {
                     if case .subject(let repository) = member.role { repository } else { nil }
                 }
         )
+    }
+
+    @Test
+    func `workspace integration preserves exact structural member order`() throws {
+        let workspace = Xcode_Workspace.Xcode.Workspace(
+            references: [
+                .file(.init(scheme: .group, path: ".")),
+                .file(.init(scheme: .group, path: "../institute")),
+            ]
+        )
+
+        let specification = try Institute.Xcode.integration(workspace, repositories: [])
+
+        #expect(specification.members.map(\.location) == ["group:.", "group:../institute"])
+        #expect(specification.members.map(\.role) == [.control(.application), .control(.institute)])
+    }
+
+    @Test
+    func `workspace integration fails closed for an unowned reference`() throws {
+        let workspace = Xcode_Workspace.Xcode.Workspace(
+            references: [.file(.init(scheme: .group, path: "../unknown"))]
+        )
+
+        #expect(throws: Institute.Error.self) {
+            _ = try Institute.Xcode.integration(workspace, repositories: [])
+        }
     }
 }
 

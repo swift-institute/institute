@@ -112,7 +112,17 @@ extension Institute.Xcode.Scheme.Test.Unit {
 
         #expect(rendered.contains("<TestableReference"))
         #expect(rendered.contains(#"skipped="NO""#))
+        #expect(rendered.contains(#"parallelizable="YES""#))
         #expect(rendered.contains("Color Standard Tests"))
+    }
+
+    @Test
+    func `one scheme supports native build build for testing and test actions`() {
+        let rendered = Institute.Xcode.Scheme.render(Self.plan)
+
+        #expect(rendered.contains(#"buildForRunning="YES""#))
+        #expect(rendered.contains(#"buildForTesting="YES""#))
+        #expect(rendered.contains("<TestAction"))
     }
 }
 
