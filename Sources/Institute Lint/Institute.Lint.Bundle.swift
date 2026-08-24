@@ -120,8 +120,25 @@ extension Institute.Lint.Bundle {
     /// layer root — this reads that invariant backwards, and agrees with
     /// the sweep's authoritative layer by construction.
     ///
+    /// The control-plane checkouts that are institute-class by identity.
+    ///
+    /// The two packages the Institute application itself is built from.
+    /// They sit at the hierarchy root under their own repository
+    /// identity — there is no layer organization above them — so the
+    /// layer-root derivation below cannot classify them, yet their rule
+    /// set is not in question: control-plane code is organization-wide
+    /// code, and it takes the organization-wide bundle its foundations
+    /// peers activate. The match is against the checkout's identity at
+    /// the hierarchy root, never against a directory that merely shares
+    /// the name somewhere deeper in the tree.
+    private static let controlPlane: Swift.Set<Swift.String> = [
+        "institute",
+        "institute-application",
+    ]
+
     /// - Returns: `nil` when `package` is not under `hierarchy`, or when
-    ///   its first component names no layer root. Reported as
+    ///   its first component names no layer root and it is not a
+    ///   control-plane checkout at the hierarchy root. Reported as
     ///   ``Institute/Lint/Measurement/Verdict/unmeasured(reason:)`` by
     ///   the caller rather than defaulted: guessing a rule set for a
     ///   package outside the layout is how a number nobody can interpret
@@ -144,6 +161,12 @@ extension Institute.Lint.Bundle {
                 $0.organization == root.string
             })
         else {
+            // A control-plane checkout is identified, not guessed: the
+            // package root must *be* the identity-named directory at the
+            // hierarchy root. Any other unplaced package stays `nil`.
+            if full.count == base.count + 1, Self.controlPlane.contains(root.string) {
+                return .institute
+            }
             return nil
         }
         return Self(layer)
