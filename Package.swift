@@ -326,6 +326,7 @@ let package = Package(
         .product(name: "Source Linter", package: "swift-source"),
         .product(name: "Source Report", package: "swift-source"),
         .product(name: "Source Swift Format", package: "swift-source"),
+        .product(name: "Source SwiftLint", package: "swift-source"),
         .product(name: "Thread Pool", package: "swift-threads"),
       ]
     ),

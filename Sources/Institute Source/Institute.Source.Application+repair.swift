@@ -7,6 +7,7 @@ public import Source_Execution
 import Source_Linter
 public import Source_Measurement
 import Source_Swift_Format
+import Source_SwiftLint
 internal import Source_Profile
 public import Source_Repair
 
@@ -59,8 +60,7 @@ extension Institute.Source.Application {
       }
     }
     let execution = try Self.execution(process: process)
-    let engines = rules.map { Set($0.map(\.engine)) }
-    let measurements = await execution.plan(subject, profile: profile, engines: engines)
+    let measurements = await execution.plan(subject, profile: profile)
     let files = Self.fileSystem(root: subject.root)
     let sourceFiles = try Self.stagedFiles(subject: subject, files: files)
     let sources = Source_Repair.Source.SourceSet.digest(sourceFiles)
@@ -87,8 +87,7 @@ extension Institute.Source.Application {
     let stagedExecution = try Self.execution(process: remapped)
     let repeated = await stagedExecution.measure(
       subject,
-      profile: profile,
-      engines: engines
+      profile: profile
     )
     return staging.finish(remeasured: repeated)
   }
@@ -156,7 +155,9 @@ extension Institute.Source.Application {
   ) throws(Source_Execution.Source.Execution.Error) -> Source_Execution.Source.Execution {
     try .init(
       drivers: [
-        .linter(process: process), .swiftFormat(process: process),
+        .linter(process: process),
+        .swiftLint(process: process),
+        .swiftFormat(process: process),
       ]
     )
   }
