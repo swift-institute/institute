@@ -5,6 +5,89 @@ public import Source_Profile
 import Thread_Pool
 
 extension Institute.Source.Acquisition {
+  func snapshot(
+    executable path: Swift.String,
+    into directory: File.Directory
+  ) throws(Institute.Error) -> (
+    file: File,
+    digest: Source_Profile.Source.Profile.Digest
+  ) {
+    let source: File
+    do throws(File.Path.Error) { source = File(try .init(path)) } catch {
+      throw .configuration("invalid local source linter path")
+    }
+    guard source.stat.isFile, !source.stat.isSymlink else {
+      throw .configuration("local source linter is not a regular file")
+    }
+    let sourcePermissions: File.System.Metadata.Permissions
+    do throws(Kernel.File.Stats.Error) { sourcePermissions = try source.stat.permissions } catch {
+      throw .filesystem("cannot inspect local source linter permissions: \(error)")
+    }
+    guard
+      sourcePermissions.contains(.ownerExecute)
+        || sourcePermissions.contains(.groupExecute)
+        || sourcePermissions.contains(.otherExecute)
+    else {
+      throw .configuration("local source linter is not executable")
+    }
+
+    let digest = try Institute.Source.Application.digest(file: source.description)
+    let destination = directory[
+      file: try Self.component("swift-linter-local-\(digest.hex)")
+    ]
+    if destination.stat.isFile,
+      try Institute.Source.Application.digest(file: destination.description) == digest
+    {
+      try Self.permissions(executable: true, file: destination)
+      return (destination, digest)
+    }
+
+    do throws(File.System.Create.Directory.Error) {
+      try File.System.Create.Directory.create(
+        at: directory.path,
+        createIntermediates: true
+      )
+    } catch {
+      throw .filesystem("cannot create source asset directory \(directory): \(error)")
+    }
+    let stagingPath: File.Path
+    do throws(File.Path.Temporary.Error) {
+      stagingPath = try File.Path.Temporary.sibling(
+        of: destination.path,
+        prefix: ".source-local-linter-",
+        suffix: ".staging"
+      )
+    } catch {
+      throw .filesystem("cannot allocate local source linter staging path: \(error)")
+    }
+    let staging = File(stagingPath)
+    defer {
+      do throws(File.System.Delete.Error) {
+        if staging.stat.exists { try staging.delete() }
+      } catch {}
+    }
+    do throws(File.System.Copy.Error) {
+      try File.System.Copy.copy(from: source.path, to: staging.path)
+    } catch {
+      throw .filesystem("cannot snapshot local source linter: \(error)")
+    }
+    let copied = try Institute.Source.Application.digest(file: staging.description)
+    guard copied == digest else {
+      throw .configuration("local source linter changed while being snapshotted")
+    }
+    try Self.permissions(executable: true, file: staging)
+    do throws(File.System.Move.Error) {
+      try File.System.Move.move(
+        from: staging.path,
+        to: destination.path,
+        options: .init(overwrite: true)
+      )
+    } catch {
+      throw .filesystem("cannot publish local source linter snapshot: \(error)")
+    }
+    return (destination, digest)
+  }
+
   func acquire(
     _ asset: Institute.Source.Policy.Asset,
     executable: Swift.Bool,

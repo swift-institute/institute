@@ -7,8 +7,14 @@ public import Source_Profile
 import Thread_Pool
 
 extension Institute.Source.Application {
+  public enum Linter: Sendable, Equatable {
+    case published
+    case local(executable: Swift.String)
+  }
+
   public func prepare(
-    workspace: Swift.String
+    workspace: Swift.String,
+    linter selection: Linter = .published
   ) async throws(Institute.Error) -> Institute.Source.Preparation {
     let policy = Institute.Source.Policy.current
     let directory = try Self.artifactDirectory(workspace: workspace)
@@ -21,13 +27,23 @@ extension Institute.Source.Application {
     let tools = directory[directory: "tools"]
     let acquisition = Institute.Source.Acquisition(process: process)
     let swiftFormatAsset = try Self.engine("swift-format", policy: policy).executable
-    let linterAsset = try Self.engine("swift-linter", policy: policy).executable
     let swiftFormat = try await acquisition.acquire(swiftFormatAsset, executable: true, into: tools)
-    let linterToolFile = try await acquisition.acquire(linterAsset, executable: true, into: tools)
+    let linterToolFile: File
+    let linter: Institute.Source.Preparation.Linter
+    switch selection {
+    case .published:
+      let asset = try Self.engine("swift-linter", policy: policy).executable
+      linterToolFile = try await acquisition.acquire(asset, executable: true, into: tools)
+      linter = .init(origin: .published(asset: asset.name), digest: asset.digest)
+    case .local(let executable):
+      let snapshot = try acquisition.snapshot(executable: executable, into: tools)
+      linterToolFile = snapshot.file
+      linter = .init(origin: .local, digest: snapshot.digest)
+    }
     let swiftFormatExecutable = swiftFormat.description
     let linterExecutable = linterToolFile.description
     let swiftFormatTool = swiftFormatAsset.digest
-    let linterTool = linterAsset.digest
+    let linterTool = linter.digest
     let format = directory[file: try Self.component(policy.swiftFormat.path)]
     do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
       try await format.write.atomic(policy.swiftFormat.contents)
@@ -76,7 +92,7 @@ extension Institute.Source.Application {
       swiftFormatExecutable: swiftFormatExecutable,
       swiftFormatTool: swiftFormatTool,
       linterExecutable: linterExecutable,
-      linterTool: linterTool,
+      linter: linter,
       directory: directory.description,
       profiles: profiles,
       verifiedProfiles: verifiedProfiles.sorted()
