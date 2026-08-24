@@ -27,25 +27,57 @@ extension Institute.Xcode.Scheme.Test.Unit {
                 ("Institute Development", false), ("Institute Lint", false),
                 ("Institute Pages", false), ("Institute Doctor", false),
                 ("Institute Conversion", false), ("Institute Instruments", false),
+                ("Institute CI Canon", false), ("Institute CI Contract", false),
+                ("Institute CI Inventory", false), ("Institute CI Model", false),
+                ("Institute CI Validation", false), ("Institute CI Workflow", false),
+                ("Institute Repository Policy", false), ("Institute Source Policy", false),
                 ("Institute Tests", true),
                 ("Institute Instruments Tests", true),
                 ("Institute Development Tests", true),
+                ("Institute CI Canon Tests", true),
+                ("Institute CI Inventory Tests", true),
+                ("Institute CI Model Tests", true),
+                ("Institute CI Validation Tests", true),
+                ("Institute CI Workflow Tests", true),
+                ("Institute Source Policy Tests", true),
             ]
         )
         try Self.package(
             at: application,
             name: "institute-application",
             targets: [
-                ("Institute Architecture Model", false), ("Institute Architecture Facts", false),
-                ("Institute Architecture Graph", false), ("Institute_Architecture_Index", false),
+                ("Institute Application", false), ("Institute CI Application", false),
+                ("Institute Application CLI", false),
+                ("Institute Certification Application", false),
+                ("Institute Coherence Application", false),
+                ("Institute Composition Application", false),
+                ("Institute Context Application", false),
+                ("Institute Conversion Application", false),
+                ("Institute Dependency Application", false),
+                ("Institute Doctor Application", false),
+                ("Institute GitHub Application", false),
+                ("Institute Inventory Application", false),
+                ("Institute Lint Application", false),
+                ("Institute Navigation Application", false),
+                ("Institute Package Application", false),
+                ("Institute Repository Application", false),
+                ("Institute Source Application", false),
+                ("Institute Verification Application", false),
+                ("Institute Workspace Application", false),
+                ("Institute Architecture CLI", false),
+                ("Institute Architecture Candidates", false),
+                ("Institute Architecture Facts", false),
+                ("Institute Architecture Graph", false),
+                ("Institute Architecture Index", false),
+                ("Institute Architecture Migration", false),
+                ("Institute Architecture Model", false),
                 ("Institute Architecture Validation", false),
-                ("Institute_Architecture_Candidates", false),
-                ("Institute Architecture Migration", false), ("InstituteArchitectureCLI", false),
-                ("Institute GitHub", false), ("Institute Source Application", false),
-                ("Institute Application", false), ("Institute Application CLI", false),
-                ("InstituteArchitectureTests", true),
+                ("Institute GitHub", false),
+                ("Institute CI Application Tests", true),
+                ("Institute Repository Application Tests", true),
                 ("Institute Source Application Tests", true),
                 ("Institute Application Tests", true),
+                ("Institute Architecture Tests", true),
             ]
         )
         try Self.package(
@@ -92,19 +124,27 @@ extension Institute.Xcode.Scheme.Test.Unit {
             timeout: .seconds(5)
         )
 
-        #expect(Array(plan.buildables.prefix(13)).allSatisfy { $0.reference == "../institute" })
-        #expect(Array(plan.buildables.dropFirst(13).prefix(12)).allSatisfy { $0.reference == "." })
+        #expect(Array(plan.buildables.prefix(21)).allSatisfy { $0.reference == "../institute" })
+        #expect(Array(plan.buildables.dropFirst(21).prefix(28)).allSatisfy { $0.reference == "." })
         #expect(
-            Array(plan.buildables.dropFirst(25).prefix(6)).allSatisfy { $0.reference == "../slow" })
+            Array(plan.buildables.dropFirst(49).prefix(6)).allSatisfy { $0.reference == "../slow" })
         #expect(plan.buildables.last?.reference == "../fast")
         #expect(
             plan.testables.map(\.target) == [
                 "Institute Tests",
                 "Institute Instruments Tests",
                 "Institute Development Tests",
-                "InstituteArchitectureTests",
+                "Institute CI Canon Tests",
+                "Institute CI Inventory Tests",
+                "Institute CI Model Tests",
+                "Institute CI Validation Tests",
+                "Institute CI Workflow Tests",
+                "Institute Source Policy Tests",
+                "Institute CI Application Tests",
+                "Institute Repository Application Tests",
                 "Institute Source Application Tests",
                 "Institute Application Tests",
+                "Institute Architecture Tests",
                 "Slow Tests",
                 "Fast Tests",
             ])
