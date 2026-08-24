@@ -64,7 +64,6 @@ extension Institute.Sync {
                     ("Institute Doctor Application", false),
                     ("Institute GitHub Application", false),
                     ("Institute Inventory Application", false),
-                    ("Institute Lint Application", false),
                     ("Institute Navigation Application", false),
                     ("Institute Package Application", false),
                     ("Institute Repository Application", false),

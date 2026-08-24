@@ -57,7 +57,6 @@ extension Institute.Xcode.Scheme.Test.Unit {
                 ("Institute Doctor Application", false),
                 ("Institute GitHub Application", false),
                 ("Institute Inventory Application", false),
-                ("Institute Lint Application", false),
                 ("Institute Navigation Application", false),
                 ("Institute Package Application", false),
                 ("Institute Repository Application", false),
@@ -125,9 +124,9 @@ extension Institute.Xcode.Scheme.Test.Unit {
         )
 
         #expect(Array(plan.buildables.prefix(21)).allSatisfy { $0.reference == "../institute" })
-        #expect(Array(plan.buildables.dropFirst(21).prefix(28)).allSatisfy { $0.reference == "." })
+        #expect(Array(plan.buildables.dropFirst(21).prefix(27)).allSatisfy { $0.reference == "." })
         #expect(
-            Array(plan.buildables.dropFirst(49).prefix(6)).allSatisfy { $0.reference == "../slow" })
+            Array(plan.buildables.dropFirst(48).prefix(6)).allSatisfy { $0.reference == "../slow" })
         #expect(plan.buildables.last?.reference == "../fast")
         #expect(
             plan.testables.map(\.target) == [

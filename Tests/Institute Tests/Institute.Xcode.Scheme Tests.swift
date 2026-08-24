@@ -112,6 +112,8 @@ extension Institute.Xcode.Scheme.Test.Unit {
 
         #expect(rendered.contains("<TestableReference"))
         #expect(rendered.contains(#"skipped="NO""#))
+        #expect(rendered.contains(#"parallelizable="YES""#))
+        #expect(!rendered.contains(#"parallelizable="NO""#))
         #expect(rendered.contains("Color Standard Tests"))
     }
 

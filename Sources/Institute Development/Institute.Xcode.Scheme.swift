@@ -72,7 +72,8 @@ extension Institute.Xcode.Scheme {
                         blueprint: testable.target,
                         name: testable.target,
                         container: "container:\(testable.reference)"
-                    )
+                    ),
+                    parallelizable: true
                 )
             }
         )
@@ -372,10 +373,10 @@ extension Institute.Xcode.Scheme {
                     "Institute Context Application", "Institute Conversion Application",
                     "Institute Dependency Application", "Institute Doctor Application",
                     "Institute GitHub Application", "Institute Inventory Application",
-                    "Institute Lint Application", "Institute Navigation Application",
-                    "Institute Package Application", "Institute Repository Application",
-                    "Institute Source Application", "Institute Verification Application",
-                    "Institute Workspace Application", "Institute Architecture CLI",
+                    "Institute Navigation Application", "Institute Package Application",
+                    "Institute Repository Application", "Institute Source Application",
+                    "Institute Verification Application", "Institute Workspace Application",
+                    "Institute Architecture CLI",
                     "Institute Architecture Candidates", "Institute Architecture Facts",
                     "Institute Architecture Graph", "Institute Architecture Index",
                     "Institute Architecture Migration", "Institute Architecture Model",
