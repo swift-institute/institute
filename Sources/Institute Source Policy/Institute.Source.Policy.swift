@@ -54,7 +54,7 @@ extension Institute.Source {
                     executable: .init(
                         name: "swift-format",
                         digest: .init(
-                            "649ef37b500751f36258ce7fce0a47f1348a542f1ec6b54d52428064fae5c9a9"
+                            "f61455c5d950bdc7ad5115c53c2c0d769d8c1f314f4ac64a179dfe097aa07e54"
                         ),
                         origin: .xcode(
                             application: "/Applications/Xcode-beta.app",
