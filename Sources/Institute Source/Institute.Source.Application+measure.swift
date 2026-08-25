@@ -8,6 +8,7 @@ public import Source_Execution
 import Source_Linter
 public import Source_Measurement
 internal import Source_Profile
+import Source_Repair
 public import Source_Report
 import Source_Swift_Format
 
