@@ -92,11 +92,12 @@ extension Institute.Source.Acquisition {
   func acquire(
     _ asset: Institute.Source.Policy.Asset,
     executable: Swift.Bool,
+    xcodeApplication: Swift.String? = nil,
     into directory: File.Directory
   ) async throws(Institute.Error) -> File {
     let component = try Self.component(asset.name)
     let destination = directory[file: component]
-    if destination.stat.isFile,
+    if xcodeApplication == nil, destination.stat.isFile,
       try Institute.Source.Application.digest(file: destination.description) == asset.digest
     {
       try Self.permissions(executable: executable, file: destination)
@@ -130,8 +131,14 @@ extension Institute.Source.Acquisition {
 
     switch asset.origin {
     case .release(let base):
+      guard xcodeApplication == nil else {
+        throw .configuration("Xcode selection supplied for a release source asset")
+      }
       try await download(asset: asset, base: base, to: staging, under: directory)
     case .releaseArchive(let base, let archive, let digest, let member):
+      guard xcodeApplication == nil else {
+        throw .configuration("Xcode selection supplied for an archive source asset")
+      }
       try await extract(
         asset: asset,
         base: base,
@@ -143,7 +150,7 @@ extension Institute.Source.Acquisition {
       )
     case .xcode(let application, let version, let build, let relativePath):
       try await copyXcode(
-        application: application,
+        application: xcodeApplication ?? application,
         version: version,
         build: build,
         relativePath: relativePath,

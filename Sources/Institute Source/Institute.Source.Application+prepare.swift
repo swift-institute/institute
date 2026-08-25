@@ -4,6 +4,7 @@ public import Institute_Source_Policy
 public import Institute_Model
 internal import Institute_Source_Profile
 public import Source_Profile
+public import Source_Repair
 import Thread_Pool
 
 extension Institute.Source.Application {
@@ -14,11 +15,44 @@ extension Institute.Source.Application {
 
   public func prepare(
     workspace: Swift.String,
+    xcodeApplication: Swift.String? = nil,
     swiftLint swiftLintSelection: Executable = .published,
     linter linterSelection: Executable = .published
   ) async throws(Institute.Error) -> Institute.Source.Preparation {
+    try await prepare(
+      directory: Self.artifactDirectory(workspace: workspace),
+      binding: .workspace(
+        digest: try Self.digest(file: workspace + "/contents.xcworkspacedata").hex
+      ),
+      xcodeApplication: xcodeApplication,
+      swiftLint: swiftLintSelection,
+      linter: linterSelection
+    )
+  }
+
+  public func prepare(
+    subject: Source_Repair.Source.Subject,
+    xcodeApplication: Swift.String? = nil,
+    swiftLint swiftLintSelection: Executable = .published,
+    linter linterSelection: Executable = .published
+  ) async throws(Institute.Error) -> Institute.Source.Preparation {
+    try await prepare(
+      directory: try Self.artifactDirectory(packageRoot: subject.root),
+      binding: .package(subject.binding),
+      xcodeApplication: xcodeApplication,
+      swiftLint: swiftLintSelection,
+      linter: linterSelection
+    )
+  }
+
+  private func prepare(
+    directory: File.Directory,
+    binding: Institute.Source.Preparation.Binding,
+    xcodeApplication: Swift.String?,
+    swiftLint swiftLintSelection: Executable,
+    linter linterSelection: Executable
+  ) async throws(Institute.Error) -> Institute.Source.Preparation {
     let policy = Institute.Source.Policy.current
-    let directory = try Self.artifactDirectory(workspace: workspace)
     do throws(Either<Kernel.Thread.Pool.Error, File.System.Create.Directory.Error>) {
       try await directory.create.recursive()
     } catch {
@@ -28,7 +62,12 @@ extension Institute.Source.Application {
     let tools = directory[directory: "tools"]
     let acquisition = Institute.Source.Acquisition(process: process)
     let swiftFormatAsset = try Self.engine("swift-format", policy: policy).executable
-    let swiftFormat = try await acquisition.acquire(swiftFormatAsset, executable: true, into: tools)
+    let swiftFormat = try await acquisition.acquire(
+      swiftFormatAsset,
+      executable: true,
+      xcodeApplication: xcodeApplication,
+      into: tools
+    )
     let swiftLintToolFile: File
     let swiftLint: Institute.Source.Preparation.Tool
     switch swiftLintSelection {
@@ -118,7 +157,7 @@ extension Institute.Source.Application {
     }
     let preparation = Institute.Source.Preparation(
       policyRevision: policy.revision,
-      workspaceDigest: try Self.digest(file: workspace + "/contents.xcworkspacedata").hex,
+      binding: binding,
       swiftFormatExecutable: swiftFormatExecutable,
       swiftFormatTool: swiftFormatTool,
       swiftLintExecutable: swiftLintExecutable,
@@ -181,6 +220,20 @@ extension Institute.Source.Application {
       throw .configuration("source workspace has no containing directory")
     }
     return parent[directory: ".source"]
+  }
+
+  public static func artifactDirectory(packageRoot: Swift.String) throws(Institute.Error)
+    -> File.Directory
+  {
+    let path: File.Path
+    do throws(File.Path.Error) { path = try .init(packageRoot) } catch {
+      throw .configuration("invalid source package path \(packageRoot)")
+    }
+    let root = File.Directory(path)
+    guard root[file: "Package.swift"].stat.isFile else {
+      throw .configuration("source package manifest is missing at \(packageRoot)")
+    }
+    return root[directory: ".source"]
   }
 
   static func digest(file path: Swift.String) throws(Institute.Error)

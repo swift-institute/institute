@@ -7,31 +7,70 @@ public import Source_Measurement
 
 extension Institute.Source.Workspace {
   public static func subject(
+    repository: Swift.String,
+    revision: Swift.String,
+    root: Swift.String,
+    using git: Git.Client = .init()
+  ) throws(Institute.Error) -> Source.Subject {
+    let head: Swift.String
+    let dirty: Swift.Bool
+    do throws(Git.Client.Error) {
+      head = try git.head(at: root).rawValue
+      dirty = try !git.status(at: root).isEmpty
+    } catch {
+      throw .filesystem("cannot bind source package (repository): \(error)")
+    }
+    guard head == revision else {
+      throw .configuration("source package HEAD is \(head), expected \(revision)")
+    }
+    guard !dirty else {
+      throw .configuration("source package has changes outside revision \(revision)")
+    }
+    return try subject(identity: "\(repository)@\(revision)", root: root, using: git)
+  }
+
+  public static func subject(
     for row: Row,
     using git: Git.Client = .init()
   ) throws(Institute.Error) -> Source.Subject {
+    try subject(identity: row.identity, root: row.directory, using: git)
+  }
+
+  public static func subject(
+    identity: Swift.String,
+    root: Swift.String,
+    using git: Git.Client = .init()
+  ) throws(Institute.Error) -> Source.Subject {
     let paths: [Swift.String]
-    do throws(Git.Client.Error) { paths = try git.paths(at: row.directory) } catch {
-      throw .filesystem("cannot enumerate Git paths for \(row.identity): \(error)")
+    do throws(Git.Client.Error) { paths = try git.paths(at: root) } catch {
+      throw .filesystem("cannot enumerate Git paths for \(identity): \(error)")
     }
-    return try subject(for: row, paths: paths)
+    return try subject(identity: identity, root: root, paths: paths)
   }
 
   public static func subject(
     for row: Row,
     paths: [Swift.String]
   ) throws(Institute.Error) -> Source.Subject {
+    try subject(identity: row.identity, root: row.directory, paths: paths)
+  }
+
+  public static func subject(
+    identity: Swift.String,
+    root rootPath: Swift.String,
+    paths: [Swift.String]
+  ) throws(Institute.Error) -> Source.Subject {
     let root: File.Directory
-    do throws(File.Path.Error) { root = File.Directory(try .init(row.directory)) } catch {
-      throw .configuration("invalid source member path \(row.directory)")
+    do throws(File.Path.Error) { root = File.Directory(try .init(rootPath)) } catch {
+      throw .configuration("invalid source member path \(rootPath)")
     }
     guard root[file: "Package.swift"].stat.isFile else {
-      throw .configuration("source member manifest is missing at \(row.directory)")
+      throw .configuration("source member manifest is missing at \(rootPath)")
     }
     let rootCanonical: File.Path
     do throws(File.System.Canonical.Error) {
       rootCanonical = try File.System.Canonical.resolve(root.path)
-    } catch { throw .filesystem("cannot canonicalize source root \(row.directory): \(error)") }
+    } catch { throw .filesystem("cannot canonicalize source root \(rootPath): \(error)") }
 
     var sources: [Swift.String] = []
     var packages: [[Swift.Substring]] = []
@@ -81,7 +120,7 @@ extension Institute.Source.Workspace {
         )
       )
     }
-    return .init(identity: row.identity, root: row.directory, artifacts: artifacts)
+    return .init(identity: identity, root: rootPath, artifacts: artifacts)
   }
 
   private static func digest(_ file: File) throws(Institute.Error) -> Source.Artifact.Digest {

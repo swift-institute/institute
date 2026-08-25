@@ -25,12 +25,12 @@ extension Institute.CI.Validation {
             "embedded", "embedded-wasm-sdk", "android-build",
             "static-linux-musl-build", "macos-release",
             "apple-simulator-build", "windows-release",
-            "format", "lint", "swift-linter", "advisory-summary", "ci-ok",
+            "source", "advisory-summary", "ci-ok",
         ]
 
         public static let gating: [String] = [
             "linux-release", "macos-release", "windows-release",
-            "format", "lint", "swift-linter",
+            "source",
         ]
 
         public func findings(in subject: Subject) throws(EnvironmentDefect) -> [Finding] {
@@ -59,6 +59,15 @@ extension Institute.CI.Validation {
             }
 
             var result: [Finding] = []
+            for retired in ["format", "lint", "swift-linter"] where jobs[retired] != nil {
+                result.append(
+                    finding(
+                        subject.repository,
+                        "CI-010",
+                        "retired source job `\(retired)` is still present"
+                    )
+                )
+            }
             for name in Self.catalogue where jobs[name]?.mapping == nil {
                 result.append(
                     finding(

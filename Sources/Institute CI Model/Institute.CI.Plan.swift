@@ -58,7 +58,7 @@ extension Institute.CI {
         public var gating: [Leg] { legs.filter(\.gating) }
 
         static let fullTierLegs = [
-            "format", "lint", "swift-linter", "linux-release",
+            "source", "linux-release",
             "macos-release", "windows-release", "linux-6-4",
             "advisory-summary",
         ]
@@ -159,7 +159,7 @@ extension Institute.CI {
                 } else {
                     throw .noRecognizedPlatformFamily(platformSupport)
                 }
-                legIds = ["format", "lint", "swift-linter", primary, "linux-6-4"]
+                legIds = ["source", primary, "linux-6-4"]
 
             case .full:
                 legIds = Self.fullTierLegs

@@ -31,7 +31,7 @@ extension Institute.CI {
         /// Gating legs — exactly ci-ok's needs minus `plan`.
         public var gating: Bool {
             switch id {
-            case "format", "lint", "swift-linter",
+            case "source",
                 "macos-release", "linux-release", "windows-release":
                 true
 

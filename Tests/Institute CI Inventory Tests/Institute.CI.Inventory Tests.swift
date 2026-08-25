@@ -27,18 +27,10 @@ struct CIInventoryTests {
             steps:
               - name: Classify tier
                 run: institute-continuous-integration package plan
-          format:
+          source:
             if: ${{ !github.event.repository.private }}
             needs: plan
-            runs-on: ubuntu-latest
-          lint:
-            if: ${{ !github.event.repository.private }}
-            needs: plan
-            runs-on: ubuntu-latest
-          swift-linter:
-            if: ${{ !github.event.repository.private }}
-            needs: plan
-            runs-on: ubuntu-latest
+            runs-on: xcode-27
           linux-release:
             if: ${{ !github.event.repository.private }}
             needs: plan
@@ -66,7 +58,7 @@ struct CIInventoryTests {
             runs-on: ubuntu-latest
           ci-ok:
             if: ${{ !github.event.repository.private }}
-            needs: [plan, format, lint, swift-linter, linux-release, macos-release, windows-release]
+            needs: [plan, source, linux-release, macos-release, windows-release]
             runs-on: ubuntu-latest
         """
 

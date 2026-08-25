@@ -12,6 +12,15 @@ public import Source_Report
 import Source_Swift_Format
 
 extension Institute.Source.Application {
+  public static func bundle(_ token: Swift.String) throws(Institute.Error)
+    -> Institute.Source.Bundle
+  {
+    guard let bundle = Institute.Source.Bundle(rawValue: token) else {
+      throw .configuration("invalid source bundle \(token)")
+    }
+    return bundle
+  }
+
   public func measure(
     cohort: Institute.Source.Workspace.Cohort,
     selected: [Institute.Source.Workspace.Row]? = nil,
@@ -23,6 +32,68 @@ extension Institute.Source.Application {
     let rows = selected ?? cohort.measurable
     let scope: Source_Report.Source.Report.Scope =
       selected == nil && engines == nil ? .workspace : .partial
+    let expectedBinding = Institute.Source.Preparation.Binding.workspace(
+      digest: try Self.digest(file: cohort.workspace + "/contents.xcworkspacedata").hex
+    )
+    guard preparation.binding == expectedBinding else {
+      return Self.unmeasuredReport(
+        scope: scope,
+        reason: .init(code: "stale-subject", detail: cohort.workspace)
+      )
+    }
+    let owner = Institute.Source.Profile(policy: .current)
+    var entries:
+      [(bundle: Institute.Source.Bundle, subject: Source_Measurement.Source.Subject)] = []
+    for row in rows {
+      entries.append(
+        (
+          bundle: try owner.bundle(for: row),
+          subject: try Institute.Source.Workspace.subject(for: row)
+        )
+      )
+    }
+    return try await measure(
+      entries: entries,
+      scope: scope,
+      engines: engines,
+      jobs: jobs,
+      references: cohort.reasons
+        + Self.selfApplicationReasons(cohort: cohort, policy: .current)
+        + references,
+      preparation: preparation
+    )
+  }
+
+  public func measure(
+    subject: Source_Measurement.Source.Subject,
+    bundle: Institute.Source.Bundle,
+    jobs: Swift.Int? = nil,
+    preparation: Institute.Source.Preparation
+  ) async throws(Institute.Error) -> Source_Report.Source.Report {
+    guard preparation.binding == .package(subject.binding) else {
+      return Self.unmeasuredReport(
+        scope: .workspace,
+        reason: .init(code: "stale-subject", detail: subject.identity)
+      )
+    }
+    return try await measure(
+      entries: [(bundle: bundle, subject: subject)],
+      scope: .workspace,
+      engines: nil,
+      jobs: jobs,
+      references: [],
+      preparation: preparation
+    )
+  }
+
+  private func measure(
+    entries: [(bundle: Institute.Source.Bundle, subject: Source_Measurement.Source.Subject)],
+    scope: Source_Report.Source.Report.Scope,
+    engines: Set<Source_Measurement.Source.Engine.ID>?,
+    jobs: Swift.Int?,
+    references: [Source_Measurement.Source.Reason],
+    preparation: Institute.Source.Preparation
+  ) async throws(Institute.Error) -> Source_Report.Source.Report {
     let policy = Institute.Source.Policy.current
     guard preparation.policyRevision == policy.revision else {
       return Self.unmeasuredReport(
@@ -68,20 +139,13 @@ extension Institute.Source.Application {
     } catch {
       throw .configuration("cannot register source engines: \(error)")
     }
-    var subjects: [Source_Measurement.Source.Subject] = []
-    var entries:
-      [(row: Institute.Source.Workspace.Row, subject: Source_Measurement.Source.Subject)] = []
-    for row in rows {
-      let subject = try Institute.Source.Workspace.subject(for: row)
-      subjects.append(subject)
-      entries.append((row: row, subject: subject))
-    }
+    var subjects = entries.map(\.subject)
     let configuration = try Self.configuration(policy: policy, preparation: preparation)
     subjects.append(configuration.subject)
     let owner = Institute.Source.Profile(policy: policy)
     var requirements: [Source_Report.Source.Report.Commitment.Requirement] = []
     for entry in entries {
-      let bundle = try owner.bundle(for: entry.row)
+      let bundle = entry.bundle
       let artifacts = entry.subject.artifacts.filter { $0.kind == .swift }.map(\.path)
       for engine in policy.requiredEngines where engines?.contains(engine) ?? true {
         let rules: [Source_Measurement.Source.Rule.ID]
@@ -109,21 +173,7 @@ extension Institute.Source.Application {
       jobs: jobs ?? 1
     ).mapAsync(entries) { entry in
       let subject = entry.subject
-      let bundle: Institute.Source.Bundle
-      do throws(Institute.Error) {
-        bundle = try Institute.Source.Profile(policy: policy).bundle(for: entry.row)
-      } catch {
-        return policy.requiredEngines.map {
-          .init(
-            engine: $0,
-            subject: subject,
-            activeRules: [],
-            applicableRules: [],
-            files: subject.paths(of: .swift),
-            verdict: .unmeasured([.init(code: "profile-binding", detail: "\(error)")])
-          )
-        }
-      }
+      let bundle = entry.bundle
       let rules = Institute.Source.Profile(policy: policy).rules(for: bundle)
       let linterConfiguration =
         "\(preparation.directory)/\(bundle.rawValue)-source-linter-profile.json"
@@ -185,7 +235,10 @@ extension Institute.Source.Application {
       let measured = await execution.measure(subject, profile: profile, engines: engines)
       let current: Source_Measurement.Source.Subject
       do throws(Institute.Error) {
-        current = try Institute.Source.Workspace.subject(for: entry.row)
+        current = try Institute.Source.Workspace.subject(
+          identity: subject.identity,
+          root: subject.root
+        )
       } catch {
         return profile.engines.map {
           .init(
@@ -217,6 +270,10 @@ extension Institute.Source.Application {
       return measured
     }
     let measurements = measuredBySubject.flatMap { $0 }
+    var controlIdentities: Swift.Set<Swift.String> = []
+    let controlEvidence = measurements.flatMap(\.controls).filter {
+      controlIdentities.insert($0.identity).inserted
+    }
     let profileBytes = preparation.profiles.keys.sorted()
       .compactMap { preparation.profiles[$0]?.hex }
       .joined(separator: ":").utf8.map(Byte.init)
@@ -227,13 +284,29 @@ extension Institute.Source.Application {
       commitment: .init(
         subjects: subjects,
         engines: policy.requiredEngines.map {
-          .init(id: $0, artifactKinds: [.swift])
+          let controlPolicy: Source_Report.Source.Report.Commitment.Engine.ControlPolicy =
+            switch $0.token {
+            case "swift-format", "swiftlint":
+              .transitionalExternal
+            default:
+              .required
+            }
+          return .init(
+            id: $0,
+            artifactKinds: [.swift],
+            controlPolicy: controlPolicy
+          )
         } + [
           .init(id: policy.configuration.engine, artifactKinds: [.configuration])
         ],
         rules: Swift.Set(
           requirements.flatMap(\.rules) + [policy.configuration.predicate]
-        ).map { .init(id: $0, controls: []) },
+        ).map { rule in
+          .init(
+            id: rule,
+            controls: controlEvidence.filter { $0.rule == rule }.map(\.identity)
+          )
+        },
         requirements: requirements,
         predicates: [
           .init(
@@ -250,14 +323,10 @@ extension Institute.Source.Application {
         ]
       ),
       subjects: subjects,
-      references: cohort.reasons
-        + Self.selfApplicationReasons(
-          cohort: cohort,
-          policy: policy
-        ) + references,
+      references: references,
       measurements: measurements,
       artifactEvidence: configuration.evidence,
-      controlEvidence: []
+      controlEvidence: controlEvidence
     )
   }
 

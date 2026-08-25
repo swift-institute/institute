@@ -4,10 +4,10 @@ public import Source_Profile
 
 extension Institute.Source {
   public struct Preparation: Sendable, JSON.Serializable {
-    public static let schema = 5
+    public static let schema = 6
 
     public let policyRevision: Swift.String
-    public let workspaceDigest: Swift.String
+    public let binding: Binding
     public let swiftFormatExecutable: Swift.String
     public let swiftFormatTool: Source_Profile.Source.Profile.Digest
     public let swiftLintExecutable: Swift.String
@@ -20,7 +20,7 @@ extension Institute.Source {
 
     public init(
       policyRevision: Swift.String,
-      workspaceDigest: Swift.String,
+      binding: Binding,
       swiftFormatExecutable: Swift.String,
       swiftFormatTool: Source_Profile.Source.Profile.Digest,
       swiftLintExecutable: Swift.String,
@@ -32,7 +32,7 @@ extension Institute.Source {
       verifiedProfiles: [Swift.String]
     ) {
       self.policyRevision = policyRevision
-      self.workspaceDigest = workspaceDigest
+      self.binding = binding
       self.swiftFormatExecutable = swiftFormatExecutable
       self.swiftFormatTool = swiftFormatTool
       self.swiftLintExecutable = swiftLintExecutable
@@ -48,7 +48,7 @@ extension Institute.Source {
       [
         "schema": schema.json,
         "policyRevision": value.policyRevision.json,
-        "workspaceDigest": value.workspaceDigest.json,
+        "binding": value.binding.json,
         "swiftFormatExecutable": value.swiftFormatExecutable.json,
         "swiftFormatTool": value.swiftFormatTool.json,
         "swiftLintExecutable": value.swiftLintExecutable.json,
@@ -66,7 +66,7 @@ extension Institute.Source {
         throw .typeMismatch(expected: "object", got: "non-object")
       }
       let expected: Set<Swift.String> = [
-        "schema", "policyRevision", "workspaceDigest",
+        "schema", "policyRevision", "binding",
         "swiftFormatExecutable", "swiftFormatTool",
         "swiftLintExecutable", "swiftLint",
         "linterExecutable", "linter", "directory", "profiles",
@@ -78,10 +78,10 @@ extension Institute.Source {
           got: object.keys.sorted().joined(separator: ","))
       }
       guard let schema = object["schema"], try Swift.Int(json: schema) == Self.schema else {
-        throw .typeMismatch(expected: "source preparation schema 5", got: "other schema")
+        throw .typeMismatch(expected: "source preparation schema 6", got: "other schema")
       }
       guard let policyRevision = object["policyRevision"],
-        let workspaceDigest = object["workspaceDigest"],
+        let binding = object["binding"],
         let swiftFormatExecutable = object["swiftFormatExecutable"],
         let swiftFormatTool = object["swiftFormatTool"],
         let swiftLintExecutable = object["swiftLintExecutable"],
@@ -93,7 +93,7 @@ extension Institute.Source {
       else { throw .missingKey("source preparation field") }
       return try .init(
         policyRevision: Swift.String(json: policyRevision),
-        workspaceDigest: Swift.String(json: workspaceDigest),
+        binding: Binding(json: binding),
         swiftFormatExecutable: Swift.String(json: swiftFormatExecutable),
         swiftFormatTool: Source_Profile.Source.Profile.Digest(json: swiftFormatTool),
         swiftLintExecutable: Swift.String(json: swiftLintExecutable),

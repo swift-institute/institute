@@ -16,7 +16,7 @@ import Testing
 func `Institute source preparation round trips its parse receipt`() throws {
     let preparation = Institute.Source.Preparation(
         policyRevision: "source-enforcement-v3",
-        workspaceDigest: "workspace-digest",
+        binding: .workspace(digest: "workspace-digest"),
         swiftFormatExecutable: "/tools/swift-format",
         swiftFormatTool: .init("format-tool"),
         swiftLintExecutable: "/tools/swiftlint",
@@ -39,7 +39,7 @@ func `Institute source preparation round trips its parse receipt`() throws {
     )
 
     #expect(decoded.policyRevision == preparation.policyRevision)
-    #expect(decoded.workspaceDigest == preparation.workspaceDigest)
+    #expect(decoded.binding == preparation.binding)
     #expect(decoded.swiftFormatExecutable == preparation.swiftFormatExecutable)
     #expect(decoded.swiftFormatTool == preparation.swiftFormatTool)
     #expect(decoded.swiftLintExecutable == preparation.swiftLintExecutable)
@@ -54,10 +54,36 @@ func `Institute source preparation round trips its parse receipt`() throws {
 }
 
 @Test
+func `Institute source preparation binds one exact package subject`() throws {
+    let binding = Institute.Source.Preparation.Binding.package(
+        .init(identity: "swift-standards/swift-iso-639@revision", digest: "subject-digest")
+    )
+    let preparation = Institute.Source.Preparation(
+        policyRevision: "source-enforcement-v3",
+        binding: binding,
+        swiftFormatExecutable: "/tools/swift-format",
+        swiftFormatTool: .init("format-tool"),
+        swiftLintExecutable: "/tools/swiftlint",
+        swiftLint: .init(origin: .local, digest: .init("swiftlint-tool")),
+        linterExecutable: "/tools/swift-linter",
+        linter: .init(origin: .local, digest: .init("linter-tool")),
+        directory: "/package/.source",
+        profiles: [:],
+        verifiedProfiles: []
+    )
+
+    let decoded = try Institute.Source.Preparation(
+        jsonString: preparation.jsonString(sortKeys: true)
+    )
+
+    #expect(decoded.binding == binding)
+}
+
+@Test
 func `Institute source preparation rejects receipts without a parse verdict`() throws {
     let preparation = Institute.Source.Preparation(
         policyRevision: "source-enforcement-v3",
-        workspaceDigest: "workspace-digest",
+        binding: .workspace(digest: "workspace-digest"),
         swiftFormatExecutable: "/tools/swift-format",
         swiftFormatTool: .init("format-tool"),
         swiftLintExecutable: "/tools/swiftlint",
@@ -148,7 +174,7 @@ func `Local source linter snapshot is content addressed and omits its input path
     )
     let preparation = Institute.Source.Preparation(
         policyRevision: "source-enforcement-v3",
-        workspaceDigest: "workspace-digest",
+        binding: .workspace(digest: "workspace-digest"),
         swiftFormatExecutable: "/tools/swift-format",
         swiftFormatTool: .init("format-tool"),
         swiftLintExecutable: "/tools/swiftlint",
@@ -295,7 +321,7 @@ func `Source measurement refuses a tampered local linter snapshot`() async throw
 
     let preparation = Institute.Source.Preparation(
         policyRevision: Institute.Source.Policy.current.revision,
-        workspaceDigest: "workspace",
+        binding: .workspace(digest: "workspace"),
         swiftFormatExecutable: format.path,
         swiftFormatTool: try Institute.Source.Application.digest(file: format.path),
         swiftLintExecutable: swiftLint.path,

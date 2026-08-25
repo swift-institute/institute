@@ -13,7 +13,7 @@ struct CIValidationUniversalWorkflowTests {
         windowsPresent: Bool = true,
         aggregateNeeds: [String] = [
             "plan", "linux-release", "macos-release", "windows-release",
-            "format", "lint", "swift-linter",
+            "source",
         ],
         skippedGating: String? = nil,
         advisoryNeeds: [String] = [
@@ -73,7 +73,7 @@ struct CIValidationUniversalWorkflowTests {
     @Test func `incomplete aggregate is refused`() throws {
         let findings = try Self.findings(
             Self.workflow(aggregateNeeds: [
-                "plan", "linux-release", "macos-release", "format", "lint", "swift-linter",
+                "plan", "linux-release", "macos-release", "source",
             ])
         )
         #expect(
@@ -84,8 +84,15 @@ struct CIValidationUniversalWorkflowTests {
     }
 
     @Test func `selected gating job cannot be statically skipped`() throws {
-        let findings = try Self.findings(Self.workflow(skippedGating: "format"))
-        #expect(findings.contains { $0.message.contains("`format` is not selected") })
+        let findings = try Self.findings(Self.workflow(skippedGating: "source"))
+        #expect(findings.contains { $0.message.contains("`source` is not selected") })
+    }
+
+    @Test func `retired source jobs are refused`() throws {
+        let findings = try Self.findings(
+            Self.workflow() + "  format:\n    runs-on: ubuntu-latest\n"
+        )
+        #expect(findings.contains { $0.message.contains("retired source job `format`") })
     }
 
     @Test func `Windows cannot move into the advisory result set`() throws {

@@ -12,8 +12,8 @@ struct ContinuousIntegrationPlanTests {
             lintBundle: "standards"
         )
         #expect(plan.tier == .build)
-        #expect(plan.legs.map(\.id) == ["format", "lint", "swift-linter", "linux-release", "linux-6-4"])
-        #expect(plan.gating.map(\.id) == ["format", "lint", "swift-linter", "linux-release"])
+        #expect(plan.legs.map(\.id) == ["source", "linux-release", "linux-6-4"])
+        #expect(plan.gating.map(\.id) == ["source", "linux-release"])
     }
 
     @Test
@@ -112,7 +112,7 @@ struct ContinuousIntegrationPlanTests {
             platformSupport: "apple",
             lintBundle: "standards"
         )
-        #expect(appleOnly.legs.map(\.id) == ["format", "lint", "swift-linter", "macos-release"])
+        #expect(appleOnly.legs.map(\.id) == ["source", "macos-release"])
     }
 
     @Test
@@ -265,7 +265,7 @@ struct ContinuousIntegrationPlanTests {
         }
         // The quality gates and the aggregate's own surface survive: the
         // narrowing is of package work, not of the run.
-        #expect(ids.isSuperset(of: ["format", "lint", "swift-linter"]))
+        #expect(ids.contains("source"))
     }
 
     @Test
@@ -335,7 +335,7 @@ struct ContinuousIntegrationPlanTests {
 struct ContinuousIntegrationAggregateTests {
     static let participants = [
         "macos-release", "linux-release", "windows-release",
-        "format", "lint", "swift-linter",
+        "source",
     ]
 
     func needs(_ overrides: [String: String]) -> [String: String] {
@@ -349,10 +349,9 @@ struct ContinuousIntegrationAggregateTests {
         let verdict = Institute.CI.AggregateVerdict(
             planResult: "success",
             results: needs([
-                "format": "success", "lint": "success",
-                "swift-linter": "success", "linux-release": "success",
+                "source": "success", "linux-release": "success",
             ]),
-            gating: ["format", "lint", "swift-linter", "linux-release"],
+            gating: ["source", "linux-release"],
             subjectRepository: "o/r",
             subjectSha: "abc",
             tier: "build",
@@ -367,10 +366,9 @@ struct ContinuousIntegrationAggregateTests {
         let verdict = Institute.CI.AggregateVerdict(
             planResult: "success",
             results: needs([
-                "format": "success", "lint": "success",
-                "swift-linter": "skipped", "linux-release": "success",
+                "source": "skipped", "linux-release": "success",
             ]),
-            gating: ["format", "lint", "swift-linter", "linux-release"],
+            gating: ["source", "linux-release"],
             subjectRepository: "o/r",
             subjectSha: "abc",
             tier: "build",
@@ -379,7 +377,7 @@ struct ContinuousIntegrationAggregateTests {
         #expect(!verdict.pass)
         #expect(
             verdict.findings.contains(
-                .selectedLegNotSuccessful(job: "swift-linter", result: "skipped")
+                .selectedLegNotSuccessful(job: "source", result: "skipped")
             )
         )
     }
@@ -389,11 +387,10 @@ struct ContinuousIntegrationAggregateTests {
         let verdict = Institute.CI.AggregateVerdict(
             planResult: "success",
             results: needs([
-                "format": "success", "lint": "success",
-                "swift-linter": "success", "linux-release": "success",
+                "source": "success", "linux-release": "success",
                 "macos-release": "success",
             ]),
-            gating: ["format", "lint", "swift-linter", "linux-release"],
+            gating: ["source", "linux-release"],
             subjectRepository: "o/r",
             subjectSha: "abc",
             tier: "build",
@@ -430,10 +427,9 @@ struct ContinuousIntegrationAggregateTests {
         let verdict = Institute.CI.AggregateVerdict(
             planResult: "success",
             results: needs([
-                "format": "success", "lint": "success",
-                "swift-linter": "success", "linux-release": "success",
+                "source": "success", "linux-release": "success",
             ]),
-            gating: ["format", "lint", "swift-linter", "linux-release"],
+            gating: ["source", "linux-release"],
             subjectRepository: "o/r",
             subjectSha: "abc",
             tier: "build",
@@ -448,10 +444,9 @@ struct ContinuousIntegrationAggregateTests {
         let verdict = Institute.CI.AggregateVerdict(
             planResult: "success",
             results: needs([
-                "format": "success", "lint": "success",
-                "swift-linter": "success",
+                "source": "success",
             ]),
-            gating: ["format", "lint", "swift-linter"],
+            gating: ["source"],
             subjectRepository: "o/r",
             subjectSha: "abc",
             tier: "build",
@@ -468,11 +463,10 @@ struct ContinuousIntegrationAggregateTests {
         let verdict = Institute.CI.AggregateVerdict(
             planResult: "success",
             results: needs([
-                "format": "success", "lint": "success",
-                "swift-linter": "success", "linux-release": "success",
+                "source": "success", "linux-release": "success",
             ])
             .merging(["linux-nightly": "failure"]) { _, new in new },
-            gating: ["format", "lint", "swift-linter", "linux-release"],
+            gating: ["source", "linux-release"],
             subjectRepository: "o/r",
             subjectSha: "abc",
             tier: "build",
@@ -494,10 +488,9 @@ struct ContinuousIntegrationAggregateTests {
         let verdict = Institute.CI.AggregateVerdict(
             planResult: "success",
             results: needs([
-                "format": "success", "lint": "success",
-                "swift-linter": "success", "linux-release": "success",
+                "source": "success", "linux-release": "success",
             ]),
-            gating: ["format", "lint", "swift-linter", "linux-release"],
+            gating: ["source", "linux-release"],
             subjectRepository: "o/r",
             subjectSha: "abc",
             tier: "build",
@@ -513,11 +506,10 @@ struct ContinuousIntegrationAggregateTests {
         let verdict = Institute.CI.AggregateVerdict(
             planResult: "success",
             results: needs([
-                "format": "success", "lint": "success",
-                "swift-linter": "success", "linux-release": "success",
+                "source": "success", "linux-release": "success",
             ])
             .merging(["linux-nightly": "skipped"]) { _, new in new },
-            gating: ["format", "lint", "swift-linter", "linux-release"],
+            gating: ["source", "linux-release"],
             subjectRepository: "o/r",
             subjectSha: "abc",
             tier: "build",
@@ -533,10 +525,9 @@ struct ContinuousIntegrationAggregateTests {
         let verdict = Institute.CI.AggregateVerdict(
             planResult: "success",
             results: needs([
-                "format": "success", "lint": "success",
-                "swift-linter": "success",
+                "source": "success",
             ]),
-            gating: ["format", "lint", "swift-linter"],
+            gating: ["source"],
             subjectRepository: "o/r",
             subjectSha: "abc",
             tier: "build",
@@ -552,10 +543,10 @@ struct ContinuousIntegrationAggregateTests {
         #expect(Institute.CI.Requirement.checkContext == "ci / matrix / ci-ok")
         let table = Institute.CI.Requirement.table(
             participants: ["plan"] + Self.participants,
-            gating: [Institute.CI.Leg("format"), Institute.CI.Leg("linux-release")]
+            gating: [Institute.CI.Leg("source"), Institute.CI.Leg("linux-release")]
         )
         #expect(table.count == 6)
-        #expect(table.first { $0.job == "format" }?.expectation == .success)
+        #expect(table.first { $0.job == "source" }?.expectation == .success)
         #expect(table.first { $0.job == "macos-release" }?.expectation == .skipped)
     }
 }
