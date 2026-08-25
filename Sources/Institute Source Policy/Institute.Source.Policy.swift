@@ -48,8 +48,8 @@ extension Institute.Source {
                     id: .init("swift-format"),
                     platform: .macOSARM64,
                     version: "main",
-                    revision: "27A5237l",
-                    toolchain: "Xcode 27.0 (27A5237l)",
+                    revision: "27A5228h",
+                    toolchain: "Xcode 27.0 (27A5228h)",
                     schema: "swift-format:main",
                     executable: .init(
                         name: "swift-format",
@@ -59,7 +59,7 @@ extension Institute.Source {
                         origin: .xcode(
                             application: "/Applications/Xcode-beta.app",
                             version: "27.0",
-                            build: "27A5237l",
+                            build: "27A5228h",
                             relativePath:
                                 "Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-format"
                         )

@@ -154,6 +154,86 @@ func `Institute profile verification fails loudly on an engine refusal`() async 
 }
 
 @Test
+func `Xcode source acquisition reports expected and observed identity`() async throws {
+    let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+    try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+
+    let process = Source.Engine.Process { _, arguments, _, _ in
+        .init(
+            status: 0,
+            output: arguments.contains("CFBundleShortVersionString") ? "27.0" : "27A5228h",
+            diagnostics: ""
+        )
+    }
+    let acquisition = Institute.Source.Acquisition(process: process)
+    let asset = Institute.Source.Policy.Asset(
+        name: "swift-format",
+        digest: .init("unused"),
+        origin: .xcode(
+            application: "/Applications/Synthetic.app",
+            version: "27.0",
+            build: "27A5237l",
+            relativePath:
+                "Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-format"
+        )
+    )
+
+    do throws(Institute.Error) {
+        _ = try await acquisition.acquire(
+            asset,
+            executable: true,
+            into: try File.Directory(validating: root.path)
+        )
+        Issue.record("mismatched Xcode build identity was accepted")
+    } catch {
+        #expect(
+            error.description
+                == "pinned Xcode identity mismatch for ProductBuildVersion: "
+                + "expected 27A5237l, observed 27A5228h"
+        )
+    }
+}
+
+@Test
+func `Xcode source acquisition reports exact identity read failure`() async throws {
+    let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+    try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+
+    let process = Source.Engine.Process { _, _, _, _ in
+        .init(status: 1, output: "", diagnostics: "missing version plist")
+    }
+    let acquisition = Institute.Source.Acquisition(process: process)
+    let asset = Institute.Source.Policy.Asset(
+        name: "swift-format",
+        digest: .init("unused"),
+        origin: .xcode(
+            application: "/Applications/Synthetic.app",
+            version: "27.0",
+            build: "27A5228h",
+            relativePath:
+                "Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-format"
+        )
+    )
+
+    do throws(Institute.Error) {
+        _ = try await acquisition.acquire(
+            asset,
+            executable: true,
+            into: try File.Directory(validating: root.path)
+        )
+        Issue.record("unreadable Xcode identity was accepted")
+    } catch {
+        #expect(
+            error.description
+                == "cannot read pinned Xcode identity CFBundleShortVersionString: "
+                + "plutil exited 1: missing version plist"
+        )
+    }
+}
+
+@Test
 func `Local source linter snapshot is content addressed and omits its input path from receipt`() throws {
     let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
     let tools = root.appending(path: "tools")

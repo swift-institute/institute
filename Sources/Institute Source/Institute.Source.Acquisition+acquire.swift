@@ -320,10 +320,21 @@ extension Institute.Source.Acquisition {
       directory.description,
       [:]
     )
+    guard result.status == 0 else {
+      throw .configuration(
+        "cannot read pinned Xcode identity \(key): plutil exited \(result.status): \(result.diagnostics)"
+      )
+    }
     let values = result.output.split(whereSeparator: \.isWhitespace)
-    guard result.status == 0, values.count == 1, values[0] == expected
-    else {
-      throw .configuration("pinned Xcode identity mismatch for \(key)")
+    guard values.count == 1 else {
+      throw .configuration(
+        "cannot read pinned Xcode identity \(key): expected one value, observed \(values.count)"
+      )
+    }
+    guard values[0] == expected else {
+      throw .configuration(
+        "pinned Xcode identity mismatch for \(key): expected \(expected), observed \(values[0])"
+      )
     }
   }
 
