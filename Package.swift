@@ -98,21 +98,21 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/swift-foundations/swift-agent-skills.git", branch: "main"),
-    .package(url: "https://github.com/swift-foundations/swift-arguments.git", branch: "main"),
+    .package(url: "https://github.com/swift-compositions/swift-agent-skills.git", branch: "main"),
+    .package(url: "https://github.com/swift-compositions/swift-arguments.git", branch: "main"),
     .package(url: "https://github.com/swift-atoms/swift-ascii.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-async.git", branch: "main"),
-    .package(url: "https://github.com/swift-foundations/swift-environment.git", branch: "main"),
-    .package(url: "https://github.com/swift-foundations/swift-file-system.git", branch: "main"),
-    .package(url: "https://github.com/swift-foundations/swift-github.git", branch: "main"),
-    .package(url: "https://github.com/swift-foundations/swift-git.git", branch: "main"),
-    .package(url: "https://github.com/swift-foundations/swift-json.git", branch: "main"),
-    .package(url: "https://github.com/swift-foundations/swift-kernel.git", branch: "main"),
-    .package(url: "https://github.com/swift-foundations/swift-package-manager.git", branch: "main"),
-    .package(url: "https://github.com/swift-foundations/swift-posix.git", branch: "main"),
-    .package(url: "https://github.com/swift-foundations/swift-process.git", branch: "main"),
-    .package(url: "https://github.com/swift-foundations/swift-threads.git", branch: "main"),
-    .package(url: "https://github.com/swift-foundations/swift-xcode.git", branch: "main"),
+    .package(url: "https://github.com/swift-compositions/swift-environment.git", branch: "main"),
+    .package(url: "https://github.com/swift-compositions/swift-file-system.git", branch: "main"),
+    .package(url: "https://github.com/swift-compositions/swift-github.git", branch: "main"),
+    .package(url: "https://github.com/swift-compositions/swift-git.git", branch: "main"),
+    .package(url: "https://github.com/swift-compositions/swift-json.git", branch: "main"),
+    .package(url: "https://github.com/swift-compositions/swift-kernel.git", branch: "main"),
+    .package(url: "https://github.com/swift-compositions/swift-package-manager.git", branch: "main"),
+    .package(url: "https://github.com/swift-compositions/swift-posix.git", branch: "main"),
+    .package(url: "https://github.com/swift-compositions/swift-process.git", branch: "main"),
+    .package(url: "https://github.com/swift-compositions/swift-threads.git", branch: "main"),
+    .package(url: "https://github.com/swift-compositions/swift-xcode.git", branch: "main"),
     .package(url: "https://github.com/swift-standards/swift-xcode-standard.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-source.git", branch: "main"),
     .package(
@@ -120,11 +120,11 @@ let package = Package(
       branch: "main"
     ),
     .package(
-      url: "https://github.com/swift-foundations/swift-institute-linter-rules.git",
+      url: "https://github.com/swift-compositions/swift-institute-linter-rules.git",
       branch: "main"
     ),
     .package(
-      url: "https://github.com/swift-primitives/swift-primitives-linter-rules.git",
+      url: "https://github.com/swift-molecules/swift-primitives-linter-rules.git",
       branch: "main"
     ),
     .package(
@@ -137,7 +137,7 @@ let package = Package(
     .package(url: "https://github.com/swift-standards/swift-github-standard.git", branch: "main"),
     .package(url: "https://github.com/swift-standards/swift-spm-standard.git", branch: "main"),
     .package(
-      url: "https://github.com/swift-primitives/swift-standard-library-extensions.git",
+      url: "https://github.com/swift-atoms/swift-standard-library-extensions.git",
       branch: "main"
     ),
   ],
