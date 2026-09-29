@@ -100,7 +100,7 @@ let package = Package(
   dependencies: [
     .package(url: "https://github.com/swift-foundations/swift-agent-skills.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-arguments.git", branch: "main"),
-    .package(url: "https://github.com/swift-foundations/swift-ascii.git", branch: "main"),
+    .package(url: "https://github.com/swift-atoms/swift-ascii.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-async.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-environment.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-file-system.git", branch: "main"),
