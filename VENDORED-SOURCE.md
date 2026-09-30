@@ -1,6 +1,6 @@
 # Vendored Source targets
 
-Eight targets in `Sources/` are copied unchanged from the archived repository
+Eight targets in `Sources/` are copied, with modifications recorded below, from the archived repository
 https://github.com/swift-compositions/swift-source at revision
 9e419218900e171c0c66f76483994d89d7ef5816:
 
@@ -23,11 +23,20 @@ carry no licence headers.
 
 ## Modifications
 
-Five source files carry one mechanical change each, marked "modified" in the
-table below. `map(Byte.init)` becomes `map(Byte.init(_:))`, because the live
-swift-atoms/swift-byte `Byte` now also has `init(bitPattern:)`, which made the
-unlabelled reference ambiguous. It is the same initializer upstream called, so
-behaviour and serialization are unchanged. The other source files are unmodified.
+Five of the 98 source files are modified; the other 93 are identical to upstream.
+Each modification is the same mechanical change: `map(Byte.init)` becomes
+`map(Byte.init(_:))`, because the live swift-atoms/swift-byte `Byte` now also has
+`init(bitPattern:)`, which made the unlabelled reference ambiguous. It is the same
+initializer upstream called, so behaviour and serialization are unchanged. The
+eight sites:
+
+- `Sources/Source Profile/Source.Profile.swift`: 1 site (`digest`)
+- `Sources/Source Repair/Source.Repair.Staging.swift`: 1 site
+- `Sources/Source Repair/Source.Repair.Transaction.swift`: 1 site
+- `Sources/Source Repair/Source.SourceSet+digest.swift`: 4 sites
+- `Sources/Source Repair/Source.Subject+binding.swift`: 1 site
+
+The five files are marked "modified" in the hash table below.
 The remaining changes are in `Package.swift`:
 
 - The targets' dependency on the upstream package's own `Source` target is
