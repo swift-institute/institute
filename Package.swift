@@ -2,6 +2,11 @@
 
 import PackageDescription
 
+let vendoredSourceSettings: [SwiftSetting] = [
+  .enableExperimentalFeature("Lifetimes"),
+  .enableUpcomingFeature("InferIsolatedConformances"),
+]
+
 let package = Package(
   name: "institute",
   platforms: [
@@ -114,7 +119,8 @@ let package = Package(
     .package(url: "https://github.com/swift-compositions/swift-threads.git", branch: "main"),
     .package(url: "https://github.com/swift-compositions/swift-xcode.git", branch: "main"),
     .package(url: "https://github.com/swift-standards/swift-xcode-standard.git", branch: "main"),
-    .package(url: "https://github.com/swift-foundations/swift-source.git", branch: "main"),
+    .package(url: "https://github.com/swift-molecules/swift-source.git", branch: "main"),
+    .package(url: "https://github.com/swift-molecules/swift-diagnostic.git", branch: "main"),
     .package(url: "https://github.com/swift-molecules/swift-lint.git", branch: "main"),
     .package(
       url: "https://github.com/swift-compositions/swift-institute-linter-rules.git",
@@ -139,6 +145,77 @@ let package = Package(
     ),
   ],
   targets: [
+    .target(
+      name: "Source Measurement",
+      dependencies: [
+        .product(name: "Source", package: "swift-source"),
+        .product(name: "Diagnostic", package: "swift-diagnostic"),
+        .product(name: "JSON", package: "swift-json"),
+      ],
+      swiftSettings: vendoredSourceSettings
+    ),
+    .target(
+      name: "Source Profile",
+      dependencies: [
+        "Source Measurement",
+        .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
+        .product(name: "JSON", package: "swift-json"),
+      ],
+      swiftSettings: vendoredSourceSettings
+    ),
+    .target(
+      name: "Source Swift Format",
+      dependencies: ["Source Measurement", "Source Profile"],
+      swiftSettings: vendoredSourceSettings
+    ),
+    .target(
+      name: "Source SwiftLint",
+      dependencies: [
+        "Source Measurement",
+        "Source Profile",
+        .product(name: "JSON", package: "swift-json"),
+      ],
+      swiftSettings: vendoredSourceSettings
+    ),
+    .target(
+      name: "Source Linter",
+      dependencies: [
+        "Source Measurement",
+        "Source Profile",
+        .product(name: "JSON", package: "swift-json"),
+      ],
+      swiftSettings: vendoredSourceSettings
+    ),
+    .target(
+      name: "Source Execution",
+      dependencies: [
+        "Source Measurement",
+        "Source Profile",
+        "Source Swift Format",
+        "Source SwiftLint",
+        "Source Linter",
+      ],
+      swiftSettings: vendoredSourceSettings
+    ),
+    .target(
+      name: "Source Report",
+      dependencies: [
+        "Source Measurement", "Source Profile", .product(name: "JSON", package: "swift-json"),
+      ],
+      swiftSettings: vendoredSourceSettings
+    ),
+    .target(
+      name: "Source Repair",
+      dependencies: [
+        .product(name: "Source", package: "swift-source"),
+        "Source Measurement",
+        "Source Profile",
+        "Source Report",
+        .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
+        .product(name: "JSON", package: "swift-json"),
+      ],
+      swiftSettings: vendoredSourceSettings
+    ),
     .target(
       name: "Institute Build Coordinator",
       dependencies: [
@@ -186,7 +263,7 @@ let package = Package(
         .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
         .product(name: "Git", package: "swift-git"),
         .product(name: "JSON", package: "swift-json"),
-        .product(name: "Source Measurement", package: "swift-source"),
+        "Source Measurement",
         .product(name: "Xcode Workspace", package: "swift-xcode"),
       ]
     ),
@@ -196,7 +273,7 @@ let package = Package(
         "Institute Model",
         .product(name: "Byte", package: "swift-byte"),
         .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
-        .product(name: "Source Profile", package: "swift-source"),
+        "Source Profile",
       ]
     ),
     .target(
@@ -289,8 +366,8 @@ let package = Package(
           package: "swift-standards-linter-rules"
         ),
         .product(name: "Lint", package: "swift-lint"),
-        .product(name: "Source Measurement", package: "swift-source"),
-        .product(name: "Source Profile", package: "swift-source"),
+        "Source Measurement",
+        "Source Profile",
       ]
     ),
     .target(
@@ -304,14 +381,14 @@ let package = Package(
         .product(name: "File System", package: "swift-file-system"),
         .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
         .product(name: "Process", package: "swift-process"),
-        .product(name: "Source Execution", package: "swift-source"),
-        .product(name: "Source Measurement", package: "swift-source"),
-        .product(name: "Source Profile", package: "swift-source"),
-        .product(name: "Source Repair", package: "swift-source"),
-        .product(name: "Source Linter", package: "swift-source"),
-        .product(name: "Source Report", package: "swift-source"),
-        .product(name: "Source Swift Format", package: "swift-source"),
-        .product(name: "Source SwiftLint", package: "swift-source"),
+        "Source Execution",
+        "Source Measurement",
+        "Source Profile",
+        "Source Repair",
+        "Source Linter",
+        "Source Report",
+        "Source Swift Format",
+        "Source SwiftLint",
         .product(name: "Thread Pool", package: "swift-threads"),
       ]
     ),
@@ -465,8 +542,8 @@ let package = Package(
         .product(name: "GitHub", package: "swift-github"),
         .product(name: "JSON", package: "swift-json"),
         .product(name: "Package Manager", package: "swift-package-manager"),
-        .product(name: "Source Measurement", package: "swift-source"),
-        .product(name: "Source Repair", package: "swift-source"),
+        "Source Measurement",
+        "Source Repair",
         .product(name: "SPM Standard", package: "swift-spm-standard"),
         .product(name: "Skill Validation", package: "swift-agent-skills"),
         .product(
@@ -508,7 +585,7 @@ let package = Package(
       dependencies: [
         "Institute Source Policy",
         "Institute Model",
-        .product(name: "Source Profile", package: "swift-source"),
+        "Source Profile",
       ]
     ),
     .testTarget(
