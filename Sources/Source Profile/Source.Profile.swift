@@ -11,7 +11,7 @@ extension Source {
     }
 
     public var digest: Digest {
-      let bytes = jsonString(sortKeys: true).utf8.map(Byte.init)
+      let bytes = jsonString(sortKeys: true).utf8.map(Byte.init(_:))
       return Digest(FIPS_180_4.SHA256.digest(bytes).hex)
     }
 
