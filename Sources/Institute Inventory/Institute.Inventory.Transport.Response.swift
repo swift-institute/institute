@@ -1,4 +1,4 @@
-public import Byte_Primitives
+public import Byte
 public import Institute_Model
 
 extension Institute.Inventory.Transport {

@@ -101,7 +101,7 @@ let package = Package(
     .package(url: "https://github.com/swift-compositions/swift-agent-skills.git", branch: "main"),
     .package(url: "https://github.com/swift-compositions/swift-arguments.git", branch: "main"),
     .package(url: "https://github.com/swift-atoms/swift-ascii.git", branch: "main"),
-    .package(url: "https://github.com/swift-foundations/swift-async.git", branch: "main"),
+    .package(url: "https://github.com/swift-molecules/swift-async-fanout.git", branch: "main"),
     .package(url: "https://github.com/swift-compositions/swift-environment.git", branch: "main"),
     .package(url: "https://github.com/swift-compositions/swift-file-system.git", branch: "main"),
     .package(url: "https://github.com/swift-compositions/swift-github.git", branch: "main"),
@@ -115,10 +115,7 @@ let package = Package(
     .package(url: "https://github.com/swift-compositions/swift-xcode.git", branch: "main"),
     .package(url: "https://github.com/swift-standards/swift-xcode-standard.git", branch: "main"),
     .package(url: "https://github.com/swift-foundations/swift-source.git", branch: "main"),
-    .package(
-      url: "https://github.com/swift-primitives/swift-linter-primitives.git",
-      branch: "main"
-    ),
+    .package(url: "https://github.com/swift-molecules/swift-lint.git", branch: "main"),
     .package(
       url: "https://github.com/swift-compositions/swift-institute-linter-rules.git",
       branch: "main"
@@ -132,7 +129,7 @@ let package = Package(
       branch: "main"
     ),
     .package(url: "https://github.com/swift-ietf/swift-rfc-3986.git", branch: "main"),
-    .package(url: "https://github.com/swift-primitives/swift-byte-primitives.git", branch: "main"),
+    .package(url: "https://github.com/swift-atoms/swift-byte.git", branch: "main"),
     .package(url: "https://github.com/swift-standards/swift-fips-180-4.git", branch: "main"),
     .package(url: "https://github.com/swift-standards/swift-github-standard.git", branch: "main"),
     .package(url: "https://github.com/swift-standards/swift-spm-standard.git", branch: "main"),
@@ -155,8 +152,8 @@ let package = Package(
     .target(
       name: "Institute Model",
       dependencies: [
-        .product(name: "Async Fanout", package: "swift-async"),
-        .product(name: "Byte Primitives", package: "swift-byte-primitives"),
+        .product(name: "Async Fanout", package: "swift-async-fanout"),
+        .product(name: "Byte", package: "swift-byte"),
         .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
         .product(name: "File System", package: "swift-file-system"),
         .product(name: "Git", package: "swift-git"),
@@ -170,7 +167,7 @@ let package = Package(
       name: "Institute Inventory",
       dependencies: [
         "Institute Model",
-        .product(name: "Byte Primitives", package: "swift-byte-primitives"),
+        .product(name: "Byte", package: "swift-byte"),
         .product(name: "File System", package: "swift-file-system"),
         .product(name: "Git", package: "swift-git"),
         .product(name: "GitHub", package: "swift-github"),
@@ -183,8 +180,8 @@ let package = Package(
       name: "Institute Source Workspace",
       dependencies: [
         "Institute Model",
-        .product(name: "Async Fanout", package: "swift-async"),
-        .product(name: "Byte Primitives", package: "swift-byte-primitives"),
+        .product(name: "Async Fanout", package: "swift-async-fanout"),
+        .product(name: "Byte", package: "swift-byte"),
         .product(name: "File System", package: "swift-file-system"),
         .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
         .product(name: "Git", package: "swift-git"),
@@ -197,7 +194,7 @@ let package = Package(
       name: "Institute Source Policy",
       dependencies: [
         "Institute Model",
-        .product(name: "Byte Primitives", package: "swift-byte-primitives"),
+        .product(name: "Byte", package: "swift-byte"),
         .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
         .product(name: "Source Profile", package: "swift-source"),
       ]
@@ -221,11 +218,7 @@ let package = Package(
       dependencies: [
         "Institute CI Model",
         "Institute Model",
-        .product(name: "Byte Primitives", package: "swift-byte-primitives"),
-        .product(
-          name: "Byte Primitives Standard Library Integration",
-          package: "swift-byte-primitives"
-        ),
+        .product(name: "Byte", package: "swift-byte"),
         .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
       ]
     ),
@@ -254,11 +247,7 @@ let package = Package(
         "Institute CI Workflow",
         "Institute Model",
         .product(name: "ASCII", package: "swift-ascii"),
-        .product(name: "Byte Primitives", package: "swift-byte-primitives"),
-        .product(
-          name: "Byte Primitives Standard Library Integration",
-          package: "swift-byte-primitives"
-        ),
+        .product(name: "Byte", package: "swift-byte"),
         .product(name: "Environment", package: "swift-environment"),
         .product(name: "File System", package: "swift-file-system"),
         .product(name: "GitHub Standard", package: "swift-github-standard"),
@@ -275,11 +264,7 @@ let package = Package(
       name: "Institute Repository Policy",
       dependencies: [
         "Institute Model",
-        .product(name: "Byte Primitives", package: "swift-byte-primitives"),
-        .product(
-          name: "Byte Primitives Standard Library Integration",
-          package: "swift-byte-primitives"
-        ),
+        .product(name: "Byte", package: "swift-byte"),
         .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
         .product(name: "File System", package: "swift-file-system"),
         .product(name: "JSON", package: "swift-json"),
@@ -303,7 +288,7 @@ let package = Package(
           name: "Linter Standards Rules",
           package: "swift-standards-linter-rules"
         ),
-        .product(name: "Linter Primitives", package: "swift-linter-primitives"),
+        .product(name: "Lint", package: "swift-lint"),
         .product(name: "Source Measurement", package: "swift-source"),
         .product(name: "Source Profile", package: "swift-source"),
       ]
@@ -315,7 +300,7 @@ let package = Package(
         "Institute Source Policy",
         "Institute Source Profile",
         "Institute Source Workspace",
-        .product(name: "Async Fanout", package: "swift-async"),
+        .product(name: "Async Fanout", package: "swift-async-fanout"),
         .product(name: "File System", package: "swift-file-system"),
         .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
         .product(name: "Process", package: "swift-process"),
@@ -335,12 +320,8 @@ let package = Package(
       dependencies: [
         "Institute Model",
         "Institute Inventory",
-        .product(name: "Async Fanout", package: "swift-async"),
-        .product(name: "Byte Primitives", package: "swift-byte-primitives"),
-        .product(
-          name: "Byte Primitives Standard Library Integration",
-          package: "swift-byte-primitives"
-        ),
+        .product(name: "Async Fanout", package: "swift-async-fanout"),
+        .product(name: "Byte", package: "swift-byte"),
         .product(name: "Command", package: "swift-arguments"),
         .product(name: "GitHub", package: "swift-github"),
         .product(name: "JSON", package: "swift-json"),
@@ -354,8 +335,8 @@ let package = Package(
         "Institute Model",
         "Institute Inventory",
         "Institute Source Workspace",
-        .product(name: "Async Fanout", package: "swift-async"),
-        .product(name: "Byte Primitives", package: "swift-byte-primitives"),
+        .product(name: "Async Fanout", package: "swift-async-fanout"),
+        .product(name: "Byte", package: "swift-byte"),
         .product(name: "Command", package: "swift-arguments"),
         .product(name: "Environment", package: "swift-environment"),
         .product(name: "File System", package: "swift-file-system"),
@@ -390,7 +371,7 @@ let package = Package(
         "Institute Model",
         "Institute Development",
         "Institute Source Policy",
-        .product(name: "Async Fanout", package: "swift-async"),
+        .product(name: "Async Fanout", package: "swift-async-fanout"),
         .product(name: "Environment", package: "swift-environment"),
         .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
         .product(name: "File System", package: "swift-file-system"),
@@ -421,7 +402,7 @@ let package = Package(
         "Institute Development",
         "Institute Lint",
         "Institute Source",
-        .product(name: "Async Fanout", package: "swift-async"),
+        .product(name: "Async Fanout", package: "swift-async-fanout"),
         .product(name: "Environment", package: "swift-environment"),
         .product(name: "File System", package: "swift-file-system"),
         .product(name: "Git", package: "swift-git"),
@@ -475,12 +456,8 @@ let package = Package(
         "Institute Doctor",
         "Institute Conversion",
         "Institute Instruments",
-        .product(name: "Async Fanout", package: "swift-async"),
-        .product(name: "Byte Primitives", package: "swift-byte-primitives"),
-        .product(
-          name: "Byte Primitives Standard Library Integration",
-          package: "swift-byte-primitives"
-        ),
+        .product(name: "Async Fanout", package: "swift-async-fanout"),
+        .product(name: "Byte", package: "swift-byte"),
         .product(name: "Command", package: "swift-arguments"),
         .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
         .product(name: "File System", package: "swift-file-system"),

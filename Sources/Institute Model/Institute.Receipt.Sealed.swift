@@ -1,4 +1,4 @@
-public import Byte_Primitives
+public import Byte
 public import FIPS_180_4
 public import JSON
 

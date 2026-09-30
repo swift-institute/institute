@@ -1,6 +1,5 @@
 public import Institute_Model
-public import Byte_Primitives
-import Byte_Primitives_Standard_Library_Integration
+public import Byte
 public import JSON
 
 // The Institute protected-main branch ruleset contracts, converged by

@@ -1,4 +1,4 @@
-import Byte_Primitives_Standard_Library_Integration
+import Byte
 import Testing
 
 @testable import Institute_Conversion

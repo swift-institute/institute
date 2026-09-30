@@ -1,6 +1,6 @@
 public import Institute_Model
 public import Institute_CI_Model
-public import Byte_Primitives
+public import Byte
 import FIPS_180_4
 
 extension Institute.CI.Bootstrap.Manifest {

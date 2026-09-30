@@ -1,4 +1,4 @@
-internal import Byte_Primitives
+internal import Byte
 public import File_System
 public import Institute_Model
 internal import JSON

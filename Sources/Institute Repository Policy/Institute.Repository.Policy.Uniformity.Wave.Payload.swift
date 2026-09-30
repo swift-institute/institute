@@ -1,6 +1,5 @@
 public import Institute_Model
-public import Byte_Primitives
-import Byte_Primitives_Standard_Library_Integration
+public import Byte
 
 extension Institute.Repository.Policy.Uniformity.Wave {
     /// The ratified canonical package shape policy, embedded byte-exact.

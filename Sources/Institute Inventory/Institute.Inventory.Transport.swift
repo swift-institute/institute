@@ -1,4 +1,4 @@
-internal import Byte_Primitives
+internal import Byte
 public import Institute_Model
 public import Process
 

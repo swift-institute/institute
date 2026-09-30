@@ -1,6 +1,5 @@
 public import Institute_Model
-public import Byte_Primitives
-import Byte_Primitives_Standard_Library_Integration
+public import Byte
 public import JSON
 
 extension Institute.Repository.Policy.Uniformity.Wave {

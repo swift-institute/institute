@@ -1,7 +1,6 @@
 public import Institute_Model
 import struct Swift.String
-import Byte_Primitives
-import Byte_Primitives_Standard_Library_Integration
+import Byte
 public import Institute_CI_Model
 import File_System
 

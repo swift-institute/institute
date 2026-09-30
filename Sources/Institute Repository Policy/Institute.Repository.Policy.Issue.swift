@@ -1,5 +1,5 @@
 public import Institute_Model
-import Byte_Primitives
+import Byte
 import FIPS_180_4
 
 extension Institute.Repository.Policy {

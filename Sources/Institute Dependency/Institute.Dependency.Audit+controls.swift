@@ -1,5 +1,4 @@
-private import Byte_Primitives
-private import Byte_Primitives_Standard_Library_Integration
+private import Byte
 private import GitHub
 internal import Institute_Inventory
 internal import Institute_Model

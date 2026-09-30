@@ -1,7 +1,7 @@
 public import Institute_Source_Policy
 public import Institute_Model
 internal import Linter_Institute_Rules
-internal import Linter_Primitives
+internal import Lint
 internal import Linter_Primitives_Rules
 internal import Linter_Standards_Rules
 public import Source_Measurement

@@ -1,5 +1,5 @@
 public import Institute_Model
-public import Byte_Primitives
+public import Byte
 
 extension Institute.Repository.Policy.Caller.Wave {
     public static func close<C: Client>(

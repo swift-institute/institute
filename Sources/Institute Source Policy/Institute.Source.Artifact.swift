@@ -1,4 +1,4 @@
-internal import Byte_Primitives
+internal import Byte
 internal import FIPS_180_4
 public import Institute_Model
 public import Source_Profile
