@@ -25,7 +25,7 @@ extension Institute.Build {
         /// neither under-uses a large host nor oversubscribes a small one.
         /// Same derivation as ``Institute/Lint/Sweep/processors``.
         public static var processors: Swift.Int {
-            Swift.Int(Kernel.Thread.Count(System.Processor.count))
+            Swift.Int(Kernel.Thread.Count(System.processorCount))
         }
 
         public init(jobs: Swift.Int? = nil) {

@@ -15,7 +15,7 @@ extension Async.Fanout {
     /// Read from the machine rather than fixed, so a fan-out neither
     /// under-uses a large host nor oversubscribes a small one.
     public static var processors: Swift.Int {
-        Swift.Int(Kernel.Thread.Count(System.Processor.count))
+        Swift.Int(Kernel.Thread.Count(System.processorCount))
     }
 
     /// Every fan-out in this application spawns a child process per item —

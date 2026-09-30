@@ -33,7 +33,7 @@ extension Institute.Source.Application {
           if let parent = file.path.parent {
             try File.Directory(parent).create.recursive()
           }
-          try file.write.atomic(contentsOf: contents.map(Byte.init))
+          try file.write.atomic(contentsOf: contents.map(Byte.init(_:)))
           return .success(())
         } catch {
           return .failure(.init(code: "file-write", detail: "\(file): \(error)"))

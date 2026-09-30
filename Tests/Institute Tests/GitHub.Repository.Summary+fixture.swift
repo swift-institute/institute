@@ -1,5 +1,5 @@
 import GitHub
-import Tagged_Primitives
+import Tagged
 
 @testable import Institute_Conversion
 @testable import Institute_Dependency

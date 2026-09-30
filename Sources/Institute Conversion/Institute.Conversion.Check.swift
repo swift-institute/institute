@@ -2,7 +2,7 @@ public import File_System
 public import Institute_Doctor
 public import Institute_Model
 public import Institute_Pages
-public import Tagged_Primitives
+public import Tagged
 
 extension Institute.Conversion {
     /// `institute conversion check <path>`: re-reads a receipt and reports,

@@ -7,7 +7,7 @@ extension Institute.Repository.Policy.Caller.Wave {
     static func digest(_ values: [String]) -> String {
         var bytes: [Byte] = []
         for value in values {
-            bytes.append(contentsOf: [Byte](value.utf8))
+            bytes.append(contentsOf: [Byte](utf8: value))
             bytes.append(Byte(0))
         }
         return FIPS_180_4.SHA256.digest(bytes).hex
@@ -18,7 +18,7 @@ extension Institute.Repository.Policy.Caller.Wave {
     }
 
     static func stableBytes<T: JSON.Serializable>(_ value: T) -> [Byte] {
-        [Byte](value.jsonString(sortKeys: true).utf8)
+        [Byte](utf8: value.jsonString(sortKeys: true))
     }
 
     /// The exact bytes an evidence file carries on disk. Digests recorded in

@@ -277,7 +277,7 @@ extension Institute.Source.Application {
     }
     let profileBytes = preparation.profiles.keys.sorted()
       .compactMap { preparation.profiles[$0]?.hex }
-      .joined(separator: ":").utf8.map(Byte.init)
+      .joined(separator: ":").utf8.map(Byte.init(_:))
     let digest = Source_Profile.Source.Profile.Digest(FIPS_180_4.SHA256.digest(profileBytes).hex)
     return .init(
       scope: scope,

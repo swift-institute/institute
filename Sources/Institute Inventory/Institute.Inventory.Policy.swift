@@ -2,7 +2,7 @@ public import GitHub
 public import Institute_Model
 // `vacant` is a Set of GitHub.Organization.Name, a Tagged alias, so the
 // declaration is only well-formed with the module imported publicly.
-public import Tagged_Primitives
+public import Tagged
 
 extension Institute.Inventory {
     public struct Policy: Equatable, Sendable {

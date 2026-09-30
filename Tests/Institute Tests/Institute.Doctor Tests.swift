@@ -1,6 +1,6 @@
 import File_System
 import Foundation
-import Tagged_Primitives
+import Tagged
 import Testing
 
 @testable import Institute_Conversion

@@ -1,7 +1,7 @@
 private import Byte
 private import GitHub
 private import JSON
-private import Tagged_Primitives
+private import Tagged
 import Testing
 
 @testable import Institute_Conversion
@@ -463,7 +463,7 @@ extension Institute.Dependency.Test.Integration {
                     )
                 )
             },
-            content: { _, _ in .available([Byte](source.utf8)) }
+            content: { _, _ in .available([Byte](utf8: source)) }
         )
     }
 
@@ -514,7 +514,7 @@ extension Institute.Dependency.Test.Integration {
                 guard key == consumer else {
                     return .unmeasured("unexpected content \(key.identity)")
                 }
-                return .available([Byte](source.utf8))
+                return .available([Byte](utf8: source))
             }
         )
     }

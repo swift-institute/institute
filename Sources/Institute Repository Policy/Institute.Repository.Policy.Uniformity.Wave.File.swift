@@ -27,7 +27,7 @@ extension Institute.Repository.Policy.Uniformity.Wave.File: JSON.Serializable {
     public static func deserialize(_ json: JSON) throws(JSON.Error) -> Self {
         Self(
             blob: try Swift.String(json: json["blob"]),
-            bytes: [Byte](try Swift.String(json: json["bytes"]).utf8)
+            bytes: [Byte](utf8: try Swift.String(json: json["bytes"]))
         )
     }
 }

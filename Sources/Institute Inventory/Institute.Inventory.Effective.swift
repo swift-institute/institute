@@ -1,7 +1,7 @@
 public import GitHub
 public import Institute_Model
 public import JSON
-public import Tagged_Primitives
+public import Tagged
 
 extension Institute.Inventory {
     /// The committed public roster combined, in memory, with one live

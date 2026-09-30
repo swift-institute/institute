@@ -78,7 +78,7 @@ extension Institute.Repository.Policy.Caller.Wave.Recovery: JSON.Serializable {
             caller: try Institute.Repository.Policy.Caller.Wave.CallerSource(json: json["caller"]),
             callerDigest: try Swift.String(json: json["callerDigest"]),
             population: try Institute.Repository.Policy.Caller.Wave.Commitment(json: json["population"]),
-            canonicalRuleset: [Byte](try Swift.String(json: json["canonicalRuleset"]).utf8),
+            canonicalRuleset: [Byte](utf8: try Swift.String(json: json["canonicalRuleset"])),
             integrationID: try Swift.Int64(json: json["integrationID"]),
             policyDigest: try Swift.String(json: json["policyDigest"]),
             policySource: try Swift.String(json: json["policySource"]),

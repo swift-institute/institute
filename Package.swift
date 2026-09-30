@@ -136,6 +136,7 @@ let package = Package(
     ),
     .package(url: "https://github.com/swift-ietf/swift-rfc-3986.git", branch: "main"),
     .package(url: "https://github.com/swift-atoms/swift-byte.git", branch: "main"),
+    .package(url: "https://github.com/swift-atoms/swift-tagged.git", branch: "main"),
     .package(url: "https://github.com/swift-standards/swift-fips-180-4.git", branch: "main"),
     .package(url: "https://github.com/swift-standards/swift-github-standard.git", branch: "main"),
     .package(url: "https://github.com/swift-standards/swift-spm-standard.git", branch: "main"),
@@ -238,6 +239,7 @@ let package = Package(
         .product(name: "JSON", package: "swift-json"),
         .product(name: "Kernel", package: "swift-kernel"),
         .product(name: "RFC 3986", package: "swift-rfc-3986"),
+        .product(name: "Tagged", package: "swift-tagged"),
       ]
     ),
     .target(
@@ -251,6 +253,7 @@ let package = Package(
         .product(name: "JSON", package: "swift-json"),
         .product(name: "Kernel", package: "swift-kernel"),
         .product(name: "Process", package: "swift-process"),
+        .product(name: "Tagged", package: "swift-tagged"),
       ]
     ),
     .target(
@@ -486,6 +489,7 @@ let package = Package(
         .product(name: "JSON", package: "swift-json"),
         .product(name: "Package Manager", package: "swift-package-manager"),
         .product(name: "Process", package: "swift-process"),
+        .product(name: "Tagged", package: "swift-tagged"),
       ]
     ),
     .target(
@@ -496,6 +500,7 @@ let package = Package(
         "Institute Doctor",
         .product(name: "File System", package: "swift-file-system"),
         .product(name: "JSON", package: "swift-json"),
+        .product(name: "Tagged", package: "swift-tagged"),
       ]
     ),
     .target(
@@ -552,6 +557,7 @@ let package = Package(
         ),
         .product(name: "Xcode Workspace", package: "swift-xcode"),
         .product(name: "Xcode Workspace Standard", package: "swift-xcode-standard"),
+        .product(name: "Tagged", package: "swift-tagged"),
       ],
       path: "Tests/Institute Tests"
     ),

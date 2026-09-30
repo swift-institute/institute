@@ -1,6 +1,6 @@
 import Foundation
 import JSON
-import Tagged_Primitives
+import Tagged
 import Testing
 
 @testable import Institute_Conversion

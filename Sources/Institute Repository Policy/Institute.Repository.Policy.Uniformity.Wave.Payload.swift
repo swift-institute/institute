@@ -17,7 +17,7 @@ extension Institute.Repository.Policy.Uniformity.Wave {
         public static let digest =
             "8e37977a3b8f0a0d9e028e6089172d811eea21e6868a878ab43a1d4875df02f7"
 
-        public static let bytes = [Byte](text.utf8)
+        public static let bytes = [Byte](utf8: text)
 
         public static func canonical() throws(Institute.Repository.Policy.Uniformity.Wave.Error) -> [Byte] {
             guard Institute.Repository.Policy.Caller.Wave.digest(bytes) == digest else {

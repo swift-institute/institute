@@ -1,6 +1,6 @@
 import GitHub
 import JSON
-import Tagged_Primitives_Standard_Library_Integration
+import Tagged
 import Testing
 
 @testable import Institute_Conversion

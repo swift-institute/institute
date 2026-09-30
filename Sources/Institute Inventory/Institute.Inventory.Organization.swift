@@ -1,6 +1,6 @@
 public import GitHub
 public import Institute_Model
-public import Tagged_Primitives
+public import Tagged
 
 extension Institute.Inventory {
     public struct Organization: Equatable, Hashable, Sendable {

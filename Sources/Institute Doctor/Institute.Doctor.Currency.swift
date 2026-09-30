@@ -3,7 +3,7 @@ public import Institute_Inventory
 public import Institute_Lint
 public import Institute_Model
 public import Institute_Pages
-public import Tagged_Primitives
+public import Tagged
 
 extension Institute.Doctor {
     /// One repository name's membership across the committed inventory

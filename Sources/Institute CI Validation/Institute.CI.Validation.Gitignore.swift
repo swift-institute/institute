@@ -695,7 +695,7 @@ extension Institute.CI.Validation.Gitignore {
             }
             var batch: [Byte] = []
             for path in paths {
-                batch.append(contentsOf: [Byte](path.utf8))
+                batch.append(contentsOf: [Byte](utf8: path))
                 batch.append(Byte(0))
             }
             let batchFile: File.Path

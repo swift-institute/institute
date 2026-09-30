@@ -1,7 +1,7 @@
 public import GitHub
 public import JSON
 private import RFC_3986
-public import Tagged_Primitives
+public import Tagged
 
 extension Institute.Repository {
     public struct Key: Equatable, Hashable, Sendable, JSON.Serializable {

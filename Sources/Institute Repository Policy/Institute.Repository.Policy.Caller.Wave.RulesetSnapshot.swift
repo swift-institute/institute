@@ -153,8 +153,8 @@ extension Institute.Repository.Policy.Caller.Wave.RulesetSnapshot: JSON.Serializ
         Self(
             repository: try Swift.String(json: json["repository"]),
             id: try Swift.Int64(json: json["id"]),
-            restore: [Byte](try Swift.String(json: json["restore"]).utf8),
-            opened: [Byte](try Swift.String(json: json["opened"]).utf8)
+            restore: [Byte](utf8: try Swift.String(json: json["restore"])),
+            opened: [Byte](utf8: try Swift.String(json: json["opened"]))
         )
     }
 

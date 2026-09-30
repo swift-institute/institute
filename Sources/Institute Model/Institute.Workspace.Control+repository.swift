@@ -1,4 +1,4 @@
-internal import Tagged_Primitives
+internal import Tagged
 
 extension Institute.Workspace.Control {
     public var repository: Institute.Repository.Key {

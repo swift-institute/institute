@@ -1,4 +1,4 @@
-private import Tagged_Primitives
+private import Tagged
 
 extension Institute.Configuration {
     public func validated() throws(Institute.Error) -> Self {

@@ -30,6 +30,6 @@ extension Institute.Receipt.Sealed {
     /// spawn-and-scratch-file workaround, which predated the ecosystem
     /// publishing a SHA-2 implementation (TX-APP1F).
     public var digest: Swift.String {
-        FIPS_180_4.SHA256.digest(Array(canonical.utf8).map(Byte.init)).hex
+        FIPS_180_4.SHA256.digest(Array(canonical.utf8).map(Byte.init(_:))).hex
     }
 }

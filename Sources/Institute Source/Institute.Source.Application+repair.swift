@@ -246,7 +246,7 @@ extension Institute.Source.Application {
 
   private static func inventoryDigest(_ configuration: Institute.Configuration) -> Swift.String {
     FIPS_180_4.SHA256.digest(
-      configuration.jsonString(sortKeys: true).utf8.map(Byte.init)
+      configuration.jsonString(sortKeys: true).utf8.map(Byte.init(_:))
     ).hex
   }
 }

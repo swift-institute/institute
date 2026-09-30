@@ -348,7 +348,7 @@ extension Institute.Repository.Policy.Issue {
         }
 
         public var digest: String {
-            FIPS_180_4.SHA1.digest(Array(body.utf8).map(Byte.init)).hex
+            FIPS_180_4.SHA1.digest(Array(body.utf8).map(Byte.init(_:))).hex
         }
     }
 

@@ -18,7 +18,7 @@ extension Institute.Inventory.Writer {
         let output = try configuration.rendered()
         let file = root[file: "Institute.json"]
         guard file.stat.exists else { return .replace(output) }
-        return try read(file) == [Byte](output.utf8) ? .current : .replace(output)
+        return try read(file) == [Byte](utf8: output) ? .current : .replace(output)
     }
 
     public func run(

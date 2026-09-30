@@ -105,7 +105,7 @@ extension Institute.Dependency.Audit {
                 guard key == consumer, blob.object == "runtime-control" else {
                     return .unmeasured("runtime control received unexpected manifest content")
                 }
-                return .available([Byte](source.utf8))
+                return .available([Byte](utf8: source))
             }
         )
         let report = await Institute.Dependency.Audit(

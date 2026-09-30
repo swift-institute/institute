@@ -149,7 +149,7 @@ extension Institute.Inventory.Transport {
         }
 
         let body = lines[bodyIndex...].joined(separator: "\n")
-        return .init(status: code, headers: fields, body: body.isEmpty ? nil : [Byte](body.utf8))
+        return .init(status: code, headers: fields, body: body.isEmpty ? nil : [Byte](utf8: body))
     }
 }
 

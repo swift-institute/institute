@@ -74,7 +74,7 @@ extension Institute.CI.Bootstrap.Identity {
             "architecture=\(architecture)",
             "provisioning=\(provisioning.sorted().joined(separator: ","))",
         ]
-        return [Byte](lines.joined(separator: "\n").utf8)
+        return [Byte](utf8: lines.joined(separator: "\n"))
     }
 
     /// The cache key: lowercase hex SHA-256 of the canonical tuple
