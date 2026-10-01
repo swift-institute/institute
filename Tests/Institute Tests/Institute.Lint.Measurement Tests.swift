@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import Testing
 
 @testable import Institute_Conversion
@@ -370,7 +369,7 @@ struct `Institute Lint Measurement Tests` {
 }
 
 private struct FixProcessFixture {
-    let base: URL
+    let base: Swift.String
     let package: File.Directory
     let sources: File.Directory
     private let executable: File
@@ -379,12 +378,12 @@ private struct FixProcessFixture {
     private let formatCapture: File
 
     init() throws {
-        base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-        try FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
+        base = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+        try MainFixtureFiles.createDirectory(base)
 
-        let packageURL = base.appending(path: "swift-affine-algebra-primitives")
-        try FileManager.default.createDirectory(at: packageURL, withIntermediateDirectories: true)
-        package = try File.Directory(validating: packageURL.path)
+        let packageURL = MainFixtureFiles.join(base, "swift-affine-algebra-primitives")
+        try MainFixtureFiles.createDirectory(packageURL)
+        package = try File.Directory(validating: packageURL)
         sources = package[directory: "Sources"][directory: "Affine Algebra Primitives"]
         executable = package[directory: ".fixture"][file: "swift-linter"]
         runner = package[directory: ".fixture"][file: "swift-linter-runner"]
@@ -432,17 +431,17 @@ private struct FixProcessFixture {
     }
 
     func arguments() throws -> [Swift.String] {
-        try Swift.String(contentsOfFile: capture.description, encoding: .utf8)
+        try MainFixtureFiles.readStrictUTF8(capture.description)
             .split(separator: "\n", omittingEmptySubsequences: true)
             .map(Swift.String.init)
     }
 
     func format() throws -> Swift.String {
-        try Swift.String(contentsOfFile: formatCapture.description, encoding: .utf8)
+        try MainFixtureFiles.readStrictUTF8(formatCapture.description)
     }
 
     func remove() {
-        try? FileManager.default.removeItem(at: base)
+        try? MainFixtureFiles.remove(base)
     }
 }
 

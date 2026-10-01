@@ -1,4 +1,3 @@
-import Foundation
 import Git_Foundation
 import Testing
 
@@ -40,7 +39,7 @@ extension Institute.Inventory.Test.Integration {
             configuration: configuration
         )
         defer { fixture.remove() }
-        let before = try Data(contentsOf: fixture.file)
+        let before = try MainFixtureFiles.readBytes(fixture.filePath)
         let document = try Institute.Configuration.Document.load(at: fixture.root)
 
         let register = Institute.Inventory.Register(
@@ -54,7 +53,7 @@ extension Institute.Inventory.Test.Integration {
                   swift-rfc-9110 → swift-ietf → swift-standards/swift-ietf/swift-rfc-9110
                 """
         )
-        #expect(try Data(contentsOf: fixture.file) == before)
-        #expect(try fixture.git.status(at: fixture.location.path).isEmpty)
+        #expect(try MainFixtureFiles.readBytes(fixture.filePath) == before)
+        #expect(try fixture.git.status(at: fixture.locationPath).isEmpty)
     }
 }

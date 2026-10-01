@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import JSON
 import Testing
 
@@ -78,38 +77,38 @@ extension Institute.Composition.State.Test.Unit {
 extension Institute.Composition.State.Test.Integration {
     @Test
     func `an absent ledger loads as empty`() throws {
-        let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-        try FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: base) }
+        let base = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+        try MainFixtureFiles.createDirectory(base)
+        defer { try? MainFixtureFiles.remove(base) }
 
-        let root = try File.Directory(validating: base.path)
+        let root = try File.Directory(validating: base)
         #expect(try Institute.Composition.State.load(at: root).records.isEmpty)
     }
 
     @Test
     func `a saved ledger reloads under the checkout rather than its sibling hierarchy`() throws {
-        let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-        try FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: base) }
+        let base = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+        try MainFixtureFiles.createDirectory(base)
+        defer { try? MainFixtureFiles.remove(base) }
 
-        let checkout = base.appending(path: "Institute")
-        try FileManager.default.createDirectory(at: checkout, withIntermediateDirectories: true)
-        let root = try File.Directory(validating: checkout.path)
+        let checkout = MainFixtureFiles.join(base, "Institute")
+        try MainFixtureFiles.createDirectory(checkout)
+        let root = try File.Directory(validating: checkout)
         let state = Institute.Composition.State(records: [
             Institute.Composition.Record(
                 consumer: "swift-color",
                 dependency: "swift-color-standard",
                 declared:
                     ".package(url: \"https://github.com/swift-standards/swift-color-standard.git\", branch: \"main\")",
-                planned: ".package(path: \"\(base.path)/swift-standards/swift-color-standard\")"
+                planned: ".package(path: \"\(base)/swift-standards/swift-color-standard\")"
             )
         ])
         try state.save(at: root)
         #expect(try Institute.Composition.State.load(at: root) == state)
 
         // The ledger stays in the git-ignored checkout-local .workspace/ directory.
-        let ledger = checkout.appending(path: ".workspace/compositions.json")
-        #expect(FileManager.default.fileExists(atPath: ledger.path))
-        #expect(!FileManager.default.fileExists(atPath: base.appending(path: ".workspace").path))
+        let ledger = MainFixtureFiles.join(checkout, ".workspace/compositions.json")
+        #expect(MainFixtureFiles.exists(ledger))
+        #expect(!MainFixtureFiles.exists(MainFixtureFiles.join(base, ".workspace")))
     }
 }

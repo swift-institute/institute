@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import JSON
 import Testing
 
@@ -26,24 +25,14 @@ extension Institute.Navigation.Test {
     private static func fixture<Result>(
         _ body: (Institute.Navigation, Institute.Repository, Institute.Repository) throws -> Result
     ) throws -> Result {
-        let base = FileManager.default.temporaryDirectory
-            .appending(path: UUID().uuidString)
-            .appending(path: "entry with space")
-        let checkoutURL =
-            base
-            .appending(path: "swift-institute")
-            .appending(path: "Institute")
+        let base = MainFixtureFiles.join(MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName()), "entry with space")
+        let checkoutURL = MainFixtureFiles.join(MainFixtureFiles.join(base, "swift-institute"), "Institute")
         defer {
-            try? FileManager.default.removeItem(
-                at: base.deletingLastPathComponent()
-            )
+            try? MainFixtureFiles.remove(MainFixtureFiles.parent(of: base))
         }
-        try FileManager.default.createDirectory(
-            at: checkoutURL,
-            withIntermediateDirectories: true
-        )
+        try MainFixtureFiles.createDirectory(checkoutURL)
 
-        let checkout = try File.Directory(validating: checkoutURL.path)
+        let checkout = try File.Directory(validating: checkoutURL)
         try checkout[file: "Package.swift"].write.atomic(
             "// fixture\n"
         )

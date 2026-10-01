@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import Testing
 
 @testable import Institute_Conversion
@@ -27,12 +26,12 @@ extension Institute.Sync.Test.Integration {
     ) throws -> Institute.Sync {
         let repository = Institute.Repository(
             name: "swift-rfc-0000",
-            url: fixture.remote.path,
+            url: fixture.remotePath,
             organization: "swift-ietf",
             layer: .standards
         )
         return Institute.Sync(
-            root: try Institute.Root(checkout: File.Directory(validating: fixture.root.path)),
+            root: try Institute.Root(checkout: File.Directory(validating: fixture.rootPath)),
             selection: .init(repositories: [repository], origin: .committed(count: 1)),
             client: fixture.client
         )
@@ -81,20 +80,18 @@ extension Institute.Sync.Test.Integration {
     {
         let fixture = try Institute.Sync.Fixture()
         defer { fixture.remove() }
-        let collision = fixture.base.appending(path: "swift-standards/swift-ietf/swift-rfc-0000")
-        try FileManager.default.createDirectory(at: collision, withIntermediateDirectories: true)
-        let marker = collision.appending(path: "marker")
-        try Data("collision".utf8).write(to: marker)
+        let collision = MainFixtureFiles.join(fixture.basePath, "swift-standards/swift-ietf/swift-rfc-0000")
+        try MainFixtureFiles.createDirectory(collision)
+        let marker = MainFixtureFiles.join(collision, "marker")
+        try MainFixtureFiles.write(bytes: Array("collision".utf8), to: marker)
 
         await #expect(throws: Institute.Error.self) {
             try await Self.selectedAuthority(fixture).run(dry: false)
         }
 
-        #expect(try Data(contentsOf: marker) == Data("collision".utf8))
+        #expect(try MainFixtureFiles.readBytes(marker) == Array("collision".utf8))
         #expect(
-            !FileManager.default.fileExists(
-                atPath: fixture.root.appending(path: "institute interim.xcworkspace").path
-            )
+            !MainFixtureFiles.exists(MainFixtureFiles.join(fixture.rootPath, "institute interim.xcworkspace"))
         )
     }
 
@@ -102,26 +99,19 @@ extension Institute.Sync.Test.Integration {
     func `a symbolic sibling prefix stops sync without writing through the link`() async throws {
         let fixture = try Institute.Sync.Fixture()
         defer { fixture.remove() }
-        let outside = fixture.base.appending(path: "outside")
-        try FileManager.default.createDirectory(at: outside, withIntermediateDirectories: true)
-        try FileManager.default.createSymbolicLink(
-            at: fixture.base.appending(path: "swift-standards"),
-            withDestinationURL: outside
-        )
+        let outside = MainFixtureFiles.join(fixture.basePath, "outside")
+        try MainFixtureFiles.createDirectory(outside)
+        try MainFixtureFiles.createSymbolicLink(MainFixtureFiles.join(fixture.basePath, "swift-standards"), toURLOf: outside)
 
         await #expect(throws: Institute.Error.self) {
             try await Self.selectedAuthority(fixture).run(dry: false)
         }
 
         #expect(
-            !FileManager.default.fileExists(
-                atPath: outside.appending(path: "swift-ietf/swift-rfc-0000").path
-            )
+            !MainFixtureFiles.exists(MainFixtureFiles.join(outside, "swift-ietf/swift-rfc-0000"))
         )
         #expect(
-            !FileManager.default.fileExists(
-                atPath: fixture.root.appending(path: "institute interim.xcworkspace").path
-            )
+            !MainFixtureFiles.exists(MainFixtureFiles.join(fixture.rootPath, "institute interim.xcworkspace"))
         )
     }
 
@@ -134,7 +124,7 @@ extension Institute.Sync.Test.Integration {
         defer { fixture.remove() }
         let selected = Institute.Repository(
             name: "swift-rfc-0000",
-            url: fixture.remote.path,
+            url: fixture.remotePath,
             organization: "swift-ietf",
             layer: .standards
         )
@@ -144,7 +134,7 @@ extension Institute.Sync.Test.Integration {
             organization: "swift-foundations",
             layer: .foundations
         )
-        let root = try File.Directory(validating: fixture.root.path)
+        let root = try File.Directory(validating: fixture.rootPath)
         let sync = Institute.Sync(
             root: try Institute.Root(checkout: root),
             selection: .init(repositories: [selected], origin: .committed(count: 1)),
@@ -153,21 +143,15 @@ extension Institute.Sync.Test.Integration {
 
         try await sync.run(dry: false)
 
-        let cloned = fixture.base.appending(
-            path: "swift-standards/swift-ietf/swift-rfc-0000/.git"
-        )
-        #expect(FileManager.default.fileExists(atPath: cloned.path))
-        let excluded = fixture.base.appending(
-            path: Institute.Layout.reference(for: unselected)
-        )
-        #expect(!FileManager.default.fileExists(atPath: excluded.path))
+        let cloned = MainFixtureFiles.join(fixture.basePath, "swift-standards/swift-ietf/swift-rfc-0000/.git")
+        #expect(MainFixtureFiles.exists(cloned))
+        let excluded = MainFixtureFiles.join(fixture.basePath, Institute.Layout.reference(for: unselected))
+        #expect(!MainFixtureFiles.exists(excluded))
         let workspace = try #require(Institute.Xcode.contents(at: root))
         #expect(workspace.contains("../\(Institute.Layout.reference(for: selected))"))
         #expect(!workspace.contains("../\(Institute.Layout.reference(for: unselected))"))
         #expect(
-            !FileManager.default.fileExists(
-                atPath: fixture.root.appending(path: Institute.Layout.reference(for: selected)).path
-            )
+            !MainFixtureFiles.exists(MainFixtureFiles.join(fixture.rootPath, Institute.Layout.reference(for: selected)))
         )
     }
 
@@ -211,7 +195,7 @@ extension Institute.Sync.Test.Integration {
             layer: .foundations
         )
         return Institute.Sync(
-            root: try Institute.Root(checkout: File.Directory(validating: fixture.root.path)),
+            root: try Institute.Root(checkout: File.Directory(validating: fixture.rootPath)),
             selection: .init(repositories: [repository], origin: .committed(count: 1)),
             client: fixture.client
         )

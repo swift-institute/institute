@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import JSON
 import Source_Measurement
 import Synchronization
@@ -127,8 +126,7 @@ extension Institute.Xcode.Test.Unit {
     @Test
     func `publication restores every preimage when one document cannot be written`() throws {
         let directory = try File.Directory(
-            validating: FileManager.default.temporaryDirectory
-                .appending(path: UUID().uuidString).path
+            validating: MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
         )
         let documents = ["workspace", "membership", "scheme"].map { name in
             Institute.Xcode.Publication.Document(
@@ -311,7 +309,7 @@ extension Institute.Xcode.Test.Unit {
             ])
         )
 
-        #expect(Data(rendered.utf8).last == 0x0A)
+        #expect(Array(rendered.utf8).last == 0x0A)
         #expect(rendered.hasSuffix("</Workspace>\n"))
     }
 
@@ -492,11 +490,11 @@ extension Institute.Xcode.Test.Integration {
         `write keeps the generated workspace inside the checkout while references leave for sibling packages`()
         throws
     {
-        let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-        let checkout = base.appending(path: "institute-application")
-        defer { try? FileManager.default.removeItem(at: base) }
-        try FileManager.default.createDirectory(at: checkout, withIntermediateDirectories: true)
-        let root = try File.Directory(validating: checkout.path)
+        let base = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+        let checkout = MainFixtureFiles.join(base, "institute-application")
+        defer { try? MainFixtureFiles.remove(base) }
+        try MainFixtureFiles.createDirectory(checkout)
+        let root = try File.Directory(validating: checkout)
         let repositories = [
             Institute.Repository(
                 name: "swift-example",
@@ -509,17 +507,13 @@ extension Institute.Xcode.Test.Integration {
         let specification = try Institute.Xcode.specification(repositories)
         try Institute.Xcode.write(specification, at: root)
 
-        let generated = checkout.appending(
-            path: "institute interim.xcworkspace/contents.xcworkspacedata"
-        )
-        #expect(FileManager.default.fileExists(atPath: generated.path))
+        let generated = MainFixtureFiles.join(checkout, "institute interim.xcworkspace/contents.xcworkspacedata")
+        #expect(MainFixtureFiles.exists(generated))
         #expect(
-            !FileManager.default.fileExists(
-                atPath: base.appending(path: "institute.xcworkspace").path
-            )
+            !MainFixtureFiles.exists(MainFixtureFiles.join(base, "institute.xcworkspace"))
         )
         #expect(
-            try Data(contentsOf: generated) == Data(Institute.Xcode.render(specification).utf8)
+            try MainFixtureFiles.readBytes(generated) == Array(Institute.Xcode.render(specification).utf8)
         )
         #expect(Institute.Xcode.current(specification, at: root))
         #expect(
@@ -537,46 +531,36 @@ extension Institute.Xcode.Test.Integration {
         // catch that; this one can.
         // Group locations are relative to the directory CONTAINING the
         // .xcworkspace bundle, which is the checkout itself.
-        try FileManager.default.createDirectory(
-            at: base.appending(path: "swift-foundations/swift-example"),
-            withIntermediateDirectories: true
-        )
+        try MainFixtureFiles.createDirectory(MainFixtureFiles.join(base, "swift-foundations/swift-example"))
         for reference in try Institute.Xcode.document(specification).references {
             guard case .file(let location) = reference, location.scheme == .group else {
                 Issue.record("unexpected non-group file reference \(reference)")
                 continue
             }
-            let resolved = checkout.appending(path: location.path).standardizedFileURL
-            var isDirectory: ObjCBool = false
-            let exists = FileManager.default.fileExists(
-                atPath: resolved.path,
-                isDirectory: &isDirectory
-            )
+            let resolved = MainFixtureFiles.standardized(MainFixtureFiles.join(checkout, location.path))
             #expect(
-                exists && isDirectory.boolValue,
-                "group \(location) resolves to \(resolved.path), which is not a directory"
+                MainFixtureFiles.isDirectory(resolved),
+                "group \(location) resolves to \(resolved), which is not a directory"
             )
         }
     }
 
     @Test
     func `typed nonmeasurement control remains outside source measurement`() throws {
-        let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-        let application = base.appending(path: "institute-application")
-        defer { try? FileManager.default.removeItem(at: base) }
+        let base = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+        let application = MainFixtureFiles.join(base, "institute-application")
+        defer { try? MainFixtureFiles.remove(base) }
         for directory in [
             application,
-            base.appending(path: "institute"),
-            base.appending(path: "institute-continuous-integration"),
-            base.appending(path: "swift-foundations/swift-linter/Runner"),
-            base.appending(path: "swift-primitives/swift-example"),
+            MainFixtureFiles.join(base, "institute"),
+            MainFixtureFiles.join(base, "institute-continuous-integration"),
+            MainFixtureFiles.join(base, "swift-foundations/swift-linter/Runner"),
+            MainFixtureFiles.join(base, "swift-primitives/swift-example"),
         ] {
-            try FileManager.default.createDirectory(
-                at: directory,
-                withIntermediateDirectories: true
-            )
-            try Data("// swift-tools-version: 6.4\n".utf8).write(
-                to: directory.appending(path: "Package.swift")
+            try MainFixtureFiles.createDirectory(directory)
+            try MainFixtureFiles.write(
+                bytes: Array("// swift-tools-version: 6.4\n".utf8),
+                to: MainFixtureFiles.join(directory, "Package.swift")
             )
         }
         let repository = Institute.Repository(
@@ -585,7 +569,7 @@ extension Institute.Xcode.Test.Integration {
             organization: "swift-primitives",
             layer: .primitives
         )
-        let root = try Institute.Root(checkout: File.Directory(validating: application.path))
+        let root = try Institute.Root(checkout: File.Directory(validating: application))
         let specification = Institute.Workspace.Specification(dependency: .remoteAllowed, members: [
             .init(location: "group:.", role: .control(.application)),
             .init(location: "group:../institute", role: .control(.institute)),

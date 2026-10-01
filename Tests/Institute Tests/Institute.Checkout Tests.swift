@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import Git_Foundation
 import Testing
 
@@ -19,12 +18,12 @@ extension Institute.Checkout {
 
             let checkout = Institute.Checkout(client: fixture.client)
             let one = try checkout.materialize(
-                url: fixture.source.path,
+                url: fixture.source,
                 revision: first,
                 to: fixture.destination("one")
             )
             let two = try checkout.materialize(
-                url: fixture.source.path,
+                url: fixture.source,
                 revision: first,
                 to: fixture.destination("two")
             )
@@ -38,12 +37,10 @@ extension Institute.Checkout {
 
             // The materialized bytes are the commit's, not the source's
             // current state (the source has advanced to `second`).
-            #expect(try fixture.client.head(at: fixture.source.path) == second)
+            #expect(try fixture.client.head(at: fixture.source) == second)
             #expect(
-                try Swift.String(
-                    contentsOf: fixture.destination("one")
-                        .url.appending(path: "Fixture.txt"),
-                    encoding: .utf8
+                try MainFixtureFiles.readStrictUTF8URL(
+                    MainFixtureFiles.join(fixture.destination("one").url, "Fixture.txt")
                 ) == "first\n"
             )
         }
@@ -66,7 +63,7 @@ extension Institute.Checkout {
 
             let checkout = Institute.Checkout(client: fixture.client)
             let materialized = try checkout.materialize(
-                url: fixture.source.path,
+                url: fixture.source,
                 revision: commit,
                 to: fixture.destination("clean")
             )
@@ -74,20 +71,13 @@ extension Institute.Checkout {
             #expect(materialized.revision == commit)
             let root = fixture.destination("clean").url
             #expect(
-                try Swift.String(
-                    contentsOf: root.appending(path: "Fixture.txt"),
-                    encoding: .utf8
-                ) == "committed\n"
+                try MainFixtureFiles.readStrictUTF8URL(MainFixtureFiles.join(root, "Fixture.txt")) == "committed\n"
             )
             #expect(
-                !FileManager.default.fileExists(
-                    atPath: root.appending(path: "Staged.swift").path
-                )
+                !MainFixtureFiles.exists(MainFixtureFiles.join(root, "Staged.swift"))
             )
             #expect(
-                !FileManager.default.fileExists(
-                    atPath: root.appending(path: "Package.swift").path
-                )
+                !MainFixtureFiles.exists(MainFixtureFiles.join(root, "Package.swift"))
             )
         }
 
@@ -102,16 +92,13 @@ extension Institute.Checkout {
 
             let checkout = Institute.Checkout(client: fixture.client)
             let materialized = try checkout.materialize(
-                url: fixture.source.path,
+                url: fixture.source,
                 revision: selected,
                 to: fixture.destination("frozen")
             )
             #expect(materialized.revision == selected)
             #expect(
-                try Swift.String(
-                    contentsOf: fixture.destination("frozen").url.appending(path: "Fixture.txt"),
-                    encoding: .utf8
-                ) == "selected\n"
+                try MainFixtureFiles.readStrictUTF8URL(MainFixtureFiles.join(fixture.destination("frozen").url, "Fixture.txt")) == "selected\n"
             )
         }
 
@@ -128,12 +115,12 @@ extension Institute.Checkout {
             let checkout = Institute.Checkout(client: fixture.client)
             #expect(throws: Institute.Error.self) {
                 try checkout.materialize(
-                    url: fixture.source.path,
+                    url: fixture.source,
                     revision: absent,
                     to: fixture.destination("never")
                 )
             }
-            #expect(!FileManager.default.fileExists(atPath: fixture.destination("never").url.path))
+            #expect(!MainFixtureFiles.exists(fixture.destination("never").url))
         }
 
         @Test
@@ -143,22 +130,19 @@ extension Institute.Checkout {
 
             let commit = try fixture.commit("only", contents: "only\n")
             let destination = fixture.destination("occupied")
-            try FileManager.default.createDirectory(
-                at: destination.url,
-                withIntermediateDirectories: true
-            )
-            let sentinel = destination.url.appending(path: "Sentinel.txt")
-            try "keep\n".write(to: sentinel, atomically: true, encoding: .utf8)
+            try MainFixtureFiles.createDirectory(destination.url)
+            let sentinel = MainFixtureFiles.join(destination.url, "Sentinel.txt")
+            try MainFixtureFiles.write("keep\n", toURLPath: sentinel)
 
             let checkout = Institute.Checkout(client: fixture.client)
             #expect(throws: Institute.Error.self) {
                 try checkout.materialize(
-                    url: fixture.source.path,
+                    url: fixture.source,
                     revision: commit,
                     to: destination
                 )
             }
-            #expect(try Swift.String(contentsOf: sentinel, encoding: .utf8) == "keep\n")
+            #expect(try MainFixtureFiles.readStrictUTF8URL(sentinel) == "keep\n")
         }
 
         @Test
@@ -168,18 +152,18 @@ extension Institute.Checkout {
 
             let commit = try fixture.commit("committed", contents: "committed\n")
             try fixture.write("Dirty.txt", contents: "uncommitted work\n")
-            let before = try fixture.client.status(at: fixture.source.path)
+            let before = try fixture.client.status(at: fixture.source)
             #expect(!before.isEmpty)
 
             let checkout = Institute.Checkout(client: fixture.client)
             _ = try checkout.materialize(
-                url: fixture.source.path,
+                url: fixture.source,
                 revision: commit,
                 to: fixture.destination("readonly")
             )
 
-            #expect(try fixture.client.status(at: fixture.source.path) == before)
-            #expect(try fixture.client.head(at: fixture.source.path) == commit)
+            #expect(try fixture.client.status(at: fixture.source) == before)
+            #expect(try fixture.client.head(at: fixture.source) == commit)
         }
 
         @Test
@@ -189,37 +173,25 @@ extension Institute.Checkout {
 
             try fixture.write("Target.txt", contents: "target\n")
             try fixture.command(["add", "Target.txt"])
-            let link = fixture.source.appending(path: "Link")
-            try FileManager.default.createSymbolicLink(
-                at: link,
-                withDestinationURL: URL(fileURLWithPath: "Target.txt")
-            )
-            let script = fixture.source.appending(path: "Script.sh")
-            try "#!/bin/sh\n".write(to: script, atomically: true, encoding: .utf8)
-            try FileManager.default.setAttributes(
-                [.posixPermissions: 0o755],
-                ofItemAtPath: script.path
-            )
+            let link = MainFixtureFiles.join(fixture.source, "Link")
+            try MainFixtureFiles.createSymbolicLink(link, toURLOf: "Target.txt")
+            let script = MainFixtureFiles.join(fixture.source, "Script.sh")
+            try MainFixtureFiles.write("#!/bin/sh\n", toURLPath: script)
+            try MainFixtureFiles.setPermissions(script, posix: 0o755)
             try fixture.command(["add", "Link", "Script.sh"])
             try fixture.command(["commit", "-m", "shapes"])
-            let commit = try fixture.client.head(at: fixture.source.path)
+            let commit = try fixture.client.head(at: fixture.source)
 
             let checkout = Institute.Checkout(client: fixture.client)
             _ = try checkout.materialize(
-                url: fixture.source.path,
+                url: fixture.source,
                 revision: commit,
                 to: fixture.destination("shapes")
             )
 
             let root = fixture.destination("shapes").url
-            let attributes = try FileManager.default.attributesOfItem(
-                atPath: root.appending(path: "Link").path
-            )
-            #expect(attributes[.type] as? FileAttributeType == .typeSymbolicLink)
-            let permissions =
-                try FileManager.default.attributesOfItem(
-                    atPath: root.appending(path: "Script.sh").path
-                )[.posixPermissions] as? Swift.Int
+            #expect(try MainFixtureFiles.isSymbolicLink(MainFixtureFiles.join(root, "Link")))
+            let permissions = try MainFixtureFiles.posixPermissions(MainFixtureFiles.join(root, "Script.sh"))
             #expect((permissions ?? 0) & 0o100 != 0)
         }
 
@@ -232,20 +204,18 @@ extension Institute.Checkout {
             try fixture.write(".gitmodules", contents: "[submodule \"x\"]\n\tpath = x\n")
             try fixture.command(["add", ".gitmodules"])
             try fixture.command(["commit", "-m", "modules"])
-            let commit = try fixture.client.head(at: fixture.source.path)
+            let commit = try fixture.client.head(at: fixture.source)
 
             let checkout = Institute.Checkout(client: fixture.client)
             #expect(throws: Institute.Error.self) {
                 try checkout.materialize(
-                    url: fixture.source.path,
+                    url: fixture.source,
                     revision: commit,
                     to: fixture.destination("modules")
                 )
             }
             #expect(
-                !FileManager.default.fileExists(
-                    atPath: fixture.destination("modules").url.path
-                )
+                !MainFixtureFiles.exists(fixture.destination("modules").url)
             )
         }
     }
@@ -255,16 +225,18 @@ extension Institute.Checkout.Test {
     /// One temporary source repository plus a family of destination paths,
     /// removed together.
     struct Fixture {
-        let base: URL
-        let source: URL
+        let baseName: Swift.String
+        let base: Swift.String
+        let source: Swift.String
         let client: Git.Client
 
         init() throws {
-            base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-            source = base.appending(path: "source")
+            baseName = MainFixtureFiles.uniqueName()
+            base = MainFixtureFiles.temporaryPath(baseName)
+            source = MainFixtureFiles.join(base, "source")
             client = .init()
-            try FileManager.default.createDirectory(at: source, withIntermediateDirectories: true)
-            try client.initialize(at: source.path, bare: false)
+            try MainFixtureFiles.createDirectory(source)
+            try client.initialize(at: source, bare: false)
             try command(["config", "user.email", "workspace@swift.institute"])
             try command(["config", "user.name", "Institute Tests"])
             try command(["branch", "-M", "main"])
@@ -273,33 +245,19 @@ extension Institute.Checkout.Test {
         func remove() {
             // swift-linter:disable:next try optional
             // REASON: Foundation.FileManager.removeItem(at:) is an untyped cross-module throwing API.
-            try? FileManager.default.removeItem(at: base)
+            try? MainFixtureFiles.remove(base)
         }
 
         func destination(_ name: Swift.String) -> File.Directory {
-            .init(File.Path("\(base.path)/destinations/\(name)"))
+            .init(File.Path("\(base)/destinations/\(name)"))
         }
 
         func write(_ name: Swift.String, contents: Swift.String) throws {
-            try contents.write(
-                to: source.appending(path: name),
-                atomically: true,
-                encoding: .utf8
-            )
+            try MainFixtureFiles.write(contents, toURLPath: MainFixtureFiles.join(source, name))
         }
 
         func command(_ arguments: [Swift.String]) throws {
-            let process = Foundation.Process()
-            process.executableURL = URL(fileURLWithPath: "/usr/bin/git")
-            process.arguments = arguments
-            process.currentDirectoryURL = source
-            process.standardOutput = FileHandle.nullDevice
-            process.standardError = FileHandle.nullDevice
-            try process.run()
-            process.waitUntilExit()
-            guard process.terminationStatus == 0 else {
-                throw CocoaError(.executableNotLoadable)
-            }
+            try MainFixtureFiles.gitRequiringSuccess(arguments, inTemporary: baseName, child: "source")
         }
 
         func commit(
@@ -309,13 +267,13 @@ extension Institute.Checkout.Test {
             try write("Fixture.txt", contents: contents)
             try command(["add", "Fixture.txt"])
             try command(["commit", "-m", message])
-            return try client.head(at: source.path)
+            return try client.head(at: source)
         }
     }
 }
 
 extension File.Directory {
-    fileprivate var url: URL {
-        URL(fileURLWithPath: description, isDirectory: true)
+    fileprivate var url: Swift.String {
+        MainFixtureFiles.directoryPath(description)
     }
 }

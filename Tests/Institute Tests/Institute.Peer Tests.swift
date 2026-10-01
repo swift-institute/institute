@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import JSON
 import Testing
 
@@ -50,12 +49,12 @@ extension Institute.Peer.Test.Unit {
     @Test
     func `an absent registry file is an empty registry, never an error`() throws {
         let temporary =
-            FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-        try FileManager.default.createDirectory(at: temporary, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: temporary) }
+            MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+        try MainFixtureFiles.createDirectory(temporary)
+        defer { try? MainFixtureFiles.remove(temporary) }
 
         let registry = try Institute.Peer.Registry.load(
-            at: File.Directory(validating: temporary.path)
+            at: File.Directory(validating: temporary)
         )
 
         #expect(registry.peers.isEmpty)

@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import Package_Manager
 import Testing
 
@@ -9,12 +8,12 @@ import Testing
 extension Institute.Xcode.Scheme.Test.Unit {
     @Test
     func `concurrent manifest evaluation preserves specification order`() async throws {
-        let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-        defer { try? FileManager.default.removeItem(at: base) }
-        let application = base.appending(path: "institute-application")
-        let institute = base.appending(path: "institute")
-        let slow = base.appending(path: "slow")
-        let fast = base.appending(path: "fast")
+        let base = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+        defer { try? MainFixtureFiles.remove(base) }
+        let application = MainFixtureFiles.join(base, "institute-application")
+        let institute = MainFixtureFiles.join(base, "institute")
+        let slow = MainFixtureFiles.join(base, "slow")
+        let fast = MainFixtureFiles.join(base, "fast")
         try Self.package(
             at: institute,
             name: "institute",
@@ -114,7 +113,7 @@ extension Institute.Xcode.Scheme.Test.Unit {
                 )
             ),
         ])
-        let root = try Institute.Root(checkout: File.Directory(validating: application.path))
+        let root = try Institute.Root(checkout: File.Directory(validating: application))
 
         let plan = try await Institute.Xcode.Scheme.plan(
             for: specification,
@@ -151,18 +150,15 @@ extension Institute.Xcode.Scheme.Test.Unit {
 
     @Test
     func `a bounded manifest failure names its workspace member`() async throws {
-        let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-        defer { try? FileManager.default.removeItem(at: base) }
-        let application = base.appending(path: "institute-application")
-        let hung = base.appending(path: "hung")
-        let executable = base.appending(path: "hang")
-        try FileManager.default.createDirectory(at: application, withIntermediateDirectories: true)
+        let base = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+        defer { try? MainFixtureFiles.remove(base) }
+        let application = MainFixtureFiles.join(base, "institute-application")
+        let hung = MainFixtureFiles.join(base, "hung")
+        let executable = MainFixtureFiles.join(base, "hang")
+        try MainFixtureFiles.createDirectory(application)
         try Self.package(at: hung, name: "hung", targets: [("Hung", false)])
-        try Data("#!/bin/sh\nsleep 5\n".utf8).write(to: executable)
-        try FileManager.default.setAttributes(
-            [.posixPermissions: 0o755],
-            ofItemAtPath: executable.path
-        )
+        try MainFixtureFiles.write(bytes: Array("#!/bin/sh\nsleep 5\n".utf8), to: executable)
+        try MainFixtureFiles.setPermissions(executable, posix: 0o755)
         let specification = Institute.Workspace.Specification(dependency: .remoteAllowed, members: [
             .init(
                 location: "group:../hung",
@@ -171,13 +167,13 @@ extension Institute.Xcode.Scheme.Test.Unit {
                 )
             )
         ])
-        let root = try Institute.Root(checkout: File.Directory(validating: application.path))
+        let root = try Institute.Root(checkout: File.Directory(validating: application))
 
         do throws(Institute.Error) {
             _ = try await Institute.Xcode.Scheme.plan(
                 for: specification,
                 at: root,
-                packages: .init(executable: executable.path),
+                packages: .init(executable: executable),
                 fanout: .init(jobs: 1),
                 timeout: .milliseconds(50)
             )
@@ -193,22 +189,20 @@ extension Institute.Xcode.Scheme.Test.Unit {
 
 extension Institute.Xcode.Scheme.Test.Unit {
     private static func package(
-        at directory: URL,
+        at directory: Swift.String,
         name: Swift.String,
         targets: [(name: Swift.String, test: Swift.Bool)],
         delay: Swift.Double? = nil
     ) throws {
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        try MainFixtureFiles.createDirectory(directory)
         var declarations = [Swift.String]()
         for (index, target) in targets.enumerated() {
             let path = "\(target.test ? "Tests" : "Sources")/Fixture \(index)"
-            let targetDirectory = directory.appending(path: path)
-            try FileManager.default.createDirectory(
-                at: targetDirectory,
-                withIntermediateDirectories: true
-            )
-            try Data("public enum Fixture\(index) {}\n".utf8).write(
-                to: targetDirectory.appending(path: "Fixture.swift")
+            let targetDirectory = MainFixtureFiles.join(directory, path)
+            try MainFixtureFiles.createDirectory(targetDirectory)
+            try MainFixtureFiles.write(
+                bytes: Array("public enum Fixture\(index) {}\n".utf8),
+                to: MainFixtureFiles.join(targetDirectory, "Fixture.swift")
             )
             declarations.append(
                 ".\(target.test ? "testTarget" : "target")"
@@ -231,6 +225,6 @@ extension Institute.Xcode.Scheme.Test.Unit {
                 ]
             )
             """
-        try Data(manifest.utf8).write(to: directory.appending(path: "Package.swift"))
+        try MainFixtureFiles.write(bytes: Array(manifest.utf8), to: MainFixtureFiles.join(directory, "Package.swift"))
     }
 }

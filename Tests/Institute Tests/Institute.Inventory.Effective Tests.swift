@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import GitHub
 import JSON
 import Tagged
@@ -307,7 +306,7 @@ extension Institute.Inventory.Test.Unit {
     @Test
     func `Writer lands canonical LF-terminated bytes at owner-only permissions`() throws {
         let (_, location) = try Self.scratchRoot()
-        defer { try? FileManager.default.removeItem(at: location) }
+        defer { try? MainFixtureFiles.remove(location) }
         let effective = try Institute.Inventory.Effective(
             public: Self.publicConfiguration,
             private: .init(repositories: [], exclusions: [], unmeasured: [])
@@ -317,24 +316,23 @@ extension Institute.Inventory.Test.Unit {
             effective: effective,
             unmeasured: []
         )
-        let destination = location.appending(path: "effective.json")
-        let path = try File.Path(destination.path)
+        let destination = MainFixtureFiles.join(location, "effective.json")
+        let path = try File.Path(destination)
 
         try output.write(to: path)
         // Idempotent over an existing regular file: the atomic replace runs
         // again rather than refusing its own previous output.
         try output.write(to: path)
 
-        let bytes = try Data(contentsOf: destination)
+        let bytes = try MainFixtureFiles.readBytes(destination)
         #expect(Swift.String(decoding: bytes, as: Swift.UTF8.self) == output.canonical + "\n")
-        let attributes = try FileManager.default.attributesOfItem(atPath: destination.path)
-        #expect((attributes[.posixPermissions] as? Swift.Int) == 0o600)
+        #expect(try MainFixtureFiles.posixPermissions(destination) == 0o600)
     }
 
     @Test
     func `Writer refuses a symlink target`() throws {
         let (_, location) = try Self.scratchRoot()
-        defer { try? FileManager.default.removeItem(at: location) }
+        defer { try? MainFixtureFiles.remove(location) }
         let effective = try Institute.Inventory.Effective(
             public: Self.publicConfiguration,
             private: .init(repositories: [], exclusions: [], unmeasured: [])
@@ -344,32 +342,26 @@ extension Institute.Inventory.Test.Unit {
             effective: effective,
             unmeasured: []
         )
-        let real = location.appending(path: "elsewhere.json")
-        try Data().write(to: real)
-        let link = location.appending(path: "link.json")
-        try FileManager.default.createSymbolicLink(
-            at: link,
-            withDestinationURL: real
-        )
+        let real = MainFixtureFiles.join(location, "elsewhere.json")
+        try MainFixtureFiles.write(bytes: [], to: real)
+        let link = MainFixtureFiles.join(location, "link.json")
+        try MainFixtureFiles.createSymbolicLink(link, toURLOf: real)
 
         #expect(throws: Institute.Error.self) {
-            try output.write(to: try File.Path(link.path))
+            try output.write(to: try File.Path(link))
         }
         // A dangling link is refused too, not silently replaced.
-        let dangling = location.appending(path: "dangling.json")
-        try FileManager.default.createSymbolicLink(
-            at: dangling,
-            withDestinationURL: location.appending(path: "missing.json")
-        )
+        let dangling = MainFixtureFiles.join(location, "dangling.json")
+        try MainFixtureFiles.createSymbolicLink(dangling, toURLOf: MainFixtureFiles.join(location, "missing.json"))
         #expect(throws: Institute.Error.self) {
-            try output.write(to: try File.Path(dangling.path))
+            try output.write(to: try File.Path(dangling))
         }
     }
 
     @Test
     func `Writer refuses a pre-existing non-regular target`() throws {
         let (_, location) = try Self.scratchRoot()
-        defer { try? FileManager.default.removeItem(at: location) }
+        defer { try? MainFixtureFiles.remove(location) }
         let effective = try Institute.Inventory.Effective(
             public: Self.publicConfiguration,
             private: .init(repositories: [], exclusions: [], unmeasured: [])
@@ -379,11 +371,11 @@ extension Institute.Inventory.Test.Unit {
             effective: effective,
             unmeasured: []
         )
-        let directory = location.appending(path: "directory.json")
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let directory = MainFixtureFiles.join(location, "directory.json")
+        try MainFixtureFiles.createDirectory(directory)
 
         #expect(throws: Institute.Error.self) {
-            try output.write(to: try File.Path(directory.path))
+            try output.write(to: try File.Path(directory))
         }
     }
 
@@ -485,20 +477,20 @@ extension Institute.Inventory.Test.Unit {
     @Test
     func `An empty roster is refused rather than digested`() throws {
         let (_, location) = try Self.scratchRoot()
-        defer { try? FileManager.default.removeItem(at: location) }
-        let file = location.appending(path: "roster.json")
-        try Data(#"{"schemaVersion":1,"repositories":[],"unmeasured":[]}"#.utf8).write(to: file)
+        defer { try? MainFixtureFiles.remove(location) }
+        let file = MainFixtureFiles.join(location, "roster.json")
+        try MainFixtureFiles.write(bytes: Array(#"{"schemaVersion":1,"repositories":[],"unmeasured":[]}"#.utf8), to: file)
 
         #expect(throws: Institute.Inventory.Effective.Roster.Error.emptyPopulation) {
-            try Institute.Inventory.Effective.Roster.read(File.Path(file.path))
+            try Institute.Inventory.Effective.Roster.read(File.Path(file))
         }
     }
 
     @Test
     func `A roster file round-trips and carries its unmeasured residue`() throws {
         let (_, location) = try Self.scratchRoot()
-        defer { try? FileManager.default.removeItem(at: location) }
-        let file = location.appending(path: "roster.json")
+        defer { try? MainFixtureFiles.remove(location) }
+        let file = MainFixtureFiles.join(location, "roster.json")
         let roster = Institute.Inventory.Effective.Roster(
             repositories: [
                 .init(owner: .init("swift-foundations"), name: .init("swift-private-package"))
@@ -507,9 +499,9 @@ extension Institute.Inventory.Test.Unit {
                 .init(kind: .organization, coordinate: "swift-ietf", reason: "listing failed")
             ]
         )
-        try Data(roster.json.serialize(sortKeys: true).utf8).write(to: file)
+        try MainFixtureFiles.write(bytes: Array(roster.json.serialize(sortKeys: true).utf8), to: file)
 
-        let read = try Institute.Inventory.Effective.Roster.read(File.Path(file.path))
+        let read = try Institute.Inventory.Effective.Roster.read(File.Path(file))
         #expect(read == roster)
         // A caller that could not list an organization says so, and the
         // report publishes it — an incomplete roster cannot pass itself off
@@ -534,21 +526,21 @@ extension Institute.Inventory.Test.Unit {
     @Test
     func `A malformed roster is a typed refusal, not an empty population`() throws {
         let (_, location) = try Self.scratchRoot()
-        defer { try? FileManager.default.removeItem(at: location) }
-        let file = location.appending(path: "roster.json")
-        try Data(#"{"schemaVersion":2,"repositories":[]}"#.utf8).write(to: file)
+        defer { try? MainFixtureFiles.remove(location) }
+        let file = MainFixtureFiles.join(location, "roster.json")
+        try MainFixtureFiles.write(bytes: Array(#"{"schemaVersion":2,"repositories":[]}"#.utf8), to: file)
 
         #expect(throws: Institute.Inventory.Effective.Roster.Error.self) {
-            try Institute.Inventory.Effective.Roster.read(File.Path(file.path))
+            try Institute.Inventory.Effective.Roster.read(File.Path(file))
         }
     }
 }
 
 extension Institute.Inventory.Test.Unit {
-    private static func scratchRoot() throws -> (Institute.Root, URL) {
-        let location = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-        try FileManager.default.createDirectory(at: location, withIntermediateDirectories: true)
-        let directory = try File.Directory(validating: location.path)
+    private static func scratchRoot() throws -> (Institute.Root, Swift.String) {
+        let location = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+        try MainFixtureFiles.createDirectory(location)
+        let directory = try File.Directory(validating: location)
         return (try Institute.Root(checkout: directory), location)
     }
 }

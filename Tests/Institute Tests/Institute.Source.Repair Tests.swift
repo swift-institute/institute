@@ -1,4 +1,3 @@
-import Foundation
 import Institute_Model
 import Institute_Source_Workspace
 import JSON
@@ -87,13 +86,10 @@ func `Institute repair file system rejects path escape before IO`() {
 
 @Test
 func `Institute source subject includes every Swift file outside build products`() throws {
-    let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-    defer { try? FileManager.default.removeItem(at: root) }
+    let root = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+    defer { try? MainFixtureFiles.remove(root) }
     for directory in ["Sources", "Tests/Unit", "Tests/Support", ".workspace/Member/Sources"] {
-        try FileManager.default.createDirectory(
-            at: root.appending(path: directory),
-            withIntermediateDirectories: true
-        )
+        try MainFixtureFiles.createDirectory(MainFixtureFiles.join(root, directory))
     }
     for (path, contents) in [
         ("Package.swift", "// swift-tools-version: 6.4\n"),
@@ -102,12 +98,12 @@ func `Institute source subject includes every Swift file outside build products`
         ("Tests/Support/Fixture.swift", "struct Fixture {}\n"),
         (".workspace/Member/Sources/Residue.swift", "public enum Residue {}\n"),
     ] {
-        try Data(contents.utf8).write(to: root.appending(path: path))
+        try MainFixtureFiles.write(bytes: Array(contents.utf8), to: MainFixtureFiles.join(root, path))
     }
     let row = Institute.Source.Workspace.Row(
         index: 0,
         location: .init(scheme: .group, path: "."),
-        directory: root.path,
+        directory: root,
         identity: "swift-primitives/swift-example",
         role: .subject(
             try #require(Institute.Repository.Key(identity: "swift-primitives/swift-example"))
@@ -138,13 +134,10 @@ func `Institute source subject includes every Swift file outside build products`
 
 @Test
 func `Institute source subject excludes descendant package ownership`() throws {
-    let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-    defer { try? FileManager.default.removeItem(at: root) }
+    let root = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+    defer { try? MainFixtureFiles.remove(root) }
     for directory in ["Sources", "Tests/Nested", "TestsSibling"] {
-        try FileManager.default.createDirectory(
-            at: root.appending(path: directory),
-            withIntermediateDirectories: true
-        )
+        try MainFixtureFiles.createDirectory(MainFixtureFiles.join(root, directory))
     }
     for (path, contents) in [
         ("Package.swift", "// swift-tools-version: 6.4\n"),
@@ -154,12 +147,12 @@ func `Institute source subject excludes descendant package ownership`() throws {
         ("Tests/Nested/Nested.swift", "public enum Nested {}\n"),
         ("TestsSibling/Owned.swift", "public enum Sibling {}\n"),
     ] {
-        try Data(contents.utf8).write(to: root.appending(path: path))
+        try MainFixtureFiles.write(bytes: Array(contents.utf8), to: MainFixtureFiles.join(root, path))
     }
     let row = Institute.Source.Workspace.Row(
         index: 0,
         location: .init(scheme: .group, path: "."),
-        directory: root.path,
+        directory: root,
         identity: "swift-foundations/swift-example",
         role: .subject(
             try #require(Institute.Repository.Key(identity: "swift-foundations/swift-example"))

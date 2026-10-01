@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import JSON
 import Testing
 
@@ -33,14 +32,10 @@ extension Institute.Pages.Test {
         try fixture.materialize(name)
         guard let repository = fixture.configuration.repositories.first(where: { $0.name == name })
         else {
-            throw CocoaError(.fileNoSuchFile)
+            throw MainFixtureFiles.fileNoSuchFile
         }
         let location = try fixture.root.materialization(for: repository)
-        try contents.write(
-            toFile: location.description + "/README.md",
-            atomically: true,
-            encoding: .utf8
-        )
+        try MainFixtureFiles.write(contents, toFile: location.description + "/README.md")
     }
 
     static func writeDoccCatalogue(
@@ -50,14 +45,11 @@ extension Institute.Pages.Test {
     ) throws {
         guard let repository = fixture.configuration.repositories.first(where: { $0.name == name })
         else {
-            throw CocoaError(.fileNoSuchFile)
+            throw MainFixtureFiles.fileNoSuchFile
         }
         let location = try fixture.root.materialization(for: repository)
         let directory = location.description + "/" + relative
-        try FileManager.default.createDirectory(
-            atPath: directory,
-            withIntermediateDirectories: true
-        )
+        try MainFixtureFiles.createDirectory(directory)
     }
 }
 

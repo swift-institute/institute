@@ -405,14 +405,14 @@ extension Institute.Dependency.Test.Integration {
                 case "root":
                     .available(
                         [Byte](
-                            #"""
+                            utf8: #"""
                             .package(url: "https://github.com/old/vendor.git", branch: "main"),
                             .package(name: "swift-numerics", url: "https://github.com/swift-foundations/swift-numerics.git", branch: "main"),
                             .package(url: "https://github.com/coenttb/personal.git", branch: "main"),
                             .package(url: "https://github.com/apple/swift-crypto.git", branch: "main"),
                             .package(url: "https://github.com/public/restricted.git", branch: "main"),
                             .package(path: ".."),
-                            """#.utf8
+                            """#
                         )
                     )
 

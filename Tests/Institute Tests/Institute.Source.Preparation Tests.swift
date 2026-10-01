@@ -1,11 +1,11 @@
 import File_System
-import Foundation
 import Institute_Model
 import Institute_Source_Policy
 import Institute_Source_Profile
 import Institute_Source_Workspace
 import JSON
 import Source_Profile
+import Source_Repair
 import Source_Report
 import Synchronization
 import Testing
@@ -155,9 +155,9 @@ func `Institute profile verification fails loudly on an engine refusal`() async 
 
 @Test
 func `Xcode source acquisition reports expected and observed identity`() async throws {
-    let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-    try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-    defer { try? FileManager.default.removeItem(at: root) }
+    let root = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+    try MainFixtureFiles.createDirectory(root)
+    defer { try? MainFixtureFiles.remove(root) }
 
     let process = Source.Engine.Process { _, arguments, _, _ in
         .init(
@@ -179,11 +179,12 @@ func `Xcode source acquisition reports expected and observed identity`() async t
         )
     )
 
+    let destination = try File.Directory(validating: root)
     do throws(Institute.Error) {
         _ = try await acquisition.acquire(
             asset,
             executable: true,
-            into: try File.Directory(validating: root.path)
+            into: destination
         )
         Issue.record("mismatched Xcode build identity was accepted")
     } catch {
@@ -197,9 +198,9 @@ func `Xcode source acquisition reports expected and observed identity`() async t
 
 @Test
 func `Xcode source acquisition reports exact identity read failure`() async throws {
-    let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-    try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-    defer { try? FileManager.default.removeItem(at: root) }
+    let root = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+    try MainFixtureFiles.createDirectory(root)
+    defer { try? MainFixtureFiles.remove(root) }
 
     let process = Source.Engine.Process { _, _, _, _ in
         .init(status: 1, output: "", diagnostics: "missing version plist")
@@ -217,11 +218,12 @@ func `Xcode source acquisition reports exact identity read failure`() async thro
         )
     )
 
+    let destination = try File.Directory(validating: root)
     do throws(Institute.Error) {
         _ = try await acquisition.acquire(
             asset,
             executable: true,
-            into: try File.Directory(validating: root.path)
+            into: destination
         )
         Issue.record("unreadable Xcode identity was accepted")
     } catch {
@@ -235,22 +237,22 @@ func `Xcode source acquisition reports exact identity read failure`() async thro
 
 @Test
 func `Local source linter snapshot is content addressed and omits its input path from receipt`() throws {
-    let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-    let tools = root.appending(path: "tools")
-    let input = root.appending(path: "developer-build")
-    try FileManager.default.createDirectory(at: tools, withIntermediateDirectories: true)
-    try Data("local-linter".utf8).write(to: input)
-    try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: input.path)
-    defer { try? FileManager.default.removeItem(at: root) }
+    let root = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+    let tools = MainFixtureFiles.join(root, "tools")
+    let input = MainFixtureFiles.join(root, "developer-build")
+    try MainFixtureFiles.createDirectory(tools)
+    try MainFixtureFiles.write(bytes: Array("local-linter".utf8), to: input)
+    try MainFixtureFiles.setPermissions(input, posix: 0o755)
+    defer { try? MainFixtureFiles.remove(root) }
 
     let process = Source.Engine.Process { _, _, _, _ in
         .init(status: 0, output: "", diagnostics: "")
     }
     let acquisition = Institute.Source.Acquisition(process: process)
     let snapshot = try acquisition.snapshot(
-        executable: input.path,
+        executable: input,
         name: "swift-linter",
-        into: try File.Directory(validating: tools.path)
+        into: try File.Directory(validating: tools)
     )
     let preparation = Institute.Source.Preparation(
         policyRevision: "source-enforcement-v3",
@@ -261,20 +263,19 @@ func `Local source linter snapshot is content addressed and omits its input path
         swiftLint: .init(origin: .local, digest: .init("swiftlint-tool")),
         linterExecutable: snapshot.file.description,
         linter: .init(origin: .local, digest: snapshot.digest),
-        directory: root.path,
+        directory: root,
         profiles: [:],
         verifiedProfiles: []
     )
     let receipt = preparation.jsonString(sortKeys: true)
 
     #expect(snapshot.file.path.components.last?.string == "swift-linter-local-\(snapshot.digest.hex)")
-    #expect(try Data(contentsOf: URL(filePath: snapshot.file.description)) == Data("local-linter".utf8))
+    #expect(try MainFixtureFiles.readBytes(snapshot.file.description) == Array("local-linter".utf8))
     #expect(
-        try FileManager.default.attributesOfItem(atPath: snapshot.file.description)[.posixPermissions]
-            as? Int == 0o755
+        try MainFixtureFiles.posixPermissions(snapshot.file.description) == 0o755
     )
     #expect(receipt.contains("\"kind\":\"local\""))
-    #expect(!receipt.contains(input.path))
+    #expect(!receipt.contains(input))
     let decoded = try Institute.Source.Preparation(jsonString: receipt)
     #expect(decoded.linter.origin == .local)
     #expect(decoded.linterTool == snapshot.digest)
@@ -283,42 +284,39 @@ func `Local source linter snapshot is content addressed and omits its input path
 
 @Test
 func `Local source linter snapshot refuses missing non-file and non-executable inputs`() throws {
-    let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-    let tools = root.appending(path: "tools")
-    let directoryInput = root.appending(path: "directory")
-    let nonExecutable = root.appending(path: "non-executable")
-    try FileManager.default.createDirectory(at: tools, withIntermediateDirectories: true)
-    try FileManager.default.createDirectory(at: directoryInput, withIntermediateDirectories: true)
-    try Data("bytes".utf8).write(to: nonExecutable)
-    try FileManager.default.setAttributes(
-        [.posixPermissions: 0o644],
-        ofItemAtPath: nonExecutable.path
-    )
-    defer { try? FileManager.default.removeItem(at: root) }
+    let root = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+    let tools = MainFixtureFiles.join(root, "tools")
+    let directoryInput = MainFixtureFiles.join(root, "directory")
+    let nonExecutable = MainFixtureFiles.join(root, "non-executable")
+    try MainFixtureFiles.createDirectory(tools)
+    try MainFixtureFiles.createDirectory(directoryInput)
+    try MainFixtureFiles.write(bytes: Array("bytes".utf8), to: nonExecutable)
+    try MainFixtureFiles.setPermissions(nonExecutable, posix: 0o644)
+    defer { try? MainFixtureFiles.remove(root) }
 
     let process = Source.Engine.Process { _, _, _, _ in
         .init(status: 0, output: "", diagnostics: "")
     }
     let acquisition = Institute.Source.Acquisition(process: process)
-    let destination = try File.Directory(validating: tools.path)
+    let destination = try File.Directory(validating: tools)
 
     #expect(throws: Institute.Error.self) {
         _ = try acquisition.snapshot(
-            executable: root.appending(path: "missing").path,
+            executable: MainFixtureFiles.join(root, "missing"),
             name: "swift-linter",
             into: destination
         )
     }
     #expect(throws: Institute.Error.self) {
         _ = try acquisition.snapshot(
-            executable: directoryInput.path,
+            executable: directoryInput,
             name: "swift-linter",
             into: destination
         )
     }
     #expect(throws: Institute.Error.self) {
         _ = try acquisition.snapshot(
-            executable: nonExecutable.path,
+            executable: nonExecutable,
             name: "swift-linter",
             into: destination
         )
@@ -327,29 +325,29 @@ func `Local source linter snapshot refuses missing non-file and non-executable i
 
 @Test
 func `Different local source linter bytes change tool and profile identity`() throws {
-    let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-    let tools = root.appending(path: "tools")
-    let first = root.appending(path: "first")
-    let second = root.appending(path: "second")
-    try FileManager.default.createDirectory(at: tools, withIntermediateDirectories: true)
-    try Data("first-linter".utf8).write(to: first)
-    try Data("second-linter".utf8).write(to: second)
-    try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: first.path)
-    try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: second.path)
-    defer { try? FileManager.default.removeItem(at: root) }
+    let root = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+    let tools = MainFixtureFiles.join(root, "tools")
+    let first = MainFixtureFiles.join(root, "first")
+    let second = MainFixtureFiles.join(root, "second")
+    try MainFixtureFiles.createDirectory(tools)
+    try MainFixtureFiles.write(bytes: Array("first-linter".utf8), to: first)
+    try MainFixtureFiles.write(bytes: Array("second-linter".utf8), to: second)
+    try MainFixtureFiles.setPermissions(first, posix: 0o755)
+    try MainFixtureFiles.setPermissions(second, posix: 0o755)
+    defer { try? MainFixtureFiles.remove(root) }
 
     let process = Source.Engine.Process { _, _, _, _ in
         .init(status: 0, output: "", diagnostics: "")
     }
     let acquisition = Institute.Source.Acquisition(process: process)
-    let destination = try File.Directory(validating: tools.path)
+    let destination = try File.Directory(validating: tools)
     let firstSnapshot = try acquisition.snapshot(
-        executable: first.path,
+        executable: first,
         name: "swift-linter",
         into: destination
     )
     let secondSnapshot = try acquisition.snapshot(
-        executable: second.path,
+        executable: second,
         name: "swift-linter",
         into: destination
     )
@@ -389,36 +387,36 @@ func `Different local source linter bytes change tool and profile identity`() th
 
 @Test
 func `Source measurement refuses a tampered local linter snapshot`() async throws {
-    let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-    let format = root.appending(path: "swift-format")
-    let swiftLint = root.appending(path: "swiftlint")
-    let linter = root.appending(path: "swift-linter-local")
-    try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-    try Data("format".utf8).write(to: format)
-    try Data("swiftlint".utf8).write(to: swiftLint)
-    try Data("linter".utf8).write(to: linter)
-    defer { try? FileManager.default.removeItem(at: root) }
+    let root = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+    let format = MainFixtureFiles.join(root, "swift-format")
+    let swiftLint = MainFixtureFiles.join(root, "swiftlint")
+    let linter = MainFixtureFiles.join(root, "swift-linter-local")
+    try MainFixtureFiles.createDirectory(root)
+    try MainFixtureFiles.write(bytes: Array("format".utf8), to: format)
+    try MainFixtureFiles.write(bytes: Array("swiftlint".utf8), to: swiftLint)
+    try MainFixtureFiles.write(bytes: Array("linter".utf8), to: linter)
+    defer { try? MainFixtureFiles.remove(root) }
 
     let preparation = Institute.Source.Preparation(
         policyRevision: Institute.Source.Policy.current.revision,
         binding: .workspace(digest: "workspace"),
-        swiftFormatExecutable: format.path,
-        swiftFormatTool: try Institute.Source.Application.digest(file: format.path),
-        swiftLintExecutable: swiftLint.path,
+        swiftFormatExecutable: format,
+        swiftFormatTool: try Institute.Source.Application.digest(file: format),
+        swiftLintExecutable: swiftLint,
         swiftLint: .init(
             origin: .local,
-            digest: try Institute.Source.Application.digest(file: swiftLint.path)
+            digest: try Institute.Source.Application.digest(file: swiftLint)
         ),
-        linterExecutable: linter.path,
+        linterExecutable: linter,
         linter: .init(
             origin: .local,
-            digest: try Institute.Source.Application.digest(file: linter.path)
+            digest: try Institute.Source.Application.digest(file: linter)
         ),
-        directory: root.path,
+        directory: root,
         profiles: [:],
         verifiedProfiles: []
     )
-    try Data("tampered".utf8).write(to: linter)
+    try MainFixtureFiles.write(bytes: Array("tampered".utf8), to: linter)
     let cohort = Institute.Source.Workspace.Cohort(
         workspace: "/workspace",
         references: 0,

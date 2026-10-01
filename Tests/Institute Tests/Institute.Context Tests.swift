@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import Testing
 
 @testable import Institute_Conversion
@@ -42,11 +41,11 @@ extension Institute.Context.Test {
         ],
         _ body: (Institute.Context) throws -> Result
     ) throws -> Result {
-        let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-        defer { try? FileManager.default.removeItem(at: base) }
-        try FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
+        let base = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+        defer { try? MainFixtureFiles.remove(base) }
+        try MainFixtureFiles.createDirectory(base)
 
-        let temporary = try File.Directory(validating: base.path)
+        let temporary = try File.Directory(validating: base)
         let home = temporary[directory: "home"]
         let entry = temporary[directory: "entry"]
         let institute = entry[directory: "swift-institute"]
@@ -198,10 +197,7 @@ extension Institute.Context.Test.Unit {
 
             #expect(try context.diagnostics().isEmpty)
             #expect(
-                try Swift.String(
-                    contentsOfFile: context.entry[file: "AGENTS.md"].path.description,
-                    encoding: .utf8
-                ).hasPrefix(Institute.Context.Test.marker)
+                try MainFixtureFiles.readStrictUTF8(context.entry[file: "AGENTS.md"].path.description).hasPrefix(Institute.Context.Test.marker)
             )
         }
     }
@@ -291,9 +287,7 @@ extension Institute.Context.Test.`Edge Case` {
             )
             let legacy = context.entry[directory: ".agents"]
             try legacy.create.recursive()
-            try FileManager.default.createSymbolicLink(
-                atPath: (legacy.path / "skills").description,
-                withDestinationPath: Institute.Context.Test.projections(context).path.description
+            try MainFixtureFiles.createSymbolicLink(atPath: (legacy.path / "skills").description, destinationPath: Institute.Context.Test.projections(context).path.description
             )
 
             try context.install()
@@ -333,10 +327,7 @@ extension Institute.Context.Test.`Edge Case` {
         try Institute.Context.Test.fixture { context in
             let legacy = context.entry[directory: ".agents"]
             try legacy.create.recursive()
-            try FileManager.default.createSymbolicLink(
-                atPath: (legacy.path / "skills").description,
-                withDestinationPath: context.home[directory: "elsewhere"].path.description
-            )
+            try MainFixtureFiles.createSymbolicLink(atPath: (legacy.path / "skills").description, destinationPath: context.home[directory: "elsewhere"].path.description)
 
             #expect(
                 try context.diagnostics().contains {
@@ -358,10 +349,7 @@ extension Institute.Context.Test.`Edge Case` {
             let institute = context.entry[directory: "swift-institute"]
             let canonical = institute[directory: "Skills"].path / "public-skill"
             let alias = Institute.Context.Test.projections(context).path / "user-alias"
-            try FileManager.default.createSymbolicLink(
-                atPath: alias.description,
-                withDestinationPath: canonical.description
-            )
+            try MainFixtureFiles.createSymbolicLink(atPath: alias.description, destinationPath: canonical.description)
 
             try context.install()
 
@@ -395,10 +383,7 @@ extension Institute.Context.Test.`Edge Case` {
             let foreign = context.home[directory: "elsewhere"][directory: "foreign-skill"]
             try foreign.create.recursive()
             let alias = Institute.Context.Test.projections(context).path / "foreign-skill"
-            try FileManager.default.createSymbolicLink(
-                atPath: alias.description,
-                withDestinationPath: foreign.path.description
-            )
+            try MainFixtureFiles.createSymbolicLink(atPath: alias.description, destinationPath: foreign.path.description)
 
             try context.install()
 

@@ -20,6 +20,7 @@ extension Institute.Doctor {
     /// processes and never read the real environment.
     struct Fixture {
         let base: URL
+        var basePath: Swift.String { base.path }
         let directory: File.Directory
         let root: Institute.Root
         let configuration: Institute.Configuration

@@ -1,6 +1,5 @@
 import FIPS_180_4
 import File_System
-import Foundation
 import Testing
 
 @testable import Institute_Conversion
@@ -24,21 +23,21 @@ import Testing
 @Suite
 struct `Institute Lint Install Tests` {
     struct Origin {
-        let base: URL
+        let base: Swift.String
         let directory: File.Directory
         let hierarchy: File.Directory
         let url: Swift.String
 
         init() throws {
-            base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-            try FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
+            base = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+            try MainFixtureFiles.createDirectory(base)
             // Canonicalized: the platform temporary directory is a
             // symlink, and the install path's containment check resolves
             // physically — a fixture rooted at the symlink would fail
             // the check for a reason that has nothing to do with what
             // these tests measure.
             let root = File.Directory(
-                try File.System.Canonical.resolve(try File.Path(base.path))
+                try File.System.Canonical.resolve(try File.Path(base))
             )
             directory = root[directory: "release"]
             hierarchy = root[directory: "hierarchy"]
@@ -48,7 +47,7 @@ struct `Institute Lint Install Tests` {
         }
 
         func remove() {
-            try? FileManager.default.removeItem(at: base)
+            try? MainFixtureFiles.remove(base)
         }
 
         /// Publishes a release whose checksum file covers every asset.

@@ -1,4 +1,3 @@
-import Foundation
 import Testing
 
 @testable import Institute_Conversion
@@ -17,10 +16,7 @@ extension Institute.Doctor.Fixture {
     /// that nests a file (e.g. under `.swiftlint/RemoteConfigCache/v1/`)
     /// makes room for it first.
     func makeDirectory(_ relative: Swift.String) throws {
-        try FileManager.default.createDirectory(
-            at: base.appending(path: relative),
-            withIntermediateDirectories: true
-        )
+        try MainFixtureFiles.createDirectory(MainFixtureFiles.join(basePath, relative))
     }
 }
 

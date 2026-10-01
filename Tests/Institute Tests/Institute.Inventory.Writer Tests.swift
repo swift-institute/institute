@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import GitHub
 import Git_Foundation
 import Tagged
@@ -188,11 +187,11 @@ extension Institute.Inventory.Test.Integration {
     func `Dry run preserves the existing inventory and successful run atomically replaces it`()
         throws
     {
-        let location = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-        defer { try? FileManager.default.removeItem(at: location) }
-        try FileManager.default.createDirectory(at: location, withIntermediateDirectories: true)
-        let root = try File.Directory(validating: location.path)
-        let file = location.appending(path: "Institute.json")
+        let location = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+        defer { try? MainFixtureFiles.remove(location) }
+        try MainFixtureFiles.createDirectory(location)
+        let root = try File.Directory(validating: location)
+        let file = MainFixtureFiles.join(location, "Institute.json")
         let existing = Institute.Configuration(
             version: 1,
             scope: "swift-institute",
@@ -201,7 +200,7 @@ extension Institute.Inventory.Test.Integration {
             repositories: []
         )
         let before = try existing.rendered()
-        try Data(before.utf8).write(to: file, options: .atomic)
+        try MainFixtureFiles.writeAtomically(bytes: Array(before.utf8), to: file)
         let document = try Institute.Configuration.Document.load(at: root)
         let configuration = Institute.Configuration(
             version: 1,
@@ -214,11 +213,11 @@ extension Institute.Inventory.Test.Integration {
 
         let dry = try writer.plan(configuration)
         #expect(dry == .replace(try configuration.rendered()))
-        #expect(try Data(contentsOf: file) == Data(before.utf8))
+        #expect(try MainFixtureFiles.readBytes(file) == Array(before.utf8))
 
         let applied = try writer.run(configuration, replacing: document)
         #expect(applied == dry)
-        #expect(try Data(contentsOf: file) == Data(configuration.rendered().utf8))
+        #expect(try MainFixtureFiles.readBytes(file) == Array(configuration.rendered().utf8))
     }
 
     @Test
@@ -234,7 +233,7 @@ extension Institute.Inventory.Test.Integration {
             configuration: configuration
         )
         defer { fixture.remove() }
-        let before = try Data(contentsOf: fixture.file)
+        let before = try MainFixtureFiles.readBytes(fixture.filePath)
         let owner = GitHub.Organization.Name("swift-foundations")
         let policy = try Institute.Inventory.Policy(
             organizations: [.init(name: owner, layer: .foundations)],
@@ -268,8 +267,8 @@ extension Institute.Inventory.Test.Integration {
             return
         }
         #expect(output.contains("\"name\": \"swift-file\""))
-        #expect(try Data(contentsOf: fixture.file) == before)
-        #expect(try fixture.git.status(at: fixture.location.path).isEmpty)
+        #expect(try MainFixtureFiles.readBytes(fixture.filePath) == before)
+        #expect(try fixture.git.status(at: fixture.locationPath).isEmpty)
     }
 
     @Test
@@ -306,7 +305,7 @@ extension Institute.Inventory.Test.Integration {
             policy: policy,
             client: .init(repositories: repositories, content: content)
         )
-        let original = try Data(contentsOf: fixture.file)
+        let original = try MainFixtureFiles.readBytes(fixture.filePath)
         let existing = try Institute.Configuration.Document.load(at: fixture.root)
 
         do throws(Institute.Inventory.Error<Institute.Inventory.Test.Failure>) {
@@ -318,7 +317,7 @@ extension Institute.Inventory.Test.Integration {
                 return
             }
         }
-        #expect(try Data(contentsOf: fixture.file) == original)
+        #expect(try MainFixtureFiles.readBytes(fixture.filePath) == original)
     }
 
     @Test
@@ -384,7 +383,7 @@ extension Institute.Inventory.Test.Integration {
             }
         }
 
-        #expect(try Data(contentsOf: fixture.file) == Data(intervening.utf8))
+        #expect(try MainFixtureFiles.readBytes(fixture.filePath) == Array(intervening.utf8))
     }
 
     @Test
@@ -402,7 +401,7 @@ extension Institute.Inventory.Test.Integration {
         defer { fixture.remove() }
         let existing = try Institute.Configuration.Document.load(at: fixture.root)
         let dirty = Swift.String(try configuration.rendered().dropLast())
-        try Data(dirty.utf8).write(to: fixture.file, options: .atomic)
+        try MainFixtureFiles.writeAtomically(bytes: Array(dirty.utf8), to: fixture.filePath)
         let owner = GitHub.Organization.Name("swift-foundations")
         let policy = try Institute.Inventory.Policy(
             organizations: [.init(name: owner, layer: .foundations)],
@@ -442,19 +441,16 @@ extension Institute.Inventory.Test.Integration {
                     + "found 1 changed path"
             )
         }
-        #expect(try Data(contentsOf: fixture.file) == Data(dirty.utf8))
+        #expect(try MainFixtureFiles.readBytes(fixture.filePath) == Array(dirty.utf8))
     }
 
     @Test
     func `Regeneration reports an uninspectable Institute worktree explicitly`() async throws {
         let location =
-            FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-        defer { try? FileManager.default.removeItem(at: location) }
-        try FileManager.default.createDirectory(
-            at: location,
-            withIntermediateDirectories: true
-        )
-        let root = try File.Directory(validating: location.path)
+            MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+        defer { try? MainFixtureFiles.remove(location) }
+        try MainFixtureFiles.createDirectory(location)
+        let root = try File.Directory(validating: location)
         let configuration = Institute.Configuration(
             version: 1,
             scope: "swift-institute",
@@ -462,10 +458,7 @@ extension Institute.Inventory.Test.Integration {
             xcode: "26.6",
             repositories: []
         )
-        try Data(configuration.rendered().utf8).write(
-            to: location.appending(path: "Institute.json"),
-            options: .atomic
-        )
+        try MainFixtureFiles.writeAtomically(bytes: Array(configuration.rendered().utf8), to: MainFixtureFiles.join(location, "Institute.json"))
         let existing = try Institute.Configuration.Document.load(at: root)
         let owner = GitHub.Organization.Name("swift-foundations")
         let policy = try Institute.Inventory.Policy(

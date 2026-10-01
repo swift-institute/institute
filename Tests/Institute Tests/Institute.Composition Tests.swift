@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import Testing
 
 @testable import Institute_Conversion
@@ -24,44 +23,29 @@ extension Institute.Composition.Test {
     /// A throwaway workspace: a consumer package declaring one URL dependency,
     /// and that dependency present at its org-layout checkout.
     struct Fixture {
-        let base: URL
-        let root: URL
-        let manifest: URL
+        let base: Swift.String
+        let root: Swift.String
+        let manifest: Swift.String
         let composition: Institute.Composition
 
         init() throws {
             let temporary =
-                FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-            let checkout = temporary.appending(path: "Institute")
-            try FileManager.default.createDirectory(at: checkout, withIntermediateDirectories: true)
+                MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+            let checkout = MainFixtureFiles.join(temporary, "Institute")
+            try MainFixtureFiles.createDirectory(checkout)
             let workspaceRoot = try Institute.Root(
-                checkout: File.Directory(validating: checkout.path)
+                checkout: File.Directory(validating: checkout)
             )
-            base = URL(
-                fileURLWithPath: workspaceRoot.hierarchy.description,
-                isDirectory: true
-            )
-            root = URL(
-                fileURLWithPath: workspaceRoot.checkout.description,
-                isDirectory: true
-            )
-            manifest = base.appending(path: "swift-foundations/example/consumer/Package.swift")
+            base = MainFixtureFiles.directoryPath(workspaceRoot.hierarchy.description)
+            root = MainFixtureFiles.directoryPath(workspaceRoot.checkout.description)
+            manifest = MainFixtureFiles.join(base, "swift-foundations/example/consumer/Package.swift")
 
-            try FileManager.default.createDirectory(
-                at: base.appending(path: "swift-foundations/example/consumer"),
-                withIntermediateDirectories: true
-            )
-            try FileManager.default.createDirectory(
-                at: base.appending(path: "swift-standards/example/swift-dep"),
-                withIntermediateDirectories: true
-            )
+            try MainFixtureFiles.createDirectory(MainFixtureFiles.join(base, "swift-foundations/example/consumer"))
+            try MainFixtureFiles.createDirectory(MainFixtureFiles.join(base, "swift-standards/example/swift-dep"))
             // A workspace repository present on disk but NOT declared by the
             // consumer manifest — the "nothing to compose" case.
-            try FileManager.default.createDirectory(
-                at: base.appending(path: "swift-standards/example/swift-other"),
-                withIntermediateDirectories: true
-            )
-            try Self.manifestSource.write(to: manifest, atomically: true, encoding: .utf8)
+            try MainFixtureFiles.createDirectory(MainFixtureFiles.join(base, "swift-standards/example/swift-other"))
+            try MainFixtureFiles.write(Self.manifestSource, toURLPath: manifest)
 
             composition = Institute.Composition(
                 root: workspaceRoot,
@@ -101,7 +85,7 @@ extension Institute.Composition.Test {
         // extension. `Swift.String(contentsOf:encoding:)` throws untyped, so
         // there is no `E` to name and no typed form that satisfies both rules.
         func read() throws -> Swift.String {
-            try Swift.String(contentsOf: manifest, encoding: .utf8)
+            try MainFixtureFiles.readStrictUTF8URL(manifest)
         }
     }
 }
@@ -121,7 +105,7 @@ extension Institute.Composition.Test.Fixture {
 
         """
 
-    func remove() { try? FileManager.default.removeItem(at: base) }
+    func remove() { try? MainFixtureFiles.remove(base) }
 }
 
 extension Institute.Composition.Test.Integration {
@@ -141,7 +125,7 @@ extension Institute.Composition.Test.Integration {
         #expect(!rewritten.contains("https://github.com/example/swift-dep.git"))
 
         let ledger = try Institute.Composition.State.load(
-            at: File.Directory(validating: fixture.root.path)
+            at: File.Directory(validating: fixture.root)
         )
         #expect(ledger.record(consumer: "consumer", dependency: "swift-dep") != nil)
     }
@@ -158,7 +142,7 @@ extension Institute.Composition.Test.Integration {
         #expect(try fixture.read() == original)
 
         let ledger = try Institute.Composition.State.load(
-            at: File.Directory(validating: fixture.root.path)
+            at: File.Directory(validating: fixture.root)
         )
         #expect(ledger.records.isEmpty)
     }
@@ -216,12 +200,8 @@ extension Institute.Composition.Test.`Edge Case` {
 
         // Make the ledger unsaveable: `.workspace` exists as a plain file,
         // so creating the ledger directory fails after the manifest write.
-        let blocked = fixture.root.appending(path: ".workspace")
-        try Swift.String("not a directory").write(
-            to: blocked,
-            atomically: true,
-            encoding: .utf8
-        )
+        let blocked = MainFixtureFiles.join(fixture.root, ".workspace")
+        try MainFixtureFiles.write("not a directory", toURLPath: blocked)
 
         #expect(throws: Institute.Error.self) {
             try fixture.composition.compose(consumer: "consumer", dependency: "swift-dep")

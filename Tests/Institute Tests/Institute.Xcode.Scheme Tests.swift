@@ -1,4 +1,3 @@
-import Foundation
 import Testing
 
 @testable import Institute_Conversion
@@ -79,12 +78,12 @@ extension Institute.Xcode.Scheme.Test.Unit {
     @Test
     func `every buildable becomes one build action entry, in selection order`() {
         let rendered = Institute.Xcode.Scheme.render(Self.plan)
-        let entries = rendered.components(separatedBy: "<BuildActionEntry").count - 1
+        let entries = MainFixtureFiles.components(of: rendered, separatedBy: "<BuildActionEntry").count - 1
 
         #expect(entries == Self.plan.buildables.count)
 
-        let dimension = rendered.range(of: "Dimension Primitives")
-        let theme = rendered.range(of: "Theme")
+        let dimension = MainFixtureFiles.earliestRange(of: "Dimension Primitives", in: rendered)
+        let theme = MainFixtureFiles.earliestRange(of: "Theme", in: rendered)
         #expect(dimension != nil)
         #expect(theme != nil)
         if let dimension, let theme {

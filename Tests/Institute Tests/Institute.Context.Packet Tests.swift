@@ -113,8 +113,8 @@ extension Institute.Context.Packet.Test {
             diagnostics: [],
             maxBytes: maxBytes
         ).render(.human)
-        let marker = rendered.range(of: "\ncontinuation:")!
-        let title = rendered.range(of: "title: ")!
+        let marker = MainFixtureFiles.earliestRange(of: "\ncontinuation:", in: rendered)!
+        let title = MainFixtureFiles.earliestRange(of: "title: ", in: rendered)!
         let rawTitleBytes =
             maxBytes
             - rendered[marker.lowerBound...].utf8.count

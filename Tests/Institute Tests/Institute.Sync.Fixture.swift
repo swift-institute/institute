@@ -23,6 +23,12 @@ extension Institute.Sync {
         /// The retired location inside the checkout. It must stay untouched.
         let legacy: URL
         let client: Git.Client
+        var basePath: Swift.String { base.path }
+        var rootPath: Swift.String { root.path }
+        var remotePath: Swift.String { remote.path }
+        var sourcePath: Swift.String { source.path }
+        var localPath: Swift.String { local.path }
+        var legacyPath: Swift.String { legacy.path }
 
         init() throws {
             let temporary =

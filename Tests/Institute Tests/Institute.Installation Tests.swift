@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import Testing
 
 @testable import Institute_Conversion
@@ -23,17 +22,17 @@ extension Institute.Installation {
 
 extension Institute.Installation.Test {
     struct Fixture {
-        let base: URL
+        let base: Swift.String
         let home: File.Directory
         let source: File
         let environmentPath: Swift.String
 
         init(exposesCommand: Swift.Bool = true) throws {
-            base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-            try FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
+            base = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+            try MainFixtureFiles.createDirectory(base)
 
             let physical = File.Directory(
-                try File.System.Canonical.resolve(try File.Path(base.path))
+                try File.System.Canonical.resolve(try File.Path(base))
             )
             home = physical[directory: "home"]
             let sourceDirectory = physical[directory: "source"]
@@ -81,11 +80,11 @@ extension Institute.Installation.Test {
         }
 
         func remove() {
-            try? FileManager.default.removeItem(at: base)
+            try? MainFixtureFiles.remove(base)
         }
 
         func contents(of file: File) throws -> Swift.String {
-            try Swift.String(contentsOfFile: file.description, encoding: .utf8)
+            try MainFixtureFiles.readStrictUTF8(file.description)
         }
     }
 }
@@ -139,12 +138,9 @@ extension Institute.Installation.Test.Unit {
     func `install verifies paths beneath a symbolic ancestor`() throws {
         let fixture = try Institute.Installation.Test.Fixture()
         defer { fixture.remove() }
-        let alias = fixture.base.appending(path: "alias")
-        try FileManager.default.createSymbolicLink(
-            at: alias,
-            withDestinationURL: fixture.base
-        )
-        let home = File.Directory(try File.Path(alias.appending(path: "home").path))
+        let alias = MainFixtureFiles.join(fixture.base, "alias")
+        try MainFixtureFiles.createSymbolicLink(alias, toURLOf: fixture.base)
+        let home = File.Directory(try File.Path(MainFixtureFiles.join(alias, "home")))
         let commandDirectory = home[directory: ".local"][directory: "bin"]
         let installation = try Institute.Installation(
             source: fixture.source,
@@ -189,10 +185,7 @@ extension Institute.Installation.Test.`Edge Case` {
         try foreign.write.atomic("foreign-command")
         let commandDirectory = fixture.home[directory: ".local"][directory: "bin"]
         try commandDirectory.create.recursive()
-        try FileManager.default.createSymbolicLink(
-            atPath: fixture.command.description,
-            withDestinationPath: foreign.description
-        )
+        try MainFixtureFiles.createSymbolicLink(atPath: fixture.command.description, destinationPath: foreign.description)
         let installation = try fixture.installation
 
         #expect(throws: Institute.Error.self) {

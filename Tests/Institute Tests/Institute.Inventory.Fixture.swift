@@ -17,6 +17,8 @@ extension Institute.Inventory.Test {
         let location: URL
         let root: File.Directory
         let file: URL
+        var filePath: Swift.String { file.path }
+        var locationPath: Swift.String { location.path }
         let git: Git.Client
 
         init(configuration: Institute.Configuration) throws {

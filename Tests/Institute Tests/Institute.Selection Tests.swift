@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import JSON
 import Testing
 
@@ -190,19 +189,16 @@ extension Institute.Selection.Test.`Edge Case` {
 extension Institute.Selection.Test.Integration {
     @Test
     func `Missing and malformed selection files fail loading`() throws {
-        let location = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-        defer { try? FileManager.default.removeItem(at: location) }
-        try FileManager.default.createDirectory(at: location, withIntermediateDirectories: true)
-        let root = try File.Directory(validating: location.path)
+        let location = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+        defer { try? MainFixtureFiles.remove(location) }
+        try MainFixtureFiles.createDirectory(location)
+        let root = try File.Directory(validating: location)
 
         #expect(throws: Institute.Error.self) {
             _ = try Institute.Selection.load(at: root)
         }
 
-        try Data("{".utf8).write(
-            to: location.appending(path: "Selection.json"),
-            options: .atomic
-        )
+        try MainFixtureFiles.writeAtomically(bytes: Array("{".utf8), to: MainFixtureFiles.join(location, "Selection.json"))
         #expect(throws: Institute.Error.self) {
             _ = try Institute.Selection.load(at: root)
         }
@@ -242,23 +238,17 @@ extension Institute.Selection.Test {
         selection: Swift.String?,
         override: Swift.String? = nil
     ) throws -> (root: File.Directory, remove: () -> Void) {
-        let location = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-        try FileManager.default.createDirectory(at: location, withIntermediateDirectories: true)
+        let location = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+        try MainFixtureFiles.createDirectory(location)
         if let selection {
-            try Data(selection.utf8).write(
-                to: location.appending(path: "Selection.json"),
-                options: .atomic
-            )
+            try MainFixtureFiles.writeAtomically(bytes: Array(selection.utf8), to: MainFixtureFiles.join(location, "Selection.json"))
         }
         if let override {
-            try Data(override.utf8).write(
-                to: location.appending(path: "Selection.local.json"),
-                options: .atomic
-            )
+            try MainFixtureFiles.writeAtomically(bytes: Array(override.utf8), to: MainFixtureFiles.join(location, "Selection.local.json"))
         }
         return (
-            try File.Directory(validating: location.path),
-            { try? FileManager.default.removeItem(at: location) }
+            try File.Directory(validating: location),
+            { try? MainFixtureFiles.remove(location) }
         )
     }
 

@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import Institute_Source_Policy
 import SPM_Standard
 import Testing
@@ -211,11 +210,9 @@ extension Institute.Lint.Check.Test {
     }
 
     static func temporaryPackage() throws -> Swift.String {
-        let base = FileManager.default.temporaryDirectory.appending(
-            path: "institute-check-tests-\(UUID().uuidString)"
-        )
-        try FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
-        return base.path
+        let base = MainFixtureFiles.temporaryPath("institute-check-tests-\(MainFixtureFiles.uniqueName())")
+        try MainFixtureFiles.createDirectory(base)
+        return base
     }
 
     static func write(
@@ -225,11 +222,8 @@ extension Institute.Lint.Check.Test {
     )
         throws
     {
-        let url = URL(fileURLWithPath: root).appending(path: relative)
-        try FileManager.default.createDirectory(
-            at: url.deletingLastPathComponent(),
-            withIntermediateDirectories: true
-        )
-        try File(File.Path(url.path)).write.atomic(contents)
+        let url = MainFixtureFiles.join(root, relative)
+        try MainFixtureFiles.createDirectory(MainFixtureFiles.parent(of: url))
+        try File(File.Path(url)).write.atomic(contents)
     }
 }

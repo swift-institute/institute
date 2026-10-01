@@ -79,8 +79,8 @@ extension Institute.Composed.Test.Unit {
 
         // Sorted by reference regardless of input order, so the render is
         // deterministic run over run on the same selection.
-        let oneIndex = text.range(of: "swift-example-one")!.lowerBound
-        let twoIndex = text.range(of: "swift-example-two")!.lowerBound
+        let oneIndex = MainFixtureFiles.earliestRange(of: "swift-example-one", in: text)!.lowerBound
+        let twoIndex = MainFixtureFiles.earliestRange(of: "swift-example-two", in: text)!.lowerBound
         #expect(oneIndex < twoIndex)
     }
 

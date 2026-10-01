@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import Tagged
 import Testing
 
@@ -205,20 +204,7 @@ extension Institute.Doctor.Test.Integration {
         _ arguments: [Swift.String],
         at directory: File.Directory
     ) throws {
-        let process = Foundation.Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/git")
-        process.arguments = arguments
-        process.currentDirectoryURL = URL(
-            fileURLWithPath: directory.description,
-            isDirectory: true
-        )
-        process.standardOutput = FileHandle.nullDevice
-        process.standardError = FileHandle.nullDevice
-        try process.run()
-        process.waitUntilExit()
-        guard process.terminationStatus == 0 else {
-            throw CocoaError(.executableNotLoadable)
-        }
+        try MainFixtureFiles.gitRequiringSuccess(arguments, in: directory.description)
     }
 
     private static func materialization(
@@ -241,16 +227,14 @@ extension Institute.Doctor.Test.Integration {
         defer { fixture.remove() }
         try fixture.materialize(repository.name)
         let checkout = try fixture.root.materialization(for: repository)
-        try """
-        // swift-tools-version: 6.3
-        import PackageDescription
+        try MainFixtureFiles.write(
+            """
+            // swift-tools-version: 6.3
+            import PackageDescription
 
-        let package = Package(name: "swift-example")
-        """.write(
-            to: URL(fileURLWithPath: checkout.description)
-                .appending(path: "Package.swift"),
-            atomically: true,
-            encoding: .utf8
+            let package = Package(name: "swift-example")
+            """,
+            toURLPath: MainFixtureFiles.join(checkout.description, "Package.swift")
         )
         try Self.command(["remote", "add", "origin", repository.url], at: checkout)
         try Institute.Xcode.write(
