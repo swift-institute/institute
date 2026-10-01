@@ -142,6 +142,26 @@ struct CIInventoryAnchorTests {
         #expect(script.contains("exit 1"))
     }
 
+    /// The workspace is expanded by the shell and the checkout is literal
+    /// data: `${GITHUB_WORKSPACE}` sits in double quotes, the checkout in
+    /// single quotes.
+    @Test func `the identity check expands the workspace and quotes the checkout`() throws {
+        let source = try Self.source()
+        let script = try #require(Self.anchor([source]).identityStep(for: source)["run"]?.text)
+        #expect(
+            script.contains(
+                #"ACTUAL_COMMIT="$(git -C "${GITHUB_WORKSPACE}"/'.ci-sources/swift-continuous-integration' rev-parse HEAD)""#
+            )
+        )
+        #expect(
+            script.contains(
+                #"ACTUAL_TREE="$(git -C "${GITHUB_WORKSPACE}"/'.ci-sources/swift-continuous-integration' rev-parse 'HEAD^{tree}')""#
+            )
+        )
+        #expect(script.contains("PINNED_PATH='.'"))
+        #expect(!script.contains("'${GITHUB_WORKSPACE}"))
+    }
+
     /// A narrower subtree keeps the pre-flip spelling, so a pin can
     /// describe the arrangement it replaces.
     @Test func `a subtree pin reads that subtree, not the root`() throws {
@@ -277,3 +297,119 @@ struct CIInventoryAnchorTests {
         #expect(report.unmeasured.count == 1)
     }
 }
+
+#if !os(Windows)
+/// The emitted identity script, executed with bash against an owned local
+/// Git checkout. The object names are the fixture's own; nothing is
+/// fetched and no workflow runs.
+@Suite(.serialized)
+struct CIInventoryAnchorShellTests {
+    typealias Anchor = Institute.CI.Inventory.Anchor
+
+    static func script(
+        checkout: String,
+        commit: String,
+        tree: String,
+        path: String = "."
+    ) throws -> String {
+        Anchor.script(
+            for: Anchor.Source(
+                repository: "swift-foundations/swift-continuous-integration",
+                checkout: checkout,
+                commit: try Anchor.Revision(commit),
+                tree: Anchor.Source.Tree(path: path, oid: try Anchor.Revision(tree))
+            )
+        )
+    }
+
+    @Test func `a matching commit and tree succeed with both outputs`() throws {
+        let fixture = try AnchorShellFixture()
+        defer { fixture.remove() }
+        let pinned = try fixture.repository(at: ".ci-sources/swift-continuous-integration")
+        let run = try fixture.execute(
+            Self.script(
+                checkout: ".ci-sources/swift-continuous-integration",
+                commit: pinned.commit,
+                tree: pinned.tree
+            )
+        )
+        #expect(run.status == 0)
+        #expect(run.output == "commit=\(pinned.commit)\ntree=\(pinned.tree)\n")
+    }
+
+    @Test func `a subtree pin succeeds against that subtree`() throws {
+        let fixture = try AnchorShellFixture()
+        defer { fixture.remove() }
+        let pinned = try fixture.repository(at: ".ci-sources/swift-continuous-integration")
+        let run = try fixture.execute(
+            Self.script(
+                checkout: ".ci-sources/swift-continuous-integration",
+                commit: pinned.commit,
+                tree: pinned.subtree,
+                path: "Tools/institute-ci"
+            )
+        )
+        #expect(run.status == 0)
+        #expect(run.output == "commit=\(pinned.commit)\ntree=\(pinned.subtree)\n")
+    }
+
+    @Test func `a mismatched commit is refused`() throws {
+        let fixture = try AnchorShellFixture()
+        defer { fixture.remove() }
+        let pinned = try fixture.repository(at: ".ci-sources/swift-continuous-integration")
+        let run = try fixture.execute(
+            Self.script(
+                checkout: ".ci-sources/swift-continuous-integration",
+                commit: "0a1b2c3d4e5f60718293a4b5c6d7e8f901234567",
+                tree: pinned.tree
+            )
+        )
+        #expect(run.status == 1)
+        #expect(run.standardOutput.contains("is not the pinned '0a1b2c3d4e5f60718293a4b5c6d7e8f901234567'"))
+        #expect(run.output.isEmpty)
+    }
+
+    @Test func `a mismatched tree is refused`() throws {
+        let fixture = try AnchorShellFixture()
+        defer { fixture.remove() }
+        let pinned = try fixture.repository(at: ".ci-sources/swift-continuous-integration")
+        let run = try fixture.execute(
+            Self.script(
+                checkout: ".ci-sources/swift-continuous-integration",
+                commit: pinned.commit,
+                tree: "1122334455667788990011223344556677889900"
+            )
+        )
+        #expect(run.status == 1)
+        #expect(run.standardOutput.contains("tree of '.' is '\(pinned.tree)'"))
+        #expect(run.output.isEmpty)
+    }
+
+    @Test func `an absent checkout fails closed`() throws {
+        let fixture = try AnchorShellFixture()
+        defer { fixture.remove() }
+        let run = try fixture.execute(
+            Self.script(
+                checkout: ".ci-sources/swift-continuous-integration",
+                commit: "0a1b2c3d4e5f60718293a4b5c6d7e8f901234567",
+                tree: "1122334455667788990011223344556677889900"
+            )
+        )
+        #expect(run.status != 0)
+        #expect(run.output.isEmpty)
+    }
+
+    @Test func `a spaced, quoted checkout path is literal data, never executed`() throws {
+        let fixture = try AnchorShellFixture()
+        defer { fixture.remove() }
+        let checkout = "ci sources/it's $(touch executed) `touch executed`"
+        let pinned = try fixture.repository(at: checkout)
+        let run = try fixture.execute(
+            Self.script(checkout: checkout, commit: pinned.commit, tree: pinned.tree)
+        )
+        #expect(run.status == 0)
+        #expect(run.output == "commit=\(pinned.commit)\ntree=\(pinned.tree)\n")
+        #expect(!fixture.exists("executed"))
+    }
+}
+#endif

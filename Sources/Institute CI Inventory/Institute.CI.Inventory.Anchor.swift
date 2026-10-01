@@ -180,20 +180,27 @@ extension Institute.CI.Inventory.Anchor {
         "\(source.identifier)-identity"
     }
 
+    /// One POSIX single-quoted shell word: the bytes of `value` as literal
+    /// shell data, with each embedded `'` closed, escaped and reopened.
+    static func shellQuoted(_ value: String) -> String {
+        "'" + value.replacing("'", with: "'\\''") + "'"
+    }
+
     /// The identity check's shell body.
     public static func script(for source: Source) -> String {
-        let directory = "${GITHUB_WORKSPACE}/\(source.checkout)"
+        let directory = "\"${GITHUB_WORKSPACE}\"/\(Self.shellQuoted(source.checkout))"
         return """
             set -euo pipefail
             PINNED_COMMIT='\(source.commit.rawValue)'
             PINNED_TREE='\(source.tree.oid.rawValue)'
-            ACTUAL_COMMIT="$(git -C '\(directory)' rev-parse HEAD)"
-            ACTUAL_TREE="$(git -C '\(directory)' rev-parse '\(source.tree.revision)')"
+            PINNED_PATH=\(Self.shellQuoted(source.tree.path))
+            ACTUAL_COMMIT="$(git -C \(directory) rev-parse HEAD)"
+            ACTUAL_TREE="$(git -C \(directory) rev-parse \(Self.shellQuoted(source.tree.revision)))"
             for OID in "$ACTUAL_COMMIT" "$ACTUAL_TREE"; do
               [[ "$OID" =~ ^[0-9a-f]{40}$ ]] || { echo "::error::\(source.repository): refusing malformed object name '$OID'"; exit 1; }
             done
             [[ "$ACTUAL_COMMIT" == "$PINNED_COMMIT" ]] || { echo "::error::\(source.repository): checked-out commit '$ACTUAL_COMMIT' is not the pinned '$PINNED_COMMIT'. Refusing to execute unpinned CI sources."; exit 1; }
-            [[ "$ACTUAL_TREE" == "$PINNED_TREE" ]] || { echo "::error::\(source.repository): tree of '\(source.tree.path)' is '$ACTUAL_TREE', pinned '$PINNED_TREE'. The commit resolved but its content did not."; exit 1; }
+            [[ "$ACTUAL_TREE" == "$PINNED_TREE" ]] || { echo "::error::\(source.repository): tree of '$PINNED_PATH' is '$ACTUAL_TREE', pinned '$PINNED_TREE'. The commit resolved but its content did not."; exit 1; }
             echo "commit=$ACTUAL_COMMIT" >> "$GITHUB_OUTPUT"
             echo "tree=$ACTUAL_TREE" >> "$GITHUB_OUTPUT"
 
