@@ -396,10 +396,18 @@ func `Source measurement refuses a tampered local linter snapshot`() async throw
     try MainFixtureFiles.write(bytes: Array("swiftlint".utf8), to: swiftLint)
     try MainFixtureFiles.write(bytes: Array("linter".utf8), to: linter)
     defer { try? MainFixtureFiles.remove(root) }
+    let workspace = MainFixtureFiles.join(root, "workspace")
+    try MainFixtureFiles.createDirectory(workspace)
+    let workspaceFile = MainFixtureFiles.join(workspace, "contents.xcworkspacedata")
+    try MainFixtureFiles.write(
+        bytes: Array("<Workspace version=\"1.0\"></Workspace>\n".utf8),
+        to: workspaceFile
+    )
+    let workspaceDigest = try Institute.Source.Application.digest(file: workspaceFile).hex
 
     let preparation = Institute.Source.Preparation(
         policyRevision: Institute.Source.Policy.current.revision,
-        binding: .workspace(digest: "workspace"),
+        binding: .workspace(digest: workspaceDigest),
         swiftFormatExecutable: format,
         swiftFormatTool: try Institute.Source.Application.digest(file: format),
         swiftLintExecutable: swiftLint,
@@ -418,7 +426,7 @@ func `Source measurement refuses a tampered local linter snapshot`() async throw
     )
     try MainFixtureFiles.write(bytes: Array("tampered".utf8), to: linter)
     let cohort = Institute.Source.Workspace.Cohort(
-        workspace: "/workspace",
+        workspace: workspace,
         references: 0,
         groupReferences: 0,
         containerReferences: 0,

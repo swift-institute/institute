@@ -133,6 +133,11 @@ extension Institute.Sync {
                 name: "institute-continuous-integration",
                 targets: [("Institute Continuous Integration Source", false)]
             )
+            try Self.package(
+                at: base.appending(path: "swift-foundations/swift-linter/Runner"),
+                name: "swift-linter-runner",
+                targets: [("runner", false)]
+            )
             try client.initialize(at: source.path, bare: false)
             try Self.package(
                 at: source,
