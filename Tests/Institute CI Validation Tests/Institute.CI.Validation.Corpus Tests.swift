@@ -1,5 +1,4 @@
 public import Institute_Model
-import Foundation
 import Institute_CI_Model
 import Institute_CI_Validation
 import GitHub_Standard
@@ -27,13 +26,11 @@ struct InstituteValidationCorpusTests {
     /// The corpus, located from this file rather than from a working
     /// directory, so the suite behaves the same under SwiftPM, Xcode,
     /// and CI.
-    static var fixtureRoot: URL {
-        var url = URL(fileURLWithPath: #filePath)
-        url.deleteLastPathComponent()  // → the test target directory
-        return url.appendingPathComponent("Fixtures")
+    static var fixtureRoot: String {
+        FixtureFiles.sibling(of: #filePath, "Fixtures")
     }
 
-    static var corpus: Validation.Corpus { .init(root: fixtureRoot.path) }
+    static var corpus: Validation.Corpus { .init(root: fixtureRoot) }
 
     /// Copy the read-only fixture data before creating the Git indexes needed
     /// by GH-IGNORE scenarios. This suite owns its setup instead of relying
@@ -41,53 +38,43 @@ struct InstituteValidationCorpusTests {
     static func withPrivateCorpus<Result>(
         _ body: (Validation.Corpus) throws -> Result
     ) throws -> Result {
-        let fileManager = FileManager.default
-        let root = fileManager.temporaryDirectory
-            .appending(path: "institute-ci-validation-corpus-\(UUID().uuidString)")
-        try fileManager.copyItem(at: fixtureRoot, to: root)
+        let root = FixtureFiles.temporaryPath(
+            "institute-ci-validation-corpus-\(FixtureFiles.uniqueName())"
+        )
+        try FixtureFiles.copy(fixtureRoot, to: root)
         do {
             try prepareGitignoreRepositories(in: root)
-            let result = try body(.init(root: root.path))
-            try fileManager.removeItem(at: root)
+            let result = try body(.init(root: root))
+            try FixtureFiles.remove(root)
             return result
         } catch {
             // swift-linter:disable:next try optional
             // REASON: The original setup or assertion failure is the verdict.
-            try? fileManager.removeItem(at: root)
+            try? FixtureFiles.remove(root)
             throw error
         }
     }
 
-    private static func prepareGitignoreRepositories(in corpus: URL) throws {
-        let fileManager = FileManager.default
-        let ruleDirectories = try fileManager.contentsOfDirectory(
-            at: corpus,
-            includingPropertiesForKeys: [.isDirectoryKey]
-        )
-        .filter { $0.lastPathComponent.hasPrefix("gh-ignore-") }
-        .filter { (try? $0.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true }
+    private static func prepareGitignoreRepositories(in corpus: String) throws {
+        let ruleDirectories = try FixtureFiles.subdirectories(of: corpus)
+            .filter { FixtureFiles.lastComponent(of: $0).hasPrefix("gh-ignore-") }
         for rule in ruleDirectories {
             for expectation in ["pass", "fail", "edge"] {
-                let root = rule.appending(path: expectation)
-                guard fileManager.fileExists(atPath: root.path) else { continue }
-                for subject in try fileManager.contentsOfDirectory(
-                    at: root,
-                    includingPropertiesForKeys: [.isDirectoryKey]
-                )
-                where (try? subject.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true
-                {
+                let root = FixtureFiles.join(rule, expectation)
+                guard FixtureFiles.exists(root) else { continue }
+                for subject in try FixtureFiles.subdirectories(of: root) {
                     guard
                         try Institute.CI.Validation.Gitignore.git(
                             ["init", "-q", "."],
-                            in: subject.path
+                            in: subject
                         ).status == 0
-                    else { throw CocoaError(.fileWriteUnknown) }
+                    else { throw FixtureFiles.setupFailure }
                     guard
                         try Institute.CI.Validation.Gitignore.git(
                             ["add", "-f", "--all"],
-                            in: subject.path
+                            in: subject
                         ).status == 0
-                    else { throw CocoaError(.fileWriteUnknown) }
+                    else { throw FixtureFiles.setupFailure }
                 }
             }
         }

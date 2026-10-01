@@ -1,5 +1,4 @@
 public import Institute_Model
-import Foundation
 import Institute_CI_Model
 import Institute_CI_Validation
 import GitHub_Standard
@@ -110,36 +109,31 @@ struct CIValidationGitignoreTests {
         }
 
         @Test func `canon resolution uses a native path hierarchy`() throws {
-            let root = FileManager.default.temporaryDirectory
-                .appending(path: "gitignore-canon-resolution-\(UUID().uuidString)")
-            let canon = root.appending(path: Gitignore.canonPath)
-            let nested = root.appending(path: "nested/support")
+            let root = FixtureFiles.temporaryPath(
+                "gitignore-canon-resolution-\(FixtureFiles.uniqueName())"
+            )
+            let canon = FixtureFiles.join(root, Gitignore.canonPath)
+            let nested = FixtureFiles.join(root, "nested/support")
             // Retried on Windows: a hosted runner's real-time scanner can
             // transiently hold a freshly created path under `%TEMP%`,
             // which surfaces here as `ERROR_SHARING_VIOLATION` — see
             // `Gitignore.retryingTransientWindowsFailures`.
             try Gitignore.retryingTransientWindowsFailures {
-                try FileManager.default.createDirectory(
-                    at: nested,
-                    withIntermediateDirectories: true
-                )
+                try FixtureFiles.createDirectory(nested)
             }
             try Gitignore.retryingTransientWindowsFailures {
-                try FileManager.default.createDirectory(
-                    at: canon.deletingLastPathComponent(),
-                    withIntermediateDirectories: true
-                )
+                try FixtureFiles.createDirectory(FixtureFiles.parent(of: canon))
             }
-            defer { try? FileManager.default.removeItem(at: root) }
+            defer { try? FixtureFiles.remove(root) }
             try Gitignore.retryingTransientWindowsFailures {
-                try "canon".write(to: canon, atomically: true, encoding: .utf8)
+                try FixtureFiles.write("canon", to: canon)
             }
 
-            #expect(Gitignore.resolvedCanonPath(startingAt: nested.path) == canon.path)
+            #expect(Gitignore.resolvedCanonPath(startingAt: nested) == canon)
             for `class` in Class.allCases {
                 #expect(
-                    Gitignore.siblingCanonPath(of: canon.path, for: `class`)
-                        == root.appending(path: `class`.canonPath).path
+                    Gitignore.siblingCanonPath(of: canon, for: `class`)
+                        == FixtureFiles.join(root, `class`.canonPath)
                 )
             }
         }
@@ -291,8 +285,8 @@ struct CIValidationGitignoreTests {
             // or the whitelist stops being deny-by-default one admitted
             // path at a time.
             let canon = try CIValidationGitignoreTests.canon(for: .package)
-            let widened = canon.replacingOccurrences(
-                of: "!/Lint/\n",
+            let widened = canon.replacing(
+                "!/Lint/\n",
                 with: "!/Lint/\n!/Extra/\n"
             )
             #expect(widened != canon)
@@ -457,16 +451,15 @@ extension CIValidationGitignoreTests {
     {
         let canonPath = try #require(Gitignore.resolvedCanonPath)
         let lfText = try #require(Gitignore.read(canonPath))
-        let crlfPath = FileManager.default.temporaryDirectory
-            .appending(path: "crlf-canon-\(UUID().uuidString).txt")
-        let rawCRLFText = lfText.replacingOccurrences(of: "\n", with: "\r\n")
-        try Data(rawCRLFText.utf8).write(to: crlfPath)
-        defer { try? FileManager.default.removeItem(at: crlfPath) }
+        let crlfPath = FixtureFiles.temporaryPath("crlf-canon-\(FixtureFiles.uniqueName()).txt")
+        let rawCRLFText = lfText.replacing("\n", with: "\r\n")
+        try FixtureFiles.write(bytes: Array(rawCRLFText.utf8), to: crlfPath)
+        defer { try? FixtureFiles.remove(crlfPath) }
 
-        let crlfRead = try #require(Gitignore.read(crlfPath.path))
+        let crlfRead = try #require(Gitignore.read(crlfPath))
         #expect(crlfRead == lfText)
 
-        let widened = crlfRead.replacingOccurrences(of: "!/Lint/\n", with: "!/Lint/\n!/Extra/\n")
+        let widened = crlfRead.replacing("!/Lint/\n", with: "!/Lint/\n!/Extra/\n")
         #expect(widened != crlfRead)
     }
 }

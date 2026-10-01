@@ -1,5 +1,4 @@
 public import Institute_Model
-import Foundation
 import Institute_CI_Model
 import Institute_CI_Validation
 import GitHub_Standard
@@ -9,15 +8,14 @@ import Testing
 struct `Control Validation Tests` {
     @Test
     func `canonical checker deletion is a finding`() throws {
-        let root = FileManager.default.temporaryDirectory
-            .appendingPathComponent(UUID().uuidString)
-        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
-        try Data("candidate data\n".utf8).write(to: root.appendingPathComponent("README.md"))
+        let root = FixtureFiles.temporaryPath(FixtureFiles.uniqueName())
+        try FixtureFiles.createDirectory(root)
+        defer { try? FixtureFiles.remove(root) }
+        try FixtureFiles.write(bytes: Array("candidate data\n".utf8), to: FixtureFiles.join(root, "README.md"))
 
         let run = Institute.CI.Control.Validation.run(
             repository: "swift-institute/.github",
-            root: root.path
+            root: root
         )
 
         #expect(run.defect == nil)
@@ -26,14 +24,10 @@ struct `Control Validation Tests` {
 
     @Test
     func `candidate remains data while floating-action positive control fires`() throws {
-        let root = FileManager.default.temporaryDirectory
-            .appendingPathComponent(UUID().uuidString)
-        let workflows = root.appendingPathComponent(".github/workflows")
-        try FileManager.default.createDirectory(
-            at: workflows,
-            withIntermediateDirectories: true
-        )
-        defer { try? FileManager.default.removeItem(at: root) }
+        let root = FixtureFiles.temporaryPath(FixtureFiles.uniqueName())
+        let workflows = FixtureFiles.join(root, ".github/workflows")
+        try FixtureFiles.createDirectory(workflows)
+        defer { try? FixtureFiles.remove(root) }
 
         let workflow = """
             on:
@@ -45,14 +39,15 @@ struct `Control Validation Tests` {
                 steps:
                   - uses: swift-institute/.github/.github/actions/probe@main
             """
-        try Data(workflow.utf8).write(to: workflows.appendingPathComponent("probe.yml"))
-        try Data("#!/bin/sh\nexit 99\n".utf8).write(
-            to: root.appendingPathComponent("candidate-code")
+        try FixtureFiles.write(bytes: Array(workflow.utf8), to: FixtureFiles.join(workflows, "probe.yml"))
+        try FixtureFiles.write(
+            bytes: Array("#!/bin/sh\nexit 99\n".utf8),
+            to: FixtureFiles.join(root, "candidate-code")
         )
 
         let run = Institute.CI.Control.Validation.run(
             repository: "swift-institute-test/control-candidate",
-            root: root.path
+            root: root
         )
 
         #expect(run.defect == nil)
@@ -62,23 +57,23 @@ struct `Control Validation Tests` {
 
     @Test
     func `canonical compositor does not retain the superseded runner label heuristic`() throws {
-        let root = FileManager.default.temporaryDirectory
-            .appendingPathComponent(UUID().uuidString)
-        let workflows = root.appendingPathComponent(".github/workflows")
-        try FileManager.default.createDirectory(at: workflows, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        let root = FixtureFiles.temporaryPath(FixtureFiles.uniqueName())
+        let workflows = FixtureFiles.join(root, ".github/workflows")
+        try FixtureFiles.createDirectory(workflows)
+        defer { try? FixtureFiles.remove(root) }
 
         let universal = CIValidationUniversalWorkflowTests.workflow()
-            .replacingOccurrences(
-                of: "  macos-release:\n    runs-on: ubuntu-latest",
+            .replacing(
+                "  macos-release:\n    runs-on: ubuntu-latest",
                 with: "  macos-release:\n    runs-on: xcode-27"
             )
-            .replacingOccurrences(
-                of: "  apple-simulator-build:\n    runs-on: ubuntu-latest",
+            .replacing(
+                "  apple-simulator-build:\n    runs-on: ubuntu-latest",
                 with: "  apple-simulator-build:\n    runs-on: xcode-27"
             )
-        try Data(universal.utf8).write(
-            to: workflows.appendingPathComponent("swift-ci.yml")
+        try FixtureFiles.write(
+            bytes: Array(universal.utf8),
+            to: FixtureFiles.join(workflows, "swift-ci.yml")
         )
         let host = """
             on:
@@ -90,13 +85,14 @@ struct `Control Validation Tests` {
             permissions: {}
             jobs: {}
             """
-        try Data(host.utf8).write(
-            to: workflows.appendingPathComponent("control-validate.yml")
+        try FixtureFiles.write(
+            bytes: Array(host.utf8),
+            to: FixtureFiles.join(workflows, "control-validate.yml")
         )
 
         let run = Institute.CI.Control.Validation.run(
             repository: "swift-institute/.github",
-            root: root.path
+            root: root
         )
 
         #expect(
@@ -121,14 +117,13 @@ struct `Control Validation Tests` {
 
     @Test
     func `empty candidate is unmeasured`() throws {
-        let root = FileManager.default.temporaryDirectory
-            .appendingPathComponent(UUID().uuidString)
-        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        let root = FixtureFiles.temporaryPath(FixtureFiles.uniqueName())
+        try FixtureFiles.createDirectory(root)
+        defer { try? FixtureFiles.remove(root) }
 
         let run = Institute.CI.Control.Validation.run(
             repository: "swift-institute-test/control-candidate",
-            root: root.path
+            root: root
         )
 
         #expect(run.findings.isEmpty)

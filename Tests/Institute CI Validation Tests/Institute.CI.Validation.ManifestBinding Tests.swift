@@ -1,5 +1,4 @@
 public import Institute_Model
-import Foundation
 import Institute_CI_Model
 import Institute_CI_Validation
 import Institute_CI_Workflow
@@ -30,22 +29,19 @@ struct CIValidationManifestBindingTests {
     @Suite
     struct Integration {
         @Test func `the fixture stubs are still Python and still present`() throws {
-            let url = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
-                .appendingPathComponent("Fixtures")
+            let fixtures = FixtureFiles.sibling(of: #filePath, "Fixtures")
 
             func stubs(under path: String) -> [String] {
-                let root = url.appendingPathComponent(path)
+                let root = FixtureFiles.join(fixtures, path)
                 return
-                    (FileManager.default
-                    .enumerator(atPath: root.path)?
-                    .compactMap { $0 as? String }
+                    (FixtureFiles.relativeFiles(under: root)?
                     .filter { $0.hasSuffix(".py") }
                     // `FileManager.enumerator(atPath:)` yields relative
                     // paths joined with the platform's native separator —
                     // `\` on Windows. The corpus spelling this asserts is
                     // the repository-relative form, which is always
                     // `/`-joined regardless of host platform.
-                    .map { $0.replacingOccurrences(of: "\\", with: "/") } ?? [])
+                    .map { $0.replacing("\\", with: "/") } ?? [])
                     .sorted()
             }
 
@@ -157,7 +153,7 @@ struct CIValidationManifestBindingTests {
         @Test func `a missing manifest is a finding and not an exit-2`() throws {
             let subject = Institute.CI.Validation.Subject(
                 repository: "swift-institute-test/empty",
-                root: NSTemporaryDirectory()
+                root: FixtureFiles.temporaryRoot
             )
             let findings = try Institute.CI.Validation.ManifestBinding()
                 .findings(in: subject)

@@ -1,5 +1,4 @@
 public import Institute_Model
-import Foundation
 import Institute_CI_Model
 import Institute_CI_Validation
 import GitHub_Standard
@@ -22,17 +21,17 @@ struct CIValidationSchemaCorrespondenceTests {
     /// This test target, located from the file rather than the working
     /// directory.
     static var repositoryRoot: String {
-        var url = URL(fileURLWithPath: #filePath)
-        for _ in 0..<3 { url.deleteLastPathComponent() }
-        return url.path
+        FixtureFiles.ancestor(of: #filePath, levels: 3)
     }
 
     static func scenario(
         _ kind: String,
         _ name: String
     ) -> Institute.CI.Validation.SchemaCorrespondence {
-        let directory = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
-            .appendingPathComponent("Fixtures/schema-correspondence/\(kind)/\(name)").path
+        let directory = FixtureFiles.sibling(
+            of: #filePath,
+            "Fixtures/schema-correspondence/\(kind)/\(name)"
+        )
         return .init(
             schemaFile: "\(directory)/metadata-schema.json",
             syncWorkflowFile: "\(directory)/sync-metadata.yml",

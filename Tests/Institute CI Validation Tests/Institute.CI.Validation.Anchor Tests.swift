@@ -1,5 +1,4 @@
 public import Institute_Model
-import Foundation
 import Institute_CI_Model
 import Institute_CI_Validation
 import GitHub_Standard
@@ -23,8 +22,7 @@ struct CIValidationAnchorTests {
     static let rule: Validation.Rule = "CI-ANCHOR-001"
 
     static func root(_ kind: String, _ name: String) -> String {
-        URL(fileURLWithPath: #filePath).deletingLastPathComponent()
-            .appendingPathComponent("Fixtures/ci-anchor-001/\(kind)/\(name)").path
+        FixtureFiles.sibling(of: #filePath, "Fixtures/ci-anchor-001/\(kind)/\(name)")
     }
 
     static func scenario(_ kind: String, _ name: String) -> Validation.Subject {
@@ -121,7 +119,7 @@ struct CIValidationAnchorTests {
     /// character apart in a JSON file and worlds apart in meaning.
     @Test func `a malformed manifest is a finding, not an absent anchor`() throws {
         let root = try Self.temporary(manifest: "{ not json", workflow: "on: {}\njobs: {}\n")
-        defer { try? FileManager.default.removeItem(atPath: root) }
+        defer { try? FixtureFiles.remove(root) }
         let findings = try Institute.CI.Validation.Anchor()
             .findings(in: .init(repository: "swift-institute-test/malformed", root: root))
         #expect(findings.count == 1)
@@ -147,7 +145,7 @@ struct CIValidationAnchorTests {
             }
             """
         let root = try Self.temporary(manifest: manifest, workflow: "on: {}\njobs: {}\n")
-        defer { try? FileManager.default.removeItem(atPath: root) }
+        defer { try? FixtureFiles.remove(root) }
         let findings = try Institute.CI.Validation.Anchor()
             .findings(in: .init(repository: "swift-institute-test/abbreviated", root: root))
         #expect(findings.count == 1)
@@ -158,12 +156,11 @@ struct CIValidationAnchorTests {
     /// a defect and not a pass — the same decision `Subject.workflows`
     /// makes for every other rule.
     @Test func `an unparseable workflow is a finding`() throws {
-        let manifest = try String(
-            contentsOfFile: Self.root("pass", "pinned-sources") + "/.github/trust-anchor.json",
-            encoding: .utf8
+        let manifest = try FixtureFiles.read(
+            Self.root("pass", "pinned-sources") + "/.github/trust-anchor.json"
         )
         let root = try Self.temporary(manifest: manifest, workflow: "jobs:\n  - [\n")
-        defer { try? FileManager.default.removeItem(atPath: root) }
+        defer { try? FixtureFiles.remove(root) }
         let findings = try Institute.CI.Validation.Anchor()
             .findings(in: .init(repository: "swift-institute-test/unparseable", root: root))
         #expect(!findings.isEmpty)
@@ -171,22 +168,11 @@ struct CIValidationAnchorTests {
 
     /// A scratch subject carrying a manifest and a workflow.
     static func temporary(manifest: String, workflow: String) throws -> String {
-        let root = NSTemporaryDirectory() + "ci-anchor-001-" + UUID().uuidString
+        let root = FixtureFiles.temporaryRoot + "ci-anchor-001-" + FixtureFiles.uniqueName()
         let workflows = root + "/.github/workflows"
-        try FileManager.default.createDirectory(
-            atPath: workflows,
-            withIntermediateDirectories: true
-        )
-        try manifest.write(
-            toFile: root + "/.github/trust-anchor.json",
-            atomically: true,
-            encoding: .utf8
-        )
-        try workflow.write(
-            toFile: workflows + "/swift-ci.yml",
-            atomically: true,
-            encoding: .utf8
-        )
+        try FixtureFiles.createDirectory(workflows)
+        try FixtureFiles.write(manifest, to: root + "/.github/trust-anchor.json")
+        try FixtureFiles.write(workflow, to: workflows + "/swift-ci.yml")
         return root
     }
 }
