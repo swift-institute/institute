@@ -399,6 +399,22 @@ struct CIInventoryAnchorShellTests {
         #expect(run.output.isEmpty)
     }
 
+    /// The single-quote escape itself, executed: a checkout path with an
+    /// embedded `'` is emitted as `'…'\''…'` and still names that
+    /// directory, so both recorded facts verify against it.
+    @Test func `a checkout path with an embedded single quote verifies through its escape`() throws {
+        let fixture = try AnchorShellFixture()
+        defer { fixture.remove() }
+        let checkout = ".ci-sources/o'brien"
+        let pinned = try fixture.repository(at: checkout)
+        let script = try Self.script(checkout: checkout, commit: pinned.commit, tree: pinned.tree)
+        #expect(script.contains(#""${GITHUB_WORKSPACE}"/'.ci-sources/o'\''brien' rev-parse HEAD"#))
+        let run = try fixture.execute(script)
+        #expect(run.status == 0)
+        #expect(run.output == "commit=\(pinned.commit)\ntree=\(pinned.tree)\n")
+        #expect(fixture.exists(checkout + "/.git"))
+    }
+
     @Test func `a spaced, quoted checkout path is literal data, never executed`() throws {
         let fixture = try AnchorShellFixture()
         defer { fixture.remove() }
