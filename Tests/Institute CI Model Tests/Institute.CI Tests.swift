@@ -545,7 +545,15 @@ struct ContinuousIntegrationAggregateTests {
             participants: ["plan"] + Self.participants,
             gating: [Institute.CI.Leg("source"), Institute.CI.Leg("linux-release")]
         )
-        #expect(table.count == 6)
+        #expect(table.count == 4)
+        #expect(
+            table == [
+                Institute.CI.Requirement(job: "macos-release", expectation: .skipped),
+                Institute.CI.Requirement(job: "linux-release", expectation: .success),
+                Institute.CI.Requirement(job: "windows-release", expectation: .skipped),
+                Institute.CI.Requirement(job: "source", expectation: .success),
+            ]
+        )
         #expect(table.first { $0.job == "source" }?.expectation == .success)
         #expect(table.first { $0.job == "macos-release" }?.expectation == .skipped)
     }
