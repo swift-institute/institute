@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import Package_Manager
 import SPM_Standard
 import Testing
@@ -42,8 +41,12 @@ extension Institute.Composition.BuildPlan.Test {
         #expect(plan.seeds == ["swift-a-primitives", "swift-b-primitives"])
         #expect(plan.packages.map(\.identity) == ["swift-a-primitives", "swift-b-primitives"])
 
-        let aIndex = try #require(first.range(of: "swift-a-primitives")).lowerBound
-        let bIndex = try #require(first.range(of: "swift-b-primitives")).lowerBound
+        let aIndex = try #require(
+            DevelopmentFixtureFiles.earliestRange(of: "swift-a-primitives", in: first)
+        ).lowerBound
+        let bIndex = try #require(
+            DevelopmentFixtureFiles.earliestRange(of: "swift-b-primitives", in: first)
+        ).lowerBound
         #expect(aIndex < bIndex)
     }
 
@@ -98,24 +101,22 @@ extension Institute.Composition.BuildPlan.Test {
 
     @Test
     func `a mixed-root plan renders paths that resolve`() throws {
-        let base = FileManager.default.temporaryDirectory
-            .resolvingSymlinksInPath()
-            .appending(path: UUID().uuidString)
-        let rootOne = base.appending(path: "one/swift-primitives/swift-a-primitives")
-        let rootTwo = base.appending(path: "two/swift-primitives/swift-b-primitives")
-        let workspaceDirectory = base.appending(path: "workspaces")
+        let base = DevelopmentFixtureFiles.temporaryPath(
+            resolvingSymlinks: true,
+            DevelopmentFixtureFiles.uniqueName()
+        )
+        let rootOne = DevelopmentFixtureFiles.join(base, "one/swift-primitives/swift-a-primitives")
+        let rootTwo = DevelopmentFixtureFiles.join(base, "two/swift-primitives/swift-b-primitives")
+        let workspaceDirectory = DevelopmentFixtureFiles.join(base, "workspaces")
         for directory in [rootOne, rootTwo, workspaceDirectory] {
-            try FileManager.default.createDirectory(
-                at: directory,
-                withIntermediateDirectories: true
-            )
+            try DevelopmentFixtureFiles.createDirectory(directory)
         }
-        defer { try? FileManager.default.removeItem(at: base) }
+        defer { try? DevelopmentFixtureFiles.remove(base) }
 
         let workspace = Institute.Composition.Workspace.keyed(
             "mixed",
-            under: try File.Directory(validating: workspaceDirectory.path),
-            anchor: try File.Directory(validating: base.path)
+            under: try File.Directory(validating: workspaceDirectory),
+            anchor: try File.Directory(validating: base)
         )
         let generated = Institute.Composed.Root.directory(in: workspace)
 
@@ -134,7 +135,7 @@ extension Institute.Composition.BuildPlan.Test {
                     layer: .primitives
                 ),
                 hierarchy: try Institute.Hierarchy.ID("one"),
-                directory: try File.Directory(validating: rootOne.path),
+                directory: try File.Directory(validating: rootOne),
                 identity: "swift-a-primitives",
                 evaluation: evaluation
             ),
@@ -146,7 +147,7 @@ extension Institute.Composition.BuildPlan.Test {
                     layer: .primitives
                 ),
                 hierarchy: try Institute.Hierarchy.ID("two"),
-                directory: try File.Directory(validating: rootTwo.path),
+                directory: try File.Directory(validating: rootTwo),
                 identity: "swift-b-primitives",
                 evaluation: .init(
                     name: .init("swift-b-primitives"),
@@ -174,12 +175,12 @@ extension Institute.Composition.BuildPlan.Test {
         }
 
         for package in packages {
-            let resolved = URL(fileURLWithPath: generated.path.description)
-                .appending(path: package.reference)
-                .standardizedFileURL
-                .resolvingSymlinksInPath()
+            let resolved = DevelopmentFixtureFiles.standardizedResolved(
+                generated.path.description,
+                package.reference
+            )
             #expect(
-                FileManager.default.fileExists(atPath: resolved.path),
+                DevelopmentFixtureFiles.exists(resolved),
                 "reference \(package.reference) does not resolve from \(generated)"
             )
         }

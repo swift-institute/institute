@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import JSON
 import Testing
 
@@ -60,15 +59,18 @@ extension Institute.Hierarchy.Registry.Test.Unit {
 
 extension Institute.Hierarchy.Registry.Test.Integration {
     private static func temporaryCheckout() throws -> File.Directory {
-        let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-        try FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
-        return try File.Directory(validating: base.path)
+        let base = DevelopmentFixtureFiles.temporaryPath(
+            resolvingSymlinks: false,
+            DevelopmentFixtureFiles.uniqueName()
+        )
+        try DevelopmentFixtureFiles.createDirectory(base)
+        return try File.Directory(validating: base)
     }
 
     @Test
     func `an absent registry loads as empty`() throws {
         let checkout = try Self.temporaryCheckout()
-        defer { try? FileManager.default.removeItem(atPath: checkout.path.description) }
+        defer { try? DevelopmentFixtureFiles.remove(checkout.path.description) }
 
         #expect(try Institute.Hierarchy.Registry.list(at: checkout).isEmpty)
     }
@@ -77,13 +79,10 @@ extension Institute.Hierarchy.Registry.Test.Integration {
     func `a saved registry round-trips, written pretty and sorted with a trailing newline`() throws
     {
         let checkout = try Self.temporaryCheckout()
-        defer { try? FileManager.default.removeItem(atPath: checkout.path.description) }
+        defer { try? DevelopmentFixtureFiles.remove(checkout.path.description) }
 
         let root = try File.Directory(validating: checkout.path.description + "/root")
-        try FileManager.default.createDirectory(
-            atPath: root.path.description,
-            withIntermediateDirectories: true
-        )
+        try DevelopmentFixtureFiles.createDirectory(root.path.description)
 
         let id = try Institute.Hierarchy.ID("swift-color")
         try Institute.Hierarchy.Registry.register(
@@ -94,7 +93,7 @@ extension Institute.Hierarchy.Registry.Test.Integration {
         )
 
         let ledgerPath = checkout.path.description + "/.workspace/hierarchies.json"
-        let raw = try Swift.String(contentsOfFile: ledgerPath, encoding: .utf8)
+        let raw = try DevelopmentFixtureFiles.readStrictUTF8File(ledgerPath)
         #expect(raw.hasSuffix("\n"))
         #expect(!raw.hasSuffix("\n\n"))
 
@@ -105,7 +104,7 @@ extension Institute.Hierarchy.Registry.Test.Integration {
     @Test
     func `a duplicate id fails registration with a typed error`() throws {
         let checkout = try Self.temporaryCheckout()
-        defer { try? FileManager.default.removeItem(atPath: checkout.path.description) }
+        defer { try? DevelopmentFixtureFiles.remove(checkout.path.description) }
 
         let first = try Self.directory(under: checkout, name: "first")
         let second = try Self.directory(under: checkout, name: "second")
@@ -131,13 +130,13 @@ extension Institute.Hierarchy.Registry.Test.Integration {
     @Test
     func `two ids resolving to the same physical directory collide`() throws {
         let checkout = try Self.temporaryCheckout()
-        defer { try? FileManager.default.removeItem(atPath: checkout.path.description) }
+        defer { try? DevelopmentFixtureFiles.remove(checkout.path.description) }
 
         let real = try Self.directory(under: checkout, name: "real")
         let aliasPath = checkout.path.description + "/alias"
-        try FileManager.default.createSymbolicLink(
+        try DevelopmentFixtureFiles.createSymbolicLink(
             atPath: aliasPath,
-            withDestinationPath: real.path.description
+            destinationPath: real.path.description
         )
         let alias = try File.Directory(validating: aliasPath)
 
@@ -161,7 +160,7 @@ extension Institute.Hierarchy.Registry.Test.Integration {
     @Test
     func `a missing registered root reports missing, never valid`() throws {
         let checkout = try Self.temporaryCheckout()
-        defer { try? FileManager.default.removeItem(atPath: checkout.path.description) }
+        defer { try? DevelopmentFixtureFiles.remove(checkout.path.description) }
 
         let root = try Self.directory(under: checkout, name: "gone")
         let id = try Institute.Hierarchy.ID("swift-color")
@@ -172,7 +171,7 @@ extension Institute.Hierarchy.Registry.Test.Integration {
             at: checkout
         )
 
-        try FileManager.default.removeItem(atPath: root.path.description)
+        try DevelopmentFixtureFiles.remove(root.path.description)
 
         #expect(throws: Institute.Hierarchy.Registry.Error.self) {
             _ = try Institute.Hierarchy.Registry.status(of: id, at: checkout)
@@ -187,12 +186,12 @@ extension Institute.Hierarchy.Registry.Test.Integration {
     @Test
     func `forget removes only the registry record, on either ownership`() throws {
         let checkout = try Self.temporaryCheckout()
-        defer { try? FileManager.default.removeItem(atPath: checkout.path.description) }
+        defer { try? DevelopmentFixtureFiles.remove(checkout.path.description) }
 
         for ownership: Institute.Hierarchy.Ownership in [.managed, .adopted] {
             let root = try Self.directory(under: checkout, name: "root-\(ownership.rawValue)")
             let marker = root.path.description + "/marker.txt"
-            try "content".write(toFile: marker, atomically: true, encoding: .utf8)
+            try DevelopmentFixtureFiles.writeFile("content", toFile: marker)
 
             let id = try Institute.Hierarchy.ID("hierarchy-\(ownership.rawValue)")
             try Institute.Hierarchy.Registry.register(
@@ -208,15 +207,15 @@ extension Institute.Hierarchy.Registry.Test.Integration {
                 _ = try Institute.Hierarchy.Registry.resolve(id, at: checkout)
             }
             // The root and its content were never touched by `forget`.
-            #expect(FileManager.default.fileExists(atPath: root.path.description))
-            #expect(FileManager.default.fileExists(atPath: marker))
+            #expect(DevelopmentFixtureFiles.exists(root.path.description))
+            #expect(DevelopmentFixtureFiles.exists(marker))
         }
     }
 
     @Test
     func `forgetting an unregistered id fails with a typed error`() throws {
         let checkout = try Self.temporaryCheckout()
-        defer { try? FileManager.default.removeItem(atPath: checkout.path.description) }
+        defer { try? DevelopmentFixtureFiles.remove(checkout.path.description) }
 
         #expect(throws: Institute.Hierarchy.Registry.Error.self) {
             try Institute.Hierarchy.Registry.forget(
@@ -229,7 +228,7 @@ extension Institute.Hierarchy.Registry.Test.Integration {
     @Test
     func `an id survives a locator change: register, relocate, resolve again, same id`() throws {
         let checkout = try Self.temporaryCheckout()
-        defer { try? FileManager.default.removeItem(atPath: checkout.path.description) }
+        defer { try? DevelopmentFixtureFiles.remove(checkout.path.description) }
 
         let before = try Self.directory(under: checkout, name: "before")
         let after = try Self.directory(under: checkout, name: "after")
@@ -268,7 +267,7 @@ extension Institute.Hierarchy.Registry.Test.Integration {
         -> File.Directory
     {
         let path = checkout.path.description + "/" + name
-        try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true)
+        try DevelopmentFixtureFiles.createDirectory(path)
         return try File.Directory(validating: path)
     }
 }

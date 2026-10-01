@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import Testing
 
 @testable import Institute_Development
@@ -90,15 +89,18 @@ extension Institute.Composition.Workspace.Test.Unit {
 
 extension Institute.Composition.Workspace.Test.Integration {
     private static func temporaryBase() throws -> File.Directory {
-        let base = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-        try FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
-        return try File.Directory(validating: base.path)
+        let base = DevelopmentFixtureFiles.temporaryPath(
+            resolvingSymlinks: false,
+            DevelopmentFixtureFiles.uniqueName()
+        )
+        try DevelopmentFixtureFiles.createDirectory(base)
+        return try File.Directory(validating: base)
     }
 
     @Test
     func `concurrent acquisition of one workspace fails deterministically`() throws {
         let base = try Self.temporaryBase()
-        defer { try? FileManager.default.removeItem(atPath: base.path.description) }
+        defer { try? DevelopmentFixtureFiles.remove(base.path.description) }
 
         let workspace = Institute.Composition.Workspace.keyed("locked", under: base, anchor: base)
         let token = try workspace.acquire()
@@ -111,7 +113,7 @@ extension Institute.Composition.Workspace.Test.Integration {
     @Test
     func `a released workspace can be acquired again`() throws {
         let base = try Self.temporaryBase()
-        defer { try? FileManager.default.removeItem(atPath: base.path.description) }
+        defer { try? DevelopmentFixtureFiles.remove(base.path.description) }
 
         let workspace = Institute.Composition.Workspace.keyed("cycle", under: base, anchor: base)
         let first = try workspace.acquire()
@@ -123,7 +125,7 @@ extension Institute.Composition.Workspace.Test.Integration {
     @Test
     func `distinct workspaces lock independently and share no scratch state`() throws {
         let base = try Self.temporaryBase()
-        defer { try? FileManager.default.removeItem(atPath: base.path.description) }
+        defer { try? DevelopmentFixtureFiles.remove(base.path.description) }
 
         let one = Institute.Composition.Workspace.keyed("one", under: base, anchor: base)
         let two = Institute.Composition.Workspace.keyed("two", under: base, anchor: base)
@@ -140,29 +142,26 @@ extension Institute.Composition.Workspace.Test.Integration {
         throws
     {
         let base = try Self.temporaryBase()
-        defer { try? FileManager.default.removeItem(atPath: base.path.description) }
+        defer { try? DevelopmentFixtureFiles.remove(base.path.description) }
 
         let workspace = Institute.Composition.Workspace.keyed("fresh", under: base, anchor: base)
         let ordinary = workspace.executionLocation(fresh: false)
         #expect(ordinary == workspace.scratch)
 
         let first = workspace.executionLocation(fresh: true)
-        try FileManager.default.createDirectory(
-            atPath: first.path.description,
-            withIntermediateDirectories: true
-        )
+        try DevelopmentFixtureFiles.createDirectory(first.path.description)
         let marker = first.path.description + "/marker"
-        FileManager.default.createFile(atPath: marker, contents: Data("state".utf8))
+        DevelopmentFixtureFiles.createFile(marker, contents: Array("state".utf8))
 
         let second = workspace.executionLocation(fresh: true)
         #expect(second != first)
-        #expect(FileManager.default.fileExists(atPath: marker))
+        #expect(DevelopmentFixtureFiles.exists(marker))
     }
 
     @Test
     func `a written composed root lands inside the workspace container`() throws {
         let base = try Self.temporaryBase()
-        defer { try? FileManager.default.removeItem(atPath: base.path.description) }
+        defer { try? DevelopmentFixtureFiles.remove(base.path.description) }
 
         let workspace = Institute.Composition.Workspace.keyed("write", under: base, anchor: base)
         try Institute.Composed.Root.write(

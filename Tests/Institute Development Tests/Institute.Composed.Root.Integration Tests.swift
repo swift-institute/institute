@@ -1,6 +1,5 @@
 import Institute_Build_Coordinator
 import File_System
-import Foundation
 import Package_Manager
 import SPM_Standard
 import Testing
@@ -16,24 +15,26 @@ extension Institute.Composed.Root {
 extension Institute.Composed.Root.Integration {
     /// The committed fixture root, located from this file — fixtures
     /// are source, present wherever the tests compile from.
-    private static var fixtures: URL {
-        URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()
-            .appending(path: "Fixtures/Composition")
+    private static var fixtures: Swift.String {
+        DevelopmentFixtureFiles.sibling(of: #filePath, "Fixtures/Composition")
     }
 
-    private static func scratch() throws -> URL {
-        let base = FileManager.default.temporaryDirectory
-            .resolvingSymlinksInPath()
-            .appending(path: "institute-t6-\(UUID().uuidString)")
-        try FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
+    private static func scratch() throws -> Swift.String {
+        let base = DevelopmentFixtureFiles.temporaryPath(
+            resolvingSymlinks: true,
+            "institute-t6-\(DevelopmentFixtureFiles.uniqueName())"
+        )
+        try DevelopmentFixtureFiles.createDirectory(base)
         return base
     }
 
-    private static func copy(_ fixture: Swift.String, into base: URL) throws -> URL {
-        let destination = base.appending(path: URL(fileURLWithPath: fixture).lastPathComponent)
-        try FileManager.default.copyItem(
-            at: fixtures.appending(path: fixture),
+    private static func copy(_ fixture: Swift.String, into base: Swift.String) throws -> Swift.String {
+        let destination = DevelopmentFixtureFiles.join(
+            base,
+            DevelopmentFixtureFiles.lastComponent(of: fixture)
+        )
+        try DevelopmentFixtureFiles.copy(
+            DevelopmentFixtureFiles.join(fixtures, fixture),
             to: destination
         )
         return destination
@@ -41,33 +42,27 @@ extension Institute.Composed.Root.Integration {
 
     /// Renders a template manifest, substituting runtime coordinates.
     private static func instantiate(
-        _ template: URL,
+        _ template: Swift.String,
         substituting substitutions: [Swift.String: Swift.String]
     ) throws {
-        var text = try Swift.String(
-            decoding: [UInt8](Data(contentsOf: template)),
+        var text = Swift.String(
+            decoding: try DevelopmentFixtureFiles.readBytes(template),
             as: Swift.UTF8.self
         )
         for (token, value) in substitutions {
-            text = text.replacingOccurrences(of: token, with: value)
+            text = DevelopmentFixtureFiles.replacingAll(token, with: value, in: text)
         }
-        try Data(text.utf8).write(
-            to: template.deletingLastPathComponent().appending(path: "Package.swift")
+        try DevelopmentFixtureFiles.write(
+            bytes: Array(text.utf8),
+            to: DevelopmentFixtureFiles.sibling(of: template, "Package.swift")
         )
     }
 
     /// Runs `git` for fixture-repository construction only — never a
     /// SwiftPM operation, which goes through ``Build/Coordinator`` or
     /// ``Package/Manager`` exclusively.
-    private static func git(_ arguments: [Swift.String], in directory: URL) throws {
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-        process.arguments = ["git"] + arguments
-        process.currentDirectoryURL = directory
-        process.standardOutput = FileHandle.nullDevice
-        process.standardError = FileHandle.nullDevice
-        try process.run()
-        process.waitUntilExit()
+    private static func git(_ arguments: [Swift.String], in directory: Swift.String) throws {
+        try DevelopmentFixtureFiles.git(arguments, in: directory)
     }
 
     private static func text(_ result: Institute.Build.Coordinator.Result) -> Swift.String {
@@ -81,11 +76,11 @@ extension Institute.Composed.Root.Integration {
         throws
     {
         let base = try Self.scratch()
-        defer { try? FileManager.default.removeItem(at: base) }
+        defer { try? DevelopmentFixtureFiles.remove(base) }
         let fixture = try Self.copy("LocalOverride", into: base)
 
         // The transitive remote: a real git repository at main.
-        let remote = fixture.appending(path: "remote/B")
+        let remote = DevelopmentFixtureFiles.join(fixture, "remote/B")
         try Self.git(["init", "-b", "main"], in: remote)
         try Self.git(["add", "."], in: remote)
         try Self.git(
@@ -97,21 +92,21 @@ extension Institute.Composed.Root.Integration {
         )
 
         try Self.instantiate(
-            fixture.appending(path: "A/Package.template.swift"),
-            substituting: ["REMOTE_B_URL": "file://\(remote.path)"]
+            DevelopmentFixtureFiles.join(fixture, "A/Package.template.swift"),
+            substituting: ["REMOTE_B_URL": "file://\(remote)"]
         )
         try Self.instantiate(
-            fixture.appending(path: "C/Package.template.swift"),
+            DevelopmentFixtureFiles.join(fixture, "C/Package.template.swift"),
             substituting: [
-                "PATH_A": fixture.appending(path: "A").path,
-                "PATH_B_LOCAL": fixture.appending(path: "local-root/B").path,
+                "PATH_A": DevelopmentFixtureFiles.join(fixture, "A"),
+                "PATH_B_LOCAL": DevelopmentFixtureFiles.join(fixture, "local-root/B"),
             ]
         )
 
         let coordinator = Institute.Build.Coordinator()
         let result = try coordinator.run(
             .build,
-            at: fixture.appending(path: "C").path,
+            at: DevelopmentFixtureFiles.join(fixture, "C"),
             fresh: false,
             arguments: [],
             capturingDiagnostics: true
@@ -125,7 +120,7 @@ extension Institute.Composed.Root.Integration {
         // The resolver's own state record agrees: identity `b`
         // resolved as a filesystem dependency at the local root.
         let resolution = try Package.Manager().resolution(
-            at: fixture.appending(path: "C").path
+            at: DevelopmentFixtureFiles.join(fixture, "C")
         )
         let b = resolution.dependency(for: .init("b"))
         #expect(b != nil)
@@ -149,20 +144,20 @@ extension Institute.Composed.Root.Integration {
     @Test
     func `two paths with the same evaluated identity fail`() throws {
         let base = try Self.scratch()
-        defer { try? FileManager.default.removeItem(at: base) }
+        defer { try? DevelopmentFixtureFiles.remove(base) }
         let fixture = try Self.copy("IdentityCollision", into: base)
 
         try Self.instantiate(
-            fixture.appending(path: "Root/Package.template.swift"),
+            DevelopmentFixtureFiles.join(fixture, "Root/Package.template.swift"),
             substituting: [
-                "PATH_X_B": fixture.appending(path: "X/B").path,
-                "PATH_Y_B": fixture.appending(path: "Y/B").path,
+                "PATH_X_B": DevelopmentFixtureFiles.join(fixture, "X/B"),
+                "PATH_Y_B": DevelopmentFixtureFiles.join(fixture, "Y/B"),
             ]
         )
 
         let result = try Institute.Build.Coordinator().run(
             .build,
-            at: fixture.appending(path: "Root").path,
+            at: DevelopmentFixtureFiles.join(fixture, "Root"),
             fresh: false,
             arguments: [],
             capturingDiagnostics: true
@@ -174,24 +169,22 @@ extension Institute.Composed.Root.Integration {
     @Test
     func `inventory-directory spelling divergence is reported, not silently accepted`() throws {
         let base = try Self.scratch()
-        defer { try? FileManager.default.removeItem(at: base) }
+        defer { try? DevelopmentFixtureFiles.remove(base) }
 
         // A real hierarchy: root/swift-primitives/<reference>, where the
         // materialized manifest's evaluated name diverges from the
         // inventory reference. Evaluation is the real Package.Manager.
-        let checkout = base.appending(path: "checkout")
-        let root = base.appending(path: "root/swift-primitives")
-        try FileManager.default.createDirectory(at: checkout, withIntermediateDirectories: true)
-        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        try FileManager.default.copyItem(
-            at: Self.fixtures.appending(path: "IdentityDivergence/swift-divergent-primitives"),
-            to: root.appending(path: "swift-divergent-primitives")
+        let checkout = DevelopmentFixtureFiles.join(base, "checkout")
+        let root = DevelopmentFixtureFiles.join(base, "root/swift-primitives")
+        try DevelopmentFixtureFiles.createDirectory(checkout)
+        try DevelopmentFixtureFiles.createDirectory(root)
+        try DevelopmentFixtureFiles.copy(DevelopmentFixtureFiles.join(Self.fixtures, "IdentityDivergence/swift-divergent-primitives"), to: DevelopmentFixtureFiles.join(root, "swift-divergent-primitives")
         )
 
-        let checkoutDirectory = try File.Directory(validating: checkout.path)
+        let checkoutDirectory = try File.Directory(validating: checkout)
         try Institute.Hierarchy.Registry.register(
             id: try Institute.Hierarchy.ID("main"),
-            locator: try File.Directory(validating: base.appending(path: "root").path),
+            locator: try File.Directory(validating: DevelopmentFixtureFiles.join(base, "root")),
             ownership: .adopted,
             at: checkoutDirectory
         )
@@ -226,42 +219,34 @@ extension Institute.Composed.Root.Integration {
     @Test
     func `S5 — one generated graph references packages under two registered roots`() throws {
         let base = try Self.scratch()
-        defer { try? FileManager.default.removeItem(at: base) }
+        defer { try? DevelopmentFixtureFiles.remove(base) }
 
         // Two physically unrelated roots.
-        let one = base.appending(path: "alpha/materialized")
-        let two = base.appending(path: "beta/elsewhere")
-        try FileManager.default.createDirectory(at: one, withIntermediateDirectories: true)
-        try FileManager.default.createDirectory(at: two, withIntermediateDirectories: true)
-        try FileManager.default.copyItem(
-            at: Self.fixtures.appending(path: "MixedRoots/root-one/B"),
-            to: one.appending(path: "B")
+        let one = DevelopmentFixtureFiles.join(base, "alpha/materialized")
+        let two = DevelopmentFixtureFiles.join(base, "beta/elsewhere")
+        try DevelopmentFixtureFiles.createDirectory(one)
+        try DevelopmentFixtureFiles.createDirectory(two)
+        try DevelopmentFixtureFiles.copy(DevelopmentFixtureFiles.join(Self.fixtures, "MixedRoots/root-one/B"), to: DevelopmentFixtureFiles.join(one, "B")
         )
-        try FileManager.default.copyItem(
-            at: Self.fixtures.appending(path: "MixedRoots/root-two/D"),
-            to: two.appending(path: "D")
+        try DevelopmentFixtureFiles.copy(DevelopmentFixtureFiles.join(Self.fixtures, "MixedRoots/root-two/D"), to: DevelopmentFixtureFiles.join(two, "D")
         )
-        let consumer = base.appending(path: "consumer/E")
-        try FileManager.default.createDirectory(at: consumer, withIntermediateDirectories: true)
-        try FileManager.default.copyItem(
-            at: Self.fixtures.appending(path: "MixedRoots/E/Sources"),
-            to: consumer.appending(path: "Sources")
+        let consumer = DevelopmentFixtureFiles.join(base, "consumer/E")
+        try DevelopmentFixtureFiles.createDirectory(consumer)
+        try DevelopmentFixtureFiles.copy(DevelopmentFixtureFiles.join(Self.fixtures, "MixedRoots/E/Sources"), to: DevelopmentFixtureFiles.join(consumer, "Sources")
         )
-        try FileManager.default.copyItem(
-            at: Self.fixtures.appending(path: "MixedRoots/E/Package.template.swift"),
-            to: consumer.appending(path: "Package.template.swift")
+        try DevelopmentFixtureFiles.copy(DevelopmentFixtureFiles.join(Self.fixtures, "MixedRoots/E/Package.template.swift"), to: DevelopmentFixtureFiles.join(consumer, "Package.template.swift")
         )
         try Self.instantiate(
-            consumer.appending(path: "Package.template.swift"),
+            DevelopmentFixtureFiles.join(consumer, "Package.template.swift"),
             substituting: [
-                "PATH_B": one.appending(path: "B").path,
-                "PATH_D": two.appending(path: "D").path,
+                "PATH_B": DevelopmentFixtureFiles.join(one, "B"),
+                "PATH_D": DevelopmentFixtureFiles.join(two, "D"),
             ]
         )
 
         let result = try Institute.Build.Coordinator().run(
             .build,
-            at: consumer.path,
+            at: consumer,
             fresh: false,
             arguments: [],
             capturingDiagnostics: true
@@ -273,7 +258,7 @@ extension Institute.Composed.Root.Integration {
     @Test
     func `library-less, duplicate product names, and empty population laws hold`() throws {
         let base = try Self.scratch()
-        defer { try? FileManager.default.removeItem(at: base) }
+        defer { try? DevelopmentFixtureFiles.remove(base) }
         let fixture = try Self.copy("LibraryLess", into: base)
 
         // Two identities exposing one product name, plus an
@@ -286,19 +271,19 @@ extension Institute.Composed.Root.Integration {
             packages: [
                 .init(
                     identity: "lib",
-                    reference: fixture.appending(path: "Lib").path,
+                    reference: DevelopmentFixtureFiles.join(fixture, "Lib"),
                     libraryProducts: ["Shared Name"],
                     buildableTargetCount: 1
                 ),
                 .init(
                     identity: "second",
-                    reference: fixture.appending(path: "Second").path,
+                    reference: DevelopmentFixtureFiles.join(fixture, "Second"),
                     libraryProducts: ["Shared Name"],
                     buildableTargetCount: 1
                 ),
                 .init(
                     identity: "tool",
-                    reference: fixture.appending(path: "Tool").path,
+                    reference: DevelopmentFixtureFiles.join(fixture, "Tool"),
                     libraryProducts: [],
                     buildableTargetCount: 1
                 ),
@@ -310,8 +295,8 @@ extension Institute.Composed.Root.Integration {
 
         let workspace = Institute.Composition.Workspace.keyed(
             "t6-libraryless",
-            under: try File.Directory(validating: base.path),
-            anchor: try File.Directory(validating: base.path)
+            under: try File.Directory(validating: base),
+            anchor: try File.Directory(validating: base)
         )
         try Institute.Composed.Root.write(plan, swift: "6.3.3", in: workspace)
 
@@ -334,23 +319,21 @@ extension Institute.Composed.Root.Integration {
     @Test
     func `a physical path escape fails`() throws {
         let base = try Self.scratch()
-        defer { try? FileManager.default.removeItem(at: base) }
+        defer { try? DevelopmentFixtureFiles.remove(base) }
 
-        let root = base.appending(path: "root")
-        let outside = base.appending(path: "outside/swift-escapee")
-        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        try FileManager.default.createDirectory(at: outside, withIntermediateDirectories: true)
-        try FileManager.default.createSymbolicLink(
-            at: root.appending(path: "swift-primitives"),
-            withDestinationURL: base.appending(path: "outside")
+        let root = DevelopmentFixtureFiles.join(base, "root")
+        let outside = DevelopmentFixtureFiles.join(base, "outside/swift-escapee")
+        try DevelopmentFixtureFiles.createDirectory(root)
+        try DevelopmentFixtureFiles.createDirectory(outside)
+        try DevelopmentFixtureFiles.createSymbolicLink(DevelopmentFixtureFiles.join(root, "swift-primitives"), to: DevelopmentFixtureFiles.join(base, "outside")
         )
 
         #expect(throws: Institute.Error.self) {
             try Institute.Root.preflight(
                 File.Directory(
-                    try File.Path(root.appending(path: "swift-primitives/swift-escapee").path)
+                    try File.Path(DevelopmentFixtureFiles.join(root, "swift-primitives/swift-escapee"))
                 ),
-                under: File.Directory(try File.Path(root.path))
+                under: File.Directory(try File.Path(root))
             )
         }
     }

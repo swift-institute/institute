@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import Package_Manager
 import SPM_Standard
 import Testing
@@ -24,21 +23,18 @@ extension Institute.Composition.SourceMap.Test {
         var evaluations: [Swift.String: Package.Manifest.Evaluation] = [:]
 
         init() throws {
-            let base = FileManager.default.temporaryDirectory
-                .resolvingSymlinksInPath()
-                .appending(path: UUID().uuidString)
-            try FileManager.default.createDirectory(
-                at: base.appending(path: "checkout"),
-                withIntermediateDirectories: true
+            let base = DevelopmentFixtureFiles.temporaryPath(
+                resolvingSymlinks: true,
+                DevelopmentFixtureFiles.uniqueName()
             )
-            try FileManager.default.createDirectory(
-                at: base.appending(path: "root"),
-                withIntermediateDirectories: true
+            try DevelopmentFixtureFiles.createDirectory(DevelopmentFixtureFiles.join(base, "checkout"))
+            try DevelopmentFixtureFiles.createDirectory(DevelopmentFixtureFiles.join(base, "root"))
+            self.checkout = try File.Directory(
+                validating: DevelopmentFixtureFiles.join(base, "checkout")
             )
-            self.checkout = try File.Directory(validating: base.appending(path: "checkout").path)
             self.root = File.Directory(
                 try File.System.Canonical.resolve(
-                    File.Path(base.appending(path: "root").path)
+                    File.Path(DevelopmentFixtureFiles.join(base, "root"))
                 )
             )
             self.hierarchy = try Institute.Hierarchy.ID("main")
@@ -52,7 +48,7 @@ extension Institute.Composition.SourceMap.Test {
 
         func tearDown() {
             guard let parent = checkout.path.parent else { return }
-            try? FileManager.default.removeItem(atPath: parent.description)
+            try? DevelopmentFixtureFiles.remove(parent.description)
         }
 
         static func repository(_ name: Swift.String) -> Institute.Repository {
@@ -72,13 +68,10 @@ extension Institute.Composition.SourceMap.Test {
             dependencies: [Swift.String] = []
         ) throws {
             let directory = try Institute.Layout.directory(for: repository, at: root)
-            try FileManager.default.createDirectory(
-                atPath: directory.path.description,
-                withIntermediateDirectories: true
-            )
-            FileManager.default.createFile(
-                atPath: directory[file: "Package.swift"].path.description,
-                contents: Data("// fixture manifest\n".utf8)
+            try DevelopmentFixtureFiles.createDirectory(directory.path.description)
+            DevelopmentFixtureFiles.createFile(
+                directory[file: "Package.swift"].path.description,
+                contents: Array("// fixture manifest\n".utf8)
             )
             evaluations[directory.description] = .init(
                 name: .init(name ?? repository.name),
@@ -222,13 +215,14 @@ extension Institute.Composition.SourceMap.Test {
         var fixture = try Fixture()
         defer { fixture.tearDown() }
 
-        let secondBase = FileManager.default.temporaryDirectory
-            .resolvingSymlinksInPath()
-            .appending(path: UUID().uuidString)
-        try FileManager.default.createDirectory(at: secondBase, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: secondBase) }
+        let secondBase = DevelopmentFixtureFiles.temporaryPath(
+            resolvingSymlinks: true,
+            DevelopmentFixtureFiles.uniqueName()
+        )
+        try DevelopmentFixtureFiles.createDirectory(secondBase)
+        defer { try? DevelopmentFixtureFiles.remove(secondBase) }
         let secondRoot = File.Directory(
-            try File.System.Canonical.resolve(File.Path(secondBase.path))
+            try File.System.Canonical.resolve(File.Path(secondBase))
         )
         let second = try Institute.Hierarchy.ID("second")
         try Institute.Hierarchy.Registry.register(
@@ -243,13 +237,10 @@ extension Institute.Composition.SourceMap.Test {
         try fixture.materialize(a, dependencies: ["swift-b-primitives"])
 
         let bDirectory = try Institute.Layout.directory(for: b, at: secondRoot)
-        try FileManager.default.createDirectory(
-            atPath: bDirectory.path.description,
-            withIntermediateDirectories: true
-        )
-        FileManager.default.createFile(
-            atPath: bDirectory[file: "Package.swift"].path.description,
-            contents: Data("// fixture manifest\n".utf8)
+        try DevelopmentFixtureFiles.createDirectory(bDirectory.path.description)
+        DevelopmentFixtureFiles.createFile(
+            bDirectory[file: "Package.swift"].path.description,
+            contents: Array("// fixture manifest\n".utf8)
         )
         fixture.evaluations[bDirectory.description] = .init(
             name: .init("swift-b-primitives"),
@@ -279,10 +270,7 @@ extension Institute.Composition.SourceMap.Test {
 
         let a = Fixture.repository("swift-a-primitives")
         let directory = try Institute.Layout.directory(for: a, at: fixture.root)
-        try FileManager.default.createDirectory(
-            atPath: directory.path.description,
-            withIntermediateDirectories: true
-        )
+        try DevelopmentFixtureFiles.createDirectory(directory.path.description)
 
         let map = Institute.Composition.SourceMap(defaultHierarchy: fixture.hierarchy)
         #expect(throws: Institute.Composition.SourceMap.Error.self) {

@@ -1,6 +1,5 @@
 import Dispatch
 import File_System
-import Foundation
 import Synchronization
 import Testing
 
@@ -26,28 +25,27 @@ extension Institute.Development.VerificationPlan.Test {
     struct Fixture {
         static let resolvedSentinel = "{\"originHash\" : \"sentinel — never touched\"}\n"
 
-        let base: URL
-        let root: URL
-        let resolved: URL
+        let base: Swift.String
+        let root: Swift.String
+        let resolved: Swift.String
         let plan: Institute.Development.VerificationPlan
 
         init() throws {
-            let temporary =
-                FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-            let checkout = temporary.appending(path: "Institute")
-            try FileManager.default.createDirectory(at: checkout, withIntermediateDirectories: true)
+            let temporary = DevelopmentFixtureFiles.temporaryPath(
+                resolvingSymlinks: false,
+                DevelopmentFixtureFiles.uniqueName()
+            )
+            let checkout = DevelopmentFixtureFiles.join(temporary, "Institute")
+            try DevelopmentFixtureFiles.createDirectory(checkout)
             let workspaceRoot = try Institute.Root(
-                checkout: File.Directory(validating: checkout.path)
+                checkout: File.Directory(validating: checkout)
             )
-            base = URL(
-                fileURLWithPath: workspaceRoot.hierarchy.description,
-                isDirectory: true
+            base = DevelopmentFixtureFiles.directoryPath(workspaceRoot.hierarchy.description)
+            root = DevelopmentFixtureFiles.directoryPath(workspaceRoot.checkout.description)
+            resolved = DevelopmentFixtureFiles.join(
+                base,
+                "swift-foundations/example/consumer/Package.resolved"
             )
-            root = URL(
-                fileURLWithPath: workspaceRoot.checkout.description,
-                isDirectory: true
-            )
-            resolved = base.appending(path: "swift-foundations/example/consumer/Package.resolved")
 
             for directory in [
                 "swift-foundations/example/consumer",
@@ -56,22 +54,17 @@ extension Institute.Development.VerificationPlan.Test {
                 "swift-standards/example/swift-dep-b",
                 "swift-standards/example/swift-closure",
             ] {
-                try FileManager.default.createDirectory(
-                    at: base.appending(path: directory),
-                    withIntermediateDirectories: true
-                )
+                try DevelopmentFixtureFiles.createDirectory(DevelopmentFixtureFiles.join(base, directory))
             }
-            try Self.consumerSource.write(
-                to: base.appending(path: "swift-foundations/example/consumer/Package.swift"),
-                atomically: true,
-                encoding: .utf8
+            try DevelopmentFixtureFiles.write(
+                Self.consumerSource,
+                to: DevelopmentFixtureFiles.join(base, "swift-foundations/example/consumer/Package.swift")
             )
-            try Self.consumerBSource.write(
-                to: base.appending(path: "swift-foundations/example/consumer-b/Package.swift"),
-                atomically: true,
-                encoding: .utf8
+            try DevelopmentFixtureFiles.write(
+                Self.consumerBSource,
+                to: DevelopmentFixtureFiles.join(base, "swift-foundations/example/consumer-b/Package.swift")
             )
-            try Self.resolvedSentinel.write(to: resolved, atomically: true, encoding: .utf8)
+            try DevelopmentFixtureFiles.write(Self.resolvedSentinel, to: resolved)
 
             let composition = Institute.Composition(
                 root: workspaceRoot,
@@ -144,24 +137,20 @@ extension Institute.Development.VerificationPlan.Test {
         // `Swift.String(contentsOf:encoding:)` throws untyped, so there is
         // no `E` to name.
         func read(_ consumer: Swift.String) throws -> Swift.String {
-            try Swift.String(
-                contentsOf: base.appending(
-                    path: "swift-foundations/example/\(consumer)/Package.swift"
-                ),
-                encoding: .utf8
+            try DevelopmentFixtureFiles.readStrictUTF8(
+                DevelopmentFixtureFiles.join(base, "swift-foundations/example/\(consumer)/Package.swift")
             )
         }
 
         func write(_ source: Swift.String, consumer: Swift.String) throws {
-            try source.write(
-                to: base.appending(path: "swift-foundations/example/\(consumer)/Package.swift"),
-                atomically: true,
-                encoding: .utf8
+            try DevelopmentFixtureFiles.write(
+                source,
+                to: DevelopmentFixtureFiles.join(base, "swift-foundations/example/\(consumer)/Package.swift")
             )
         }
 
         func readResolved() throws -> Swift.String {
-            try Swift.String(contentsOf: resolved, encoding: .utf8)
+            try DevelopmentFixtureFiles.readStrictUTF8(resolved)
         }
     }
 }
@@ -196,7 +185,7 @@ extension Institute.Development.VerificationPlan.Test.Fixture {
 
         """
 
-    func remove() { try? FileManager.default.removeItem(at: base) }
+    func remove() { try? DevelopmentFixtureFiles.remove(base) }
 }
 
 extension Institute.Development.VerificationPlan.Test.Transaction {
@@ -248,7 +237,7 @@ extension Institute.Development.VerificationPlan.Test.Transaction {
         #expect(try fixture.read("consumer") == original)
         let sentinel = Institute.Development.VerificationPlan.Test.Fixture.resolvedSentinel
         #expect(try fixture.readResolved() == sentinel)
-        #expect(FileManager.default.fileExists(atPath: fixture.resolved.path))
+        #expect(DevelopmentFixtureFiles.exists(fixture.resolved))
     }
 
     @Test
@@ -319,11 +308,8 @@ extension Institute.Development.VerificationPlan.Test.Fixture {
     /// Reads the consumer manifest while a verification owner runs.
     func readDuringVerification() throws(Institute.Error) -> Swift.String {
         do {
-            return try Swift.String(
-                contentsOf: base.appending(
-                    path: "swift-foundations/example/consumer/Package.swift"
-                ),
-                encoding: .utf8
+            return try DevelopmentFixtureFiles.readStrictUTF8(
+                DevelopmentFixtureFiles.join(base, "swift-foundations/example/consumer/Package.swift")
             )
         } catch {
             throw .composition("cannot read the composed manifest: \(error)")
@@ -346,7 +332,7 @@ extension Institute.Development.VerificationPlan.Test.`Edge Case` {
             planned: ".package(path: \"/somewhere/swift-dep-a\")"
         )
         try Institute.Composition.State(records: [record]).save(
-            at: File.Directory(validating: fixture.root.path)
+            at: File.Directory(validating: fixture.root)
         )
 
         var invocations = 0
@@ -369,11 +355,12 @@ extension Institute.Development.VerificationPlan.Test.`Edge Case` {
         // Hand-compose the manifest without a ledger record: the planned
         // clause is present but nothing records how to reverse it.
         let planned =
-            ".package(path: \"\(fixture.base.path)/swift-standards/example/swift-dep-a\")"
+            ".package(path: \"\(fixture.base)/swift-standards/example/swift-dep-a\")"
         let clean = Institute.Development.VerificationPlan.Test.Fixture.consumerSource
-        let dirty = clean.replacingOccurrences(
-            of: ".package(url: \"https://github.com/example/swift-dep-a.git\", branch: \"main\"),",
-            with: planned + ","
+        let dirty = DevelopmentFixtureFiles.replacingAll(
+            ".package(url: \"https://github.com/example/swift-dep-a.git\", branch: \"main\"),",
+            with: planned + ",",
+            in: clean
         )
         try fixture.write(dirty, consumer: "consumer")
 
@@ -402,7 +389,7 @@ extension Institute.Development.VerificationPlan.Test.`Edge Case` {
             }
         }
 
-        #expect(FileManager.default.fileExists(atPath: fixture.resolved.path))
+        #expect(DevelopmentFixtureFiles.exists(fixture.resolved))
         let sentinel = Institute.Development.VerificationPlan.Test.Fixture.resolvedSentinel
         #expect(try fixture.readResolved() == sentinel)
     }
@@ -446,7 +433,7 @@ extension Institute.Development.VerificationPlan.Test.`Edge Case` {
             consumer: "consumer",
             manifest: File(
                 try File.Path(
-                    "\(fixture.base.path)/swift-foundations/example/consumer/Package.swift"
+                    "\(fixture.base)/swift-foundations/example/consumer/Package.swift"
                 )
             ),
             source: source,
@@ -454,7 +441,7 @@ extension Institute.Development.VerificationPlan.Test.`Edge Case` {
                 .init(
                     reference: "swift-dep-a",
                     url: "https://github.com/example/swift-dep-a.git",
-                    path: "\(fixture.base.path)/swift-standards/example/swift-dep-a"
+                    path: "\(fixture.base)/swift-standards/example/swift-dep-a"
                 )
             ],
             ledger: .init()
