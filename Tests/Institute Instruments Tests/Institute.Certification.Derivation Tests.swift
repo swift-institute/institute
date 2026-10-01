@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import JSON
 import Testing
 
@@ -39,14 +38,9 @@ extension Institute.Certification.Test.Derivation {
         repositories: [Institute.Repository],
         heads: [Swift.String: Swift.String]
     ) throws -> Institute.Certification.Derivation {
-        let temporary = FileManager.default.temporaryDirectory
-            .appendingPathComponent("certification-derivation-\(UUID().uuidString)")
-        try FileManager.default.createDirectory(
-            at: temporary,
-            withIntermediateDirectories: true
-        )
+        let temporary = try TemporaryDirectory.make(prefix: "certification-derivation")
         return try .init(
-            root: Institute.Root(checkout: File.Directory(validating: temporary.path)),
+            root: Institute.Root(checkout: File.Directory(validating: temporary)),
             configuration: .init(
                 version: 1,
                 scope: "test",

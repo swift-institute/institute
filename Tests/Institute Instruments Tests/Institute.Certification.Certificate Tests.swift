@@ -1,4 +1,3 @@
-import Foundation
 import JSON
 import Testing
 
@@ -251,8 +250,8 @@ extension Institute.Certification.Test.Certificate {
         #expect(decoded == certificate)
         #expect(decoded.digest == certificate.digest)
 
-        let corrupt = certificate.canonical.replacingOccurrences(
-            of: "\"verdict\":\"certified\"",
+        let corrupt = certificate.canonical.replacing(
+            "\"verdict\":\"certified\"",
             with: "\"verdict\":\"failed\""
         )
         #expect(throws: JSON.Error.self) {

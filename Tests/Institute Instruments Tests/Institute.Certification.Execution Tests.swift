@@ -1,5 +1,4 @@
 import File_System
-import Foundation
 import JSON
 import Testing
 
@@ -51,22 +50,14 @@ extension Institute.Certification.Test.Execution {
         materializedHead: Swift.String?,
         outcome: Institute.Certification.Account.Outcome
     ) throws -> Institute.Certification.Execution {
-        let temporary = FileManager.default.temporaryDirectory
-            .appendingPathComponent("certification-execution-\(UUID().uuidString)")
-        let checkout = temporary.appendingPathComponent("swift-institute/institute")
-        let materialization = temporary.appendingPathComponent(
-            "swift-primitives/swift-color"
-        )
-        try FileManager.default.createDirectory(
-            at: checkout,
-            withIntermediateDirectories: true
-        )
-        try FileManager.default.createDirectory(
-            at: materialization,
-            withIntermediateDirectories: true
+        let temporary = try TemporaryDirectory.make(
+            prefix: "certification-execution",
+            creating: ["swift-institute/institute", "swift-primitives/swift-color"]
         )
         return try .init(
-            root: Institute.Root(checkout: File.Directory(validating: checkout.path)),
+            root: Institute.Root(
+                checkout: File.Directory(validating: temporary + "/swift-institute/institute")
+            ),
             configuration: .init(
                 version: 1,
                 scope: "test",
