@@ -50,6 +50,18 @@ extension Institute.Sync {
             client = .init()
 
             try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+            let configuration = Institute.Configuration(
+                version: 1,
+                scope: "swift-institute",
+                swift: "6.3.3",
+                xcode: "26.6",
+                repositories: []
+            )
+            try configuration.rendered().write(
+                to: root.appending(path: "Institute.json"),
+                atomically: true,
+                encoding: .utf8
+            )
             try FileManager.default.createDirectory(
                 at: base.appending(path: "swift-foundations"),
                 withIntermediateDirectories: true
