@@ -353,6 +353,27 @@ struct CIInventoryAnchorShellTests {
         #expect(run.output == "commit=\(pinned.commit)\ntree=\(pinned.subtree)\n")
     }
 
+    /// The tree lookup itself failing: HEAD is the fixture's real, measured
+    /// commit, but the pinned subtree path does not exist in it, so
+    /// `git rev-parse 'HEAD:Tools/absent'` fails and the script stops before
+    /// writing any output. The tree OID is a syntactic 40-hex sample, not a
+    /// measured object.
+    @Test func `an absent pinned subtree path fails closed`() throws {
+        let fixture = try AnchorShellFixture()
+        defer { fixture.remove() }
+        let pinned = try fixture.repository(at: ".ci-sources/swift-continuous-integration")
+        let run = try fixture.execute(
+            Self.script(
+                checkout: ".ci-sources/swift-continuous-integration",
+                commit: pinned.commit,
+                tree: "1122334455667788990011223344556677889900",
+                path: "Tools/absent"
+            )
+        )
+        #expect(run.status != 0)
+        #expect(run.output.isEmpty)
+    }
+
     @Test func `a mismatched commit is refused`() throws {
         let fixture = try AnchorShellFixture()
         defer { fixture.remove() }
