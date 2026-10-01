@@ -419,16 +419,14 @@ extension Institute.Dependency.Test.Integration {
                 case "nested":
                     .available(
                         [Byte](
-                            #".package(url: "https://github.com/old/vendor.git", branch: "main")"#
-                                .utf8
+                            utf8: #".package(url: "https://github.com/old/vendor.git", branch: "main")"#
                         )
                     )
 
                 case "variant":
                     .available(
                         [Byte](
-                            #".package(url: "https://github.com/swift-foundations/swift-json.git", branch: "main")"#
-                                .utf8
+                            utf8: #".package(url: "https://github.com/swift-foundations/swift-json.git", branch: "main")"#
                         )
                     )
 

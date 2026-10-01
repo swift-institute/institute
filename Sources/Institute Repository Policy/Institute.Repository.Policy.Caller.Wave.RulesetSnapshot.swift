@@ -131,9 +131,8 @@ extension Institute.Repository.Policy.Caller.Wave {
 
         private static func bytes(_ object: [Swift.String: JSON]) -> [Byte] {
             [Byte](
-                JSON.object(object.map { ($0.key, $0.value) })
+                utf8: JSON.object(object.map { ($0.key, $0.value) })
                     .serialize(sortKeys: true)
-                    .utf8
             )
         }
     }

@@ -138,8 +138,8 @@ extension String {
     /// corpus's spacing variants resolve identically.
     fileprivate var referencesEnvironmentContext: Bool {
         let characters = Array(self)
-        let opening = Array("${{")
-        let keyword = Array("env.")
+        let opening = Array("${{" as Swift.String)
+        let keyword = Array("env." as Swift.String)
         var index = 0
         while index + opening.count <= characters.count {
             guard Array(characters[index..<(index + opening.count)]) == opening else {

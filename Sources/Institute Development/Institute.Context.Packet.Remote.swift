@@ -2,6 +2,7 @@ public import Async_Fanout
 public import Institute_Inventory
 public import Institute_Model
 public import JSON
+internal import Standard_Library_Extensions
 
 extension Institute.Context.Packet {
     public enum Remote: Sendable {}

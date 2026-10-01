@@ -5,6 +5,7 @@ public import Institute_Inventory
 public import Institute_Lint
 public import Institute_Model
 public import Institute_Pages
+internal import Standard_Library_Extensions
 
 extension Institute.Doctor {
     /// One local `swift-linter` remote-config cache entry, against a live

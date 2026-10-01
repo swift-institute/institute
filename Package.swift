@@ -442,6 +442,10 @@ let package = Package(
         .product(name: "Skill Validation", package: "swift-agent-skills"),
         .product(name: "Xcode Scheme", package: "swift-xcode"),
         .product(name: "Xcode Workspace", package: "swift-xcode"),
+        .product(
+          name: "Standard Library Extensions",
+          package: "swift-standard-library-extensions"
+        ),
       ]
     ),
     .target(
@@ -490,6 +494,10 @@ let package = Package(
         .product(name: "Package Manager", package: "swift-package-manager"),
         .product(name: "Process", package: "swift-process"),
         .product(name: "Tagged", package: "swift-tagged"),
+        .product(
+          name: "Standard Library Extensions",
+          package: "swift-standard-library-extensions"
+        ),
       ]
     ),
     .target(

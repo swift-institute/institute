@@ -2,6 +2,7 @@ public import File_System
 public import Institute_Model
 public import Package_Manager
 public import SPM_Standard
+internal import Standard_Library_Extensions
 
 extension Institute.Composition {
     /// Which checkout each composed repository resolves to: one default

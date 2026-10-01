@@ -229,7 +229,7 @@ extension Institute.CI.Validation {
         /// not this validator's finding to make.
         static func packageCalls(in code: String) -> [String] {
             let characters = Array(code)
-            let token = Array(".package")
+            let token = Array(".package" as Swift.String)
             var calls: [String] = []
             var start = 0
             while start + token.count <= characters.count {
@@ -341,7 +341,7 @@ extension Institute.CI.Validation {
         /// The legacy requirement spelling, `.branch("x")`.
         static func legacyBranchValue(in text: String) -> String? {
             let characters = Array(text)
-            let token = Array(".branch(")
+            let token = Array(".branch(" as Swift.String)
             var start = 0
             while start + token.count <= characters.count {
                 guard Array(characters[start..<(start + token.count)]) == token else {

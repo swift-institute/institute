@@ -215,9 +215,8 @@ extension Institute.Repository.Policy.Ruleset {
 
     private static func serialized(_ object: [String: JSON]) -> [Byte] {
         [Byte](
-            JSON.object(object.map { ($0.key, $0.value) })
+            utf8: JSON.object(object.map { ($0.key, $0.value) })
                 .serialize(sortKeys: true)
-                .utf8
         )
     }
 }
