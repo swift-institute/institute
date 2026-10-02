@@ -14,9 +14,9 @@ extension Institute.Repository.Policy.Fleet {
         }
         let lintBundle: Swift.String
         switch organization.layer {
-        case "L1": lintBundle = "primitives"
-        case "L2": lintBundle = "standards"
-        case "L3", "control": lintBundle = "institute"
+        case "L1", "L2": lintBundle = "primitives"
+        case "L3": lintBundle = "standards"
+        case "L4", "control": lintBundle = "institute"
         default: throw .invalidLayer(organization.layer)
         }
         let authored = repositories?.first(where: { $0.name == repository })
@@ -34,7 +34,7 @@ extension Institute.Repository.Policy.Fleet {
                 throw .duplicateOrganization(organization.name)
             }
             switch organization.layer {
-            case "L1", "L2", "L3", "control": break
+            case "L1", "L2", "L3", "L4", "control": break
             default: throw .invalidLayer(organization.layer)
             }
             switch organization.status {
