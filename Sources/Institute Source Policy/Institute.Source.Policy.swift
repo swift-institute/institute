@@ -48,18 +48,18 @@ extension Institute.Source {
                     id: .init("swift-format"),
                     platform: .macOSARM64,
                     version: "main",
-                    revision: "27A5228h",
-                    toolchain: "Xcode 27.0 (27A5228h)",
+                    revision: "27A9269",
+                    toolchain: "Xcode 27.1 (27A9269)",
                     schema: "swift-format:main",
                     executable: .init(
                         name: "swift-format",
                         digest: .init(
-                            "f61455c5d950bdc7ad5115c53c2c0d769d8c1f314f4ac64a179dfe097aa07e54"
+                            "1b4fc083a7b8e21b23b2478dadb996f736a901fa9ff0a14145d981d45989b6ec"
                         ),
                         origin: .xcode(
-                            application: "/Applications/Xcode-beta.app",
-                            version: "27.0",
-                            build: "27A5228h",
+                            application: "/Applications/Xcode_27.1.app",
+                            version: "27.1",
+                            build: "27A9269",
                             relativePath:
                                 "Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-format"
                         )

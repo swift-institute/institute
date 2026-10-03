@@ -34,14 +34,14 @@ struct `Institute source policy` {
         let engine = try #require(
             Institute.Source.Policy.current.engines.first { $0.id.token == "swift-format" }
         )
-        #expect(engine.revision == "27A5228h")
-        #expect(engine.toolchain == "Xcode 27.0 (27A5228h)")
+        #expect(engine.revision == "27A9269")
+        #expect(engine.toolchain == "Xcode 27.1 (27A9269)")
         guard case .xcode(_, let version, let build, _) = engine.executable.origin else {
             Issue.record("swift-format is not acquired from Xcode")
             return
         }
-        #expect(version == "27.0")
-        #expect(build == "27A5228h")
+        #expect(version == "27.1")
+        #expect(build == "27A9269")
     }
 
     @Test
