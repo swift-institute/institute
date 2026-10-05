@@ -382,6 +382,10 @@ custom_rules:
     #     added `(?![ \t]*==)` lookahead exempts a bare `Error` immediately
     #     followed by `==` (dot-qualified `Foo.Error ==` was already exempt
     #     via the `(?<!\.)` lookbehind).
+    # Module selectors (2026-10-05, RULE-COHERENCE-1 case B): `Swift::Error`
+    #     (and any `Module::Error`) is qualified; the `(?<!::)` lookbehind
+    #     exempts it, matching [SOURCE-MODULE-SELECTOR]'s `Module::Name`
+    #     spelling and swift-linter's `swift protocol qualification`.
     # Validated: the 35 unshielded FP sites across swift-linux/witnesses/
     # paths/io stop firing with NO shields added; genuine violations fire.
     # §NOTES fix (2026-07-30, #136): a bare-`Error` REFERENCE (not
@@ -409,7 +413,7 @@ custom_rules:
     # `Error` genuinely denotes the stdlib protocol. End-state (SwiftSyntax
     # symbol resolution) is the only way to distinguish the two cases
     # automatically; until then this stays a manual per-site judgment call.
-    regex: '\b(?<!Swift\.)(?<!\.)(?<!struct )(?<!enum )(?<!class )(?<!actor )(?<!typealias )(?<!associatedtype )(?<!throws\()Error\b(?!\.)(?![ \t]*==)'
+    regex: '\b(?<!Swift\.)(?<!\.)(?<!::)(?<!struct )(?<!enum )(?<!class )(?<!actor )(?<!typealias )(?<!associatedtype )(?<!throws\()Error\b(?!\.)(?![ \t]*==)'
     message: "Qualify bare 'Error' ([PLAT-ARCH-011]; user-confirmed 2026-05-05). Applies to generic constraints (`<E: Swift.Error>`), conformances (`: Swift.Error`), and any other reference. Avoids ambiguity with namespace-scoped Error types and is the institute's convention everywhere. If the bare 'Error' genuinely denotes the stdlib protocol, qualify as 'Swift.Error'. If it resolves to a local NESTED error type (e.g. a sibling-file `Outer.Inner.Error`), qualify with that type's actual path instead — qualifying those as 'Swift.Error' is semantically wrong and breaks typed-throws/error-producing call sites (see #136). Declaration sites (`struct/enum/class/actor/typealias/associatedtype Error: Swift.Error`) are exempt — that's [API-ERR-002]'s Nest.Name pattern. Backtick-quoted test function names and associated-type `Error ==` constraint positions are also exempt (§NOTES 2026-07-07)."
     severity: warning
     match_kinds:
