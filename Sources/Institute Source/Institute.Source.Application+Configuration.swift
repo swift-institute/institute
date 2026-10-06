@@ -8,6 +8,8 @@ public import Source_Measurement
 internal import Source_Profile
 
 extension Institute.Source.Application {
+  static let configurationSubject = "control:source-profile"
+
   static func configuration(
     policy: Institute.Source.Policy,
     preparation: Institute.Source.Preparation
@@ -59,7 +61,7 @@ extension Institute.Source.Application {
         purpose: .generatedPolicy,
         provenance: .generated(
           .init(
-            owner: .init("control:continuous-integration"),
+            owner: .init(Self.configurationSubject),
             input: "Institute.Source.Policy",
             revision: policy.revision,
             digest: declaration.digest.hex
@@ -89,7 +91,7 @@ extension Institute.Source.Application {
       artifacts.append(artifact)
       evidence.append(
         .init(
-          subject: "control:source-profile",
+          subject: Self.configurationSubject,
           artifact: artifact,
           predicate: policy.configuration.predicate,
           actual: measured,
@@ -100,7 +102,7 @@ extension Institute.Source.Application {
     }
     return (
       subject: .init(
-        identity: "control:source-profile",
+        identity: Self.configurationSubject,
         root: preparation.directory,
         artifacts: artifacts
       ),
