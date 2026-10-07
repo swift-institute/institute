@@ -1,7 +1,7 @@
 import Source_Measurement
 import Source_Report
-import Source_Swift_Format
 import Source_SwiftLint
+import Source_Swift_Format
 import Testing
 
 private let repairCoverageRoot = "/subjects/example"
@@ -25,9 +25,9 @@ private func repairCoverageSubject() -> Source.Subject {
 private func repairCoverageReport(
     _ measurement: Source.Measurement,
     rules: [Source.Rule.ID]
-) -> Source_Report.Source.Report {
+) -> Source_Report::Source.Report {
     let subject = measurement.subject
-    let commitment = Source_Report.Source.Report.Commitment(
+    let commitment = Source_Report::Source.Report.Commitment(
         subjects: [subject],
         engines: [
             .init(id: measurement.engine, artifactKinds: [.swift], controlPolicy: .transitionalExternal)
@@ -99,10 +99,10 @@ private let swiftLintRules = [
 ]
 
 private func swiftLintFinding(
-    _ file: Swift.String,
-    line: Swift.Int,
-    rule: Swift.String
-) -> Swift.String {
+    _ file: Swift::String,
+    line: Swift::Int,
+    rule: Swift::String
+) -> Swift::String {
     """
     {"character":1,"file":"\(repairCoverageRoot)/\(file)","line":\(line),"reason":"reason","rule_id":"\(rule)","severity":"Error","type":"Type"}
     """
@@ -125,8 +125,13 @@ private func swiftLintFindings() -> Source.Measurement {
     )
 }
 
-private func isComplete(_ report: Source_Report.Source.Report) -> Swift.Bool {
-    (try? Source_Report.Source.Report.Complete(report, expected: report.commitment)) != nil
+private func isComplete(_ report: Source_Report::Source.Report) -> Swift::Bool {
+    do throws(Source_Report::Source.Report.Complete.Error) {
+        _ = try Source_Report::Source.Report.Complete(report, expected: report.commitment)
+        return true
+    } catch {
+        return false
+    }
 }
 
 @Test
@@ -146,7 +151,7 @@ func `Formatter findings carry one refused repair per file and rule and measure 
     )
     let report = repairCoverageReport(measurement, rules: swiftFormatRules)
     #expect(isComplete(report))
-    #expect(Source_Report.Source.Report.Status(report, expected: report.commitment) == .findings)
+    #expect(Source_Report::Source.Report.Status(report, expected: report.commitment) == .findings)
 }
 
 @Test
@@ -170,18 +175,18 @@ func `SwiftLint findings carry one refused repair per file and rule and measure 
     )
     let report = repairCoverageReport(measurement, rules: swiftLintRules)
     #expect(isComplete(report))
-    #expect(Source_Report.Source.Report.Status(report, expected: report.commitment) == .findings)
+    #expect(Source_Report::Source.Report.Status(report, expected: report.commitment) == .findings)
 }
 
 @Test
 func `A finding without its refused repair keeps the report unmeasured`() {
     let measurement = swiftFormatFindings()
-    let missing = repairCoverageReplacing(measurement, repairs: Swift.Array(measurement.repairs.dropFirst()))
+    let missing = repairCoverageReplacing(measurement, repairs: Swift::Array(measurement.repairs.dropFirst()))
 
     let report = repairCoverageReport(missing, rules: swiftFormatRules)
 
     #expect(!isComplete(report))
-    #expect(Source_Report.Source.Report.Status(report, expected: report.commitment) == .unmeasured)
+    #expect(Source_Report::Source.Report.Status(report, expected: report.commitment) == .unmeasured)
 }
 
 @Test
@@ -195,7 +200,7 @@ func `A duplicated refused repair keeps the report unmeasured`() {
     let report = repairCoverageReport(duplicated, rules: swiftLintRules)
 
     #expect(!isComplete(report))
-    #expect(Source_Report.Source.Report.Status(report, expected: report.commitment) == .unmeasured)
+    #expect(Source_Report::Source.Report.Status(report, expected: report.commitment) == .unmeasured)
 }
 
 @Test
@@ -215,7 +220,7 @@ func `A refused repair for a file outside the measurement keeps the report unmea
     let report = repairCoverageReport(invalid, rules: swiftFormatRules)
 
     #expect(!isComplete(report))
-    #expect(Source_Report.Source.Report.Status(report, expected: report.commitment) == .unmeasured)
+    #expect(Source_Report::Source.Report.Status(report, expected: report.commitment) == .unmeasured)
 }
 
 @Test
@@ -236,7 +241,7 @@ func `A clean formatter run carries no repairs and the report is clean`() {
     #expect(measurement.repairs.isEmpty)
     let report = repairCoverageReport(measurement, rules: swiftFormatRules)
     #expect(isComplete(report))
-    #expect(Source_Report.Source.Report.Status(report, expected: report.commitment) == .clean)
+    #expect(Source_Report::Source.Report.Status(report, expected: report.commitment) == .clean)
 }
 
 @Test
@@ -265,13 +270,13 @@ func `A genuinely unmeasured formatter or SwiftLint run stays unmeasured`() {
         }
         #expect(measurement.repairs.isEmpty)
         let report = repairCoverageReport(measurement, rules: rules)
-        #expect(Source_Report.Source.Report.Status(report, expected: report.commitment) == .unmeasured)
+        #expect(Source_Report::Source.Report.Status(report, expected: report.commitment) == .unmeasured)
     }
 }
 
 @Test
 func `Source report status codes give findings a distinct exit from clean and unmeasured`() {
-    #expect(Source_Report.Source.Report.Status.clean.code == 0)
-    #expect(Source_Report.Source.Report.Status.findings.code == 1)
-    #expect(Source_Report.Source.Report.Status.unmeasured.code == 2)
+    #expect(Source_Report::Source.Report.Status.clean.code == 0)
+    #expect(Source_Report::Source.Report.Status.findings.code == 1)
+    #expect(Source_Report::Source.Report.Status.unmeasured.code == 2)
 }
