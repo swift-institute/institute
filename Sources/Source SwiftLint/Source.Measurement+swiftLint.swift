@@ -203,6 +203,7 @@ private func sourceSwiftLintMeasurement(
     applicableRules: rules,
     files: files,
     observations: observations,
+    repairs: Source.Repair.Evidence.refusals(for: findings),
     verdict: findings.isEmpty ? .clean : .findings(findings)
   )
 }
