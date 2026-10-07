@@ -40,6 +40,7 @@ extension Source.Measurement {
     }
 
     var findings: [Source.Finding] = []
+    var identities: [Swift.String: Source.Finding] = [:]
     let lines = diagnostics.split(separator: "\n", omittingEmptySubsequences: true)
     for line in lines {
       guard
@@ -58,6 +59,20 @@ extension Source.Measurement {
           Swift.String(line)
         )
       }
+      let identity = sourceSwiftFormatIdentity(finding)
+      if let seen = identities[identity] {
+        guard seen == finding else {
+          return sourceSwiftFormatUnmeasured(
+            engine,
+            subject,
+            rules,
+            "conflicting-duplicate-finding",
+            Swift.String(line)
+          )
+        }
+        continue
+      }
+      identities[identity] = finding
       findings.append(finding)
     }
     guard (status == 0) == findings.isEmpty else {
@@ -126,6 +141,19 @@ private func sourceSwiftFormatFinding(
     ),
     repair: .unavailable(.init(code: "repair-evidence-unavailable", detail: file))
   )
+}
+
+private func sourceSwiftFormatIdentity(_ finding: Source.Finding) -> Swift.String {
+  let location = finding.diagnostic.location
+  return [
+    finding.rule.engine.token,
+    finding.rule.token,
+    location.filePath ?? location.fileID,
+    location.line.description,
+    location.column.description,
+    finding.diagnostic.identifier,
+    finding.diagnostic.message,
+  ].joined(separator: "\u{0}")
 }
 
 private func sourceSwiftFormatTrim<S: Swift.StringProtocol>(_ value: S) -> Swift.String {

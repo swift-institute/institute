@@ -280,3 +280,57 @@ func `Source report status codes give findings a distinct exit from clean and un
     #expect(Source_Report::Source.Report.Status.findings.code == 1)
     #expect(Source_Report::Source.Report.Status.unmeasured.code == 2)
 }
+
+@Test
+func `Identical repeated formatter diagnostics collapse to one finding and one refused repair`() {
+    let repeated = "\(repairCoverageRoot)/Sources/A.swift:52:37: error: [DoNotUseSemicolons] remove ';'"
+    let measurement = Source.Measurement.swiftFormat(
+        engine: swiftFormatEngine,
+        subject: repairCoverageSubject(),
+        rules: swiftFormatRules,
+        status: 1,
+        output: "",
+        diagnostics: [
+            repeated,
+            repeated,
+            repeated,
+            "\(repairCoverageRoot)/Sources/B.swift:1:1: error: [OrderedImports] sort import statements",
+        ].joined(separator: "\n")
+    )
+
+    guard case .findings(let findings) = measurement.verdict else {
+        Issue.record("expected formatter findings")
+        return
+    }
+    #expect(findings.count == 2)
+    #expect(measurement.repairs.count == 2)
+    let report = repairCoverageReport(measurement, rules: swiftFormatRules)
+    #expect(isComplete(report))
+    #expect(Source_Report::Source.Report.Status(report, expected: report.commitment) == .findings)
+}
+
+@Test
+func `Distinct formatter diagnostics at one location are kept`() {
+    let measurement = Source.Measurement.swiftFormat(
+        engine: swiftFormatEngine,
+        subject: repairCoverageSubject(),
+        rules: swiftFormatRules,
+        status: 1,
+        output: "",
+        diagnostics: [
+            "\(repairCoverageRoot)/Sources/A.swift:52:37: error: [DoNotUseSemicolons] remove ';'",
+            "\(repairCoverageRoot)/Sources/A.swift:52:37: error: [UseEarlyExits] replace this 'if/else' block",
+            "\(repairCoverageRoot)/Sources/A.swift:52:37: error: [DoNotUseSemicolons] remove ';' and move the next statement",
+        ].joined(separator: "\n")
+    )
+
+    guard case .findings(let findings) = measurement.verdict else {
+        Issue.record("expected formatter findings")
+        return
+    }
+    #expect(findings.count == 3)
+    #expect(measurement.repairs.count == 1)
+    let report = repairCoverageReport(measurement, rules: swiftFormatRules)
+    #expect(isComplete(report))
+    #expect(Source_Report::Source.Report.Status(report, expected: report.commitment) == .findings)
+}
