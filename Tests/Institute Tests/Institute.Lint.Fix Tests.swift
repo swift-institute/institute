@@ -65,9 +65,10 @@ extension Institute.Lint.Fix.Test {
         ]
 
         #expect(Institute.Lint.Fix.targetsVariable == "SWIFT_LINTER_FIX_TARGETS")
+        let spelled = roots.map { $0.description.replacing("\\", with: "\\\\") }
         #expect(
             Institute.Lint.Fix.targets(roots)
-                == "[\"/fixture/package/Sources/Library\",\"/fixture/package/Tests/Library Tests\"]"
+                == "[\"\(spelled[0])\",\"\(spelled[1])\"]"
         )
     }
 }

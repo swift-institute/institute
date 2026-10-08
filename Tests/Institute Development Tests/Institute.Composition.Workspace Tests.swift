@@ -13,14 +13,20 @@ extension Institute.Composition.Workspace {
 }
 
 extension Institute.Composition.Workspace.Test.Unit {
+    #if os(Windows)
+        private static let root = "C:/tmp"
+    #else
+        private static let root = "/tmp"
+    #endif
+
     private static func directory(_ path: Swift.String) throws -> File.Directory {
-        File.Directory(try File.Path(path))
+        File.Directory(try File.Path(root + path))
     }
 
     @Test
     func `two keyed workspaces produce two distinct generated roots`() throws {
-        let base = try Self.directory("/tmp/composition-base")
-        let anchor = try Self.directory("/tmp/checkout")
+        let base = try Self.directory("/composition-base")
+        let anchor = try Self.directory("/checkout")
         let one = Institute.Composition.Workspace.keyed("one", under: base, anchor: anchor)
         let two = Institute.Composition.Workspace.keyed("two", under: base, anchor: anchor)
         #expect(one.generatedRoot != two.generatedRoot)
@@ -29,25 +35,26 @@ extension Institute.Composition.Workspace.Test.Unit {
 
     @Test
     func `a keyed workspace's generated root does not sit below the anchor`() throws {
-        let base = try Self.directory("/tmp/composition-base")
-        let anchor = try Self.directory("/tmp/checkout")
+        let base = try Self.directory("/composition-base")
+        let anchor = try Self.directory("/checkout")
         let workspace = Institute.Composition.Workspace.keyed("k", under: base, anchor: anchor)
         #expect(!workspace.generatedRoot.path.description.hasPrefix(anchor.path.description))
     }
 
     @Test
     func `the checkout workspace preserves the legacy generated-root location`() throws {
-        let checkout = try Self.directory("/tmp/checkout")
+        let checkout = try Self.directory("/checkout")
         let workspace = Institute.Composition.Workspace.checkout(checkout)
         #expect(
             workspace.generatedRoot.path.description
-                == checkout.path.description + "/institute-composed-root"
+                == (try File.Path(checkout.path.description + "/institute-composed-root"))
+                .description
         )
     }
 
     @Test
     func `rebasing under the checkout workspace is the identity, byte for byte`() throws {
-        let checkout = try Self.directory("/tmp/checkout")
+        let checkout = try Self.directory("/checkout")
         let manifests = [
             Institute.Composed.Manifest(
                 reference: "../swift-primitives/swift-bit-primitives",
@@ -66,8 +73,8 @@ extension Institute.Composition.Workspace.Test.Unit {
 
     @Test
     func `rebasing for a moved workspace resolves the reference against the anchor`() throws {
-        let base = try Self.directory("/tmp/composition-base")
-        let anchor = try Self.directory("/tmp/checkout")
+        let base = try Self.directory("/composition-base")
+        let anchor = try Self.directory("/checkout")
         let workspace = Institute.Composition.Workspace.keyed("k", under: base, anchor: anchor)
         let manifests = [
             Institute.Composed.Manifest(
@@ -81,7 +88,8 @@ extension Institute.Composition.Workspace.Test.Unit {
         let rebased = Institute.Composed.Root.rebased(manifests, in: workspace)
         #expect(rebased.count == 1)
         let reference = try #require(rebased.first).reference
-        #expect(reference == "/tmp/checkout/swift-primitives/swift-bit-primitives")
+        let expected = try File.Path(Self.root + "/checkout/swift-primitives/swift-bit-primitives")
+        #expect(reference == expected.description)
         let resolved = try File.Path(reference)
         #expect(resolved.isAbsolute)
     }
@@ -188,7 +196,8 @@ extension Institute.Composition.Workspace.Test.Integration {
             return storage
         }
         let text = Swift.String(decoding: bytes, as: Swift.UTF8.self)
-        #expect(text.contains("/swift-primitives/swift-bit-primitives"))
+        let reference = try File.Path("/swift-primitives/swift-bit-primitives").description
+        #expect(text.contains(Institute.Composed.Root.literal(reference)))
         #expect(!text.contains("\"../swift-primitives"))
     }
 }

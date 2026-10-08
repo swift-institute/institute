@@ -129,11 +129,13 @@ struct CIValidationGitignoreTests {
                 try FixtureFiles.write("canon", to: canon)
             }
 
-            #expect(Gitignore.resolvedCanonPath(startingAt: nested) == canon)
+            #expect(
+                Gitignore.resolvedCanonPath(startingAt: nested) == (try FixtureFiles.native(canon))
+            )
             for `class` in Class.allCases {
                 #expect(
                     Gitignore.siblingCanonPath(of: canon, for: `class`)
-                        == FixtureFiles.join(root, `class`.canonPath)
+                        == (try FixtureFiles.native(FixtureFiles.join(root, `class`.canonPath)))
                 )
             }
         }
