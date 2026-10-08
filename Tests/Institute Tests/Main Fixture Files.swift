@@ -143,8 +143,8 @@ enum MainFixtureFiles {
         try text.write(to: URL(fileURLWithPath: path), atomically: true, encoding: .utf8)
     }
 
-    /// `/usr/bin/git` in `directory`, output discarded; a nonzero exit is
-    /// `CocoaError(.executableNotLoadable)`.
+    /// The resolved git in `directory`, standard output discarded; a nonzero
+    /// exit throws ``GitFailure`` carrying the arguments, status and stderr.
     static func gitRequiringSuccess(_ arguments: [Swift.String], in directory: Swift.String) throws {
         try gitRequiringSuccess(
             arguments,
@@ -176,20 +176,38 @@ enum MainFixtureFiles {
         )
     }
 
-    private static func gitRequiringSuccess(
+    struct GitFailure: Swift.Error, Swift.CustomStringConvertible {
+        let arguments: [Swift.String]
+        let directory: Swift.String
+        let status: Swift.Int32
+        let standardError: Swift.String
+
+        var description: Swift.String {
+            "git \(arguments.joined(separator: " ")) in \(directory) exited \(status): \(standardError)"
+        }
+    }
+
+    static func gitRequiringSuccess(
         _ arguments: [Swift.String],
         currentDirectory: URL
     ) throws {
         let process = Foundation.Process()
+        let standardError = Pipe()
         process.executableURL = URL(fileURLWithPath: Git.Client.installed)
         process.arguments = arguments
         process.currentDirectoryURL = currentDirectory
         process.standardOutput = FileHandle.nullDevice
-        process.standardError = FileHandle.nullDevice
+        process.standardError = standardError
         try process.run()
+        let diagnostics = standardError.fileHandleForReading.readDataToEndOfFile()
         process.waitUntilExit()
         guard process.terminationStatus == 0 else {
-            throw CocoaError(.executableNotLoadable)
+            throw GitFailure(
+                arguments: arguments,
+                directory: currentDirectory.path,
+                status: process.terminationStatus,
+                standardError: Swift.String(decoding: diagnostics, as: Swift.UTF8.self)
+            )
         }
     }
 
