@@ -137,12 +137,12 @@ extension Institute.Coherence.Test {
     static func noop(
         _ root: Institute.Root,
         _ selection: Institute.Selection.Resolved
-    ) throws(Institute.Error) {}
+    ) async throws(Institute.Error) {}
 
     static func succeed(
         _ root: Institute.Root,
         _ selection: Institute.Selection.Resolved
-    ) throws(Institute.Error) -> Swift.Int {
+    ) async throws(Institute.Error) -> Swift.Int {
         selection.repositories.count
     }
 
@@ -150,10 +150,10 @@ extension Institute.Coherence.Test {
         exitCode: Swift.Int32,
         output: Swift.String = ""
     )
-        -> @Sendable (Institute.Root, Institute.Selection.Resolved) throws(Institute.Error) ->
+        -> @Sendable (Institute.Root, Institute.Selection.Resolved) async throws(Institute.Error) ->
         Institute_Model.Institute.Build.Coordinator.Result
     {
-        { _, _ throws(Institute.Error) in
+        { _, _ async throws(Institute.Error) in
             .init(
                 exitCode: exitCode,
                 standardOutput: Swift.Array(output.utf8),
