@@ -63,7 +63,7 @@ extension Institute.Peer.Layout.Test.Unit {
             at: root
         )
 
-        #expect(directory.description == "/scratch/rule-law/rule-law")
+        #expect(directory.description == (try File.Path("/scratch/rule-law/rule-law")).description)
     }
 }
 

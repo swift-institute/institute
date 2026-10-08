@@ -104,7 +104,7 @@ extension Institute.Lint.Target.Test.`Edge Case` {
             at: package
         )
 
-        #expect(roots.map(\.description) == ["/fixture/package"])
+        #expect(roots.map(\.description) == [(try File.Path("/fixture/package")).description])
     }
 
     @Test
