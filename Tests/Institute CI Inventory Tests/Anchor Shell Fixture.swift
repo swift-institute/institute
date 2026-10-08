@@ -29,7 +29,7 @@ struct AnchorShellFixture {
         )
         try "marker\n".write(
             toFile: directory + "/Tools/institute-ci/marker",
-            atomically: true,
+            atomically: false,
             encoding: .utf8
         )
         for arguments in [

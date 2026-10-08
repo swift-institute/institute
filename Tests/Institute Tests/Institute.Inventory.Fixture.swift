@@ -32,7 +32,7 @@ extension Institute.Inventory.Test {
             file = location.appending(path: "Institute.json")
             git = .init()
 
-            try Data(configuration.rendered().utf8).write(to: file, options: .atomic)
+            try Data(configuration.rendered().utf8).write(to: file)
             try git.initialize(at: location.path, bare: false)
             try Self.execute(
                 ["config", "user.email", "workspace@swift.institute"],

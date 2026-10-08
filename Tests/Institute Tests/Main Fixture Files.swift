@@ -116,15 +116,15 @@ enum MainFixtureFiles {
     }
 
     static func write(_ text: Swift.String, toFile path: Swift.String) throws {
-        try text.write(toFile: path, atomically: true, encoding: .utf8)
+        try text.write(toFile: path, atomically: false, encoding: .utf8)
+    }
+
+    static func fileNumber(_ path: Swift.String) throws -> Swift.Int? {
+        try FileManager.default.attributesOfItem(atPath: path)[.systemFileNumber] as? Swift.Int
     }
 
     static func write(bytes: [Swift.UInt8], to path: Swift.String) throws {
         try Data(bytes).write(to: URL(fileURLWithPath: path))
-    }
-
-    static func writeAtomically(bytes: [Swift.UInt8], to path: Swift.String) throws {
-        try Data(bytes).write(to: URL(fileURLWithPath: path), options: .atomic)
     }
 
     static func setPermissions(_ path: Swift.String, posix: Swift.Int) throws {
@@ -162,7 +162,7 @@ enum MainFixtureFiles {
     }
 
     static func write(_ text: Swift.String, toURLPath path: Swift.String) throws {
-        try text.write(to: URL(fileURLWithPath: path), atomically: true, encoding: .utf8)
+        try text.write(to: URL(fileURLWithPath: path), atomically: false, encoding: .utf8)
     }
 
     /// The resolved git in `directory`, its standard output and error read
