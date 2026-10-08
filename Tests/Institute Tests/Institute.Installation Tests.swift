@@ -104,10 +104,14 @@ extension Institute.Installation.Test.Unit {
             try fixture.contents(of: installation.executable)
                 == "coordinator-version-one"
         )
-        #expect(
-            try File.System.Metadata.Permissions(at: installation.executable.path)
-                == .executable
-        )
+        #if os(Windows)
+            #expect(installation.executable.stat.isFile)
+        #else
+            #expect(
+                try File.System.Metadata.Permissions(at: installation.executable.path)
+                    == .executable
+            )
+        #endif
         #expect(
             try File.System.Canonical.resolve(installation.command.path)
                 == installation.executable.path
