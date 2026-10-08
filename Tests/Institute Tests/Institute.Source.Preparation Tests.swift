@@ -271,9 +271,13 @@ func `Local source linter snapshot is content addressed and omits its input path
 
     #expect(snapshot.file.path.components.last?.string == "swift-linter-local-\(snapshot.digest.hex)")
     #expect(try MainFixtureFiles.readBytes(snapshot.file.description) == Array("local-linter".utf8))
-    #expect(
-        try MainFixtureFiles.posixPermissions(snapshot.file.description) == 0o755
-    )
+    #if os(Windows)
+        #expect(snapshot.file.stat.isFile)
+    #else
+        #expect(
+            try MainFixtureFiles.posixPermissions(snapshot.file.description) == 0o755
+        )
+    #endif
     #expect(receipt.contains("\"kind\":\"local\""))
     #expect(!receipt.contains(input))
     let decoded = try Institute.Source.Preparation(jsonString: receipt)
@@ -314,13 +318,22 @@ func `Local source linter snapshot refuses missing non-file and non-executable i
             into: destination
         )
     }
-    #expect(throws: Institute.Error.self) {
-        _ = try acquisition.snapshot(
+    #if os(Windows)
+        let accepted = try acquisition.snapshot(
             executable: nonExecutable,
             name: "swift-linter",
             into: destination
         )
-    }
+        #expect(accepted.file.stat.isFile)
+    #else
+        #expect(throws: Institute.Error.self) {
+            _ = try acquisition.snapshot(
+                executable: nonExecutable,
+                name: "swift-linter",
+                into: destination
+            )
+        }
+    #endif
 }
 
 @Test

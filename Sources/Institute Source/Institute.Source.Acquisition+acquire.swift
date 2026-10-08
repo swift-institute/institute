@@ -20,17 +20,21 @@ extension Institute.Source.Acquisition {
     guard source.stat.isFile, !source.stat.isSymlink else {
       throw .configuration("local source tool is not a regular file")
     }
-    let sourcePermissions: File.System.Metadata.Permissions
-    do throws(Kernel.File.Stats.Error) { sourcePermissions = try source.stat.permissions } catch {
-      throw .filesystem("cannot inspect local source tool permissions: \(error)")
-    }
-    guard
-      sourcePermissions.contains(.ownerExecute)
-        || sourcePermissions.contains(.groupExecute)
-        || sourcePermissions.contains(.otherExecute)
-    else {
-      throw .configuration("local source tool is not executable")
-    }
+    #if !os(Windows)
+      // The POSIX mode-bit precheck has no Windows counterpart. There only the structural
+      // checks apply; whether the file launches is decided where it is run.
+      let sourcePermissions: File.System.Metadata.Permissions
+      do throws(Kernel.File.Stats.Error) { sourcePermissions = try source.stat.permissions } catch {
+        throw .filesystem("cannot inspect local source tool permissions: \(error)")
+      }
+      guard
+        sourcePermissions.contains(.ownerExecute)
+          || sourcePermissions.contains(.groupExecute)
+          || sourcePermissions.contains(.otherExecute)
+      else {
+        throw .configuration("local source tool is not executable")
+      }
+    #endif
 
     let digest = try Institute.Source.Application.digest(file: source.description)
     let destination = directory[
