@@ -620,6 +620,7 @@ let package = Package(
       dependencies: [
         "Institute CI Inventory",
         "Institute CI Validation",
+        .product(name: "File System", package: "swift-file-system"),
         .product(name: "Process", package: "swift-process"),
       ],
       exclude: ["Fixtures"]
