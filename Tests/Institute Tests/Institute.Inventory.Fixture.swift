@@ -55,7 +55,7 @@ extension Institute.Inventory.Test.Fixture {
 
     private static func execute(_ arguments: [Swift.String], at directory: URL) throws {
         let process = Foundation.Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/git")
+        process.executableURL = URL(fileURLWithPath: Git.Client.installed)
         process.arguments = arguments
         process.currentDirectoryURL = directory
         process.standardOutput = FileHandle.nullDevice

@@ -1,4 +1,5 @@
 import Foundation
+import Git_Foundation
 
 /// Foundation-only file and path operations for the Testing files of this
 /// target: String paths, byte arrays and String indices in and out, the
@@ -180,7 +181,7 @@ enum MainFixtureFiles {
         currentDirectory: URL
     ) throws {
         let process = Foundation.Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/git")
+        process.executableURL = URL(fileURLWithPath: Git.Client.installed)
         process.arguments = arguments
         process.currentDirectoryURL = currentDirectory
         process.standardOutput = FileHandle.nullDevice

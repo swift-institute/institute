@@ -290,6 +290,28 @@ extension Institute.Coherence.Test.Unit {
     }
 
     @Test
+    func `A diagnostic whose path holds a drive-style colon is attributed to its package`() throws {
+        let temporary = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+        #if os(Windows)
+            let checkout = temporary + "/Institute"
+        #else
+            let checkout = temporary + "/C:/Institute"
+        #endif
+        try MainFixtureFiles.createDirectory(checkout)
+        let root = try Institute.Root(checkout: File.Directory(validating: checkout))
+        let repositories = Institute.Coherence.Test.repositories()
+        let culprit = repositories[1]
+        let location = try root.materialization(for: culprit)
+        let diagnostic = "\(location.description)/Sources/Foo.swift:12:5: error: cannot find 'x'"
+
+        #expect(
+            Institute.Coherence.attribute(diagnostic, repositories: repositories, root: root)
+                == culprit
+        )
+        try MainFixtureFiles.remove(temporary)
+    }
+
+    @Test
     func `A seeded compile failure names its package, the build stage, and the diagnostic`()
         async throws
     {
