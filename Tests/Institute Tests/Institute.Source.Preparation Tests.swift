@@ -127,7 +127,11 @@ func `Institute profile verification passes exactly on the engine's silent zero`
 
     #expect(
         recorded.withLock { $0 } == [
-            ["--profile-check", "/artifacts/.source/institute-source-linter-profile.json"]
+            [
+                "--profile",
+                "/artifacts/.source/institute-source-linter-profile.json",
+                "/artifacts/.source",
+            ]
         ]
     )
 }
