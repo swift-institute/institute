@@ -104,7 +104,13 @@ extension Institute.Coherence {
         repositories: [Institute.Repository],
         root: Institute.Root
     ) -> Institute.Repository? {
-        guard let colon = diagnostic.firstIndex(of: ":") else { return nil }
+        guard
+            let colon = diagnostic.indices.first(where: { index in
+                let next = diagnostic.index(after: index)
+                return diagnostic[index] == ":" && next < diagnostic.endIndex
+                    && diagnostic[next].isNumber
+            })
+        else { return nil }
         let path = Swift.String(diagnostic[diagnostic.startIndex..<colon])
         for repository in repositories {
             let directory: File.Directory
