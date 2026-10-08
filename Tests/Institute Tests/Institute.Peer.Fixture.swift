@@ -60,7 +60,7 @@ extension Institute.Peer.Fixture {
             at: destination.deletingLastPathComponent(),
             withIntermediateDirectories: true
         )
-        try contents.write(to: destination, atomically: true, encoding: .utf8)
+        try contents.write(to: destination, atomically: false, encoding: .utf8)
     }
 
     /// Materializes `repository` at its peer-layout location as a real

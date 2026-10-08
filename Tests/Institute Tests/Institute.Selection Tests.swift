@@ -198,7 +198,7 @@ extension Institute.Selection.Test.Integration {
             _ = try Institute.Selection.load(at: root)
         }
 
-        try MainFixtureFiles.writeAtomically(bytes: Array("{".utf8), to: MainFixtureFiles.join(location, "Selection.json"))
+        try MainFixtureFiles.write(bytes: Array("{".utf8), to: MainFixtureFiles.join(location, "Selection.json"))
         #expect(throws: Institute.Error.self) {
             _ = try Institute.Selection.load(at: root)
         }
@@ -241,10 +241,10 @@ extension Institute.Selection.Test {
         let location = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
         try MainFixtureFiles.createDirectory(location)
         if let selection {
-            try MainFixtureFiles.writeAtomically(bytes: Array(selection.utf8), to: MainFixtureFiles.join(location, "Selection.json"))
+            try MainFixtureFiles.write(bytes: Array(selection.utf8), to: MainFixtureFiles.join(location, "Selection.json"))
         }
         if let override {
-            try MainFixtureFiles.writeAtomically(bytes: Array(override.utf8), to: MainFixtureFiles.join(location, "Selection.local.json"))
+            try MainFixtureFiles.write(bytes: Array(override.utf8), to: MainFixtureFiles.join(location, "Selection.local.json"))
         }
         return (
             try File.Directory(validating: location),

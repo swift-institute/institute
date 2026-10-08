@@ -142,7 +142,7 @@ extension Institute.Doctor.Fixture {
     func write(_ contents: Swift.String, to relative: Swift.String) throws {
         try contents.write(
             to: base.appending(path: relative),
-            atomically: true,
+            atomically: false,
             encoding: .utf8
         )
     }
