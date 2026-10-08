@@ -334,3 +334,80 @@ func `Distinct formatter diagnostics at one location are kept`() {
     #expect(isComplete(report))
     #expect(Source_Report::Source.Report.Status(report, expected: report.commitment) == .findings)
 }
+
+private func swiftFormatMeasurement(_ diagnostics: [Swift::String]) -> Source.Measurement {
+    Source.Measurement.swiftFormat(
+        engine: swiftFormatEngine,
+        subject: repairCoverageSubject(),
+        rules: swiftFormatRules,
+        status: 1,
+        output: "",
+        diagnostics: diagnostics.joined(separator: "\n")
+    )
+}
+
+private func unmeasuredReasons(_ measurement: Source.Measurement) -> [Source.Reason]? {
+    if case .unmeasured(let reasons) = measurement.verdict { reasons } else { nil }
+}
+
+@Test
+func `A multi-line formatter diagnostic is one finding with its full quoted text`() {
+    let measurement = swiftFormatMeasurement([
+        "\(repairCoverageRoot)/Sources/A.swift:316:29: error: [NeverForceUnwrap] do not force unwrap 'Example(",
+        "                    rawValue: value",
+        "                )'",
+        "\(repairCoverageRoot)/Sources/B.swift:1:1: error: [OrderedImports] sort import statements",
+    ])
+
+    guard case .findings(let findings) = measurement.verdict else {
+        Issue.record("expected formatter findings, got \(measurement.verdict)")
+        return
+    }
+    #expect(findings.count == 2)
+    #expect(findings[0].diagnostic.identifier == "NeverForceUnwrap")
+    #expect(findings[0].diagnostic.location.line == 316)
+    #expect(
+        findings[0].diagnostic.message
+            == "do not force unwrap 'Example(\n                    rawValue: value\n                )'"
+    )
+    let report = repairCoverageReport(measurement, rules: swiftFormatRules)
+    #expect(isComplete(report))
+    #expect(Source_Report::Source.Report.Status(report, expected: report.commitment) == .findings)
+}
+
+@Test
+func `A stray formatter line outside any quote stays unmeasured`() {
+    let after = swiftFormatMeasurement([
+        "\(repairCoverageRoot)/Sources/A.swift:3:1: error: [Indentation] indent by 4 spaces",
+        "not a diagnostic",
+    ])
+    let first = swiftFormatMeasurement(["not a diagnostic"])
+
+    #expect(unmeasuredReasons(after) == [.init(code: "malformed-output", detail: "not a diagnostic")])
+    #expect(unmeasuredReasons(first) == [.init(code: "malformed-output", detail: "not a diagnostic")])
+}
+
+@Test
+func `A quoted formatter diagnostic that never closes stays unmeasured`() {
+    let measurement = swiftFormatMeasurement([
+        "\(repairCoverageRoot)/Sources/A.swift:316:29: error: [NeverForceUnwrap] do not force unwrap 'Example(",
+        "                    rawValue: value",
+    ])
+
+    #expect(unmeasuredReasons(measurement)?.map(\.code) == ["malformed-output"])
+}
+
+@Test
+func `An apostrophe in a one-line formatter message does not absorb the next diagnostic`() {
+    let measurement = swiftFormatMeasurement([
+        "\(repairCoverageRoot)/Sources/A.swift:1:1: error: [ValidateDocumentationComments] don't document this",
+        "\(repairCoverageRoot)/Sources/B.swift:1:1: error: [OrderedImports] sort import statements",
+    ])
+
+    guard case .findings(let findings) = measurement.verdict else {
+        Issue.record("expected formatter findings, got \(measurement.verdict)")
+        return
+    }
+    #expect(findings.map(\.diagnostic.identifier) == ["ValidateDocumentationComments", "OrderedImports"])
+    #expect(findings[0].diagnostic.message == "don't document this")
+}

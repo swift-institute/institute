@@ -39,10 +39,23 @@ extension Source.Measurement {
       )
     }
 
+    var records: [Swift.String] = []
+    for line in diagnostics.split(separator: "\n", omittingEmptySubsequences: true) {
+      if let last = records.last, sourceSwiftFormatQuoteIsOpen(last),
+        !sourceSwiftFormatIsHeader(line)
+      {
+        records[records.count - 1] = last + "\n" + line
+      } else {
+        records.append(Swift.String(line))
+      }
+    }
+    if let last = records.last, last.contains("\n"), sourceSwiftFormatQuoteIsOpen(last) {
+      return sourceSwiftFormatUnmeasured(engine, subject, rules, "malformed-output", last)
+    }
+
     var findings: [Source.Finding] = []
     var identities: [Swift.String: Source.Finding] = [:]
-    let lines = diagnostics.split(separator: "\n", omittingEmptySubsequences: true)
-    for line in lines {
+    for line in records {
       guard
         let finding = sourceSwiftFormatFinding(
           Swift.String(line),
@@ -141,6 +154,18 @@ private func sourceSwiftFormatFinding(
     ),
     repair: .unavailable(.init(code: "repair-evidence-unavailable", detail: file))
   )
+}
+
+private func sourceSwiftFormatQuoteIsOpen(_ record: Swift.String) -> Swift.Bool {
+  let fields = record.split(separator: ":", maxSplits: 4, omittingEmptySubsequences: false)
+  guard fields.count == 5 else { return false }
+  return fields[4].count(where: { $0 == "'" }) % 2 == 1
+}
+
+private func sourceSwiftFormatIsHeader<S: Swift.StringProtocol>(_ line: S) -> Swift.Bool {
+  let fields = line.split(separator: ":", maxSplits: 4, omittingEmptySubsequences: false)
+  return fields.count == 5 && Swift.Int(fields[1]) != nil && Swift.Int(fields[2]) != nil
+    && sourceSwiftFormatTrim(fields[4]).first == "["
 }
 
 private func sourceSwiftFormatIdentity(_ finding: Source.Finding) -> Swift.String {
