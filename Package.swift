@@ -630,6 +630,7 @@ let package = Package(
         "Institute Development",
         "Institute Model",
         .product(name: "File System", package: "swift-file-system"),
+        .product(name: "Git", package: "swift-git"),
         .product(name: "JSON", package: "swift-json"),
         .product(name: "Package Manager", package: "swift-package-manager"),
         .product(name: "SPM Standard", package: "swift-spm-standard"),

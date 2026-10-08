@@ -1,4 +1,5 @@
 import Foundation
+import Git_Foundation
 
 enum DevelopmentFixtureFiles {
     static func temporaryPath(resolvingSymlinks: Swift.Bool, _ name: Swift.String) -> Swift.String {
@@ -106,12 +107,15 @@ enum DevelopmentFixtureFiles {
 
     static func git(_ arguments: [Swift.String], in directory: Swift.String) throws {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-        process.arguments = ["git"] + arguments
+        process.executableURL = URL(fileURLWithPath: Git.Client.installed)
+        process.arguments = arguments
         process.currentDirectoryURL = URL(fileURLWithPath: directory)
         process.standardOutput = FileHandle.nullDevice
         process.standardError = FileHandle.nullDevice
         try process.run()
         process.waitUntilExit()
+        guard process.terminationStatus == 0 else {
+            throw CocoaError(.executableNotLoadable)
+        }
     }
 }
