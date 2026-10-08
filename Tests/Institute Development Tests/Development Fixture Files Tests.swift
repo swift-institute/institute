@@ -23,9 +23,12 @@ func `A failing development fixture git command is reported, not ignored`() thro
     try DevelopmentFixtureFiles.createDirectory(directory)
     try DevelopmentFixtureFiles.git(["init", "--quiet"], in: directory)
 
-    #expect(throws: (any Error).self) {
+    let failure = #expect(throws: DevelopmentFixtureFiles.GitFailure.self) {
         try DevelopmentFixtureFiles.git(["rev-parse", "--verify", "refs/heads/absent"], in: directory)
     }
+
+    #expect(failure?.status != 0)
+    #expect(failure?.standardError.isEmpty == false)
 
     try DevelopmentFixtureFiles.remove(directory)
 }

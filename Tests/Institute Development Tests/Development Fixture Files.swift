@@ -105,17 +105,35 @@ enum DevelopmentFixtureFiles {
         try text.write(toFile: path, atomically: true, encoding: .utf8)
     }
 
+    struct GitFailure: Swift.Error, Swift.CustomStringConvertible {
+        let arguments: [Swift.String]
+        let directory: Swift.String
+        let status: Swift.Int32
+        let standardError: Swift.String
+
+        var description: Swift.String {
+            "git \(arguments.joined(separator: " ")) in \(directory) exited \(status): \(standardError)"
+        }
+    }
+
     static func git(_ arguments: [Swift.String], in directory: Swift.String) throws {
         let process = Process()
+        let standardError = Pipe()
         process.executableURL = URL(fileURLWithPath: Git.Client.installed)
         process.arguments = arguments
         process.currentDirectoryURL = URL(fileURLWithPath: directory)
         process.standardOutput = FileHandle.nullDevice
-        process.standardError = FileHandle.nullDevice
+        process.standardError = standardError
         try process.run()
+        let diagnostics = standardError.fileHandleForReading.readDataToEndOfFile()
         process.waitUntilExit()
         guard process.terminationStatus == 0 else {
-            throw CocoaError(.executableNotLoadable)
+            throw GitFailure(
+                arguments: arguments,
+                directory: directory,
+                status: process.terminationStatus,
+                standardError: Swift.String(decoding: diagnostics, as: Swift.UTF8.self)
+            )
         }
     }
 }
