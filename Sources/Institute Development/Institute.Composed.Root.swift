@@ -105,6 +105,12 @@ extension Institute.Composed.Root {
         )
     }
 
+    /// The contents of a Swift string literal spelling `text`, with each
+    /// backslash and quote escaped so a native Windows path stays verbatim.
+    static func literal(_ text: Swift.String) -> Swift.String {
+        text.replacing("\\", with: "\\\\").replacing("\"", with: "\\\"")
+    }
+
     static func renderCore(
         _ packages: [Institute.Composition.BuildPlan.Package],
         swift: Swift.String
@@ -119,7 +125,7 @@ extension Institute.Composed.Root {
         lines.append("    name: \"\(targetName)\",")
         lines.append("    dependencies: [")
         for package in ordered {
-            lines.append("        .package(path: \"\(package.reference)\"),")
+            lines.append("        .package(path: \"\(literal(package.reference))\"),")
         }
         lines.append("    ],")
         lines.append("    targets: [")

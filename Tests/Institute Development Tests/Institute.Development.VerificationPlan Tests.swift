@@ -354,8 +354,10 @@ extension Institute.Development.VerificationPlan.Test.`Edge Case` {
 
         // Hand-compose the manifest without a ledger record: the planned
         // clause is present but nothing records how to reverse it.
-        let planned =
-            ".package(path: \"\(fixture.base)/swift-standards/example/swift-dep-a\")"
+        let assignment = try #require(
+            fixture.plan.assignments.first { $0.reference == "swift-dep-a" }
+        )
+        let planned = ".package(path: \"\(assignment.path)\")"
         let clean = Institute.Development.VerificationPlan.Test.Fixture.consumerSource
         let dirty = DevelopmentFixtureFiles.replacingAll(
             ".package(url: \"https://github.com/example/swift-dep-a.git\", branch: \"main\"),",
