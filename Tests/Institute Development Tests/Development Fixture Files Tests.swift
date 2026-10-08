@@ -28,7 +28,7 @@ func `A failing development fixture git command is reported, not ignored`() thro
     }
 
     #expect(failure?.status != 0)
-    #expect(failure?.standardError.isEmpty == false)
+    #expect(failure?.output.isEmpty == false)
 
     try DevelopmentFixtureFiles.remove(directory)
 }
