@@ -50,6 +50,28 @@ enum MainFixtureFiles {
         try FileManager.default.removeItem(atPath: path)
     }
 
+    /// The build products directory holding this test bundle and the
+    /// executables the test targets depend on.
+    static var productsDirectory: Swift.String {
+        let bundle = Bundle(for: ProductsAnchor.self).bundleURL
+        #if os(macOS)
+            return bundle.deletingLastPathComponent().path
+        #else
+            return bundle.path
+        #endif
+    }
+
+    private final class ProductsAnchor {}
+
+    /// The compiled fixture linter built from `Institute Lint Fixture Linter`.
+    static var fixtureLinter: Swift.String {
+        #if os(Windows)
+            join(productsDirectory, "Institute Lint Fixture Linter.exe")
+        #else
+            join(productsDirectory, "Institute Lint Fixture Linter")
+        #endif
+    }
+
     static func exists(_ path: Swift.String) -> Swift.Bool {
         FileManager.default.fileExists(atPath: path)
     }
@@ -143,8 +165,9 @@ enum MainFixtureFiles {
         try text.write(to: URL(fileURLWithPath: path), atomically: false, encoding: .utf8)
     }
 
-    /// The resolved git in `directory`, standard output discarded; a nonzero
-    /// exit throws ``GitFailure`` carrying the arguments, status and stderr.
+    /// The resolved git in `directory`, its standard output and error read
+    /// through one pipe; a nonzero exit throws ``GitFailure`` carrying the
+    /// arguments, status and that output.
     static func gitRequiringSuccess(_ arguments: [Swift.String], in directory: Swift.String) throws {
         try gitRequiringSuccess(
             arguments,
@@ -180,10 +203,10 @@ enum MainFixtureFiles {
         let arguments: [Swift.String]
         let directory: Swift.String
         let status: Swift.Int32
-        let standardError: Swift.String
+        let output: Swift.String
 
         var description: Swift.String {
-            "git \(arguments.joined(separator: " ")) in \(directory) exited \(status): \(standardError)"
+            "git \(arguments.joined(separator: " ")) in \(directory) exited \(status): \(output)"
         }
     }
 
@@ -192,21 +215,21 @@ enum MainFixtureFiles {
         currentDirectory: URL
     ) throws {
         let process = Foundation.Process()
-        let standardError = Pipe()
+        let output = Pipe()
         process.executableURL = URL(fileURLWithPath: Git.Client.installed)
         process.arguments = arguments
         process.currentDirectoryURL = currentDirectory
-        process.standardOutput = FileHandle.nullDevice
-        process.standardError = standardError
+        process.standardOutput = output
+        process.standardError = output
         try process.run()
-        let diagnostics = standardError.fileHandleForReading.readDataToEndOfFile()
+        let diagnostics = output.fileHandleForReading.readDataToEndOfFile()
         process.waitUntilExit()
         guard process.terminationStatus == 0 else {
             throw GitFailure(
                 arguments: arguments,
                 directory: currentDirectory.path,
                 status: process.terminationStatus,
-                standardError: Swift.String(decoding: diagnostics, as: Swift.UTF8.self)
+                output: Swift.String(decoding: diagnostics, as: Swift.UTF8.self)
             )
         }
     }

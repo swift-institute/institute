@@ -529,9 +529,14 @@ let package = Package(
         .product(name: "SPM Standard", package: "swift-spm-standard"),
       ]
     ),
+    .executableTarget(
+      name: "Institute Lint Fixture Linter",
+      path: "Tests/Institute Lint Fixture Linter"
+    ),
     .testTarget(
       name: "Institute Tests",
       dependencies: [
+        "Institute Lint Fixture Linter",
         "Institute Build Coordinator",
         "Institute Model",
         "Institute Inventory",
