@@ -237,6 +237,27 @@ struct `Institute Lint Measurement Tests` {
         #expect(try fixture.format() == "sarif")
     }
 
+    @Test
+    func `a linter that cannot be launched is unmeasured, never clean`() throws {
+        let fixture = try FixProcessFixture()
+        defer { fixture.remove() }
+        try fixture.replaceExecutable(with: Swift.Array("not a program\n".utf8))
+
+        let measurement = Institute.Lint(hierarchy: fixture.package).measure(
+            try .resolve(fixture.package.description),
+            using: try fixture.installation(),
+            default: nil,
+            format: .sarif
+        )
+
+        #expect(measurement.verdict != .clean)
+        if case .unmeasured = measurement.verdict {
+        } else {
+            Issue.record("expected an unmeasured verdict, got \(measurement.verdict)")
+        }
+        #expect(try fixture.arguments() == [])
+    }
+
     /// A file's findings are narrowed out of the package's; the
     /// package's verdict is not recomputed. A file with no findings
     /// inside a failing package has not been shown to be clean, and
@@ -385,7 +406,11 @@ private struct FixProcessFixture {
         try MainFixtureFiles.createDirectory(packageURL)
         package = try File.Directory(validating: packageURL)
         sources = package[directory: "Sources"][directory: "Affine Algebra Primitives"]
-        executable = package[directory: ".fixture"][file: "swift-linter"]
+        #if os(Windows)
+            executable = package[directory: ".fixture"][file: "swift-linter.exe"]
+        #else
+            executable = package[directory: ".fixture"][file: "swift-linter"]
+        #endif
         runner = package[directory: ".fixture"][file: "swift-linter-runner"]
         capture = package[file: ".swift-linter-arguments"]
         formatCapture = package[file: ".swift-linter-format"]
@@ -407,18 +432,7 @@ private struct FixProcessFixture {
         try sources[file: "Affine.swift"].write.atomic("public enum Affine {}\n")
         try capture.write.atomic("")
         try formatCapture.write.atomic("")
-        try executable.write.atomic(
-            """
-            #!/bin/sh
-            printf '%s\\n' "$@" > '\(capture.description)'
-            printf '%s' "${SWIFT_LINTER_FORMAT:-}" > '\(formatCapture.description)'
-            if [ "${SWIFT_LINTER_FORMAT:-}" = sarif ]; then
-              printf '%s\\n' '{"version":"2.1.0","runs":[{"results":[]}]}'
-            fi
-            printf '%s\\n' 'swift-affine-algebra-primitives · 1 active rules · 1 files linted · 0 violations' >&2
-            """
-        )
-        try File.System.Metadata.Permissions.set(.executable, at: executable.path)
+        try MainFixtureFiles.copy(MainFixtureFiles.fixtureLinter, to: executable.description)
         try runner.write.atomic("runner\n")
     }
 
@@ -438,6 +452,10 @@ private struct FixProcessFixture {
 
     func format() throws -> Swift.String {
         try MainFixtureFiles.readStrictUTF8(formatCapture.description)
+    }
+
+    func replaceExecutable(with bytes: [Swift.UInt8]) throws {
+        try MainFixtureFiles.write(bytes: bytes, to: executable.description)
     }
 
     func remove() {
