@@ -292,7 +292,11 @@ extension Institute.Coherence.Test.Unit {
     @Test
     func `A diagnostic whose path holds a drive-style colon is attributed to its package`() throws {
         let temporary = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
-        let checkout = temporary + "/C:/Institute"
+        #if os(Windows)
+            let checkout = temporary + "/Institute"
+        #else
+            let checkout = temporary + "/C:/Institute"
+        #endif
         try MainFixtureFiles.createDirectory(checkout)
         let root = try Institute.Root(checkout: File.Directory(validating: checkout))
         let repositories = Institute.Coherence.Test.repositories()
