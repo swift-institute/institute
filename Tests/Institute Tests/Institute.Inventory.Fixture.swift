@@ -54,16 +54,6 @@ extension Institute.Inventory.Test.Fixture {
     }
 
     private static func execute(_ arguments: [Swift.String], at directory: URL) throws {
-        let process = Foundation.Process()
-        process.executableURL = URL(fileURLWithPath: Git.Client.installed)
-        process.arguments = arguments
-        process.currentDirectoryURL = directory
-        process.standardOutput = FileHandle.nullDevice
-        process.standardError = FileHandle.nullDevice
-        try process.run()
-        process.waitUntilExit()
-        guard process.terminationStatus == 0 else {
-            throw CocoaError(.executableNotLoadable)
-        }
+        try MainFixtureFiles.gitRequiringSuccess(arguments, currentDirectory: directory)
     }
 }
