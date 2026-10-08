@@ -304,13 +304,16 @@ extension Institute.Installation {
             findings.append("missing managed Institute executable: \(executable)")
             return findings
         }
-        do throws(File.System.Metadata.Permissions.Error) {
-            if try File.System.Metadata.Permissions(at: executable.path) != .executable {
-                findings.append("managed Institute executable is not executable: \(executable)")
+        #if !os(Windows)
+            // Windows files carry no execute permission; a regular file is the contract there.
+            do throws(File.System.Metadata.Permissions.Error) {
+                if try File.System.Metadata.Permissions(at: executable.path) != .executable {
+                    findings.append("managed Institute executable is not executable: \(executable)")
+                }
+            } catch {
+                throw .filesystem("cannot inspect Institute executable permissions: \(error)")
             }
-        } catch {
-            throw .filesystem("cannot inspect Institute executable permissions: \(error)")
-        }
+        #endif
         guard
             try Institute.Materialization.verdict(
                 at: command.path,
