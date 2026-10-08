@@ -23,6 +23,22 @@ func `A failing fixture git command reports its arguments, status and stderr`() 
 
     #expect(failure?.arguments == ["rev-parse", "--verify", "refs/heads/absent"])
     #expect(failure?.status != 0)
-    #expect(failure?.standardError.isEmpty == false)
+    #expect(failure?.output.isEmpty == false)
+    try MainFixtureFiles.remove(directory)
+}
+
+@Test
+func `A fixture git commit, which flushes its standard output, succeeds`() throws {
+    let directory = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+    try MainFixtureFiles.createDirectory(directory)
+    try MainFixtureFiles.gitRequiringSuccess(["init", "--quiet"], in: directory)
+    try MainFixtureFiles.gitRequiringSuccess(["config", "user.email", "fixture@swift.institute"], in: directory)
+    try MainFixtureFiles.gitRequiringSuccess(["config", "user.name", "Fixture"], in: directory)
+    try MainFixtureFiles.write("committed\n", toFile: MainFixtureFiles.join(directory, "Fixture.txt"))
+    try MainFixtureFiles.gitRequiringSuccess(["add", "Fixture.txt"], in: directory)
+
+    try MainFixtureFiles.gitRequiringSuccess(["commit", "-m", "fixture"], in: directory)
+
+    try MainFixtureFiles.gitRequiringSuccess(["rev-parse", "--verify", "HEAD"], in: directory)
     try MainFixtureFiles.remove(directory)
 }
