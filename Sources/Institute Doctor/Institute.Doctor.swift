@@ -218,8 +218,8 @@ extension Institute.Doctor {
         do throws(Process.Error) {
             output = try Process.Spawn.run(
                 .init(
-                    executable: executable,
-                    arguments: arguments,
+                    executable: "/usr/bin/env",
+                    arguments: [executable] + arguments,
                     environment: environment,
                     stdout: .pipe,
                     stderr: .pipe

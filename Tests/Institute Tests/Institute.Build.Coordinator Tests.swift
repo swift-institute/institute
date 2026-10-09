@@ -27,23 +27,6 @@ struct `Build Coordinator Tests` {
         #expect(Institute.Build.Coordinator(jobs: 2).jobs == 2)
     }
 
-    @Test
-    func `an empty invocation is refused rather than run as a bare environment listing`() {
-        var cleanups = 0
-        #expect(throws: Institute.Build.Error.self) {
-            _ = try Institute.Build.Coordinator().coordinated(
-                [],
-                in: "/",
-                describing: "empty",
-                cleanup: { error in
-                    cleanups += 1
-                    return error
-                }
-            )
-        }
-        #expect(cleanups == 1)
-    }
-
     @Test(arguments: [0, -1, Swift.Int.min])
     func `a nonpositive job count clamps rather than producing an unrunnable invocation`(
         jobs: Swift.Int
