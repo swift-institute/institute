@@ -90,8 +90,8 @@ extension Institute.Navigation {
         do throws(Process.Error) {
             output = try Process.Spawn.run(
                 .init(
-                    executable: "/usr/bin/env",
-                    arguments: [executable] + arguments,
+                    executable: executable,
+                    arguments: arguments,
                     environment: environment,
                     stdout: .pipe,
                     stderr: .pipe

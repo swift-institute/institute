@@ -272,9 +272,9 @@ extension Institute.Lint {
         do throws(Process.Error) {
             output = try Process.Spawn.run(
                 .init(
-                    executable: "/usr/bin/env",
+                    executable: "git",
                     arguments: [
-                        "git", "ls-remote",
+                        "ls-remote",
                         "https://github.com/\(input.repository).git",
                         Currency.branch,
                     ],
