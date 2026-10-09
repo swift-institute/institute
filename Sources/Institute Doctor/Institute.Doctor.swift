@@ -215,6 +215,8 @@ extension Institute.Doctor {
         environment: [Swift.String: Swift.String]? = nil
     ) throws(Institute.Error) -> Swift.String {
         let output: Process.Output
+        let spawnTrace = InstituteDiagnosticSpawnTrace.begin("doctor", executable, arguments, nil)
+        defer { InstituteDiagnosticSpawnTrace.end(spawnTrace) }
         do throws(Process.Error) {
             output = try Process.Spawn.run(
                 .init(

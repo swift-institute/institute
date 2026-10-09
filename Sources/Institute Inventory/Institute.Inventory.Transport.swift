@@ -54,6 +54,8 @@ extension Institute.Inventory.Transport {
     ) async throws(Error) -> Response {
         let arguments = ["api", "-i", "--method", "GET"] + request
         let output: Process.Output
+        let spawnTrace = InstituteDiagnosticSpawnTrace.begin("inventory.transport", "gh", arguments, nil)
+        defer { InstituteDiagnosticSpawnTrace.end(spawnTrace) }
         do throws(Process.Error) {
             output = try Process.Spawn.run(
                 .init(

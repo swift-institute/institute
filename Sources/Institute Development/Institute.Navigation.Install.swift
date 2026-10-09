@@ -222,6 +222,8 @@ extension Institute.Navigation {
         at directory: File.Directory
     ) throws(Institute.Error) -> Swift.String {
         let output: Process.Output
+        let spawnTrace = InstituteDiagnosticSpawnTrace.begin("navigation.install", executable, arguments, directory.description)
+        defer { InstituteDiagnosticSpawnTrace.end(spawnTrace) }
         do throws(Process.Error) {
             output = try Process.Spawn.run(
                 .init(
