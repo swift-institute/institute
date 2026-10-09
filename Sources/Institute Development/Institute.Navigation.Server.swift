@@ -87,6 +87,8 @@ extension Institute.Navigation {
         environment: [Swift.String: Swift.String]
     ) throws(Institute.Error) -> Swift.String {
         let output: Process.Output
+        let spawnTrace = InstituteDiagnosticSpawnTrace.begin("navigation.server", executable, arguments, nil)
+        defer { InstituteDiagnosticSpawnTrace.end(spawnTrace) }
         do throws(Process.Error) {
             output = try Process.Spawn.run(
                 .init(

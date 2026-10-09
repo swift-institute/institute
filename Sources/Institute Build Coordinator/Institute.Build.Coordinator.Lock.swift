@@ -74,6 +74,8 @@ extension Institute.Build.Coordinator {
         if Environment.read(Self.heldMarker) != nil {
             var output: Process.Output?
             var failure: Institute.Build.Error?
+            let spawnTrace = InstituteDiagnosticSpawnTrace.begin("coordinator(nested)", program, Swift.Array(invocation.dropFirst()), directory)
+            defer { InstituteDiagnosticSpawnTrace.end(spawnTrace) }
             do throws(Process.Error) {
                 output = try Process.Spawn.run(
                     .init(
@@ -118,6 +120,7 @@ extension Institute.Build.Coordinator {
             let message = "cannot open SwiftPM coordination lock \(path): \(error)"
             throw cleanup(.filesystem(message)) ?? .filesystem(message)
         }
+        let lockTrace = InstituteDiagnosticSpawnTrace.begin("coordinator(lock-wait)", program, [], path.description)
         do throws(Kernel.Lock.Error) {
             try Kernel.Lock.lock(
                 lock.kernelDescriptor,
@@ -125,12 +128,16 @@ extension Institute.Build.Coordinator {
                 kind: .exclusive
             )
         } catch {
+            InstituteDiagnosticSpawnTrace.end(lockTrace)
             let message = "cannot acquire SwiftPM coordination lock \(path): \(error)"
             throw cleanup(.filesystem(message)) ?? .filesystem(message)
         }
+        InstituteDiagnosticSpawnTrace.end(lockTrace)
 
         var output: Process.Output?
         var failure: Institute.Build.Error?
+        let spawnTrace = InstituteDiagnosticSpawnTrace.begin("coordinator(locked)", program, Swift.Array(invocation.dropFirst()), directory)
+        defer { InstituteDiagnosticSpawnTrace.end(spawnTrace) }
         do throws(Process.Error) {
             output = try Process.Spawn.run(
                 .init(

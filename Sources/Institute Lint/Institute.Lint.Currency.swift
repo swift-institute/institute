@@ -269,6 +269,8 @@ extension Institute.Lint {
         of input: Currency
     ) throws(Institute.Error) -> Swift.String {
         let output: Process.Output
+        let spawnTrace = InstituteDiagnosticSpawnTrace.begin("lint.currency", "git", ["ls-remote", "https://github.com/\(input.repository).git"], nil)
+        defer { InstituteDiagnosticSpawnTrace.end(spawnTrace) }
         do throws(Process.Error) {
             output = try Process.Spawn.run(
                 .init(
