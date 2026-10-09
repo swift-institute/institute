@@ -184,14 +184,14 @@ extension Institute.Source.Application {
   ) async throws(Institute.Error) {
     let result = await process.run(
       linterExecutable,
-      ["--profile-check", profile],
+      ["--profile", profile, directory],
       directory,
       ["SWIFT_LINTER_BUNDLE": bundle.token]
     )
     guard result.status == 0 else {
       throw .configuration(
-        "rendered source linter profile for \(bundle.rawValue) does not parse "
-          + "under the pinned engine: \(result.diagnostics)\(result.output)"
+        "rendered source linter profile for \(bundle.rawValue) is not the pinned "
+          + "engine's baked bundle: \(result.diagnostics)\(result.output)"
       )
     }
   }
