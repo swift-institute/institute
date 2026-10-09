@@ -42,3 +42,19 @@ func `A fixture git commit, which flushes its standard output, succeeds`() throw
     try MainFixtureFiles.gitRequiringSuccess(["rev-parse", "--verify", "HEAD"], in: directory)
     try MainFixtureFiles.remove(directory)
 }
+
+@Test
+func `Fixture writes rewrite a file in place, never through a renamed temporary`() throws {
+    let directory = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+    try MainFixtureFiles.createDirectory(directory)
+    let path = MainFixtureFiles.join(directory, "Fixture.txt")
+    try MainFixtureFiles.write("first\n", toFile: path)
+    let before = try MainFixtureFiles.fileNumber(path)
+
+    try MainFixtureFiles.write("second\n", toFile: path)
+    try MainFixtureFiles.write(bytes: Swift.Array("third\n".utf8), to: path)
+
+    #expect(try MainFixtureFiles.fileNumber(path) == before)
+    #expect(try MainFixtureFiles.readStrictUTF8(path) == "third\n")
+    try MainFixtureFiles.remove(directory)
+}

@@ -264,16 +264,18 @@ struct `Institute Lint Measurement Tests` {
     /// saying so would be the same lie in miniature.
     @Test
     func `restricting to a file narrows findings but keeps the verdict`() throws {
+        let a = try File.Path("/tmp/pkg/Sources/A.swift")
+        let b = try File.Path("/tmp/pkg/Sources/B.swift")
         let measurement = Institute.Lint.adjudicate(
             package: "/tmp/pkg",
             status: 1,
             standardOutput: """
-                /tmp/pkg/Sources/A.swift:1:1: error: one
-                /tmp/pkg/Sources/B.swift:2:1: error: two
+                \(a):1:1: error: one
+                \(b):2:1: error: two
                 """,
             standardError: Self.summary
         )
-        let narrowed = measurement.restricted(to: try File.Path("/tmp/pkg/Sources/A.swift"))
+        let narrowed = measurement.restricted(to: a)
         #expect(narrowed.findings.count == 1)
         #expect(narrowed.verdict == measurement.verdict)
     }

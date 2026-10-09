@@ -59,7 +59,7 @@ extension Institute.Sync {
             )
             try configuration.rendered().write(
                 to: root.appending(path: "Institute.json"),
-                atomically: true,
+                atomically: false,
                 encoding: .utf8
             )
             try FileManager.default.createDirectory(
@@ -277,7 +277,7 @@ extension Institute.Sync.Fixture {
     ) throws {
         try contents.write(
             to: repository.appending(path: "Fixture.txt"),
-            atomically: true,
+            atomically: false,
             encoding: .utf8
         )
         try command(["add", "--all"], at: repository)

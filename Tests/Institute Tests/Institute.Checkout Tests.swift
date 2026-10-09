@@ -191,8 +191,35 @@ extension Institute.Checkout {
 
             let root = fixture.destination("shapes").url
             #expect(try MainFixtureFiles.isSymbolicLink(MainFixtureFiles.join(root, "Link")))
-            let permissions = try MainFixtureFiles.posixPermissions(MainFixtureFiles.join(root, "Script.sh"))
-            #expect((permissions ?? 0) & 0o100 != 0)
+            #if os(Windows)
+                #expect(fixture.destination("shapes")[file: "Script.sh"].stat.isFile)
+            #else
+                let permissions = try MainFixtureFiles.posixPermissions(MainFixtureFiles.join(root, "Script.sh"))
+                #expect((permissions ?? 0) & 0o100 != 0)
+            #endif
+        }
+
+        @Test
+        func `a materialization keeps the commit's bytes whatever the end-of-line attributes`() throws {
+            let fixture = try Fixture()
+            defer { fixture.remove() }
+
+            try fixture.write(".gitattributes", contents: "* text eol=crlf\n")
+            try fixture.command(["add", ".gitattributes"])
+            let commit = try fixture.commit("attributed", contents: "first\n")
+
+            let checkout = Institute.Checkout(client: fixture.client)
+            _ = try checkout.materialize(
+                url: fixture.source,
+                revision: commit,
+                to: fixture.destination("exact")
+            )
+
+            #expect(
+                try MainFixtureFiles.readBytes(
+                    MainFixtureFiles.join(fixture.destination("exact").url, "Fixture.txt")
+                ) == Swift.Array("first\n".utf8)
+            )
         }
 
         @Test

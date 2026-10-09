@@ -82,7 +82,7 @@ enum DevelopmentFixtureFiles {
     }
 
     static func write(_ text: Swift.String, to path: Swift.String) throws {
-        try text.write(to: URL(fileURLWithPath: path), atomically: true, encoding: .utf8)
+        try text.write(to: URL(fileURLWithPath: path), atomically: false, encoding: .utf8)
     }
 
     static func write(bytes: [Swift.UInt8], to path: Swift.String) throws {
@@ -102,7 +102,7 @@ enum DevelopmentFixtureFiles {
     }
 
     static func writeFile(_ text: Swift.String, toFile path: Swift.String) throws {
-        try text.write(toFile: path, atomically: true, encoding: .utf8)
+        try text.write(toFile: path, atomically: false, encoding: .utf8)
     }
 
     struct GitFailure: Swift.Error, Swift.CustomStringConvertible {

@@ -145,6 +145,20 @@ extension Institute.Checkout {
             }
         }
 
+        // The commit's bytes, exactly: repository-local attributes outrank every
+        // machine and repository end-of-line setting, such as core.autocrlf.
+        let info = staging[directory: ".git"][directory: "info"]
+        do throws(File.System.Create.Directory.Error) {
+            try info.create.recursive()
+        } catch {
+            throw .filesystem("cannot create \(info): \(error)")
+        }
+        do throws(File.System.Write.Atomic.Error) {
+            try info[file: "attributes"].write.atomic("* -text\n")
+        } catch {
+            throw .filesystem("cannot write \(info[file: "attributes"]): \(error)")
+        }
+
         try execute { () throws(Git.Client.Error) in
             try client.checkout(detached: revision, at: staging.description)
         }

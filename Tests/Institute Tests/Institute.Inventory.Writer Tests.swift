@@ -200,7 +200,7 @@ extension Institute.Inventory.Test.Integration {
             repositories: []
         )
         let before = try existing.rendered()
-        try MainFixtureFiles.writeAtomically(bytes: Array(before.utf8), to: file)
+        try MainFixtureFiles.write(bytes: Array(before.utf8), to: file)
         let document = try Institute.Configuration.Document.load(at: root)
         let configuration = Institute.Configuration(
             version: 1,
@@ -401,7 +401,7 @@ extension Institute.Inventory.Test.Integration {
         defer { fixture.remove() }
         let existing = try Institute.Configuration.Document.load(at: fixture.root)
         let dirty = Swift.String(try configuration.rendered().dropLast())
-        try MainFixtureFiles.writeAtomically(bytes: Array(dirty.utf8), to: fixture.filePath)
+        try MainFixtureFiles.write(bytes: Array(dirty.utf8), to: fixture.filePath)
         let owner = GitHub.Organization.Name("swift-foundations")
         let policy = try Institute.Inventory.Policy(
             organizations: [.init(name: owner, layer: .foundations)],
@@ -458,7 +458,7 @@ extension Institute.Inventory.Test.Integration {
             xcode: "26.6",
             repositories: []
         )
-        try MainFixtureFiles.writeAtomically(bytes: Array(configuration.rendered().utf8), to: MainFixtureFiles.join(location, "Institute.json"))
+        try MainFixtureFiles.write(bytes: Array(configuration.rendered().utf8), to: MainFixtureFiles.join(location, "Institute.json"))
         let existing = try Institute.Configuration.Document.load(at: root)
         let owner = GitHub.Organization.Name("swift-foundations")
         let policy = try Institute.Inventory.Policy(
