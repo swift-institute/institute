@@ -36,7 +36,7 @@ extension Institute.Build.Coordinator {
     /// in key, in mode, or in what happens on the failure path.
     ///
     /// - Parameters:
-    ///   - invocation: The argument vector, run through `/usr/bin/env`.
+    ///   - invocation: The argument vector; its first element is the program, found on `PATH`.
     ///   - directory: The child's working directory.
     ///   - description: How the operation is named in failure messages.
     ///   - capture: When `true`, the child's `stdout`/`stderr` are piped and
@@ -67,14 +67,18 @@ extension Institute.Build.Coordinator {
         // package test` deadlocked exactly this way). The marker is
         // exported to every coordinated child below and never set any
         // other way.
+        guard let program = invocation.first else {
+            throw cleanup(.process("\(description) has no program to run"))
+                ?? .process("\(description) has no program to run")
+        }
         if Environment.read(Self.heldMarker) != nil {
             var output: Process.Output?
             var failure: Institute.Build.Error?
             do throws(Process.Error) {
                 output = try Process.Spawn.run(
                     .init(
-                        executable: "/usr/bin/env",
-                        arguments: invocation,
+                        executable: program,
+                        arguments: Swift.Array(invocation.dropFirst()),
                         stdout: capture ? .pipe : .inherit,
                         stderr: capture ? .pipe : .inherit,
                         workingDirectory: directory
@@ -130,8 +134,8 @@ extension Institute.Build.Coordinator {
         do throws(Process.Error) {
             output = try Process.Spawn.run(
                 .init(
-                    executable: "/usr/bin/env",
-                    arguments: invocation,
+                    executable: program,
+                    arguments: Swift.Array(invocation.dropFirst()),
                     environment: Environment.read.all()
                         .merging([Self.heldMarker: "1"]) { _, marker in marker },
                     stdout: capture ? .pipe : .inherit,
