@@ -388,6 +388,30 @@ func `A stray formatter line outside any quote stays unmeasured`() {
 }
 
 @Test
+func `A formatter note after a finding is context, not malformed output`() {
+    let measurement = swiftFormatMeasurement([
+        "\(repairCoverageRoot)/Sources/A.swift:3:1: error: [Indentation] indent by 4 spaces",
+        "\(repairCoverageRoot)/Sources/A.swift:27:24: note: ambiguous overload 'withEscaped(_:)' is here",
+    ])
+
+    guard case .findings(let findings) = measurement.verdict else {
+        Issue.record("expected formatter findings, got \(measurement.verdict)")
+        return
+    }
+    #expect(findings.count == 1)
+    #expect(findings[0].diagnostic.identifier == "Indentation")
+}
+
+@Test
+func `A formatter note carrying a rule tag stays unmeasured`() {
+    let measurement = swiftFormatMeasurement([
+        "\(repairCoverageRoot)/Sources/A.swift:3:1: note: [Indentation] indent by 4 spaces"
+    ])
+
+    #expect(unmeasuredReasons(measurement)?.map(\.code) == ["malformed-output"])
+}
+
+@Test
 func `A quoted formatter diagnostic that never closes stays unmeasured`() {
     let measurement = swiftFormatMeasurement([
         "\(repairCoverageRoot)/Sources/A.swift:316:29: error: [NeverForceUnwrap] do not force unwrap 'Example(",

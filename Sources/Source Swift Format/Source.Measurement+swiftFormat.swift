@@ -55,7 +55,7 @@ extension Source.Measurement {
 
     var findings: [Source.Finding] = []
     var identities: [Swift.String: Source.Finding] = [:]
-    for line in records {
+    for line in records where !sourceSwiftFormatIsContext(line) {
       guard
         let finding = sourceSwiftFormatFinding(
           Swift.String(line),
@@ -166,6 +166,16 @@ private func sourceSwiftFormatIsHeader<S: Swift.StringProtocol>(_ line: S) -> Sw
   let fields = line.split(separator: ":", maxSplits: 4, omittingEmptySubsequences: false)
   return fields.count == 5 && Swift.Int(fields[1]) != nil && Swift.Int(fields[2]) != nil
     && sourceSwiftFormatTrim(fields[4]).first == "["
+}
+
+private func sourceSwiftFormatIsContext(_ record: Swift.String) -> Swift.Bool {
+  let fields = record.split(separator: ":", maxSplits: 4, omittingEmptySubsequences: false)
+  guard fields.count == 5, Swift.Int(fields[1]) != nil, Swift.Int(fields[2]) != nil else {
+    return false
+  }
+  let severity = sourceSwiftFormatTrim(fields[3])
+  return (severity == "note" || severity == "warning")
+    && sourceSwiftFormatTrim(fields[4]).first != "["
 }
 
 private func sourceSwiftFormatIdentity(_ finding: Source.Finding) -> Swift.String {
