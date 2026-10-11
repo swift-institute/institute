@@ -17,9 +17,34 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  swift-build-repro:
+    name: Standalone swift build of the S5 fixture
+    if: ${{ github.head_ref == 'diagnose-windows-spawn-hang' || github.ref == 'refs/heads/diagnose-windows-spawn-hang' }}
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: SwiftyLab/setup-swift@38f54a76b70d989321de9dc7c840618c08cf56e9 # v1.14.0
+        with:
+          swift-version: "6.4"
+          cache-snapshot: false
+      - name: Build the fixture four ways
+        shell: pwsh
+        run: |
+          & "$env:GITHUB_WORKSPACE\.github\diagnose\repro-s5.ps1" -Fixtures "$env:GITHUB_WORKSPACE\Tests\Institute Development Tests\Fixtures\Composition\MixedRoots" *>&1 |
+            Tee-Object C:\repro.txt
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: repro-s5
+          path: C:\repro.txt
   windows-tests:
     name: Windows tests (${{ matrix.mode }})
-    if: ${{ github.head_ref == 'diagnose-windows-spawn-hang' || github.ref == 'refs/heads/diagnose-windows-spawn-hang' }}
+    # Runs 38125655658 and 38128757956 already captured this job's evidence;
+    # it is parked while the standalone reproduction below runs.
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: windows-latest
     timeout-minutes: 100
     strategy:
