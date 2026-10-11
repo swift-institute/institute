@@ -101,7 +101,7 @@ extension Institute.Source {
                     toolchain: "Xcode 27.1;Build version 27A9269;",
                     schema: "swift-linter-structured:2",
                     executable: .init(
-                        name: "swift-linter-macos-arm64",
+                        name: "swift-linter-macos-arm64-cd4f4b448e906e48c800eb6a2b9a12eaebb2413a",
                         digest: .init(
                             "61bc783372100c0d2d024d6f0c7be0fc79b330645c93dff35e0e8a27bbd0db2b"
                         ),
