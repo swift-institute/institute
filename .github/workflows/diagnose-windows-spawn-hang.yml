@@ -83,11 +83,27 @@ jobs:
             $all | Where-Object { $_.ParentProcessId -eq $id -and -not $tree.ContainsKey([int]$_.ProcessId) } |
               ForEach-Object { $queue.Enqueue([int]$_.ProcessId) }
           }
-          $late = $all | Where-Object { $_.CreationDate -ge $start -and $_.ProcessId -ne $PID -and $_.Name -notin @('conhost.exe', 'WmiPrvSE.exe') }
-          $late | Select-Object ProcessId, ParentProcessId, Name, CreationDate, CommandLine,
-            @{ n = 'InTestTree'; e = { $tree.ContainsKey([int]$_.ProcessId) } } |
+          $late = $all | Where-Object { $_.CreationDate -ge $start -and $_.ProcessId -ne $PID -and $_.Name -notin @('conhost.exe', 'WmiPrvSE.exe', 'svchost.exe') }
+          $late | Select-Object ProcessId, ParentProcessId, Name, CreationDate, ThreadCount, HandleCount, KernelModeTime, UserModeTime, CommandLine,
+            @{ n = 'InTestTree'; e = { $tree.ContainsKey([int]$_.ProcessId) } },
+            @{ n = 'GetProcess'; e = { try { $g = Get-Process -Id $_.ProcessId -ErrorAction Stop; "threads=$($g.Threads.Count) hasExited=$($g.HasExited) exitCode=$($g.ExitCode)" } catch { "error: $_" } } } |
             Format-List | Out-File -Width 4096 "$diag\processes-since-test-start.txt"
           Get-Content "$diag\processes-since-test-start.txt"
+          try {
+            Add-Type -Path "$env:GITHUB_WORKSPACE\.github\diagnose\Handles.cs"
+            $probe = [System.IO.File]::Open("$diag\probe.txt", 'Create')
+            $fileType = [HandleDump]::TypeIndexOf($PID, $probe.SafeFileHandle.DangerousGetHandle().ToInt64())
+            $probe.Close()
+            $pids = [int[]]@($late | ForEach-Object { [int]$_.ProcessId })
+            $rows = [HandleDump]::Dump($pids, $fileType)
+            "pid`thandle`tobject`ttype`taccess`tattr (File type index $fileType)" | Out-File "$diag\file-handles.tsv"
+            $rows | Out-File -Append "$diag\file-handles.tsv"
+            $byObject = $rows | ForEach-Object { $c = $_ -split "`t"; [pscustomobject]@{ Pid = $c[0]; Handle = $c[1]; Object = $c[2]; Access = $c[4]; Attr = $c[5] } } | Group-Object Object
+            $names = @{}; $late | ForEach-Object { $names["$($_.ProcessId)"] = $_.Name }
+            $byObject | Where-Object { ($_.Group | Select-Object -ExpandProperty Pid -Unique).Count -gt 1 } | ForEach-Object {
+              "object $($_.Name): " + (($_.Group | ForEach-Object { "$($names[$_.Pid])($($_.Pid)) h=$($_.Handle) access=$($_.Access) attr=$($_.Attr)" }) -join '; ')
+            } | Tee-Object "$diag\shared-file-objects.txt"
+          } catch { "handle dump failed: $_" | Tee-Object "$diag\handle-dump-error.txt" }
           if ($env:CDB) {
             foreach ($proc in $late) {
               $id = $proc.ProcessId
@@ -95,9 +111,16 @@ jobs:
               "== cdb $($proc.Name) $id"
               $job = Start-Job -ScriptBlock {
                 param($cdb, $id, $out)
-                & $cdb -p $id -lines -c ".sympath+ C:\b\x86_64-unknown-windows-msvc\debug; .reload; ~*kn 60; !handle 0 f File; !handle 0 f Process; qd" *> $out
+                & $cdb -p $id -lines -y "srv*C:\sym*https://msdl.microsoft.com/download/symbols;C:\b\x86_64-unknown-windows-msvc\debug" -c "!peb; ~*kn 40; !handle 0 f File; qd" *> $out
               } -ArgumentList $env:CDB, $id, $out
-              if (-not (Wait-Job $job -Timeout 180)) { "cdb timed out for $id" ; Stop-Job $job }
+              if (-not (Wait-Job $job -Timeout 240)) { "cdb timed out for $id"; Stop-Job $job }
+              if (Select-String -Path $out -Pattern 'Cannot debug pid' -Quiet) {
+                $job = Start-Job -ScriptBlock {
+                  param($cdb, $id, $out)
+                  & $cdb -pv -p $id -lines -y "srv*C:\sym*https://msdl.microsoft.com/download/symbols" -c "!peb; ~*kn 40; qd" *> "$out.noninvasive.txt"
+                } -ArgumentList $env:CDB, $id, $out
+                if (-not (Wait-Job $job -Timeout 120)) { Stop-Job $job }
+              }
             }
           }
           Get-ChildItem -Recurse 'C:\ProgramData\Microsoft\Windows\WER' -Filter Report.wer -ErrorAction SilentlyContinue |
