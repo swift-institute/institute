@@ -52,12 +52,12 @@ extension Institute.Inventory.Transport {
     public static func githubCLI(
         _ request: [Swift.String]
     ) async throws(Error) -> Response {
-        let arguments = ["gh", "api", "-i", "--method", "GET"] + request
+        let arguments = ["api", "-i", "--method", "GET"] + request
         let output: Process.Output
         do throws(Process.Error) {
             output = try Process.Spawn.run(
                 .init(
-                    executable: "/usr/bin/env",
+                    executable: "gh",
                     arguments: arguments,
                     stdout: .pipe,
                     stderr: .pipe
