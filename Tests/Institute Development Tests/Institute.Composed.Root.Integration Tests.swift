@@ -40,6 +40,22 @@ extension Institute.Composed.Root.Integration {
         return destination
     }
 
+    private static func manifestPath(_ path: Swift.String) -> Swift.String {
+        #if os(Windows)
+            DevelopmentFixtureFiles.replacingAll("\\", with: "/", in: path)
+        #else
+            path
+        #endif
+    }
+
+    private static func fileURL(_ path: Swift.String) -> Swift.String {
+        #if os(Windows)
+            "file:///\(manifestPath(path))"
+        #else
+            "file://\(path)"
+        #endif
+    }
+
     /// Renders a template manifest, substituting runtime coordinates.
     private static func instantiate(
         _ template: Swift.String,
@@ -93,13 +109,13 @@ extension Institute.Composed.Root.Integration {
 
         try Self.instantiate(
             DevelopmentFixtureFiles.join(fixture, "A/Package.template.swift"),
-            substituting: ["REMOTE_B_URL": "file://\(remote)"]
+            substituting: ["REMOTE_B_URL": Self.fileURL(remote)]
         )
         try Self.instantiate(
             DevelopmentFixtureFiles.join(fixture, "C/Package.template.swift"),
             substituting: [
-                "PATH_A": DevelopmentFixtureFiles.join(fixture, "A"),
-                "PATH_B_LOCAL": DevelopmentFixtureFiles.join(fixture, "local-root/B"),
+                "PATH_A": Self.manifestPath(DevelopmentFixtureFiles.join(fixture, "A")),
+                "PATH_B_LOCAL": Self.manifestPath(DevelopmentFixtureFiles.join(fixture, "local-root/B")),
             ]
         )
 
