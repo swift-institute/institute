@@ -287,6 +287,7 @@ extension Institute.Context.Test.`Edge Case` {
             )
             let legacy = context.entry[directory: ".agents"]
             try legacy.create.recursive()
+            try Institute.Context.Test.projections(context).create.recursive()
             try MainFixtureFiles.createSymbolicLink(atPath: (legacy.path / "skills").description, destinationPath: Institute.Context.Test.projections(context).path.description
             )
 
