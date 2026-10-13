@@ -1,6 +1,7 @@
 name: publish-planner
 
-# Builds the `institute` planner at one exact revision of this repository and
+# Builds the `institute` planner at one exact revision of this repository with
+# Swift 6.4 (the version the institute-ci action installs) and
 # publishes it on the `ci-binaries` release as revision-named assets, which
 # are never replaced. The institute-ci action in swift-institute/.github
 # downloads these by the digests pinned in its `.institute-ci-planner` file
@@ -31,10 +32,8 @@ jobs:
         include:
           - platform: linux-x86_64
             runner: ubuntu-latest
-            flags: --static-swift-stdlib
           - platform: macos-arm64
             runner: xcode-27
-            flags: ''
     steps:
       - uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
         with:
@@ -59,7 +58,6 @@ jobs:
         shell: bash
         env:
           REVISION: ${{ inputs.revision }}
-          FLAGS: ${{ matrix.flags }}
           PLATFORM: ${{ matrix.platform }}
         run: |
           set -euo pipefail
@@ -88,7 +86,7 @@ jobs:
               sudo apt-get install -qq -y $(printf '%s\n' $pkgs | sort -u)
             fi
           fi
-          swift build -c release --product institute $FLAGS
+          swift build -c release --product institute
           mkdir -p out
           cp .build/release/institute "out/institute-$PLATFORM-$REVISION"
           cp Package.resolved "out/Package.resolved-$PLATFORM-$REVISION"
