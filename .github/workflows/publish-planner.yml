@@ -2,10 +2,12 @@ name: publish-planner
 
 # Builds the `institute` planner at one exact revision of this repository with
 # Swift 6.4 (the version the institute-ci action installs) and
-# publishes it on the `ci-binaries` release as revision-named assets, which
-# are never replaced. The institute-ci action in swift-institute/.github
-# downloads these by the digests pinned in its `.institute-ci-planner` file
-# instead of compiling the planner in every CI run.
+# publishes it on the `ci-binaries` release under names that carry each
+# file's own digest, so an asset is never replaced and a revision can be
+# republished when its dependency heads move (a linter re-pin). The
+# institute-ci action in swift-institute/.github downloads these by the
+# digests pinned in its `.institute-ci-planner` file instead of compiling
+# the planner in every CI run.
 
 on:
   workflow_dispatch:
@@ -87,10 +89,14 @@ jobs:
             fi
           fi
           swift build -c release --product institute
+          sha() { (sha256sum "$1" 2>/dev/null || shasum -a 256 "$1") | cut -d' ' -f1; }
           mkdir -p out
-          cp .build/release/institute "out/institute-$PLATFORM-$REVISION"
-          cp Package.resolved "out/Package.resolved-$PLATFORM-$REVISION"
-          swift --version > "out/TOOLCHAIN-$PLATFORM-$REVISION.txt" 2>&1
+          binary="$(sha .build/release/institute)"
+          graph="$(sha Package.resolved)"
+          cp .build/release/institute "out/institute-$PLATFORM-$binary"
+          cp Package.resolved "out/Package.resolved-$PLATFORM-$graph"
+          swift --version > "out/TOOLCHAIN-$PLATFORM-$binary.txt" 2>&1
+          echo "$REVISION $PLATFORM $binary $graph" > "out/PIN-$PLATFORM"
       - name: Smoke-launch
         shell: bash
         env:
@@ -98,7 +104,7 @@ jobs:
           PLATFORM: ${{ matrix.platform }}
         run: |
           set -euo pipefail
-          binary="out/institute-$PLATFORM-$REVISION"
+          binary="$(ls out/institute-"$PLATFORM"-*)"
           if [ "$(uname -s)" = Darwin ] && ! "$binary" --help >/dev/null 2>&1; then
             swift_usr="$(cd "$(dirname "$(xcrun --find swift)")/.." && pwd -P)"
             for candidate in "$swift_usr/lib/swift-5.0/macosx" "$swift_usr/lib/swift/macosx"; do
@@ -130,7 +136,7 @@ jobs:
           pattern: planner-*
           path: out
           merge-multiple: true
-      - name: Publish revision-named assets
+      - name: Publish the assets
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -139,23 +145,29 @@ jobs:
         run: |
           set -euo pipefail
           cd out
-          sha256sum institute-* Package.resolved-* TOOLCHAIN-* > "SHA256SUMS-$REVISION"
-          cat "SHA256SUMS-$REVISION"
+          cat PIN-* > "PIN-$REVISION-$GITHUB_RUN_ID"
+          rm PIN-linux-x86_64 PIN-macos-arm64
+          sha256sum institute-* Package.resolved-* TOOLCHAIN-* > "SHA256SUMS-$REVISION-$GITHUB_RUN_ID"
+          cat "SHA256SUMS-$REVISION-$GITHUB_RUN_ID"
           if ! gh release view ci-binaries -R "$REPOSITORY" >/dev/null 2>&1; then
             gh release create ci-binaries -R "$REPOSITORY" --title ci-binaries \
-              --notes "Revision-named planner binaries for the institute-ci action. Assets are never replaced." \
+              --notes "Planner binaries for the institute-ci action, named by their own digests. Assets are never replaced." \
               --target "$REVISION"
           fi
           existing="$(gh release view ci-binaries -R "$REPOSITORY" --json assets --jq '.assets[].name')"
-          if grep -q -- "-$REVISION" <<< "$existing"; then
-            echo "::error::assets for $REVISION already exist; revision-named assets are never replaced"
-            exit 1
-          fi
+          for asset in ./*; do
+            if grep -qxF -- "${asset#./}" <<< "$existing"; then
+              echo "::error::asset ${asset#./} already exists; published assets are never replaced"
+              exit 1
+            fi
+          done
           gh release upload ci-binaries -R "$REPOSITORY" ./*
           {
             echo "### Planner $REVISION"
             echo
+            echo "Lines for .institute-ci-planner:"
+            echo
             echo '```'
-            cat "SHA256SUMS-$REVISION"
+            cat "PIN-$REVISION-$GITHUB_RUN_ID"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
