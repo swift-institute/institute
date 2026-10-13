@@ -26,13 +26,13 @@ struct `Repository Policy BranchPin Tests` {
             {
               "schemaVersion": 1,
               "organizations": [
-                {"name":"swift-primitives","layer":"L1","status":"active"},
-                {"name":"swift-standards","layer":"L2","status":"active"},
-                {"name":"swift-foundations","layer":"L3","status":"active"}
+                {"name":"swift-atoms","layer":"L1","status":"active"},
+                {"name":"swift-standards","layer":"L3","status":"active"},
+                {"name":"swift-compositions","layer":"L4","status":"active"}
               ],
               "repositories": [
                 {
-                  "name":"swift-foundations/swift-windows",
+                  "name":"swift-compositions/swift-kernel",
                   "platforms":"windows",
                   "embeddedTarget":"Kernel"
                 }
@@ -43,7 +43,7 @@ struct `Repository Policy BranchPin Tests` {
 
         let fleet = try Institute.Repository.Policy.Fleet.read(at: path)
         #expect(
-            try fleet.configuration(for: "swift-primitives/swift-bool-primitives")
+            try fleet.configuration(for: "swift-atoms/swift-bool")
                 == .init(lintBundle: "primitives", platforms: "", embeddedTarget: "")
         )
         #expect(
@@ -51,7 +51,7 @@ struct `Repository Policy BranchPin Tests` {
                 == .init(lintBundle: "standards", platforms: "", embeddedTarget: "")
         )
         #expect(
-            try fleet.configuration(for: "swift-foundations/swift-windows")
+            try fleet.configuration(for: "swift-compositions/swift-kernel")
                 == .init(
                     lintBundle: "institute",
                     platforms: "windows",
@@ -72,9 +72,9 @@ struct `Repository Policy BranchPin Tests` {
                     """
             )
         }
-        #expect(throws: Institute.Repository.Policy.Fleet.Error.invalidLayer("L4")) {
+        #expect(throws: Institute.Repository.Policy.Fleet.Error.invalidLayer("L5")) {
             try Self.fleet(
-                organizations: #"{"name":"swift-institute","layer":"L4","status":"active"}"#
+                organizations: #"{"name":"swift-institute","layer":"L5","status":"active"}"#
             )
         }
         #expect(throws: Institute.Repository.Policy.Fleet.Error.invalidStatus("enabled")) {
