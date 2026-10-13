@@ -179,7 +179,7 @@ extension Institute.Development.VerificationPlan.Transaction {
                 )
             }
 
-            let planned = ".package(path: \"\(assignment.path)\")"
+            let planned = Package.Manifest.Redirection.clause(path: assignment.path)
             guard !current.contains(planned) else {
                 throw .composition(
                     """

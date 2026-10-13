@@ -1,4 +1,5 @@
 import File_System
+import Package_Manager
 import Testing
 
 @testable import Institute_Conversion
@@ -117,11 +118,14 @@ extension Institute.Composition.Test.Integration {
         try fixture.composition.compose(consumer: "consumer", dependency: "swift-dep")
 
         let rewritten = try fixture.read()
-        #expect(
-            rewritten.contains(
-                ".package(path: \"\(fixture.composition.root.hierarchy)/swift-standards/example/swift-dep\")"
-            )
-        )
+        #if os(Windows)
+            let separator = "\\"
+        #else
+            let separator = "/"
+        #endif
+        let dependency = ["\(fixture.composition.root.hierarchy)", "swift-standards", "example", "swift-dep"]
+            .joined(separator: separator)
+        #expect(rewritten.contains(Package.Manifest.Redirection.clause(path: dependency)))
         #expect(!rewritten.contains("https://github.com/example/swift-dep.git"))
 
         let ledger = try Institute.Composition.State.load(
