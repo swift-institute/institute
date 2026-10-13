@@ -154,10 +154,16 @@ extension Institute.Xcode.Scheme.Test.Unit {
         defer { try? MainFixtureFiles.remove(base) }
         let application = MainFixtureFiles.join(base, "institute-application")
         let hung = MainFixtureFiles.join(base, "hung")
-        let executable = MainFixtureFiles.join(base, "hang")
+        #if os(Windows)
+            let executable = MainFixtureFiles.join(base, "hang.bat")
+            let script = "@ping -n 6 127.0.0.1 > nul\r\n"
+        #else
+            let executable = MainFixtureFiles.join(base, "hang")
+            let script = "#!/bin/sh\nsleep 5\n"
+        #endif
         try MainFixtureFiles.createDirectory(application)
         try Self.package(at: hung, name: "hung", targets: [("Hung", false)])
-        try MainFixtureFiles.write(bytes: Array("#!/bin/sh\nsleep 5\n".utf8), to: executable)
+        try MainFixtureFiles.write(bytes: Array(script.utf8), to: executable)
         try MainFixtureFiles.setPermissions(executable, posix: 0o755)
         let specification = Institute.Workspace.Specification(dependency: .remoteAllowed, members: [
             .init(

@@ -414,8 +414,13 @@ extension Institute.Context.Test.`Edge Case` {
                 #expect(message.contains("no canonical skill root resolved"))
                 // Naming the roots is the difference between a failure a
                 // contributor can act on and one they can only report.
-                #expect(message.contains("swift-institute/Skills"))
-                #expect(message.contains("rule-institute/Skills"))
+                #if os(Windows)
+                    let separator = "\\"
+                #else
+                    let separator = "/"
+                #endif
+                #expect(message.contains("swift-institute\(separator)Skills"))
+                #expect(message.contains("rule-institute\(separator)Skills"))
             }
         }
     }
