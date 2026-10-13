@@ -1,0 +1,163 @@
+name: publish-planner
+
+# Builds the `institute` planner at one exact revision of this repository and
+# publishes it on the `ci-binaries` release as revision-named assets, which
+# are never replaced. The institute-ci action in swift-institute/.github
+# downloads these by the digests pinned in its `.institute-ci-planner` file
+# instead of compiling the planner in every CI run.
+
+on:
+  workflow_dispatch:
+    inputs:
+      revision:
+        description: 'Exact 40-character lowercase hex commit of this repository to build.'
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-planner-${{ inputs.revision }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build · ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - platform: linux-x86_64
+            runner: ubuntu-latest
+            flags: --static-swift-stdlib
+          - platform: macos-arm64
+            runner: xcode-27
+            flags: ''
+    steps:
+      - uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+      - name: Validate revision
+        shell: bash
+        env:
+          REVISION: ${{ inputs.revision }}
+        run: |
+          set -euo pipefail
+          [[ "$REVISION" =~ ^[0-9a-f]{40}$ ]] || { echo "::error::revision must be 40 lowercase hex characters"; exit 1; }
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.revision }}
+          persist-credentials: false
+      - name: Install Swift
+        if: runner.os != 'macOS'
+        uses: SwiftyLab/setup-swift@38f54a76b70d989321de9dc7c840618c08cf56e9 # v1.14.0
+        with:
+          swift-version: '6.4'
+      - name: Build
+        shell: bash
+        env:
+          REVISION: ${{ inputs.revision }}
+          FLAGS: ${{ matrix.flags }}
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          set -euo pipefail
+          [ "$(git rev-parse HEAD)" = "$REVISION" ] || { echo "::error::checked out $(git rev-parse HEAD), not $REVISION"; exit 1; }
+          swift package resolve
+          if command -v apt-get >/dev/null 2>&1; then
+            shopt -s nullglob
+            libs=$(grep -hroE '\.linkedLibrary\("[^"]+"' Package.swift .build/checkouts/*/Package.swift .build/checkouts/*/Package@swift-*.swift 2>/dev/null \
+              | sed -E 's/.*"([^"]+)".*/\1/' | sort -u || true)
+            pkgs=""
+            for lib in $libs; do
+              case "$lib" in
+                uuid) pkgs="$pkgs uuid-dev" ;;
+                uring) pkgs="$pkgs liburing-dev" ;;
+                z) pkgs="$pkgs zlib1g-dev" ;;
+                ssl|crypto) pkgs="$pkgs libssl-dev" ;;
+                curl) pkgs="$pkgs libcurl4-openssl-dev" ;;
+                sqlite3) pkgs="$pkgs libsqlite3-dev" ;;
+                xml2) pkgs="$pkgs libxml2-dev" ;;
+                c|dl|m|pthread|rt|util|resolv) ;;
+                *) echo "::warning::No apt mapping for linked library '$lib'." ;;
+              esac
+            done
+            if [ -n "${pkgs// }" ]; then
+              sudo apt-get update -qq
+              sudo apt-get install -qq -y $(printf '%s\n' $pkgs | sort -u)
+            fi
+          fi
+          swift build -c release --product institute $FLAGS
+          mkdir -p out
+          cp .build/release/institute "out/institute-$PLATFORM-$REVISION"
+          cp Package.resolved "out/Package.resolved-$PLATFORM-$REVISION"
+          swift --version > "out/TOOLCHAIN-$PLATFORM-$REVISION.txt" 2>&1
+      - name: Smoke-launch
+        shell: bash
+        env:
+          REVISION: ${{ inputs.revision }}
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          set -euo pipefail
+          binary="out/institute-$PLATFORM-$REVISION"
+          if [ "$(uname -s)" = Darwin ] && ! "$binary" --help >/dev/null 2>&1; then
+            swift_usr="$(cd "$(dirname "$(xcrun --find swift)")/.." && pwd -P)"
+            for candidate in "$swift_usr/lib/swift-5.0/macosx" "$swift_usr/lib/swift/macosx"; do
+              [ -f "$candidate/libswiftCore.dylib" ] && DYLD_LIBRARY_PATH="$candidate" "$binary" --help >/dev/null && exit 0
+            done
+            echo "::error::the built planner does not launch"; exit 1
+          fi
+          "$binary" --help >/dev/null
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: planner-${{ matrix.platform }}
+          path: out
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    name: Publish
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: planner-*
+          path: out
+          merge-multiple: true
+      - name: Publish revision-named assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REVISION: ${{ inputs.revision }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          cd out
+          sha256sum institute-* Package.resolved-* TOOLCHAIN-* > "SHA256SUMS-$REVISION"
+          cat "SHA256SUMS-$REVISION"
+          if ! gh release view ci-binaries -R "$REPOSITORY" >/dev/null 2>&1; then
+            gh release create ci-binaries -R "$REPOSITORY" --title ci-binaries \
+              --notes "Revision-named planner binaries for the institute-ci action. Assets are never replaced." \
+              --target "$REVISION"
+          fi
+          existing="$(gh release view ci-binaries -R "$REPOSITORY" --json assets --jq '.assets[].name')"
+          if grep -q -- "-$REVISION" <<< "$existing"; then
+            echo "::error::assets for $REVISION already exist; revision-named assets are never replaced"
+            exit 1
+          fi
+          gh release upload ci-binaries -R "$REPOSITORY" ./*
+          {
+            echo "### Planner $REVISION"
+            echo
+            echo '```'
+            cat "SHA256SUMS-$REVISION"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
