@@ -1,5 +1,6 @@
 import Dispatch
 import File_System
+import Package_Manager
 import Synchronization
 import Testing
 
@@ -357,7 +358,7 @@ extension Institute.Development.VerificationPlan.Test.`Edge Case` {
         let assignment = try #require(
             fixture.plan.assignments.first { $0.reference == "swift-dep-a" }
         )
-        let planned = ".package(path: \"\(assignment.path)\")"
+        let planned = Package.Manifest.Redirection.clause(path: assignment.path)
         let clean = Institute.Development.VerificationPlan.Test.Fixture.consumerSource
         let dirty = DevelopmentFixtureFiles.replacingAll(
             ".package(url: \"https://github.com/example/swift-dep-a.git\", branch: \"main\"),",
