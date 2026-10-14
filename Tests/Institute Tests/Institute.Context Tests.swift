@@ -217,6 +217,89 @@ extension Institute.Context.Test.Unit {
             #expect(try context.diagnostics().isEmpty)
         }
     }
+
+    @Test
+    func `install preserves a retired skill link to an unmanaged target`() throws {
+        try Institute.Context.Test.fixture { context in
+            let source = context.entry[directory: "swift-institute"]
+            [directory: "Skills"][directory: "public-skill"]
+            try source[file: "SKILL.md"].delete()
+            let unmanaged = context.home[directory: "unmanaged"]
+            try unmanaged.create.recursive()
+            try unmanaged[file: "notes.txt"].write.atomic("Keep this content.\n")
+            let skills = Institute.Context.Test.projections(context)
+            try skills.create.recursive()
+            let projection = skills.path / "public-skill"
+            try MainFixtureFiles.createSymbolicLink(
+                atPath: projection.description,
+                destinationPath: unmanaged.path.description
+            )
+
+            try context.install()
+
+            #expect(try Institute.Context.Test.resolves(projection, to: unmanaged.path))
+            #expect(
+                try MainFixtureFiles.readStrictUTF8(unmanaged[file: "notes.txt"].path.description)
+                    == "Keep this content.\n"
+            )
+        }
+    }
+
+    #if os(Windows)
+        @Test
+        func `install removes a retired generated skill copy`() throws {
+            try Institute.Context.Test.fixture { context in
+                let source = context.entry[directory: "swift-institute"]
+                [directory: "Skills"][directory: "public-skill"]
+                let skills = Institute.Context.Test.projections(context)
+                let projection = skills[directory: "public-skill"]
+                try projection.create.recursive()
+                try projection[file: ".institute-materialization"].write.atomic(
+                    source.path.description
+                )
+                try projection[file: "SKILL.md"].write.atomic("# Generated copy\n")
+                try source[file: "SKILL.md"].delete()
+
+                try context.install()
+
+                #expect(!skills[file: "public-skill"].stat.exists)
+                #expect(try context.diagnostics().isEmpty)
+            }
+        }
+
+        @Test(arguments: [false, true])
+        func `install preserves unmanaged or changed-marker retired skill directories`(
+            changedMarker: Swift.Bool
+        ) throws {
+            try Institute.Context.Test.fixture { context in
+                let source = context.entry[directory: "swift-institute"]
+                [directory: "Skills"][directory: "public-skill"]
+                try source[file: "SKILL.md"].delete()
+                let skills = Institute.Context.Test.projections(context)
+                let projection = skills[directory: "public-skill"]
+                try projection.create.recursive()
+                try projection[file: "notes.txt"].write.atomic("Keep this content.\n")
+                let marker = projection[file: ".institute-materialization"]
+                let changedTarget = context.home[directory: "unmanaged"].path.description
+                if changedMarker {
+                    try marker.write.atomic(changedTarget)
+                }
+
+                try context.install()
+
+                #expect(
+                    try MainFixtureFiles.readStrictUTF8(projection[file: "notes.txt"].path.description)
+                        == "Keep this content.\n"
+                )
+                if changedMarker {
+                    #expect(try MainFixtureFiles.readStrictUTF8(marker.path.description) == changedTarget)
+                } else {
+                    #expect(!marker.stat.exists)
+                }
+            }
+        }
+    #endif
+
 }
 
 extension Institute.Context.Test.`Edge Case` {

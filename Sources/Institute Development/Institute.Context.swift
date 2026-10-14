@@ -115,7 +115,7 @@ extension Institute.Context {
         }
         for path in retiredLinks {
             do throws(File.System.Delete.Error) {
-                try File(path).delete()
+                try File.Directory(path).delete.recursive()
             } catch {
                 throw .filesystem("cannot remove retired context link \(path): \(error)")
             }
@@ -394,20 +394,32 @@ extension Institute.Context {
         }
 
         let expected = Set(links.map(\.path))
-        let prefixes = sources.map { "\($0.path)/" }
         var stale = [File.Path]()
-        for entry in entries where entry.type == .symbolicLink {
-            guard let path = entry.pathIfValid, !expected.contains(path) else {
+        for entry in entries where entry.type == .symbolicLink || entry.type == .directory {
+            guard let path = entry.pathIfValid, !expected.contains(path),
+                let name = Array(path.components).last
+            else {
                 continue
             }
-            guard let name = Swift.String(entry.name) else {
-                continue
+            let installedTarget = entry.type == .symbolicLink ? try target(of: path) : nil
+            for source in sources {
+                let canonical = source.path / name
+                // Exact stored targets also recognize owned dangling links.
+                let verdict: Institute.Materialization.Verdict =
+                    if installedTarget == canonical {
+                        .satisfied
+                    } else {
+                        try Institute.Materialization.verdict(
+                            at: path,
+                            expecting: canonical,
+                            canonical: canonical
+                        )
+                    }
+                if verdict == .satisfied {
+                    stale.append(path)
+                    break
+                }
             }
-            let installedTarget = try target(of: path)
-            guard prefixes.contains(where: { "\(installedTarget)" == "\($0)\(name)" }) else {
-                continue
-            }
-            stale.append(path)
         }
         return stale
     }
