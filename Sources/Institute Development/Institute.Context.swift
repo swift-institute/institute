@@ -404,7 +404,6 @@ extension Institute.Context {
             let installedTarget = entry.type == .symbolicLink ? try target(of: path) : nil
             for source in sources {
                 let canonical = source.path / name
-                // Exact stored targets also recognize owned dangling links.
                 let verdict: Institute.Materialization.Verdict =
                     if installedTarget == canonical {
                         .satisfied
