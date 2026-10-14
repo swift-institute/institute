@@ -249,8 +249,8 @@ extension Institute.Context.Test.Unit {
         @Test
         func `install removes a retired generated skill copy`() throws {
             try Institute.Context.Test.fixture { context in
-                let source = context.entry[directory: "swift-institute"]
-                [directory: "Skills"][directory: "public-skill"]
+                let institute = context.entry[directory: "swift-institute"]
+                let source = institute[directory: "Skills"][directory: "public-skill"]
                 let skills = Institute.Context.Test.projections(context)
                 let projection = skills[directory: "public-skill"]
                 try projection.create.recursive()
@@ -272,8 +272,8 @@ extension Institute.Context.Test.Unit {
             changedMarker: Swift.Bool
         ) throws {
             try Institute.Context.Test.fixture { context in
-                let source = context.entry[directory: "swift-institute"]
-                [directory: "Skills"][directory: "public-skill"]
+                let institute = context.entry[directory: "swift-institute"]
+                let source = institute[directory: "Skills"][directory: "public-skill"]
                 try source[file: "SKILL.md"].delete()
                 let skills = Institute.Context.Test.projections(context)
                 let projection = skills[directory: "public-skill"]
