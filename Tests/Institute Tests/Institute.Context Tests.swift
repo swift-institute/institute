@@ -221,8 +221,8 @@ extension Institute.Context.Test.Unit {
     @Test
     func `install preserves a retired skill link to an unmanaged target`() throws {
         try Institute.Context.Test.fixture { context in
-            let source = context.entry[directory: "swift-institute"]
-            [directory: "Skills"][directory: "public-skill"]
+            let institute = context.entry[directory: "swift-institute"]
+            let source = institute[directory: "Skills"][directory: "public-skill"]
             try source[file: "SKILL.md"].delete()
             let unmanaged = context.home[directory: "unmanaged"]
             try unmanaged.create.recursive()
