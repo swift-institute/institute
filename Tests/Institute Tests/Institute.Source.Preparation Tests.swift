@@ -203,40 +203,102 @@ func `Xcode source acquisition fails closed on a different Xcode version`() asyn
 }
 
 @Test
-func `Xcode source acquisition does not fail on a build change alone`() async throws {
+func `Cached Xcode source acquisition still fails closed on a different version`() async throws {
     let root = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
     try MainFixtureFiles.createDirectory(root)
     defer { try? MainFixtureFiles.remove(root) }
+    let cached = MainFixtureFiles.join(root, "swift-format")
+    try MainFixtureFiles.write(bytes: Array("cached tool".utf8), to: cached)
 
     let process = Source.Engine.Process { _, arguments, _, _ in
         .init(
             status: 0,
-            output: arguments.contains("CFBundleShortVersionString") ? "27.0" : "27A5228h",
+            output: arguments.contains("CFBundleShortVersionString") ? "27.1" : "27A9275",
             diagnostics: ""
         )
     }
     let acquisition = Institute.Source.Acquisition(process: process)
     let asset = Institute.Source.Policy.Asset(
         name: "swift-format",
-        digest: .init("unused"),
+        digest: try Institute.Source.Application.digest(file: cached),
         origin: .xcode(
             application: "/Applications/Synthetic.app",
             version: "27.0",
-            relativePath:
-                "Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-format"
+            relativePath: "Contents/version.plist"
         )
     )
 
-    let destination = try File.Directory(validating: root)
+    let directory = try File.Directory(validating: root)
     do throws(Institute.Error) {
         _ = try await acquisition.acquire(
             asset,
-            executable: true,
-            into: destination
+            executable: false,
+            into: directory
         )
+        Issue.record("a cached tool bypassed the Xcode version check")
     } catch {
-        #expect(!error.description.contains("pinned Xcode identity mismatch"))
+        #expect(
+            error.description
+                == "pinned Xcode identity mismatch for CFBundleShortVersionString: "
+                + "expected 27.0, observed 27.1"
+        )
     }
+}
+
+@Test(
+    .enabled(if: MainFixtureFiles.exists("/Applications/Xcode.app/Contents/version.plist")),
+    arguments: ["27A9269", "27A9275"]
+)
+func `Xcode source acquisition succeeds across build changes and records the observed build`(
+    _ build: Swift.String
+) async throws {
+    let root = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+    try MainFixtureFiles.createDirectory(root)
+    defer { try? MainFixtureFiles.remove(root) }
+    let source = "/Applications/Xcode.app/Contents/version.plist"
+    let bytes = try MainFixtureFiles.readBytes(source)
+    let digest = try Institute.Source.Application.digest(file: source)
+    try MainFixtureFiles.write(bytes: bytes, to: MainFixtureFiles.join(root, "swift-format"))
+
+    let process = Source.Engine.Process { _, arguments, _, _ in
+        .init(
+            status: 0,
+            output: arguments.contains("CFBundleShortVersionString") ? "27.1" : build,
+            diagnostics: ""
+        )
+    }
+    let acquisition = Institute.Source.Acquisition(process: process)
+    let asset = Institute.Source.Policy.Asset(
+        name: "swift-format",
+        digest: digest,
+        origin: .xcode(
+            application: "/Applications/Xcode.app",
+            version: "27.1",
+            relativePath: "Contents/version.plist"
+        )
+    )
+    let directory = try File.Directory(validating: root)
+    let tool = try await acquisition.acquire(asset, executable: false, into: directory)
+    #expect(try MainFixtureFiles.readBytes(tool.description) == bytes)
+    let observed = try await acquisition.observedXcodeBuild(of: asset, under: directory)
+    #expect(observed == build)
+    let preparation = Institute.Source.Preparation(
+        policyRevision: "source-enforcement-v3",
+        binding: .workspace(digest: "workspace-digest"),
+        swiftFormatExecutable: tool.description,
+        swiftFormatTool: digest,
+        swiftLintExecutable: "/tools/swiftlint",
+        swiftLint: .init(origin: .local, digest: .init("swiftlint-tool")),
+        linterExecutable: "/tools/swift-linter",
+        linter: .init(origin: .local, digest: .init("linter-tool")),
+        directory: root,
+        profiles: [:],
+        verifiedProfiles: [],
+        swiftFormatXcodeBuild: observed
+    )
+    let decoded = try Institute.Source.Preparation(jsonString: preparation.jsonString(sortKeys: true))
+    #expect(decoded.swiftFormatXcodeBuild == build)
+    #expect(decoded.swiftFormatTool == digest)
 }
 
 @Test
@@ -538,9 +600,11 @@ func `Xcode source acquisition fails closed on a different tool digest`() async 
         .init(status: 0, output: "27.1", diagnostics: "")
     }
     let acquisition = Institute.Source.Acquisition(process: process)
+    let cached = MainFixtureFiles.join(root, "swift-format")
+    try MainFixtureFiles.write(bytes: Array("cached tool".utf8), to: cached)
     let asset = Institute.Source.Policy.Asset(
         name: "swift-format",
-        digest: .init(Swift.String(repeating: "0", count: 64)),
+        digest: try Institute.Source.Application.digest(file: cached),
         origin: .xcode(
             application: "/Applications/Xcode.app",
             version: "27.1",

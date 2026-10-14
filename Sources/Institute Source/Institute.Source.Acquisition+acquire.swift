@@ -101,7 +101,11 @@ extension Institute.Source.Acquisition {
   ) async throws(Institute.Error) -> File {
     let component = try Self.component(asset.name)
     let destination = directory[file: component]
-    if xcodeApplication == nil, destination.stat.isFile,
+    let reuse = switch asset.origin {
+    case .xcode: false
+    case .release, .releaseArchive: xcodeApplication == nil
+    }
+    if reuse, destination.stat.isFile,
       try Institute.Source.Application.digest(file: destination.description) == asset.digest
     {
       try Self.permissions(executable: executable, file: destination)
