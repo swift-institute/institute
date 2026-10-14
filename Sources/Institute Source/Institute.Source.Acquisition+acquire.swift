@@ -152,11 +152,11 @@ extension Institute.Source.Acquisition {
         to: staging,
         under: directory
       )
-    case .xcode(let application, let version, let build, let relativePath):
+    case .xcode(let application, let version, let builds, let relativePath):
       try await copyXcode(
         application: xcodeApplication ?? application,
         version: version,
-        build: build,
+        builds: builds,
         relativePath: relativePath,
         to: staging,
         under: directory
@@ -277,7 +277,7 @@ extension Institute.Source.Acquisition {
   private func copyXcode(
     application: Swift.String,
     version: Swift.String,
-    build: Swift.String,
+    builds: [Swift.String],
     relativePath: Swift.String,
     to destination: File,
     under directory: File.Directory
@@ -288,13 +288,13 @@ extension Institute.Source.Acquisition {
     let plist = "\(application)/Contents/version.plist"
     try await verifyPlist(
       key: "CFBundleShortVersionString",
-      expected: version,
+      accepted: [version],
       plist: plist,
       under: directory
     )
     try await verifyPlist(
       key: "ProductBuildVersion",
-      expected: build,
+      accepted: builds,
       plist: plist,
       under: directory
     )
@@ -314,7 +314,7 @@ extension Institute.Source.Acquisition {
 
   private func verifyPlist(
     key: Swift.String,
-    expected: Swift.String,
+    accepted: [Swift.String],
     plist: Swift.String,
     under directory: File.Directory
   ) async throws(Institute.Error) {
@@ -335,9 +335,9 @@ extension Institute.Source.Acquisition {
         "cannot read pinned Xcode identity \(key): expected one value, observed \(values.count)"
       )
     }
-    guard values[0] == expected else {
+    guard accepted.contains(Swift.String(values[0])) else {
       throw .configuration(
-        "pinned Xcode identity mismatch for \(key): expected \(expected), observed \(values[0])"
+        "pinned Xcode identity mismatch for \(key): expected \(accepted.joined(separator: " or ")), observed \(values[0])"
       )
     }
   }

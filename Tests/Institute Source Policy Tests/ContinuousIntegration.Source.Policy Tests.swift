@@ -36,12 +36,12 @@ struct `Institute source policy` {
         )
         #expect(engine.revision == "27A9269")
         #expect(engine.toolchain == "Xcode 27.1 (27A9269)")
-        guard case .xcode(_, let version, let build, _) = engine.executable.origin else {
+        guard case .xcode(_, let version, let builds, _) = engine.executable.origin else {
             Issue.record("swift-format is not acquired from Xcode")
             return
         }
         #expect(version == "27.1")
-        #expect(build == "27A9269")
+        #expect(builds == ["27A9269", "27A9275"])
     }
 
     @Test

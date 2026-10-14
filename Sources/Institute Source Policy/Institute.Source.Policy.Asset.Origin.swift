@@ -13,7 +13,7 @@ extension Institute.Source.Policy.Asset {
         case xcode(
             application: Swift.String,
             version: Swift.String,
-            build: Swift.String,
+            builds: [Swift.String],
             relativePath: Swift.String
         )
     }

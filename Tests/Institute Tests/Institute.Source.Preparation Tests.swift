@@ -177,7 +177,7 @@ func `Xcode source acquisition reports expected and observed identity`() async t
         origin: .xcode(
             application: "/Applications/Synthetic.app",
             version: "27.0",
-            build: "27A5237l",
+            builds: ["27A5237l"],
             relativePath:
                 "Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-format"
         )
@@ -201,6 +201,44 @@ func `Xcode source acquisition reports expected and observed identity`() async t
 }
 
 @Test
+func `Xcode source acquisition accepts any listed build of the pinned version`() async throws {
+    let root = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+    try MainFixtureFiles.createDirectory(root)
+    defer { try? MainFixtureFiles.remove(root) }
+
+    let process = Source.Engine.Process { _, arguments, _, _ in
+        .init(
+            status: 0,
+            output: arguments.contains("CFBundleShortVersionString") ? "27.0" : "27A5228h",
+            diagnostics: ""
+        )
+    }
+    let acquisition = Institute.Source.Acquisition(process: process)
+    let asset = Institute.Source.Policy.Asset(
+        name: "swift-format",
+        digest: .init("unused"),
+        origin: .xcode(
+            application: "/Applications/Synthetic.app",
+            version: "27.0",
+            builds: ["27A5237l", "27A5228h"],
+            relativePath:
+                "Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-format"
+        )
+    )
+
+    let destination = try File.Directory(validating: root)
+    do throws(Institute.Error) {
+        _ = try await acquisition.acquire(
+            asset,
+            executable: true,
+            into: destination
+        )
+    } catch {
+        #expect(!error.description.contains("pinned Xcode identity mismatch"))
+    }
+}
+
+@Test
 func `Xcode source acquisition reports exact identity read failure`() async throws {
     let root = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
     try MainFixtureFiles.createDirectory(root)
@@ -216,7 +254,7 @@ func `Xcode source acquisition reports exact identity read failure`() async thro
         origin: .xcode(
             application: "/Applications/Synthetic.app",
             version: "27.0",
-            build: "27A5228h",
+            builds: ["27A5228h"],
             relativePath:
                 "Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-format"
         )
