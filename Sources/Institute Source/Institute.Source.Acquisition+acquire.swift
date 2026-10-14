@@ -152,11 +152,10 @@ extension Institute.Source.Acquisition {
         to: staging,
         under: directory
       )
-    case .xcode(let application, let version, let builds, let relativePath):
+    case .xcode(let application, let version, let relativePath):
       try await copyXcode(
         application: xcodeApplication ?? application,
         version: version,
-        builds: builds,
         relativePath: relativePath,
         to: staging,
         under: directory
@@ -277,7 +276,6 @@ extension Institute.Source.Acquisition {
   private func copyXcode(
     application: Swift.String,
     version: Swift.String,
-    builds: [Swift.String],
     relativePath: Swift.String,
     to destination: File,
     under directory: File.Directory
@@ -286,18 +284,16 @@ extension Institute.Source.Acquisition {
       !relativePath.hasPrefix("/"), !relativePath.split(separator: "/").contains("..")
     else { throw .configuration("invalid pinned Xcode source asset path") }
     let plist = "\(application)/Contents/version.plist"
-    try await verifyPlist(
+    let observed = try await readPlist(
       key: "CFBundleShortVersionString",
-      accepted: [version],
       plist: plist,
       under: directory
     )
-    try await verifyPlist(
-      key: "ProductBuildVersion",
-      accepted: builds,
-      plist: plist,
-      under: directory
-    )
+    guard observed == version else {
+      throw .configuration(
+        "pinned Xcode identity mismatch for CFBundleShortVersionString: expected \(version), observed \(observed)"
+      )
+    }
     let source: File
     do throws(File.Path.Error) {
       source = File(try File.Path(application) / File.Path(relativePath))
@@ -312,12 +308,24 @@ extension Institute.Source.Acquisition {
     }
   }
 
-  private func verifyPlist(
+  func observedXcodeBuild(
+    of asset: Institute.Source.Policy.Asset,
+    xcodeApplication: Swift.String? = nil,
+    under directory: File.Directory
+  ) async throws(Institute.Error) -> Swift.String? {
+    guard case .xcode(let application, _, _) = asset.origin else { return nil }
+    return try await readPlist(
+      key: "ProductBuildVersion",
+      plist: "\(xcodeApplication ?? application)/Contents/version.plist",
+      under: directory
+    )
+  }
+
+  private func readPlist(
     key: Swift.String,
-    accepted: [Swift.String],
     plist: Swift.String,
     under directory: File.Directory
-  ) async throws(Institute.Error) {
+  ) async throws(Institute.Error) -> Swift.String {
     let result = await process.run(
       "/usr/bin/plutil",
       ["-extract", key, "raw", "-o", "-", plist],
@@ -335,11 +343,7 @@ extension Institute.Source.Acquisition {
         "cannot read pinned Xcode identity \(key): expected one value, observed \(values.count)"
       )
     }
-    guard accepted.contains(Swift.String(values[0])) else {
-      throw .configuration(
-        "pinned Xcode identity mismatch for \(key): expected \(accepted.joined(separator: " or ")), observed \(values[0])"
-      )
-    }
+    return Swift.String(values[0])
   }
 
   private static func component(_ name: Swift.String) throws(Institute.Error)

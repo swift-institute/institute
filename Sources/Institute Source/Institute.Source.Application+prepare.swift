@@ -68,6 +68,11 @@ extension Institute.Source.Application {
       xcodeApplication: xcodeApplication,
       into: tools
     )
+    let swiftFormatXcodeBuild = try await acquisition.observedXcodeBuild(
+      of: swiftFormatAsset,
+      xcodeApplication: xcodeApplication,
+      under: tools
+    )
     let swiftLintToolFile: File
     let swiftLint: Institute.Source.Preparation.Tool
     switch swiftLintSelection {
@@ -166,7 +171,8 @@ extension Institute.Source.Application {
       linter: linter,
       directory: directory.description,
       profiles: profiles,
-      verifiedProfiles: verifiedProfiles.sorted()
+      verifiedProfiles: verifiedProfiles.sorted(),
+      swiftFormatXcodeBuild: swiftFormatXcodeBuild
     )
     let receipt = directory[file: "receipt.json"]
     do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {

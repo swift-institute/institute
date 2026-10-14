@@ -30,18 +30,21 @@ struct `Institute source policy` {
     }
 
     @Test
-    func `swift format binds the hosted Xcode identity exactly`() throws {
+    func `swift format binds the hosted Xcode version and its digest`() throws {
         let engine = try #require(
             Institute.Source.Policy.current.engines.first { $0.id.token == "swift-format" }
         )
         #expect(engine.revision == "27A9269")
         #expect(engine.toolchain == "Xcode 27.1 (27A9269)")
-        guard case .xcode(_, let version, let builds, _) = engine.executable.origin else {
+        guard case .xcode(_, let version, _) = engine.executable.origin else {
             Issue.record("swift-format is not acquired from Xcode")
             return
         }
         #expect(version == "27.1")
-        #expect(builds == ["27A9269", "27A9275"])
+        #expect(
+            engine.executable.digest
+                == .init("1b4fc083a7b8e21b23b2478dadb996f736a901fa9ff0a14145d981d45989b6ec")
+        )
     }
 
     @Test

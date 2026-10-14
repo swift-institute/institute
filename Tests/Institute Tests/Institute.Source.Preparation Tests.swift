@@ -31,12 +31,15 @@ func `Institute source preparation round trips its parse receipt`() throws {
         ),
         directory: "/artifacts/.source",
         profiles: ["institute": .init("profile-digest")],
-        verifiedProfiles: ["institute"]
+        verifiedProfiles: ["institute"],
+        swiftFormatXcodeBuild: "27A9275"
     )
 
     let decoded = try Institute.Source.Preparation(
         jsonString: preparation.jsonString(sortKeys: true)
     )
+
+    #expect(decoded.swiftFormatXcodeBuild == "27A9275")
 
     #expect(decoded.policyRevision == preparation.policyRevision)
     #expect(decoded.binding == preparation.binding)
@@ -158,7 +161,7 @@ func `Institute profile verification fails loudly on an engine refusal`() async 
 }
 
 @Test
-func `Xcode source acquisition reports expected and observed identity`() async throws {
+func `Xcode source acquisition fails closed on a different Xcode version`() async throws {
     let root = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
     try MainFixtureFiles.createDirectory(root)
     defer { try? MainFixtureFiles.remove(root) }
@@ -166,7 +169,7 @@ func `Xcode source acquisition reports expected and observed identity`() async t
     let process = Source.Engine.Process { _, arguments, _, _ in
         .init(
             status: 0,
-            output: arguments.contains("CFBundleShortVersionString") ? "27.0" : "27A5228h",
+            output: arguments.contains("CFBundleShortVersionString") ? "27.1" : "27A5228h",
             diagnostics: ""
         )
     }
@@ -177,7 +180,6 @@ func `Xcode source acquisition reports expected and observed identity`() async t
         origin: .xcode(
             application: "/Applications/Synthetic.app",
             version: "27.0",
-            builds: ["27A5237l"],
             relativePath:
                 "Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-format"
         )
@@ -190,18 +192,18 @@ func `Xcode source acquisition reports expected and observed identity`() async t
             executable: true,
             into: destination
         )
-        Issue.record("mismatched Xcode build identity was accepted")
+        Issue.record("a different Xcode version was accepted")
     } catch {
         #expect(
             error.description
-                == "pinned Xcode identity mismatch for ProductBuildVersion: "
-                + "expected 27A5237l, observed 27A5228h"
+                == "pinned Xcode identity mismatch for CFBundleShortVersionString: "
+                + "expected 27.0, observed 27.1"
         )
     }
 }
 
 @Test
-func `Xcode source acquisition accepts any listed build of the pinned version`() async throws {
+func `Xcode source acquisition does not fail on a build change alone`() async throws {
     let root = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
     try MainFixtureFiles.createDirectory(root)
     defer { try? MainFixtureFiles.remove(root) }
@@ -220,7 +222,6 @@ func `Xcode source acquisition accepts any listed build of the pinned version`()
         origin: .xcode(
             application: "/Applications/Synthetic.app",
             version: "27.0",
-            builds: ["27A5237l", "27A5228h"],
             relativePath:
                 "Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-format"
         )
@@ -254,7 +255,6 @@ func `Xcode source acquisition reports exact identity read failure`() async thro
         origin: .xcode(
             application: "/Applications/Synthetic.app",
             version: "27.0",
-            builds: ["27A5228h"],
             relativePath:
                 "Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-format"
         )
@@ -494,4 +494,69 @@ func `Source measurement refuses a tampered local linter snapshot`() async throw
     )
 
     #expect(report.references.contains { $0.code == "stale-tool" })
+}
+
+@Test
+func `Xcode source acquisition reports the observed build for the receipt`() async throws {
+    let root = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+    try MainFixtureFiles.createDirectory(root)
+    defer { try? MainFixtureFiles.remove(root) }
+
+    let process = Source.Engine.Process { _, arguments, _, _ in
+        .init(
+            status: 0,
+            output: arguments.contains("ProductBuildVersion") ? "27A9275" : "27.1",
+            diagnostics: ""
+        )
+    }
+    let acquisition = Institute.Source.Acquisition(process: process)
+    let asset = Institute.Source.Policy.Asset(
+        name: "swift-format",
+        digest: .init("unused"),
+        origin: .xcode(
+            application: "/Applications/Synthetic.app",
+            version: "27.1",
+            relativePath:
+                "Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-format"
+        )
+    )
+
+    let build = try await acquisition.observedXcodeBuild(
+        of: asset,
+        under: try File.Directory(validating: root)
+    )
+    #expect(build == "27A9275")
+}
+
+@Test(.enabled(if: MainFixtureFiles.exists("/Applications/Xcode.app/Contents/version.plist")))
+func `Xcode source acquisition fails closed on a different tool digest`() async throws {
+    let root = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+    try MainFixtureFiles.createDirectory(root)
+    defer { try? MainFixtureFiles.remove(root) }
+
+    let process = Source.Engine.Process { _, _, _, _ in
+        .init(status: 0, output: "27.1", diagnostics: "")
+    }
+    let acquisition = Institute.Source.Acquisition(process: process)
+    let asset = Institute.Source.Policy.Asset(
+        name: "swift-format",
+        digest: .init(Swift.String(repeating: "0", count: 64)),
+        origin: .xcode(
+            application: "/Applications/Xcode.app",
+            version: "27.1",
+            relativePath: "Contents/version.plist"
+        )
+    )
+
+    let destination = try File.Directory(validating: root)
+    do throws(Institute.Error) {
+        _ = try await acquisition.acquire(
+            asset,
+            executable: false,
+            into: destination
+        )
+        Issue.record("a tool with a different digest was accepted")
+    } catch {
+        #expect(error.description.hasPrefix("source asset swift-format hashes to "))
+    }
 }

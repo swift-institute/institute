@@ -59,7 +59,6 @@ extension Institute.Source {
                         origin: .xcode(
                             application: "/Applications/Xcode_27.1.app",
                             version: "27.1",
-                            builds: ["27A9269", "27A9275"],
                             relativePath:
                                 "Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-format"
                         )

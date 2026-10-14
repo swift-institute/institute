@@ -4,12 +4,13 @@ public import Source_Profile
 
 extension Institute.Source {
   public struct Preparation: Sendable, JSON.Serializable {
-    public static let schema = 6
+    public static let schema = 7
 
     public let policyRevision: Swift.String
     public let binding: Binding
     public let swiftFormatExecutable: Swift.String
     public let swiftFormatTool: Source_Profile.Source.Profile.Digest
+    public let swiftFormatXcodeBuild: Swift.String?
     public let swiftLintExecutable: Swift.String
     public let swiftLint: Tool
     public let linterExecutable: Swift.String
@@ -29,12 +30,14 @@ extension Institute.Source {
       linter: Tool,
       directory: Swift.String,
       profiles: [Swift.String: Source_Profile.Source.Profile.Digest],
-      verifiedProfiles: [Swift.String]
+      verifiedProfiles: [Swift.String],
+      swiftFormatXcodeBuild: Swift.String? = nil
     ) {
       self.policyRevision = policyRevision
       self.binding = binding
       self.swiftFormatExecutable = swiftFormatExecutable
       self.swiftFormatTool = swiftFormatTool
+      self.swiftFormatXcodeBuild = swiftFormatXcodeBuild
       self.swiftLintExecutable = swiftLintExecutable
       self.swiftLint = swiftLint
       self.linterExecutable = linterExecutable
@@ -51,6 +54,7 @@ extension Institute.Source {
         "binding": value.binding.json,
         "swiftFormatExecutable": value.swiftFormatExecutable.json,
         "swiftFormatTool": value.swiftFormatTool.json,
+        "swiftFormatXcodeBuild": value.swiftFormatXcodeBuild.json,
         "swiftLintExecutable": value.swiftLintExecutable.json,
         "swiftLint": value.swiftLint.json,
         "linterExecutable": value.linterExecutable.json,
@@ -67,7 +71,7 @@ extension Institute.Source {
       }
       let expected: Set<Swift.String> = [
         "schema", "policyRevision", "binding",
-        "swiftFormatExecutable", "swiftFormatTool",
+        "swiftFormatExecutable", "swiftFormatTool", "swiftFormatXcodeBuild",
         "swiftLintExecutable", "swiftLint",
         "linterExecutable", "linter", "directory", "profiles",
         "verifiedProfiles",
@@ -78,7 +82,7 @@ extension Institute.Source {
           got: object.keys.sorted().joined(separator: ","))
       }
       guard let schema = object["schema"], try Swift.Int(json: schema) == Self.schema else {
-        throw .typeMismatch(expected: "source preparation schema 6", got: "other schema")
+        throw .typeMismatch(expected: "source preparation schema \(Self.schema)", got: "other schema")
       }
       guard let policyRevision = object["policyRevision"],
         let binding = object["binding"],
@@ -89,7 +93,8 @@ extension Institute.Source {
         let linterExecutable = object["linterExecutable"],
         let linter = object["linter"], let directory = object["directory"],
         let profiles = object["profiles"],
-        let verifiedProfiles = object["verifiedProfiles"]
+        let verifiedProfiles = object["verifiedProfiles"],
+        let swiftFormatXcodeBuild = object["swiftFormatXcodeBuild"]
       else { throw .missingKey("source preparation field") }
       return try .init(
         policyRevision: Swift.String(json: policyRevision),
@@ -102,7 +107,8 @@ extension Institute.Source {
         linter: Tool(json: linter),
         directory: Swift.String(json: directory),
         profiles: [Swift.String: Source_Profile.Source.Profile.Digest](json: profiles),
-        verifiedProfiles: [Swift.String](json: verifiedProfiles)
+        verifiedProfiles: [Swift.String](json: verifiedProfiles),
+        swiftFormatXcodeBuild: Swift.String?(json: swiftFormatXcodeBuild)
       )
     }
   }
