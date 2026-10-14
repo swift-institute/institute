@@ -97,7 +97,7 @@ extension Institute.Source {
                     platform: .macOSARM64,
                     version: "ci-binaries",
                     revision: "b71d296092d35d98c5715ebaf6875ee3cb917027",
-                    toolchain: "Xcode 27.1;Build version 27A9269;",
+                    toolchain: "Xcode 27.1;Build version 27A9275;",
                     schema: "swift-linter-structured:2",
                     executable: .init(
                         name: "swift-linter-macos-arm64-b71d296092d35d98c5715ebaf6875ee3cb917027",
