@@ -1,0 +1,169 @@
+name: Diagnose Windows spawn hang (temporary, not for merge)
+
+on:
+  push:
+    branches:
+      - diagnose-windows-spawn-hang
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: diagnose-windows-spawn-hang
+  cancel-in-progress: true
+
+jobs:
+  swift-build-repro:
+    name: Standalone swift build of the S5 fixture
+    if: ${{ github.head_ref == 'diagnose-windows-spawn-hang' || github.ref == 'refs/heads/diagnose-windows-spawn-hang' }}
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: SwiftyLab/setup-swift@38f54a76b70d989321de9dc7c840618c08cf56e9 # v1.14.0
+        with:
+          swift-version: "6.4"
+          cache-snapshot: false
+      - name: Build the fixture four ways
+        shell: pwsh
+        run: |
+          & "$env:GITHUB_WORKSPACE\.github\diagnose\repro-s5.ps1" -Fixtures "$env:GITHUB_WORKSPACE\Tests\Institute Development Tests\Fixtures\Composition\MixedRoots" *>&1 |
+            Tee-Object C:\repro.txt
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: repro-s5
+          path: C:\repro.txt
+  windows-tests:
+    name: Windows tests (${{ matrix.mode }})
+    # Runs 38125655658 and 38128757956 already captured this job's evidence;
+    # it is parked while the standalone reproduction below runs.
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: windows-latest
+    timeout-minutes: 100
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [parallel, serial]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: SwiftyLab/setup-swift@38f54a76b70d989321de9dc7c840618c08cf56e9 # v1.14.0
+        with:
+          swift-version: "6.4"
+          cache-snapshot: false
+      - name: Locate debugger
+        shell: pwsh
+        run: |
+          $candidates = @(
+            "${env:ProgramFiles(x86)}\Windows Kits\10\Debuggers\x64\cdb.exe",
+            "${env:ProgramFiles}\Windows Kits\10\Debuggers\x64\cdb.exe"
+          )
+          $cdb = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+          if ($cdb) { "CDB=$cdb" | Out-File -Append $env:GITHUB_ENV; "cdb: $cdb" } else { "cdb not found" }
+      - name: Build tests
+        shell: bash
+        run: |
+          swift --version
+          swift build --build-tests -c debug --build-system native --scratch-path C:/b
+      - name: Run tests under a watchdog
+        shell: pwsh
+        env:
+          MODE: ${{ matrix.mode }}
+          _NT_SYMBOL_PATH: srv*C:\sym*https://msdl.microsoft.com/download/symbols
+        run: |
+          $diag = 'C:\diag'
+          New-Item -ItemType Directory -Force $diag | Out-Null
+          $arguments = @('test', '-c', 'debug', '--build-system', 'native', '--scratch-path', 'C:/b',
+            '--skip-build', '--event-stream-output-path', "$diag\events.jsonl", '--event-stream-version', '0')
+          if ($env:MODE -eq 'serial') { $arguments += '--no-parallel' }
+          $start = Get-Date
+          "start $($start.ToString('o')) swift $($arguments -join ' ')" | Tee-Object "$diag\watchdog.txt"
+          $p = Start-Process -FilePath swift -ArgumentList $arguments -NoNewWindow -PassThru `
+            -RedirectStandardOutput "$diag\stdout.txt" -RedirectStandardError "$diag\stderr.txt"
+          $limit = 15 * 60
+          $exited = $p.WaitForExit($limit * 1000)
+          if ($exited) {
+            "exited $($p.ExitCode) after $([int]((Get-Date) - $start).TotalSeconds)s" | Tee-Object -Append "$diag\watchdog.txt"
+            Get-Content "$diag\stdout.txt" -Tail 40
+            exit 0
+          }
+          "TIMEOUT after ${limit}s; root pid $($p.Id)" | Tee-Object -Append "$diag\watchdog.txt"
+          $all = Get-CimInstance Win32_Process
+          $all | Select-Object ProcessId, ParentProcessId, Name, CreationDate, CommandLine |
+            Sort-Object CreationDate | Format-List | Out-File -Width 4096 "$diag\processes-all.txt"
+          $tree = @{}
+          $queue = [System.Collections.Generic.Queue[int]]::new()
+          $queue.Enqueue($p.Id)
+          while ($queue.Count -gt 0) {
+            $id = $queue.Dequeue()
+            $tree[$id] = $true
+            $all | Where-Object { $_.ParentProcessId -eq $id -and -not $tree.ContainsKey([int]$_.ProcessId) } |
+              ForEach-Object { $queue.Enqueue([int]$_.ProcessId) }
+          }
+          $late = $all | Where-Object { $_.CreationDate -ge $start -and $_.ProcessId -ne $PID -and $_.Name -notin @('conhost.exe', 'WmiPrvSE.exe', 'svchost.exe') }
+          $late | Select-Object ProcessId, ParentProcessId, Name, CreationDate, ThreadCount, HandleCount, KernelModeTime, UserModeTime, CommandLine,
+            @{ n = 'InTestTree'; e = { $tree.ContainsKey([int]$_.ProcessId) } },
+            @{ n = 'GetProcess'; e = { try { $g = Get-Process -Id $_.ProcessId -ErrorAction Stop; "threads=$($g.Threads.Count) hasExited=$($g.HasExited) exitCode=$($g.ExitCode)" } catch { "error: $_" } } } |
+            Format-List | Out-File -Width 4096 "$diag\processes-since-test-start.txt"
+          Get-Content "$diag\processes-since-test-start.txt"
+          try {
+            Add-Type -Path "$env:GITHUB_WORKSPACE\.github\diagnose\Handles.cs"
+            $probe = [System.IO.File]::Open("$diag\probe.txt", 'Create')
+            $fileType = [HandleDump]::TypeIndexOf($PID, $probe.SafeFileHandle.DangerousGetHandle().ToInt64())
+            $probe.Close()
+            $pids = [int[]]@($late | ForEach-Object { [int]$_.ProcessId })
+            $rows = [HandleDump]::Dump($pids, $fileType)
+            "pid`thandle`tobject`ttype`taccess`tattr (File type index $fileType)" | Out-File "$diag\file-handles.tsv"
+            $rows | Out-File -Append "$diag\file-handles.tsv"
+            $byObject = $rows | ForEach-Object { $c = $_ -split "`t"; [pscustomobject]@{ Pid = $c[0]; Handle = $c[1]; Object = $c[2]; Access = $c[4]; Attr = $c[5] } } | Group-Object Object
+            $names = @{}; $late | ForEach-Object { $names["$($_.ProcessId)"] = $_.Name }
+            $byObject | Where-Object { ($_.Group | Select-Object -ExpandProperty Pid -Unique).Count -gt 1 } | ForEach-Object {
+              "object $($_.Name): " + (($_.Group | ForEach-Object { "$($names[$_.Pid])($($_.Pid)) h=$($_.Handle) access=$($_.Access) attr=$($_.Attr)" }) -join '; ')
+            } | Tee-Object "$diag\shared-file-objects.txt"
+          } catch { "handle dump failed: $_" | Tee-Object "$diag\handle-dump-error.txt" }
+          if ($env:CDB) {
+            foreach ($proc in $late) {
+              $id = $proc.ProcessId
+              $out = "$diag\cdb-$($proc.Name)-$id.txt"
+              "== cdb $($proc.Name) $id"
+              $job = Start-Job -ScriptBlock {
+                param($cdb, $id, $out)
+                & $cdb -p $id -lines -y "srv*C:\sym*https://msdl.microsoft.com/download/symbols;C:\b\x86_64-unknown-windows-msvc\debug" -c "!peb; ~*kn 40; !handle 0 f File; qd" *> $out
+              } -ArgumentList $env:CDB, $id, $out
+              if (-not (Wait-Job $job -Timeout 240)) { "cdb timed out for $id"; Stop-Job $job }
+              if (Select-String -Path $out -Pattern 'Cannot debug pid' -Quiet) {
+                $job = Start-Job -ScriptBlock {
+                  param($cdb, $id, $out)
+                  & $cdb -pv -p $id -lines -y "srv*C:\sym*https://msdl.microsoft.com/download/symbols" -c "!peb; ~*kn 40; qd" *> "$out.noninvasive.txt"
+                } -ArgumentList $env:CDB, $id, $out
+                if (-not (Wait-Job $job -Timeout 120)) { Stop-Job $job }
+              }
+            }
+          }
+          Get-ChildItem -Recurse 'C:\ProgramData\Microsoft\Windows\WER' -Filter Report.wer -ErrorAction SilentlyContinue |
+            ForEach-Object { "=== $($_.FullName)"; Get-Content $_.FullName -Encoding Unicode } |
+            Out-File "$diag\wer-reports.txt"
+          & taskkill /T /F /PID $p.Id | Out-File -Append "$diag\watchdog.txt"
+          exit 1
+      - name: Collect crash reports
+        if: always()
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force C:\diag | Out-Null
+          Get-ChildItem -Recurse 'C:\ProgramData\Microsoft\Windows\WER' -Filter Report.wer -ErrorAction SilentlyContinue |
+            ForEach-Object { "=== $($_.FullName)"; Get-Content $_.FullName -Encoding Unicode } |
+            Out-File C:\diag\wer-reports-final.txt
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: diag-${{ matrix.mode }}
+          path: C:\diag
+          if-no-files-found: warn
