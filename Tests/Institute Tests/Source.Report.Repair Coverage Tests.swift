@@ -101,10 +101,11 @@ private let swiftLintRules = [
 private func swiftLintFinding(
     _ file: Swift::String,
     line: Swift::Int,
-    rule: Swift::String
+    rule: Swift::String,
+    severity: Swift::String = "Error"
 ) -> Swift::String {
     """
-    {"character":1,"file":"\(repairCoverageRoot)/\(file)","line":\(line),"reason":"reason","rule_id":"\(rule)","severity":"Error","type":"Type"}
+    {"character":1,"file":"\(repairCoverageRoot)/\(file)","line":\(line),"reason":"reason","rule_id":"\(rule)","severity":"\(severity)","type":"Type"}
     """
 }
 
@@ -434,4 +435,81 @@ func `An apostrophe in a one-line formatter message does not absorb the next dia
     }
     #expect(findings.map(\.diagnostic.identifier) == ["ValidateDocumentationComments", "OrderedImports"])
     #expect(findings[0].diagnostic.message == "don't document this")
+}
+
+
+extension Source.Measurement {
+    @Suite struct Severity {
+        @Suite struct Unit {}
+    }
+}
+
+extension Source.Measurement.Severity.Unit {
+    @Test(arguments: [[], ["Warning"], ["Error"], ["Warning", "Error"]])
+    func `SwiftLint preserves configured severity and accepts matching process status`(
+        severities: [Swift::String]
+    ) {
+        let output = "[" + severities.enumerated().map { index, severity in
+            swiftLintFinding("Sources/A.swift", line: index + 1, rule: "line_length", severity: severity)
+        }.joined(separator: ",") + "]"
+        let status: Swift::Int32 = severities.contains("Error") ? 2 : 0
+        let measurement = Source.Measurement.swiftLint(
+            engine: swiftLintEngine,
+            subject: repairCoverageSubject(),
+            rules: swiftLintRules,
+            status: status,
+            output: output,
+            diagnostics: ""
+        )
+        let report = repairCoverageReport(measurement, rules: swiftLintRules)
+        #expect(isComplete(report))
+        if severities.isEmpty {
+            guard case .clean = measurement.verdict else {
+                Issue.record("expected clean measurement")
+                return
+            }
+        } else {
+            guard case .findings(let findings) = measurement.verdict else {
+                Issue.record("expected findings")
+                return
+            }
+            #expect(findings.map { $0.diagnostic.severity == .error } == severities.map { $0 == "Error" })
+        }
+        for mismatch in [Swift::Int32(0), 1, 2, 127] where mismatch != status {
+            let invalid = Source.Measurement.swiftLint(
+                engine: swiftLintEngine,
+                subject: repairCoverageSubject(),
+                rules: swiftLintRules,
+                status: mismatch,
+                output: output,
+                diagnostics: ""
+            )
+            guard case .unmeasured(let reasons) = invalid.verdict else {
+                Issue.record("status disagreement must be unmeasured")
+                continue
+            }
+            #expect(reasons.contains { $0.code == "engine-status-mismatch" })
+            #expect(!isComplete(repairCoverageReport(invalid, rules: swiftLintRules)))
+        }
+    }
+}
+
+
+extension Source.Measurement.Severity.Unit {
+    @Test(arguments: ["not JSON", "{}", "[{}]", "[" + swiftLintFinding("Sources/A.swift", line: 1, rule: "line_length", severity: "Unknown") + "]"])
+    func `SwiftLint malformed or unknown severity output remains unmeasured`(output: Swift::String) {
+        let measurement = Source.Measurement.swiftLint(
+            engine: swiftLintEngine,
+            subject: repairCoverageSubject(),
+            rules: swiftLintRules,
+            status: 0,
+            output: output,
+            diagnostics: ""
+        )
+        guard case .unmeasured = measurement.verdict else {
+            Issue.record("invalid output must not become complete")
+            return
+        }
+        #expect(!isComplete(repairCoverageReport(measurement, rules: swiftLintRules)))
+    }
 }

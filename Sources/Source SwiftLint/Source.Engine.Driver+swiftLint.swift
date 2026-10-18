@@ -8,7 +8,6 @@ extension Source.Engine.Driver {
         let arguments =
           [
             "lint",
-            "--strict",
             "--reporter", "json",
             "--quiet",
             "--no-cache",

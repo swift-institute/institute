@@ -179,7 +179,7 @@ private func sourceSwiftLintMeasurement(
       < (right.filePath ?? right.fileID, right.line, right.column, $1.rule.token)
   }
 
-  let expectedStatus: Swift.Int32 = findings.isEmpty ? 0 : 2
+  let expectedStatus: Swift.Int32 = findings.contains { $0.diagnostic.severity == .error } ? 2 : 0
   guard status == expectedStatus else {
     throw .init(
       code: "engine-status-mismatch",

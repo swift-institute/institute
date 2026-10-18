@@ -213,3 +213,26 @@ struct `Institute source policy` {
         return decoded
     }
 }
+
+
+extension `Institute source policy` {
+    @Test
+    func `adopted linter catalog preserves published bundle identities and profiles`() {
+        let policy = Institute.Source.Policy.current
+        let expected: [(Institute.Source.Bundle, Swift.Int, Swift.String)] = [
+            (.institute, 127, "205d15a352af1a75ca3f19f604c8bdd876ecdfc608043f047b25b96232949cb4"),
+            (.primitives, 130, "c03bd21528d50817d1fdd8c820ee328d29c9a6fb039d848d77ec976d7e56e834"),
+            (.standards, 123, "9d48fcf6436a431ca3d78dcbc3d689fa74d289e01e419ac98d0500b93b3886b2"),
+        ]
+        let engine = policy.engines.first { $0.id.token == "swift-linter" }
+        #expect(engine?.revision == "b6776f29de7e40b088ca5b4c013d49dc32733b12")
+        #expect(engine?.executable.digest == .init("cbc33a2cbf88b5282cae316f90cfaf1097e061336012f8a212a7d6088fb68e33"))
+        for (bundle, count, digest) in expected {
+            let rules = policy.linterRules(for: bundle)
+            #expect(rules.count == count)
+            #expect(Set(rules).count == count)
+            #expect(rules.map(\.token) == rules.map(\.token).sorted())
+            #expect(policy.linter(bundle: bundle, rules: rules).digest == .init(digest))
+        }
+    }
+}
