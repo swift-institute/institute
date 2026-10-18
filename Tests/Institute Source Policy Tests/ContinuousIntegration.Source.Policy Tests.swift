@@ -220,13 +220,13 @@ extension `Institute source policy` {
     func `adopted linter catalog preserves published bundle identities and profiles`() {
         let policy = Institute.Source.Policy.current
         let expected: [(Institute.Source.Bundle, Swift.Int, Swift.String)] = [
-            (.institute, 127, "205d15a352af1a75ca3f19f604c8bdd876ecdfc608043f047b25b96232949cb4"),
-            (.primitives, 130, "c03bd21528d50817d1fdd8c820ee328d29c9a6fb039d848d77ec976d7e56e834"),
-            (.standards, 123, "9d48fcf6436a431ca3d78dcbc3d689fa74d289e01e419ac98d0500b93b3886b2"),
+            (.institute, 126, "38ead8dc815a42fe7e9a11a82ddfdfe01b2589acee9e1129cf7887f4955df82e"),
+            (.primitives, 129, "4690d0ce661ed7ac8a287cdd1c0209ba3a9219a6d95cd6b21ca71ed763890c60"),
+            (.standards, 122, "1792673e3453fa926688807127816aa8561e16702c5a1805332405cf93787681"),
         ]
         let engine = policy.engines.first { $0.id.token == "swift-linter" }
-        #expect(engine?.revision == "b6776f29de7e40b088ca5b4c013d49dc32733b12")
-        #expect(engine?.executable.digest == .init("cbc33a2cbf88b5282cae316f90cfaf1097e061336012f8a212a7d6088fb68e33"))
+        #expect(engine?.revision == "51fdb39b59d5d4b98094e5de93827e5fcf1579b4")
+        #expect(engine?.executable.digest == .init("8fa9e133334cab6033e5183238d2a422183b2dd844bc07f2dcaebb3e98da76ce"))
         for (bundle, count, digest) in expected {
             let rules = policy.linterRules(for: bundle)
             #expect(rules.count == count)
