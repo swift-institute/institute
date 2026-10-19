@@ -92,14 +92,16 @@ extension Institute.Lint.Bundle {
     /// the universal rule pack's self-lint, which activates its own
     /// unbaked bundle.
     ///
-    /// `components` and `applications` carry no materialized packages
-    /// yet. They take `institute`, the organization-wide bundle, which
-    /// is what a package above the standards layer would be given.
+    /// Since the organization reorganization the former `primitives`
+    /// packages sit in `swift-atoms` and `swift-molecules`, and the former
+    /// `foundations` packages in `swift-compositions`; the bundles follow
+    /// them, as `swift-institute/.github`'s `fleet.json` assigns them
+    /// (L1 and L2 `primitives`, L3 `standards`, L4 `institute`).
     public init(_ layer: Institute.Layer) {
         switch layer {
-        case .primitives: self = .primitives
+        case .atoms, .molecules: self = .primitives
         case .standards: self = .standards
-        case .foundations, .components, .applications: self = .institute
+        case .compositions: self = .institute
         }
     }
 }

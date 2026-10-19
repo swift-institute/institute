@@ -25,8 +25,8 @@ extension Institute.Lint.Prerequisite {
     /// The exact owning Issue coordinate.
     public var issue: Swift.String {
         switch self {
-        case .sarif: "https://github.com/swift-foundations/swift-linter/issues/20"
-        case .currency: "https://github.com/swift-foundations/swift-linter/issues/33"
+        case .sarif: "https://github.com/swift-compositions/swift-linter/issues/20"
+        case .currency: "https://github.com/swift-compositions/swift-linter/issues/33"
         }
     }
 

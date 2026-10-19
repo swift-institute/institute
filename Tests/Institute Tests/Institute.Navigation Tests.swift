@@ -39,15 +39,15 @@ extension Institute.Navigation.Test {
         let root = try Institute.Root(checkout: checkout)
         let present = Institute.Repository(
             name: "swift-present",
-            url: "https://github.com/swift-primitives/swift-present.git",
-            organization: "swift-primitives",
-            layer: .primitives
+            url: "https://github.com/swift-atoms/swift-present.git",
+            organization: "swift-atoms",
+            layer: .atoms
         )
         let absent = Institute.Repository(
             name: "swift-absent",
-            url: "https://github.com/swift-foundations/swift-absent.git",
-            organization: "swift-foundations",
-            layer: .foundations
+            url: "https://github.com/swift-compositions/swift-absent.git",
+            organization: "swift-compositions",
+            layer: .compositions
         )
         let materialized = try root.materialization(for: present)
         try materialized.create.recursive()

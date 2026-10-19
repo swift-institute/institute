@@ -57,7 +57,7 @@ extension Institute.Composition.Workspace.Test.Unit {
         let checkout = try Self.directory("/checkout")
         let manifests = [
             Institute.Composed.Manifest(
-                reference: "../swift-primitives/swift-bit-primitives",
+                reference: "../swift-atoms/swift-bit-primitives",
                 package: "swift-bit-primitives",
                 identity: "swift-bit-primitives",
                 libraryProducts: ["Bit Primitives"],
@@ -78,7 +78,7 @@ extension Institute.Composition.Workspace.Test.Unit {
         let workspace = Institute.Composition.Workspace.keyed("k", under: base, anchor: anchor)
         let manifests = [
             Institute.Composed.Manifest(
-                reference: "../swift-primitives/swift-bit-primitives",
+                reference: "../swift-atoms/swift-bit-primitives",
                 package: "swift-bit-primitives",
                 identity: "swift-bit-primitives",
                 libraryProducts: ["Bit Primitives"],
@@ -88,7 +88,7 @@ extension Institute.Composition.Workspace.Test.Unit {
         let rebased = Institute.Composed.Root.rebased(manifests, in: workspace)
         #expect(rebased.count == 1)
         let reference = try #require(rebased.first).reference
-        let expected = try File.Path(Self.root + "/checkout/swift-primitives/swift-bit-primitives")
+        let expected = try File.Path(Self.root + "/checkout/swift-atoms/swift-bit-primitives")
         #expect(reference == expected.description)
         let resolved = try File.Path(reference)
         #expect(resolved.isAbsolute)
@@ -175,7 +175,7 @@ extension Institute.Composition.Workspace.Test.Integration {
         try Institute.Composed.Root.write(
             [
                 .init(
-                    reference: "../swift-primitives/swift-bit-primitives",
+                    reference: "../swift-atoms/swift-bit-primitives",
                     package: "swift-bit-primitives",
                     identity: "swift-bit-primitives",
                     libraryProducts: ["Bit Primitives"],
@@ -196,8 +196,8 @@ extension Institute.Composition.Workspace.Test.Integration {
             return storage
         }
         let text = Swift.String(decoding: bytes, as: Swift.UTF8.self)
-        let reference = try File.Path("/swift-primitives/swift-bit-primitives").description
+        let reference = try File.Path("/swift-atoms/swift-bit-primitives").description
         #expect(text.contains(Institute.Composed.Root.literal(reference)))
-        #expect(!text.contains("\"../swift-primitives"))
+        #expect(!text.contains("\"../swift-atoms"))
     }
 }

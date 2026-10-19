@@ -34,11 +34,10 @@ extension Institute.Layout.Test.Unit {
     }
 
     @Test(arguments: [
-        (Institute.Layer.primitives, "swift-primitives"),
+        (Institute.Layer.atoms, "swift-atoms"),
+        (.molecules, "swift-molecules"),
         (.standards, "swift-standards"),
-        (.foundations, "swift-foundations"),
-        (.components, "swift-components"),
-        (.applications, "swift-applications"),
+        (.compositions, "swift-compositions"),
     ])
     func `every layer roots at its organization`(
         layer: Institute.Layer,
@@ -51,13 +50,13 @@ extension Institute.Layout.Test.Unit {
     func `a layer-root repository materializes directly under its layer root`() {
         let repository = Self.repository(
             name: "swift-dimension-primitives",
-            organization: "swift-primitives",
-            layer: .primitives
+            organization: "swift-atoms",
+            layer: .atoms
         )
 
         #expect(
             Institute.Layout.reference(for: repository)
-                == "swift-primitives/swift-dimension-primitives"
+                == "swift-atoms/swift-dimension-primitives"
         )
     }
 
@@ -104,9 +103,9 @@ extension Institute.Layout.Test.`Edge Case` {
     ) {
         let repository = Institute.Repository(
             name: name,
-            url: "https://github.com/swift-foundations/\(name).git",
-            organization: "swift-foundations",
-            layer: .foundations
+            url: "https://github.com/swift-compositions/\(name).git",
+            organization: "swift-compositions",
+            layer: .compositions
         )
 
         #expect(throws: Institute.Error.self) {

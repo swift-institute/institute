@@ -94,15 +94,15 @@ extension Institute.Pages.Test.Unit {
         let repositories = [
             Institute.Repository(
                 name: "swift-example-two",
-                url: "https://github.com/swift-primitives/swift-example-two.git",
-                organization: "swift-primitives",
-                layer: .primitives
+                url: "https://github.com/swift-atoms/swift-example-two.git",
+                organization: "swift-atoms",
+                layer: .atoms
             ),
             Institute.Repository(
                 name: "swift-example-one",
-                url: "https://github.com/swift-primitives/swift-example-one.git",
-                organization: "swift-primitives",
-                layer: .primitives
+                url: "https://github.com/swift-atoms/swift-example-one.git",
+                organization: "swift-atoms",
+                layer: .atoms
             ),
         ]
         let fixture = try Institute.Doctor.Fixture(repositories: repositories)
@@ -126,15 +126,15 @@ extension Institute.Pages.Test.Unit {
         let repositories = [
             Institute.Repository(
                 name: "swift-example",
-                url: "https://github.com/swift-primitives/swift-example.git",
-                organization: "swift-primitives",
-                layer: .primitives
+                url: "https://github.com/swift-atoms/swift-example.git",
+                organization: "swift-atoms",
+                layer: .atoms
             ),
             Institute.Repository(
                 name: "swift-example-vendor",
                 url: "https://github.com/swift-intel/swift-example-vendor.git",
                 organization: "swift-intel",
-                layer: .primitives
+                layer: .atoms
             ),
         ]
         let fixture = try Institute.Doctor.Fixture(repositories: repositories)
@@ -151,7 +151,7 @@ extension Institute.Pages.Test.Unit {
         #expect(inventory.organizationProfilePages.count == 2)
         #expect(
             Swift.Set(inventory.organizationProfilePages.map(\.organization))
-                == ["swift-primitives", "swift-intel"]
+                == ["swift-atoms", "swift-intel"]
         )
         #expect(inventory.organizationProfilePages.allSatisfy { $0.kind == .organizationProfile })
         #expect(inventory.organizationProfilePages.allSatisfy { $0.layer == nil })

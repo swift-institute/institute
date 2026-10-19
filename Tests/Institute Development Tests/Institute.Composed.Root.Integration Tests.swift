@@ -187,11 +187,11 @@ extension Institute.Composed.Root.Integration {
         let base = try Self.scratch()
         defer { try? DevelopmentFixtureFiles.remove(base) }
 
-        // A real hierarchy: root/swift-primitives/<reference>, where the
+        // A real hierarchy: root/swift-atoms/<reference>, where the
         // materialized manifest's evaluated name diverges from the
         // inventory reference. Evaluation is the real Package.Manager.
         let checkout = DevelopmentFixtureFiles.join(base, "checkout")
-        let root = DevelopmentFixtureFiles.join(base, "root/swift-primitives")
+        let root = DevelopmentFixtureFiles.join(base, "root/swift-atoms")
         try DevelopmentFixtureFiles.createDirectory(checkout)
         try DevelopmentFixtureFiles.createDirectory(root)
         try DevelopmentFixtureFiles.copy(DevelopmentFixtureFiles.join(Self.fixtures, "IdentityDivergence/swift-divergent-primitives"), to: DevelopmentFixtureFiles.join(root, "swift-divergent-primitives")
@@ -214,9 +214,9 @@ extension Institute.Composed.Root.Integration {
                 roster: [
                     .init(
                         name: "swift-divergent-primitives",
-                        url: "https://github.com/swift-primitives/swift-divergent-primitives.git",
-                        organization: "swift-primitives",
-                        layer: .primitives
+                        url: "https://github.com/swift-atoms/swift-divergent-primitives.git",
+                        organization: "swift-atoms",
+                        layer: .atoms
                     )
                 ],
                 at: checkoutDirectory
@@ -341,13 +341,13 @@ extension Institute.Composed.Root.Integration {
         let outside = DevelopmentFixtureFiles.join(base, "outside/swift-escapee")
         try DevelopmentFixtureFiles.createDirectory(root)
         try DevelopmentFixtureFiles.createDirectory(outside)
-        try DevelopmentFixtureFiles.createSymbolicLink(DevelopmentFixtureFiles.join(root, "swift-primitives"), to: DevelopmentFixtureFiles.join(base, "outside")
+        try DevelopmentFixtureFiles.createSymbolicLink(DevelopmentFixtureFiles.join(root, "swift-atoms"), to: DevelopmentFixtureFiles.join(base, "outside")
         )
 
         #expect(throws: Institute.Error.self) {
             try Institute.Root.preflight(
                 File.Directory(
-                    try File.Path(DevelopmentFixtureFiles.join(root, "swift-primitives/swift-escapee"))
+                    try File.Path(DevelopmentFixtureFiles.join(root, "swift-atoms/swift-escapee"))
                 ),
                 under: File.Directory(try File.Path(root))
             )

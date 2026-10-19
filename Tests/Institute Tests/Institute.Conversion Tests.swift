@@ -27,7 +27,7 @@ extension Institute.Conversion.Test {
 
     static func repository(
         _ identity: Swift.String,
-        layer: Institute.Layer = .primitives
+        layer: Institute.Layer = .atoms
     ) -> Institute.Repository {
         let key = coordinate(identity)
         return .init(
@@ -71,7 +71,7 @@ extension Institute.Conversion.Test {
 
     static func cohortEntry(
         _ identity: Swift.String,
-        layer: Institute.Layer = .primitives,
+        layer: Institute.Layer = .atoms,
         preConversionHead: Swift.String = "head-1"
     ) -> Institute.Conversion.Repository {
         let key = coordinate(identity)
@@ -90,16 +90,16 @@ extension Institute.Conversion.Test.Unit {
         let receipt = Institute.Conversion.Receipt(
             instrument: Institute.Conversion.Test.instrument(),
             cohort: [
-                Institute.Conversion.Test.cohortEntry("swift-primitives/swift-example-two"),
-                Institute.Conversion.Test.cohortEntry("swift-primitives/swift-example-one"),
+                Institute.Conversion.Test.cohortEntry("swift-atoms/swift-example-two"),
+                Institute.Conversion.Test.cohortEntry("swift-atoms/swift-example-one"),
             ],
             pages: [
                 Institute.Conversion.Test.page(
-                    "swift-primitives/swift-example-two",
+                    "swift-atoms/swift-example-two",
                     pre: "blob-two"
                 ),
                 Institute.Conversion.Test.page(
-                    "swift-primitives/swift-example-one",
+                    "swift-atoms/swift-example-one",
                     pre: "blob-one"
                 ),
             ],
@@ -116,14 +116,14 @@ extension Institute.Conversion.Test.Unit {
         // Sorted by canonical coordinate regardless of construction order.
         #expect(
             receipt.cohort.map(\.coordinate.identity) == [
-                "swift-primitives/swift-example-one",
-                "swift-primitives/swift-example-two",
+                "swift-atoms/swift-example-one",
+                "swift-atoms/swift-example-two",
             ]
         )
         #expect(
             receipt.pages.map(\.coordinate.identity) == [
-                "swift-primitives/swift-example-one",
-                "swift-primitives/swift-example-two",
+                "swift-atoms/swift-example-one",
+                "swift-atoms/swift-example-two",
             ]
         )
     }
@@ -135,23 +135,23 @@ extension Institute.Conversion.Test.Unit {
         let receipt = Institute.Conversion.Receipt(
             instrument: Institute.Conversion.Test.instrument(),
             cohort: [
-                Institute.Conversion.Test.cohortEntry("swift-primitives/equal"),
-                Institute.Conversion.Test.cohortEntry("swift-primitives/differing"),
-                Institute.Conversion.Test.cohortEntry("swift-primitives/unconverted"),
+                Institute.Conversion.Test.cohortEntry("swift-atoms/equal"),
+                Institute.Conversion.Test.cohortEntry("swift-atoms/differing"),
+                Institute.Conversion.Test.cohortEntry("swift-atoms/unconverted"),
             ],
             pages: [
                 Institute.Conversion.Test.page(
-                    "swift-primitives/equal",
+                    "swift-atoms/equal",
                     pre: "same-blob",
                     post: "same-blob"
                 ),
                 Institute.Conversion.Test.page(
-                    "swift-primitives/differing",
+                    "swift-atoms/differing",
                     pre: "old-blob",
                     post: "new-blob"
                 ),
                 Institute.Conversion.Test.page(
-                    "swift-primitives/unconverted",
+                    "swift-atoms/unconverted",
                     pre: "old-blob",
                     post: nil
                 ),
@@ -163,7 +163,7 @@ extension Institute.Conversion.Test.Unit {
         #expect(cohort.count == 3)
         let nonExcluded = cohort.filter { !$0.excluded }
         #expect(nonExcluded.count == 1)
-        #expect(nonExcluded.first?.coordinate.identity == "swift-primitives/differing")
+        #expect(nonExcluded.first?.coordinate.identity == "swift-atoms/differing")
     }
 
     @Test
@@ -179,8 +179,8 @@ extension Institute.Conversion.Test.Unit {
         async throws
     {
         let repositories = [
-            Institute.Conversion.Test.repository("swift-primitives/swift-example-one"),
-            Institute.Conversion.Test.repository("swift-primitives/swift-example-two"),
+            Institute.Conversion.Test.repository("swift-atoms/swift-example-one"),
+            Institute.Conversion.Test.repository("swift-atoms/swift-example-two"),
         ]
         let fixture = try Institute.Doctor.Fixture(repositories: repositories)
         defer { fixture.remove() }
@@ -203,13 +203,13 @@ extension Institute.Conversion.Test.Unit {
         let fixture = try Institute.Doctor.Fixture(repositories: [])
         defer { fixture.remove() }
         let readme = Institute.Conversion.Test.page(
-            "swift-primitives/swift-example-one",
+            "swift-atoms/swift-example-one",
             pre: "blob-pre",
             post: "blob-post"
         )
         let receipt = Institute.Conversion.Receipt(
             instrument: Institute.Conversion.Test.instrument(),
-            cohort: [Institute.Conversion.Test.cohortEntry("swift-primitives/swift-example-one")],
+            cohort: [Institute.Conversion.Test.cohortEntry("swift-atoms/swift-example-one")],
             pages: [readme],
             driftChecks: [],
             evaluation: .init(
@@ -220,7 +220,7 @@ extension Institute.Conversion.Test.Unit {
                     .init(
                         trialIdentifier: "t-1-L",
                         coordinate: Institute.Conversion.Test.coordinate(
-                            "swift-primitives/swift-example-one"
+                            "swift-atoms/swift-example-one"
                         ),
                         template: "T1",
                         arm: .legacy,
@@ -236,7 +236,7 @@ extension Institute.Conversion.Test.Unit {
                     .init(
                         trialIdentifier: "t-1-C",
                         coordinate: Institute.Conversion.Test.coordinate(
-                            "swift-primitives/swift-example-one"
+                            "swift-atoms/swift-example-one"
                         ),
                         template: "T1",
                         arm: .converted,
@@ -279,13 +279,13 @@ extension Institute.Conversion.Test.Unit {
         let fixture = try Institute.Doctor.Fixture(repositories: [])
         defer { fixture.remove() }
         let readme = Institute.Conversion.Test.page(
-            "swift-primitives/swift-example-one",
+            "swift-atoms/swift-example-one",
             pre: "blob-pre",
             post: "blob-post"
         )
         let receipt = Institute.Conversion.Receipt(
             instrument: Institute.Conversion.Test.instrument(),
-            cohort: [Institute.Conversion.Test.cohortEntry("swift-primitives/swift-example-one")],
+            cohort: [Institute.Conversion.Test.cohortEntry("swift-atoms/swift-example-one")],
             pages: [readme],
             driftChecks: [],
             evaluation: .init(
@@ -321,10 +321,10 @@ extension Institute.Conversion.Test.Unit {
         defer { fixture.remove() }
         let receipt = Institute.Conversion.Receipt(
             instrument: Institute.Conversion.Test.instrument(),
-            cohort: [Institute.Conversion.Test.cohortEntry("swift-primitives/swift-example-one")],
+            cohort: [Institute.Conversion.Test.cohortEntry("swift-atoms/swift-example-one")],
             pages: [
                 Institute.Conversion.Test.page(
-                    "swift-primitives/swift-example-one",
+                    "swift-atoms/swift-example-one",
                     pre: "present-blob"
                 )
             ],
@@ -349,7 +349,7 @@ extension Institute.Conversion.Test.Unit {
     @Test
     func `Revert outcome is computed from blob equality, never authored`() {
         let restored = Institute.Conversion.Revert(
-            coordinate: Institute.Conversion.Test.coordinate("swift-primitives/swift-example-one"),
+            coordinate: Institute.Conversion.Test.coordinate("swift-atoms/swift-example-one"),
             revertCommit: "commit-1",
             restoredBlob: "blob-pre",
             expectedPreConversionBlob: "blob-pre"
@@ -357,7 +357,7 @@ extension Institute.Conversion.Test.Unit {
         #expect(restored.outcome == .restored)
 
         let failed = Institute.Conversion.Revert(
-            coordinate: Institute.Conversion.Test.coordinate("swift-primitives/swift-example-one"),
+            coordinate: Institute.Conversion.Test.coordinate("swift-atoms/swift-example-one"),
             revertCommit: "commit-1",
             restoredBlob: "wrong-blob",
             expectedPreConversionBlob: "blob-pre"

@@ -10,7 +10,7 @@ import Xcode_Workspace_Standard
 @Test
 func `Institute repair plan round trips its complete workspace binding`() throws {
     let repair = Source.Repair.Plan(
-        subject: .init(identity: "swift-primitives/swift-example", digest: "subject"),
+        subject: .init(identity: "swift-atoms/swift-example", digest: "subject"),
         profile: .init("profile"),
         sources: .init("sources"),
         operations: [],
@@ -21,7 +21,7 @@ func `Institute repair plan round trips its complete workspace binding`() throws
         workspace: "/workspace/institute interim.xcworkspace",
         workspaceDigest: "workspace",
         inventoryDigest: "inventory",
-        cohort: ["swift-standards/swift-zeta", "swift-primitives/swift-example"],
+        cohort: ["swift-standards/swift-zeta", "swift-atoms/swift-example"],
         repairs: [repair]
     )
 
@@ -33,7 +33,7 @@ func `Institute repair plan round trips its complete workspace binding`() throws
     #expect(
         decoded.cohort == [
             "swift-standards/swift-zeta",
-            "swift-primitives/swift-example",
+            "swift-atoms/swift-example",
         ]
     )
     #expect(decoded.repairs.map(\.subject) == [repair.subject])
@@ -44,7 +44,7 @@ func `Institute repair plan round trips its complete workspace binding`() throws
 @Test
 func `Institute repair plan rejects unknown wrapper fields`() throws {
     let repair = Source.Repair.Plan(
-        subject: .init(identity: "swift-primitives/swift-example", digest: "subject"),
+        subject: .init(identity: "swift-atoms/swift-example", digest: "subject"),
         profile: .init("profile"),
         sources: .init("sources"),
         operations: [],
@@ -55,7 +55,7 @@ func `Institute repair plan rejects unknown wrapper fields`() throws {
         workspace: "/workspace/institute interim.xcworkspace",
         workspaceDigest: "workspace",
         inventoryDigest: "inventory",
-        cohort: ["swift-primitives/swift-example"],
+        cohort: ["swift-atoms/swift-example"],
         repairs: [repair]
     )
     var object = try #require(plan.json.dictionary)
@@ -104,9 +104,9 @@ func `Institute source subject includes every Swift file outside build products`
         index: 0,
         location: .init(scheme: .group, path: "."),
         directory: root,
-        identity: "swift-primitives/swift-example",
+        identity: "swift-atoms/swift-example",
         role: .subject(
-            try #require(Institute.Repository.Key(identity: "swift-primitives/swift-example"))
+            try #require(Institute.Repository.Key(identity: "swift-atoms/swift-example"))
         ),
         repository: nil,
         reason: nil
@@ -153,9 +153,9 @@ func `Institute source subject excludes descendant package ownership`() throws {
         index: 0,
         location: .init(scheme: .group, path: "."),
         directory: root,
-        identity: "swift-foundations/swift-example",
+        identity: "swift-compositions/swift-example",
         role: .subject(
-            try #require(Institute.Repository.Key(identity: "swift-foundations/swift-example"))
+            try #require(Institute.Repository.Key(identity: "swift-compositions/swift-example"))
         ),
         repository: nil,
         reason: nil

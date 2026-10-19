@@ -14,7 +14,7 @@ extension Institute.Lint {
     /// ```
     ///
     /// The four-field form is every engine through
-    /// swift-foundations/swift-linter#22; the five-field form, with the
+    /// swift-compositions/swift-linter#22; the five-field form, with the
     /// trailing `<N> findings` count, is swift-linter PR #24 and every
     /// engine after it. Both are accepted so that installing a #24-built
     /// engine before every consumer has adopted the new field does not

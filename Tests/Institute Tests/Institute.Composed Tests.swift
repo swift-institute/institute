@@ -43,13 +43,13 @@ extension Institute.Composed.Test.Unit {
     {
         let manifests = [
             Institute.Composed.Test.manifest(
-                reference: "../swift-primitives/swift-example-two",
+                reference: "../swift-atoms/swift-example-two",
                 package: "swift-example-two",
                 libraryProducts: ["Example Two"],
                 buildableTargetCount: 2
             ),
             Institute.Composed.Test.manifest(
-                reference: "../swift-primitives/swift-example-one",
+                reference: "../swift-atoms/swift-example-one",
                 package: "swift-example-one",
                 libraryProducts: ["Example One", "Example One Testing"],
                 buildableTargetCount: 3
@@ -59,8 +59,8 @@ extension Institute.Composed.Test.Unit {
         let text = Institute.Composed.Root.render(manifests, swift: "6.3.3")
 
         #expect(text.hasPrefix("// swift-tools-version: 6.3.3\n"))
-        #expect(text.contains(".package(path: \"../swift-primitives/swift-example-one\"),"))
-        #expect(text.contains(".package(path: \"../swift-primitives/swift-example-two\"),"))
+        #expect(text.contains(".package(path: \"../swift-atoms/swift-example-one\"),"))
+        #expect(text.contains(".package(path: \"../swift-atoms/swift-example-two\"),"))
         #expect(
             text.contains(
                 ".product(name: \"Example One\", package: \"swift-example-one\"),"
@@ -88,7 +88,7 @@ extension Institute.Composed.Test.Unit {
     func `Rendering the same manifests twice produces byte-identical text`() {
         let manifests = [
             Institute.Composed.Test.manifest(
-                reference: "../swift-primitives/swift-example-one",
+                reference: "../swift-atoms/swift-example-one",
                 package: "swift-example-one",
                 libraryProducts: ["Example One"]
             )
@@ -104,13 +104,13 @@ extension Institute.Composed.Test.Unit {
     func `Expected target count sums only the repositories contributing a library product`() {
         let manifests = [
             Institute.Composed.Test.manifest(
-                reference: "../swift-primitives/swift-example-one",
+                reference: "../swift-atoms/swift-example-one",
                 package: "swift-example-one",
                 libraryProducts: ["Example One"],
                 buildableTargetCount: 3
             ),
             Institute.Composed.Test.manifest(
-                reference: "../swift-primitives/swift-example-two",
+                reference: "../swift-atoms/swift-example-two",
                 package: "swift-example-two",
                 libraryProducts: ["Example Two"],
                 buildableTargetCount: 2
@@ -129,7 +129,7 @@ extension Institute.Composed.Test.`Edge Case` {
     {
         let manifests = [
             Institute.Composed.Test.manifest(
-                reference: "../swift-primitives/swift-example-one",
+                reference: "../swift-atoms/swift-example-one",
                 package: "swift-example-one",
                 libraryProducts: ["Example One"],
                 buildableTargetCount: 3
@@ -137,7 +137,7 @@ extension Institute.Composed.Test.`Edge Case` {
             // An executable-only repository: no library product, so it has
             // no way into the composed graph through a product dependency.
             Institute.Composed.Test.manifest(
-                reference: "../swift-primitives/swift-example-tool",
+                reference: "../swift-atoms/swift-example-tool",
                 package: "swift-example-tool",
                 libraryProducts: [],
                 buildableTargetCount: 1
@@ -165,7 +165,7 @@ extension Institute.Composed.Test.`Edge Case` {
             }
         )
         let planText = Institute.Composed.Root.render(plan, swift: "6.3.3")
-        #expect(planText.contains(".package(path: \"../swift-primitives/swift-example-tool\"),"))
+        #expect(planText.contains(".package(path: \"../swift-atoms/swift-example-tool\"),"))
         #expect(!planText.contains("package: \"swift-example-tool\""))
         #expect(plan.pathDependencyCount == 2)
         #expect(plan.libraryContributingCount == 1)

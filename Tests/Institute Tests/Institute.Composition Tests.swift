@@ -39,9 +39,9 @@ extension Institute.Composition.Test {
             )
             base = MainFixtureFiles.directoryPath(workspaceRoot.hierarchy.description)
             root = MainFixtureFiles.directoryPath(workspaceRoot.checkout.description)
-            manifest = MainFixtureFiles.join(base, "swift-foundations/example/consumer/Package.swift")
+            manifest = MainFixtureFiles.join(base, "swift-compositions/example/consumer/Package.swift")
 
-            try MainFixtureFiles.createDirectory(MainFixtureFiles.join(base, "swift-foundations/example/consumer"))
+            try MainFixtureFiles.createDirectory(MainFixtureFiles.join(base, "swift-compositions/example/consumer"))
             try MainFixtureFiles.createDirectory(MainFixtureFiles.join(base, "swift-standards/example/swift-dep"))
             // A workspace repository present on disk but NOT declared by the
             // consumer manifest — the "nothing to compose" case.
@@ -60,7 +60,7 @@ extension Institute.Composition.Test {
                             name: "consumer",
                             url: "https://github.com/example/consumer.git",
                             organization: "example",
-                            layer: .foundations
+                            layer: .compositions
                         ),
                         .init(
                             name: "swift-dep",

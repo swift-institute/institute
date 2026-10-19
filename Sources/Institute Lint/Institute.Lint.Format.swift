@@ -18,7 +18,7 @@ extension Institute.Lint.Format {
 
     /// The channel the dispatched runner reads at the shared `Lint.run` terminal.
     ///
-    /// swift-foundations/swift-linter#20 owns implementing this channel. Institute
+    /// swift-compositions/swift-linter#20 owns implementing this channel. Institute
     /// sets it now so a pre-prerequisite runner fails the structured-output check
     /// instead of being mistaken for usable evidence.
     static let variable = "SWIFT_LINTER_FORMAT"

@@ -54,9 +54,9 @@ extension Institute.Composition.SourceMap.Test {
         static func repository(_ name: Swift.String) -> Institute.Repository {
             .init(
                 name: name,
-                url: "https://github.com/swift-primitives/\(name).git",
-                organization: "swift-primitives",
-                layer: .primitives
+                url: "https://github.com/swift-atoms/\(name).git",
+                organization: "swift-atoms",
+                layer: .atoms
             )
         }
 
@@ -318,7 +318,7 @@ extension Institute.Composition.SourceMap.Test {
         let a = Fixture.repository("swift-a-primitives")
         try fixture.materialize(a)
         let location = try Package.Dependency.Evaluation.Source.Location.remote(
-            .init("https://github.com/swift-primitives/swift-tls.git")
+            .init("https://github.com/swift-atoms/swift-tls.git")
         )
         fixture.evaluations = fixture.evaluations.mapValues { evaluation in
             .init(
@@ -353,7 +353,7 @@ extension Institute.Composition.SourceMap.Test {
             }
             #expect(reference == "swift-a-primitives")
             #expect(identity == "swift-tls")
-            #expect(organization == "swift-primitives")
+            #expect(organization == "swift-atoms")
         }
     }
 

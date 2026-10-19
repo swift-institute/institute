@@ -74,11 +74,11 @@ extension Institute.Repository.Policy {
         /// Exact coordinates — a new rule-pack repo is added here by an
         /// express edit, never inferred from its name.
         public static let linterRulePackRepositories: [String] = [
-            "swift-primitives/swift-primitives-linter-rules",
-            "swift-primitives/swift-linter-primitives",
+            "swift-molecules/swift-primitives-linter-rules",
+            "swift-molecules/swift-lint",
             "swift-standards/swift-standards-linter-rules",
-            "swift-foundations/swift-institute-linter-rules",
-            "swift-foundations/swift-linter-rules",
+            "swift-compositions/swift-institute-linter-rules",
+            "swift-compositions/swift-linter-rules",
         ]
 
         /// The terminal two-name credential profile is split across two

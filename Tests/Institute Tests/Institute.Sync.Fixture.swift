@@ -45,8 +45,8 @@ extension Institute.Sync {
             root = base.appending(path: "institute-application")
             source = base.appending(path: "source")
             remote = base.appending(path: "remote.git")
-            local = base.appending(path: "swift-foundations/swift-example")
-            legacy = root.appending(path: "swift-foundations/swift-example")
+            local = base.appending(path: "swift-compositions/swift-example")
+            legacy = root.appending(path: "swift-compositions/swift-example")
             client = .init()
 
             try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
@@ -63,7 +63,7 @@ extension Institute.Sync {
                 encoding: .utf8
             )
             try FileManager.default.createDirectory(
-                at: base.appending(path: "swift-foundations"),
+                at: base.appending(path: "swift-compositions"),
                 withIntermediateDirectories: true
             )
             try Self.package(
@@ -146,7 +146,7 @@ extension Institute.Sync {
                 targets: [("Institute Continuous Integration Source", false)]
             )
             try Self.package(
-                at: base.appending(path: "swift-foundations/swift-linter/Runner"),
+                at: base.appending(path: "swift-compositions/swift-linter/Runner"),
                 name: "swift-linter-runner",
                 targets: [("runner", false)]
             )
@@ -230,8 +230,8 @@ extension Institute.Sync.Fixture {
         let repository = Institute.Repository(
             name: "swift-example",
             url: remote.path,
-            organization: "swift-foundations",
-            layer: .foundations
+            organization: "swift-compositions",
+            layer: .compositions
         )
         return Institute.Sync(
             root: try Institute.Root(checkout: directory),
@@ -252,8 +252,8 @@ extension Institute.Sync.Fixture {
                 )
             ),
             ledger: try? Data(contentsOf: root.appending(path: ".workspace/compositions.json")),
-            canonical: try entries(at: base.appending(path: "swift-foundations")),
-            legacy: try entries(at: root.appending(path: "swift-foundations"))
+            canonical: try entries(at: base.appending(path: "swift-compositions")),
+            legacy: try entries(at: root.appending(path: "swift-compositions"))
         )
     }
 

@@ -21,7 +21,7 @@ extension Institute.Xcode.Scheme {
 extension Institute.Xcode.Scheme.Test.Unit {
     private static let plan = Institute.Xcode.Scheme.Plan(buildables: [
         Institute.Xcode.Scheme.Buildable(
-            reference: "../swift-primitives/swift-dimension-primitives",
+            reference: "../swift-atoms/swift-dimension-primitives",
             target: "Dimension Primitives"
         ),
         Institute.Xcode.Scheme.Buildable(
@@ -48,7 +48,7 @@ extension Institute.Xcode.Scheme.Test.Unit {
 
         #expect(
             rendered.contains(
-                #"ReferencedContainer="container:../swift-primitives/swift-dimension-primitives""#
+                #"ReferencedContainer="container:../swift-atoms/swift-dimension-primitives""#
             )
         )
         #expect(
@@ -141,7 +141,7 @@ extension Institute.Xcode.Scheme.Test.`Edge Case` {
         let declared = Institute.Xcode.Scheme.render(
             .init(
                 buildables: [
-                    .init(reference: "../swift-foundations/swift-color", target: "Color")
+                    .init(reference: "../swift-compositions/swift-color", target: "Color")
                 ],
                 testables: []
             )
@@ -149,7 +149,7 @@ extension Institute.Xcode.Scheme.Test.`Edge Case` {
         let renamed = Institute.Xcode.Scheme.render(
             .init(
                 buildables: [
-                    .init(reference: "../swift-foundations/swift-color", target: "Colour")
+                    .init(reference: "../swift-compositions/swift-color", target: "Colour")
                 ],
                 testables: []
             )

@@ -204,13 +204,15 @@ extension Institute.Repository.Policy.Metadata.Draft {
         )
     }
 
-    /// The Institute layer an organization belongs to, or the empty
-    /// string when the organization names none.
+    /// The layer topic an organization's repositories carry, or the empty
+    /// string when the organization names none. The topics kept their
+    /// pre-reorganization vocabulary: `swift-atoms` and `swift-molecules`
+    /// repositories carry `primitives`, as they did in `swift-primitives`.
     static func layer(of owner: String) -> String {
         switch owner {
-        case "swift-primitives": "primitives"
+        case "swift-atoms", "swift-molecules": "primitives"
         case "swift-standards": "standards"
-        case "swift-foundations": "foundations"
+        case "swift-compositions": "foundations"
 
         case "swift-ietf", "swift-iso", "swift-ieee", "swift-iec", "swift-w3c", "swift-whatwg",
             "swift-ecma", "swift-incits":

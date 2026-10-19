@@ -40,9 +40,9 @@ extension Institute.Certification.Test.Policy {
             inventoryBlob: Self.b,
             members: [
                 .init(
-                    key: Self.key("swift-primitives/swift-color"),
+                    key: Self.key("swift-atoms/swift-color"),
                     revision: .init(Self.a),
-                    kind: .package(layer: .primitives)
+                    kind: .package(layer: .atoms)
                 ),
                 .init(
                     key: Self.key("swift-institute/institute"),
@@ -67,7 +67,7 @@ extension Institute.Certification.Test.Policy {
         )
         #expect(derived.count(where: { $0.kind == .format }) == 1)
         #expect(derived.count(where: { $0.kind == .lint }) == 1)
-        #expect(derived.allSatisfy { $0.key.identity == "swift-primitives/swift-color" })
+        #expect(derived.allSatisfy { $0.key.identity == "swift-atoms/swift-color" })
         #expect(
             derived
                 == Institute.Certification.Obligation.derive(from: snapshot, policy: policy)

@@ -173,7 +173,7 @@ extension Institute.Doctor.Test.Unit {
 
         #expect(records.count == 1)
         #expect(records.first?.dependency == "swift-json")
-        #expect(records.first?.location == "https://github.com/swift-foundations/swift-json.git")
+        #expect(records.first?.location == "https://github.com/swift-compositions/swift-json.git")
         #expect(records.first?.branch == "main")
         #expect(records.first?.revision == "0000000000000000000000000000000000000000")
     }
@@ -192,7 +192,7 @@ extension Institute.Doctor.Test.Unit {
             {
               "identity" : "swift-json",
               "kind" : "remoteSourceControl",
-              "location" : "https://github.com/swift-foundations/swift-json.git",
+              "location" : "https://github.com/swift-compositions/swift-json.git",
               "state" : {
                 "branch" : "main",
                 "revision" : "0000000000000000000000000000000000000000"
@@ -216,9 +216,9 @@ extension Institute.Doctor.Test.Unit {
 extension Institute.Doctor.Test.Integration {
     private static let repository = Institute.Repository(
         name: "swift-example",
-        url: "https://github.com/swift-foundations/swift-example.git",
-        organization: "swift-foundations",
-        layer: .foundations
+        url: "https://github.com/swift-compositions/swift-example.git",
+        organization: "swift-compositions",
+        layer: .compositions
     )
 
     @Test
@@ -251,7 +251,7 @@ extension Institute.Doctor.Test.Integration {
         try fixture.materialize("swift-example")
         try fixture.write(
             Institute.Doctor.Test.Unit.resolved,
-            to: "swift-foundations/swift-example/Package.resolved"
+            to: "swift-compositions/swift-example/Package.resolved"
         )
 
         let report = await fixture.doctor(tool: {
@@ -275,7 +275,7 @@ extension Institute.Doctor.Test.Integration {
         try fixture.materialize("swift-example")
         try fixture.write(
             Institute.Doctor.Test.Unit.resolved,
-            to: "swift-foundations/swift-example/Package.resolved"
+            to: "swift-compositions/swift-example/Package.resolved"
         )
 
         let report = await fixture.doctor(tool: {

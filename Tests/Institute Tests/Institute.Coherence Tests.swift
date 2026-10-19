@@ -103,15 +103,15 @@ extension Institute.Coherence.Test {
         [
             Institute.Repository(
                 name: "swift-example-one",
-                url: "https://github.com/swift-primitives/swift-example-one.git",
-                organization: "swift-primitives",
-                layer: .primitives
+                url: "https://github.com/swift-atoms/swift-example-one.git",
+                organization: "swift-atoms",
+                layer: .atoms
             ),
             Institute.Repository(
                 name: "swift-example-two",
-                url: "https://github.com/swift-primitives/swift-example-two.git",
-                organization: "swift-primitives",
-                layer: .primitives
+                url: "https://github.com/swift-atoms/swift-example-two.git",
+                organization: "swift-atoms",
+                layer: .atoms
             ),
         ]
     }

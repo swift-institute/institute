@@ -52,12 +52,17 @@ extension Institute.Inventory {
 extension Institute.Inventory.Policy {
     /// The organizations discovery covers.
     ///
-    /// **Three layers only.** `swift-components` and `swift-applications` were
-    /// listed here until 2026-07-28, encoding a superseded L4/L5 doctrine. The
-    /// principal ruled that day that there is no layer above L3, and both orgs
-    /// were emptied — so discovering into them would have re-materialized the
-    /// very roots the ruling removed, the moment this ran. They are absent
-    /// deliberately; do not restore them without a new ruling.
+    /// **Four layers, as `fleet.json` declares them.** The organization
+    /// reorganization of August and September 2026 replaced
+    /// `swift-primitives` and `swift-foundations` with `swift-atoms` (L1),
+    /// `swift-molecules` (L2) and `swift-compositions` (L4), with
+    /// `swift-standards` and the specification authorities and vendors at
+    /// L3. The list below is `swift-institute/.github`'s
+    /// `.github/policy/fleet.json`, minus the `control` organization
+    /// `swift-institute`, which roots no layer. `swift-components` and
+    /// `swift-applications` stay absent: the principal emptied both on
+    /// 2026-07-28, and discovering into them would re-materialize the roots
+    /// that ruling removed.
     ///
     /// ## Membership is declared here, not discovered live (Institute#85)
     ///
@@ -66,26 +71,26 @@ extension Institute.Inventory.Policy {
     /// is added when the principal designates it to host a layer root or
     /// a specification authority's/vendor's/jurisdiction's repositories
     /// under one — a governance fact, not a GitHub API property. An org
-    /// joining or leaving therefore needs this list edited; nothing
-    /// currently detects the gap between an edit and the org's real
-    /// membership.
+    /// joining or leaving therefore needs this list edited (and
+    /// `fleet.json` with it); nothing currently detects the gap between an
+    /// edit and the org's real membership.
     ///
     /// A live check — "does the token see an org this list doesn't
     /// name?" — was evaluated and rejected, not merely deferred.
     /// Measured 2026-07-30: `GET /user/orgs` for the account this token
-    /// authenticates as returns dozens of organizations beyond these
-    /// seventeen — the sibling Rule Institute ecosystem's own org-per-
-    /// jurisdiction roster, the retired L4/L5 roots named above,
-    /// `repotraffic` and `swift-foundry` (both confirmed personal, 0
-    /// public repositories), and others — with no field a query can
-    /// filter on. A `swift-`-prefix heuristic fails on contact:
-    /// `swift-foundry` *is* swift-prefixed and is not an Institute org.
-    /// Without a qualifying signal GitHub actually exposes, a live
-    /// membership diff would report every one of those as drift on every
-    /// run — a permanent false positive noisier than the silence it
-    /// replaces, not a currency check. `repotraffic` and `swift-foundry`
-    /// are recorded here, by name, as the confirmed negative case rather
-    /// than left for the next person to re-derive.
+    /// authenticates as returns dozens of organizations beyond these —
+    /// the sibling Rule Institute ecosystem's own org-per-jurisdiction
+    /// roster, the retired L4/L5 roots named above, `repotraffic` and
+    /// `swift-foundry` (both confirmed personal, 0 public repositories),
+    /// and others — with no field a query can filter on. A
+    /// `swift-`-prefix heuristic fails on contact: `swift-foundry` *is*
+    /// swift-prefixed and is not an Institute org. Without a qualifying
+    /// signal GitHub actually exposes, a live membership diff would report
+    /// every one of those as drift on every run — a permanent false
+    /// positive noisier than the silence it replaces, not a currency
+    /// check. `repotraffic` and `swift-foundry` are recorded here, by
+    /// name, as the confirmed negative case rather than left for the next
+    /// person to re-derive.
     ///
     /// Manual curation is therefore the accepted design for *this* list,
     /// on this evidence — distinct from `vacant` below, which records a
@@ -103,23 +108,24 @@ extension Institute.Inventory.Policy {
         do throws(Error) {
             return try Self(
                 organizations: [
-                    .init(name: .init("swift-primitives"), layer: .primitives),
+                    .init(name: .init("swift-atoms"), layer: .atoms),
+                    .init(name: .init("swift-molecules"), layer: .molecules),
                     .init(name: .init("swift-standards"), layer: .standards),
                     .init(name: .init("swift-ietf"), layer: .standards),
                     .init(name: .init("swift-iso"), layer: .standards),
-                    .init(name: .init("swift-w3c"), layer: .standards),
-                    .init(name: .init("swift-whatwg"), layer: .standards),
                     .init(name: .init("swift-ieee"), layer: .standards),
                     .init(name: .init("swift-iec"), layer: .standards),
+                    .init(name: .init("swift-w3c"), layer: .standards),
+                    .init(name: .init("swift-whatwg"), layer: .standards),
                     .init(name: .init("swift-ecma"), layer: .standards),
                     .init(name: .init("swift-incits"), layer: .standards),
-                    .init(name: .init("swift-nist"), layer: .standards),
-                    .init(name: .init("swift-linux-foundation"), layer: .standards),
-                    .init(name: .init("swift-microsoft"), layer: .standards),
                     .init(name: .init("swift-arm-ltd"), layer: .standards),
                     .init(name: .init("swift-intel"), layer: .standards),
                     .init(name: .init("swift-riscv"), layer: .standards),
-                    .init(name: .init("swift-foundations"), layer: .foundations),
+                    .init(name: .init("swift-linux-foundation"), layer: .standards),
+                    .init(name: .init("swift-microsoft"), layer: .standards),
+                    .init(name: .init("swift-bipm"), layer: .standards),
+                    .init(name: .init("swift-compositions"), layer: .compositions),
                 ],
                 // Two packages hold an upstream SwiftPM identity that a
                 // third party inside our graph also needs, and workspace
@@ -148,21 +154,20 @@ extension Institute.Inventory.Policy {
                 //
                 // See swift-institute/institute-application#7.
                 denied: [
-                    .init(owner: .init("swift-foundations"), name: .init("swift-numerics")),
-                    .init(owner: .init("swift-foundations"), name: .init("swift-metrics")),
+                    .init(owner: .init("swift-compositions"), name: .init("swift-numerics")),
+                    .init(owner: .init("swift-compositions"), name: .init("swift-metrics")),
                 ],
-                // Measured 2026-07-28 against `orgs/<name>/repos?type=public`,
+                // Measured 2026-10-19 against `orgs/<name>/repos?type=public`,
                 // the same query discovery issues: every policy organization
-                // lists at least one public repository except `swift-nist`,
-                // which holds a single non-public repository and therefore
-                // lists none. Remove this the moment it publishes anything.
+                // lists at least one public repository except `swift-bipm`,
+                // which lists none. Remove this the moment it publishes
+                // anything. (`swift-nist`, vacant here until this date, is not
+                // a fleet.json organization and left the list with it.)
                 //
-                // Counted with the wrong filter first. `gh repo list` reports
-                // repositories at every visibility, which said `swift-nist`
-                // held 1 and made an empty public listing look impossible. The
-                // population a control measures has to be the one the code
-                // queries.
-                vacant: [.init("swift-nist")],
+                // Count with the filter the code queries. `gh repo list`
+                // reports repositories at every visibility, which once made an
+                // empty public listing look impossible.
+                vacant: [.init("swift-bipm")],
                 limit: .init(pages: pages, items: items)
             )
         } catch {

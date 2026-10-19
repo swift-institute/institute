@@ -130,9 +130,9 @@ extension Institute.Sync.Test.Integration {
         )
         let unselected = Institute.Repository(
             name: "swift-unused",
-            url: "https://github.com/swift-foundations/swift-unused.git",
-            organization: "swift-foundations",
-            layer: .foundations
+            url: "https://github.com/swift-compositions/swift-unused.git",
+            organization: "swift-compositions",
+            layer: .compositions
         )
         let root = try File.Directory(validating: fixture.rootPath)
         let sync = Institute.Sync(
@@ -191,8 +191,8 @@ extension Institute.Sync.Test.Integration {
         let repository = Institute.Repository(
             name: "swift-example",
             url: canonical,
-            organization: "swift-foundations",
-            layer: .foundations
+            organization: "swift-compositions",
+            layer: .compositions
         )
         return Institute.Sync(
             root: try Institute.Root(checkout: File.Directory(validating: fixture.rootPath)),
@@ -204,8 +204,8 @@ extension Institute.Sync.Test.Integration {
     @Test
     func `scp-style SSH origin against the canonical HTTPS URL is not a conflict`() async throws {
         let sync = try Self.originCheck(
-            origin: "git@github.com:swift-foundations/swift-example.git",
-            canonical: "https://github.com/swift-foundations/swift-example.git"
+            origin: "git@github.com:swift-compositions/swift-example.git",
+            canonical: "https://github.com/swift-compositions/swift-example.git"
         )
 
         try await sync.run(dry: true)
@@ -214,8 +214,8 @@ extension Institute.Sync.Test.Integration {
     @Test
     func `ssh scheme origin against the canonical HTTPS URL is not a conflict`() async throws {
         let sync = try Self.originCheck(
-            origin: "ssh://git@github.com/swift-foundations/swift-example.git",
-            canonical: "https://github.com/swift-foundations/swift-example.git"
+            origin: "ssh://git@github.com/swift-compositions/swift-example.git",
+            canonical: "https://github.com/swift-compositions/swift-example.git"
         )
 
         try await sync.run(dry: true)
@@ -240,8 +240,8 @@ extension Institute.Sync.Test.Integration {
     @Test
     func `an origin naming a genuinely different repository still conflicts`() async throws {
         let sync = try Self.originCheck(
-            origin: "git@github.com:swift-foundations/swift-other.git",
-            canonical: "https://github.com/swift-foundations/swift-example.git"
+            origin: "git@github.com:swift-compositions/swift-other.git",
+            canonical: "https://github.com/swift-compositions/swift-example.git"
         )
 
         await #expect(throws: Institute.Error.self) {

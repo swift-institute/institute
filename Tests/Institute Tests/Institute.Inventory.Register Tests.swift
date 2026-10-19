@@ -23,9 +23,9 @@ extension Institute.Inventory.Test.Integration {
                 .init(
                     name: "swift-alpha-primitives",
                     url:
-                        "https://github.com/swift-primitives/swift-alpha-primitives.git",
-                    organization: "swift-primitives",
-                    layer: .primitives
+                        "https://github.com/swift-atoms/swift-alpha-primitives.git",
+                    organization: "swift-atoms",
+                    layer: .atoms
                 ),
                 .init(
                     name: "swift-rfc-9110",
@@ -49,7 +49,7 @@ extension Institute.Inventory.Test.Integration {
         #expect(
             register.description == """
                 inventory: 2 repositories (name → organization → path)
-                  swift-alpha-primitives → swift-primitives → swift-primitives/swift-alpha-primitives
+                  swift-alpha-primitives → swift-atoms → swift-atoms/swift-alpha-primitives
                   swift-rfc-9110 → swift-ietf → swift-standards/swift-ietf/swift-rfc-9110
                 """
         )

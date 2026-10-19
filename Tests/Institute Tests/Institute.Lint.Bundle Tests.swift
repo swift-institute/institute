@@ -22,7 +22,7 @@ struct `Institute Lint Bundle Tests` {
     func `a package under a layer root takes that layer's bundle`() {
         #expect(
             Institute.Lint.Bundle.resolve(
-                File.Directory("/checkout/swift-institute/swift-primitives/swift-byte"),
+                File.Directory("/checkout/swift-institute/swift-atoms/swift-byte"),
                 under: Self.hierarchy
             ) == .primitives
         )
@@ -34,7 +34,7 @@ struct `Institute Lint Bundle Tests` {
         )
         #expect(
             Institute.Lint.Bundle.resolve(
-                File.Directory("/checkout/swift-institute/swift-foundations/swift-json"),
+                File.Directory("/checkout/swift-institute/swift-compositions/swift-json"),
                 under: Self.hierarchy
             ) == .institute
         )
@@ -85,7 +85,7 @@ struct `Institute Lint Bundle Tests` {
         )
         #expect(
             Institute.Lint.Bundle.resolve(
-                File.Directory("/elsewhere/swift-primitives/swift-byte"),
+                File.Directory("/elsewhere/swift-atoms/swift-byte"),
                 under: Self.hierarchy
             ) == nil
         )

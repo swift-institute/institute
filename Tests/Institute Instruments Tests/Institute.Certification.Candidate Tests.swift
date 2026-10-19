@@ -26,14 +26,14 @@ extension Institute.Certification.Test.Candidate {
             inventoryBlob: b,
             members: [
                 .init(
-                    key: key("swift-primitives/swift-color"),
+                    key: key("swift-atoms/swift-color"),
                     revision: .init(c),
-                    kind: .package(layer: .primitives)
+                    kind: .package(layer: .atoms)
                 ),
                 .init(
-                    key: key("swift-foundations/swift-html"),
+                    key: key("swift-compositions/swift-html"),
                     revision: .init(a),
-                    kind: .package(layer: .foundations)
+                    kind: .package(layer: .compositions)
                 ),
             ],
             exclusions: []
@@ -47,7 +47,7 @@ extension Institute.Certification.Test.Candidate {
             snapshot: Self.snapshot(),
             heads: [
                 .init(
-                    key: Self.key("swift-primitives/swift-color"),
+                    key: Self.key("swift-atoms/swift-color"),
                     pullRequest: 12,
                     revision: .init(Self.c),
                     patchDigest: "p1"
@@ -70,7 +70,7 @@ extension Institute.Certification.Test.Candidate {
                 snapshot: Self.snapshot(),
                 heads: [
                     .init(
-                        key: Self.key("swift-primitives/swift-absent"),
+                        key: Self.key("swift-atoms/swift-absent"),
                         pullRequest: 12,
                         revision: .init(Self.c),
                         patchDigest: "p1"
@@ -88,7 +88,7 @@ extension Institute.Certification.Test.Candidate {
                 snapshot: Self.snapshot(),
                 heads: [
                     .init(
-                        key: Self.key("swift-primitives/swift-color"),
+                        key: Self.key("swift-atoms/swift-color"),
                         pullRequest: 12,
                         revision: .init(Self.b),
                         patchDigest: "p1"
@@ -117,13 +117,13 @@ extension Institute.Certification.Test.Candidate {
                 snapshot: Self.snapshot(),
                 heads: [
                     .init(
-                        key: Self.key("swift-primitives/swift-color"),
+                        key: Self.key("swift-atoms/swift-color"),
                         pullRequest: 12,
                         revision: .init(Self.c),
                         patchDigest: "p1"
                     ),
                     .init(
-                        key: Self.key("swift-primitives/swift-color"),
+                        key: Self.key("swift-atoms/swift-color"),
                         pullRequest: 13,
                         revision: .init(Self.c),
                         patchDigest: "p2"

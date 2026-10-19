@@ -74,9 +74,9 @@ extension Institute.Doctor.Test.Unit {
 extension Institute.Doctor.Test.Integration {
     private static let repository = Institute.Repository(
         name: "swift-example",
-        url: "https://github.com/swift-foundations/swift-example.git",
-        organization: "swift-foundations",
-        layer: .foundations
+        url: "https://github.com/swift-compositions/swift-example.git",
+        organization: "swift-compositions",
+        layer: .compositions
     )
 
     private static let noDiscovery:
@@ -95,7 +95,7 @@ extension Institute.Doctor.Test.Integration {
         try fixture.materialize("swift-example")
         try fixture.write(
             Institute.Doctor.Test.Unit.resolved,
-            to: "swift-foundations/swift-example/Package.resolved"
+            to: "swift-compositions/swift-example/Package.resolved"
         )
 
         let report = await fixture.doctor(tool: {
@@ -133,7 +133,7 @@ extension Institute.Doctor.Test.Integration {
         try fixture.materialize("swift-example")
         try fixture.write(
             Institute.Doctor.Test.Unit.resolved,
-            to: "swift-foundations/swift-example/Package.resolved"
+            to: "swift-compositions/swift-example/Package.resolved"
         )
 
         let report = await fixture.doctor(tool: {
@@ -225,9 +225,9 @@ extension Institute.Doctor.Test.Integration {
     func `no cached lint config anywhere is a proven zero, not a failure`() async throws {
         let repository = Institute.Repository(
             name: "swift-example",
-            url: "https://github.com/swift-foundations/swift-example.git",
-            organization: "swift-foundations",
-            layer: .foundations
+            url: "https://github.com/swift-compositions/swift-example.git",
+            organization: "swift-compositions",
+            layer: .compositions
         )
         let fixture = try Institute.Doctor.Fixture(repositories: [repository])
         defer { fixture.remove() }
@@ -243,17 +243,17 @@ extension Institute.Doctor.Test.Integration {
     func `a stale cached lint config is measured against a live fetch and warns`() async throws {
         let repository = Institute.Repository(
             name: "swift-example",
-            url: "https://github.com/swift-foundations/swift-example.git",
-            organization: "swift-foundations",
-            layer: .foundations
+            url: "https://github.com/swift-compositions/swift-example.git",
+            organization: "swift-compositions",
+            layer: .compositions
         )
         let fixture = try Institute.Doctor.Fixture(repositories: [repository])
         defer { fixture.remove() }
         try fixture.materialize("swift-example")
-        try fixture.makeDirectory("swift-foundations/swift-example/.swiftlint/RemoteConfigCache/v1")
+        try fixture.makeDirectory("swift-compositions/swift-example/.swiftlint/RemoteConfigCache/v1")
         try fixture.write(
             Self.cacheHeader + "rule_one: true\n",
-            to: "swift-foundations/swift-example/.swiftlint/RemoteConfigCache/v1/cached.yml"
+            to: "swift-compositions/swift-example/.swiftlint/RemoteConfigCache/v1/cached.yml"
         )
 
         let report = await fixture.doctor(tool: {
@@ -278,17 +278,17 @@ extension Institute.Doctor.Test.Integration {
     func `a current cached lint config measures ok against a matching live fetch`() async throws {
         let repository = Institute.Repository(
             name: "swift-example",
-            url: "https://github.com/swift-foundations/swift-example.git",
-            organization: "swift-foundations",
-            layer: .foundations
+            url: "https://github.com/swift-compositions/swift-example.git",
+            organization: "swift-compositions",
+            layer: .compositions
         )
         let fixture = try Institute.Doctor.Fixture(repositories: [repository])
         defer { fixture.remove() }
         try fixture.materialize("swift-example")
-        try fixture.makeDirectory("swift-foundations/swift-example/.swiftlint/RemoteConfigCache/v1")
+        try fixture.makeDirectory("swift-compositions/swift-example/.swiftlint/RemoteConfigCache/v1")
         try fixture.write(
             Self.cacheHeader + "rule_one: true\n",
-            to: "swift-foundations/swift-example/.swiftlint/RemoteConfigCache/v1/cached.yml"
+            to: "swift-compositions/swift-example/.swiftlint/RemoteConfigCache/v1/cached.yml"
         )
 
         let report = await fixture.doctor(tool: {

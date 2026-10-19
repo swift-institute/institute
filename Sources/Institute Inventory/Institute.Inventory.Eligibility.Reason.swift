@@ -6,9 +6,9 @@ extension Institute.Inventory.Eligibility {
     ///
     /// **There is deliberately no `fork` case.** One existed until 2026-07-28
     /// and excluded three load-bearing packages —
-    /// `swift-primitives/swift-tagged-primitives` (the most-depended-on package
-    /// in the tree), `swift-foundations/swift-url-routing`, and
-    /// `swift-foundations/swift-structured-queries-postgres`. Consumers went on
+    /// `swift-atoms/swift-tagged` (the most-depended-on package
+    /// in the tree), `swift-compositions/swift-url-routing`, and
+    /// `swift-compositions/swift-sql`. Consumers went on
     /// resolving them from their remotes instead of from local source, which
     /// defeats the workspace: an edit to a member is invisible to a member that
     /// fetches the same package from GitHub.

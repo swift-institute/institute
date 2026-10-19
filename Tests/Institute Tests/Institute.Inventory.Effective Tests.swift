@@ -25,9 +25,9 @@ extension Institute.Inventory.Test.Unit {
             repositories: [
                 .init(
                     name: "swift-alpha-primitives",
-                    url: "https://github.com/swift-primitives/swift-alpha-primitives.git",
-                    organization: "swift-primitives",
-                    layer: .primitives
+                    url: "https://github.com/swift-atoms/swift-alpha-primitives.git",
+                    organization: "swift-atoms",
+                    layer: .atoms
                 )
             ]
         )
@@ -36,10 +36,10 @@ extension Institute.Inventory.Test.Unit {
                 .init(
                     id: .init(1),
                     key: .init(
-                        owner: .init("swift-foundations"),
+                        owner: .init("swift-compositions"),
                         name: .init("swift-private-package")
                     ),
-                    layer: .foundations
+                    layer: .compositions
                 )
             ],
             exclusions: [],
@@ -76,9 +76,9 @@ extension Institute.Inventory.Test.Unit {
             repositories: [
                 .init(
                     name: "swift-shared-name",
-                    url: "https://github.com/swift-primitives/swift-shared-name.git",
-                    organization: "swift-primitives",
-                    layer: .primitives
+                    url: "https://github.com/swift-atoms/swift-shared-name.git",
+                    organization: "swift-atoms",
+                    layer: .atoms
                 )
             ]
         )
@@ -86,8 +86,8 @@ extension Institute.Inventory.Test.Unit {
             repositories: [
                 .init(
                     id: .init(1),
-                    key: .init(owner: .init("swift-foundations"), name: .init("swift-shared-name")),
-                    layer: .foundations
+                    key: .init(owner: .init("swift-compositions"), name: .init("swift-shared-name")),
+                    layer: .compositions
                 )
             ],
             exclusions: [],
@@ -114,13 +114,13 @@ extension Institute.Inventory.Test.Unit {
         )
         let first = Institute.Inventory.Repository(
             id: .init(1),
-            key: .init(owner: .init("swift-foundations"), name: .init("swift-alpha")),
-            layer: .foundations
+            key: .init(owner: .init("swift-compositions"), name: .init("swift-alpha")),
+            layer: .compositions
         )
         let second = Institute.Inventory.Repository(
             id: .init(2),
-            key: .init(owner: .init("swift-foundations"), name: .init("swift-beta")),
-            layer: .foundations
+            key: .init(owner: .init("swift-compositions"), name: .init("swift-beta")),
+            layer: .compositions
         )
 
         let left = try Institute.Inventory.Effective(
@@ -151,9 +151,9 @@ extension Institute.Inventory.Test.Unit {
             repositories: [
                 .init(
                     name: "swift-alpha-primitives",
-                    url: "https://github.com/swift-primitives/swift-alpha-primitives.git",
-                    organization: "swift-primitives",
-                    layer: .primitives
+                    url: "https://github.com/swift-atoms/swift-alpha-primitives.git",
+                    organization: "swift-atoms",
+                    layer: .atoms
                 )
             ]
         )
@@ -162,10 +162,10 @@ extension Institute.Inventory.Test.Unit {
                 .init(
                     id: .init(1),
                     key: .init(
-                        owner: .init("swift-foundations"),
+                        owner: .init("swift-compositions"),
                         name: .init("swift-private-package")
                     ),
-                    layer: .foundations
+                    layer: .compositions
                 )
             ],
             exclusions: [],
@@ -264,10 +264,10 @@ extension Institute.Inventory.Test.Unit {
             scope: .effective,
             effective: effective,
             unmeasured: [
-                .init(scope: .organization(.init("swift-foundations")), reason: "listing failed"),
+                .init(scope: .organization(.init("swift-compositions")), reason: "listing failed"),
                 .init(
                     scope: .repository(
-                        .init(owner: .init("swift-foundations"), name: .init("swift-private"))
+                        .init(owner: .init("swift-compositions"), name: .init("swift-private"))
                     ),
                     reason: "content read failed"
                 ),
@@ -277,9 +277,9 @@ extension Institute.Inventory.Test.Unit {
         #expect(output.exitCode == 2)
         #expect(output.unmeasured.count == 2)
         #expect(output.unmeasured[0].kind == .organization)
-        #expect(output.unmeasured[0].coordinate == "swift-foundations")
+        #expect(output.unmeasured[0].coordinate == "swift-compositions")
         #expect(output.unmeasured[1].kind == .repository)
-        #expect(output.unmeasured[1].coordinate == "swift-foundations/swift-private")
+        #expect(output.unmeasured[1].coordinate == "swift-compositions/swift-private")
         // The absence is typed and recorded, never invented away.
         #expect(output.canonical.contains(#""kind":"organization""#))
         #expect(output.canonical.contains(#""reason":"listing failed""#))
@@ -388,9 +388,9 @@ extension Institute.Inventory.Test.Unit {
             repositories: [
                 .init(
                     name: "swift-alpha-primitives",
-                    url: "https://github.com/swift-primitives/swift-alpha-primitives.git",
-                    organization: "swift-primitives",
-                    layer: .primitives
+                    url: "https://github.com/swift-atoms/swift-alpha-primitives.git",
+                    organization: "swift-atoms",
+                    layer: .atoms
                 )
             ]
         )
@@ -402,10 +402,10 @@ extension Institute.Inventory.Test.Unit {
                 .init(
                     id: .init(1),
                     key: .init(
-                        owner: .init("swift-foundations"),
+                        owner: .init("swift-compositions"),
                         name: .init("swift-private-package")
                     ),
-                    layer: .foundations
+                    layer: .compositions
                 )
             ],
             exclusions: [],
@@ -430,7 +430,7 @@ extension Institute.Inventory.Test.Unit {
             roster: .init(
                 repositories: [
                     .init(
-                        owner: .init("swift-foundations"),
+                        owner: .init("swift-compositions"),
                         name: .init("swift-private-package")
                     )
                 ],
@@ -450,8 +450,8 @@ extension Institute.Inventory.Test.Unit {
     @Test
     func `A permuted roster digests identically`() throws {
         let rows: [Institute.Repository.Key] = [
-            .init(owner: .init("swift-foundations"), name: .init("swift-a")),
-            .init(owner: .init("swift-primitives"), name: .init("swift-b")),
+            .init(owner: .init("swift-compositions"), name: .init("swift-a")),
+            .init(owner: .init("swift-atoms"), name: .init("swift-b")),
             .init(owner: .init("swift-standards"), name: .init("swift-c")),
         ]
         let forward = try Institute.Inventory.Effective(
@@ -493,7 +493,7 @@ extension Institute.Inventory.Test.Unit {
         let file = MainFixtureFiles.join(location, "roster.json")
         let roster = Institute.Inventory.Effective.Roster(
             repositories: [
-                .init(owner: .init("swift-foundations"), name: .init("swift-private-package"))
+                .init(owner: .init("swift-compositions"), name: .init("swift-private-package"))
             ],
             unmeasured: [
                 .init(kind: .organization, coordinate: "swift-ietf", reason: "listing failed")

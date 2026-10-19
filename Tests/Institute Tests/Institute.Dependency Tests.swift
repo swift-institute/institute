@@ -40,19 +40,19 @@ extension Institute.Dependency.Test.Unit {
 
     @Test
     func `Repository URLs accept only exact canonical GitHub HTTPS syntax`() {
-        let canonical = "https://github.com/swift-foundations/swift-json.git"
+        let canonical = "https://github.com/swift-compositions/swift-json.git"
         #expect(Institute.Repository.Key(url: canonical)?.url == canonical)
 
         let hostile = [
-            "http://github.com/swift-foundations/swift-json.git",
-            "https://user@github.com/swift-foundations/swift-json.git",
-            "https://github.com:443/swift-foundations/swift-json.git",
-            "https://github.com/swift-foundations/swift-json.git?ref=main",
-            "https://github.com/swift-foundations/swift-json.git#fragment",
-            "https://github.com/swift-foundations/swift%2Djson.git",
+            "http://github.com/swift-compositions/swift-json.git",
+            "https://user@github.com/swift-compositions/swift-json.git",
+            "https://github.com:443/swift-compositions/swift-json.git",
+            "https://github.com/swift-compositions/swift-json.git?ref=main",
+            "https://github.com/swift-compositions/swift-json.git#fragment",
+            "https://github.com/swift-compositions/swift%2Djson.git",
             "https://github.com/swift%2Dfoundations/swift-json.git",
-            "https://github.com/swift-foundations/swift-json.git/extra",
-            "https://GitHub.com/swift-foundations/swift-json.git",
+            "https://github.com/swift-compositions/swift-json.git/extra",
+            "https://GitHub.com/swift-compositions/swift-json.git",
         ]
         for url in hostile {
             #expect(Institute.Repository.Key(url: url) == nil)
@@ -61,7 +61,7 @@ extension Institute.Dependency.Test.Unit {
 
     @Test
     func `Repository identity deserialization rejects encoded and structural syntax`() throws {
-        let canonical = "swift-foundations/swift-json"
+        let canonical = "swift-compositions/swift-json"
         #expect(Institute.Repository.Key(identity: canonical)?.identity == canonical)
         #expect(
             try Institute.Repository.Key.deserialize(canonical.json).identity
@@ -69,13 +69,13 @@ extension Institute.Dependency.Test.Unit {
         )
 
         let hostile = [
-            "swift-foundations/swift-json/extra",
+            "swift-compositions/swift-json/extra",
             "swift%2Dfoundations/swift-json",
-            "swift-foundations/swift%2Djson",
-            "swift-foundations/swift-json?ref=main",
-            "swift-foundations/swift-json#fragment",
-            "user@swift-foundations/swift-json",
-            "swift-foundations/..",
+            "swift-compositions/swift%2Djson",
+            "swift-compositions/swift-json?ref=main",
+            "swift-compositions/swift-json#fragment",
+            "user@swift-compositions/swift-json",
+            "swift-compositions/..",
         ]
         for identity in hostile {
             #expect(Institute.Repository.Key(identity: identity) == nil)
@@ -148,7 +148,7 @@ extension Institute.Dependency.Test.Integration {
         )
         #expect(
             first.identities.first {
-                $0.identity == "swift-foundations/swift-numerics"
+                $0.identity == "swift-compositions/swift-numerics"
             }?.ownership == .institute
         )
         #expect(first.exclusions.contains { $0.kind == .path })
@@ -172,7 +172,7 @@ extension Institute.Dependency.Test.Integration {
             name: .init("external")
         )
         let institute = Institute.Repository.Key(
-            owner: .init("swift-foundations"),
+            owner: .init("swift-compositions"),
             name: .init("internal")
         )
 
@@ -286,7 +286,7 @@ extension Institute.Dependency.Test.Integration {
         ] {
             #expect(
                 summary.contains(
-                    "\(state) edge: swift-foundations/failure-summary/Package.swift:"
+                    "\(state) edge: swift-compositions/failure-summary/Package.swift:"
                 )
             )
             #expect(
@@ -307,9 +307,9 @@ extension Institute.Dependency.Test.Integration {
     private static func repository(_ name: Swift.String) -> Institute.Repository {
         .init(
             name: name,
-            url: "https://github.com/swift-foundations/\(name).git",
-            organization: "swift-foundations",
-            layer: .foundations
+            url: "https://github.com/swift-compositions/\(name).git",
+            organization: "swift-compositions",
+            layer: .compositions
         )
     }
 
@@ -338,16 +338,16 @@ extension Institute.Dependency.Test.Integration {
                 case consumer.identity:
                     .available(metadata(key))
 
-                case "swift-foundations/unavailable":
+                case "swift-compositions/unavailable":
                     .unavailable("fixture unavailable")
 
-                case "swift-foundations/limited":
+                case "swift-compositions/limited":
                     .rateLimited("fixture rate limit")
 
-                case "swift-foundations/malformed", "swift-foundations/unmeasured":
+                case "swift-compositions/malformed", "swift-compositions/unmeasured":
                     .available(metadata(key))
 
-                case "swift-foundations/archived":
+                case "swift-compositions/archived":
                     .available(metadata(key, archived: true))
 
                 case "old/vendor":
@@ -390,10 +390,10 @@ extension Institute.Dependency.Test.Integration {
                         )
                     )
 
-                case "swift-foundations/malformed":
+                case "swift-compositions/malformed":
                     .malformed("fixture malformed source")
 
-                case "swift-foundations/unmeasured":
+                case "swift-compositions/unmeasured":
                     .unmeasured("fixture unmeasured source")
 
                 default:
@@ -407,7 +407,7 @@ extension Institute.Dependency.Test.Integration {
                         [Byte](
                             utf8: #"""
                             .package(url: "https://github.com/old/vendor.git", branch: "main"),
-                            .package(name: "swift-numerics", url: "https://github.com/swift-foundations/swift-numerics.git", branch: "main"),
+                            .package(name: "swift-numerics", url: "https://github.com/swift-compositions/swift-numerics.git", branch: "main"),
                             .package(url: "https://github.com/coenttb/personal.git", branch: "main"),
                             .package(url: "https://github.com/apple/swift-crypto.git", branch: "main"),
                             .package(url: "https://github.com/public/restricted.git", branch: "main"),
@@ -426,7 +426,7 @@ extension Institute.Dependency.Test.Integration {
                 case "variant":
                     .available(
                         [Byte](
-                            utf8: #".package(url: "https://github.com/swift-foundations/swift-json.git", branch: "main")"#
+                            utf8: #".package(url: "https://github.com/swift-compositions/swift-json.git", branch: "main")"#
                         )
                     )
 

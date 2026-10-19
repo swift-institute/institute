@@ -18,7 +18,7 @@ extension Institute.Inventory.Test.Unit {
         let client = Institute.Inventory.client { request in
             #expect(
                 request == [
-                    "repos/swift-foundations/swift-github/contents/Package.swift"
+                    "repos/swift-compositions/swift-github/contents/Package.swift"
                 ]
             )
             return .init(status: 404)
@@ -30,7 +30,7 @@ extension Institute.Inventory.Test.Unit {
 
         let response = try await client.content.get(
             .init(
-                organization: .init("swift-foundations"),
+                organization: .init("swift-compositions"),
                 repository: .init("swift-github"),
                 path: path
             )
@@ -45,56 +45,56 @@ extension Institute.Inventory.Test.Unit {
 
         #expect(
             policy.organizations.map(\.name.underlying) == [
-                "swift-primitives",
+                "swift-atoms",
+                "swift-molecules",
                 "swift-standards",
                 "swift-ietf",
                 "swift-iso",
-                "swift-w3c",
-                "swift-whatwg",
                 "swift-ieee",
                 "swift-iec",
+                "swift-w3c",
+                "swift-whatwg",
                 "swift-ecma",
                 "swift-incits",
-                "swift-nist",
-                "swift-linux-foundation",
-                "swift-microsoft",
                 "swift-arm-ltd",
                 "swift-intel",
                 "swift-riscv",
-                "swift-foundations",
+                "swift-linux-foundation",
+                "swift-microsoft",
+                "swift-bipm",
+                "swift-compositions",
             ]
         )
         #expect(
             policy.organizations.map(\.layer) == [
-                .primitives,
+                .atoms,
+                .molecules,
                 .standards, .standards, .standards, .standards, .standards,
                 .standards, .standards, .standards, .standards, .standards,
                 .standards, .standards, .standards, .standards, .standards,
-                .foundations,
+                .compositions,
             ]
         )
         #expect(!policy.organizations.map(\.name.underlying).contains("swift-institute"))
 
-        // Three layers only (principal ruling, 2026-07-28). Asserted as an
+        // The orgs the principal emptied on 2026-07-28 stay out. Asserted as an
         // absence because the failure mode is silent: discovering into either
-        // org would re-materialize a root above L3.
+        // org would re-materialize a retired root.
         #expect(!policy.organizations.map(\.name.underlying).contains("swift-components"))
         #expect(!policy.organizations.map(\.name.underlying).contains("swift-applications"))
-        #expect(!policy.organizations.map(\.layer).contains(.components))
-        #expect(!policy.organizations.map(\.layer).contains(.applications))
     }
 
     @Test
     func `Discovery traverses pages, admits a fork, and records every eligibility reason`()
         async throws
     {
-        let owner = GitHub.Organization.Name("swift-foundations")
+        let owner = GitHub.Organization.Name("swift-compositions")
         let denied = Institute.Repository.Key(
             owner: owner,
             name: .init("swift-denied")
         )
         let policy = try Institute.Inventory.Policy(
-            organizations: [.init(name: owner, layer: .foundations)],
+            organizations: [.init(name: owner, layer: .compositions)],
             denied: [denied],
             limit: .init(fixture: 3, items: 20)
         )
@@ -176,10 +176,10 @@ extension Institute.Inventory.Test.`Edge Case` {
     @Test
     func `An organization that lists nothing fails the run`() async throws {
         let empty = GitHub.Organization.Name("swift-standards")
-        let populated = GitHub.Organization.Name("swift-foundations")
+        let populated = GitHub.Organization.Name("swift-compositions")
         let policy = try Institute.Inventory.Policy(
             organizations: [
-                .init(name: populated, layer: .foundations),
+                .init(name: populated, layer: .compositions),
                 .init(name: empty, layer: .standards),
             ],
             denied: [],
@@ -220,10 +220,10 @@ extension Institute.Inventory.Test.`Edge Case` {
     @Test
     func `A declared-vacant organization may list nothing`() async throws {
         let empty = GitHub.Organization.Name("swift-standards")
-        let populated = GitHub.Organization.Name("swift-foundations")
+        let populated = GitHub.Organization.Name("swift-compositions")
         let policy = try Institute.Inventory.Policy(
             organizations: [
-                .init(name: populated, layer: .foundations),
+                .init(name: populated, layer: .compositions),
                 .init(name: empty, layer: .standards),
             ],
             denied: [],
@@ -256,7 +256,7 @@ extension Institute.Inventory.Test.`Edge Case` {
     func `Vacancy for an organization outside the policy is rejected`() async throws {
         do throws(Institute.Inventory.Policy.Error) {
             _ = try Institute.Inventory.Policy(
-                organizations: [.init(name: .init("swift-foundations"), layer: .foundations)],
+                organizations: [.init(name: .init("swift-compositions"), layer: .compositions)],
                 denied: [],
                 vacant: [.init("swift-renamed")],
                 limit: .init(fixture: 1, items: 20)
@@ -269,9 +269,9 @@ extension Institute.Inventory.Test.`Edge Case` {
 
     @Test
     func `Item bound is a typed repository traversal failure`() async throws {
-        let owner = GitHub.Organization.Name("swift-foundations")
+        let owner = GitHub.Organization.Name("swift-compositions")
         let policy = try Institute.Inventory.Policy(
-            organizations: [.init(name: owner, layer: .foundations)],
+            organizations: [.init(name: owner, layer: .compositions)],
             denied: [],
             limit: .init(fixture: 1, items: 1)
         )
@@ -314,9 +314,9 @@ extension Institute.Inventory.Test.`Edge Case` {
     func `A page fetch failure mid-pagination aborts discovery rather than truncating it`()
         async throws
     {
-        let owner = GitHub.Organization.Name("swift-foundations")
+        let owner = GitHub.Organization.Name("swift-compositions")
         let policy = try Institute.Inventory.Policy(
-            organizations: [.init(name: owner, layer: .foundations)],
+            organizations: [.init(name: owner, layer: .compositions)],
             denied: [],
             limit: .init(fixture: 5, items: 50)
         )
@@ -357,9 +357,9 @@ extension Institute.Inventory.Test.`Edge Case` {
 
     @Test
     func `Page bound is a typed repository traversal failure`() async throws {
-        let owner = GitHub.Organization.Name("swift-foundations")
+        let owner = GitHub.Organization.Name("swift-compositions")
         let policy = try Institute.Inventory.Policy(
-            organizations: [.init(name: owner, layer: .foundations)],
+            organizations: [.init(name: owner, layer: .compositions)],
             denied: [],
             limit: .init(fixture: 1, items: 10)
         )
@@ -418,9 +418,9 @@ extension Institute.Inventory.Test.`Edge Case` {
 
     @Test
     func `Malformed content failure stays typed and names its repository`() async throws {
-        let owner = GitHub.Organization.Name("swift-foundations")
+        let owner = GitHub.Organization.Name("swift-compositions")
         let policy = try Institute.Inventory.Policy(
-            organizations: [.init(name: owner, layer: .foundations)],
+            organizations: [.init(name: owner, layer: .compositions)],
             denied: [],
             limit: .init(fixture: 1, items: 1)
         )
@@ -454,11 +454,11 @@ extension Institute.Inventory.Test.`Edge Case` {
     @Test
     func `Eligible name collision across owners is rejected`() async throws {
         let first = GitHub.Organization.Name("swift-standards")
-        let second = GitHub.Organization.Name("swift-foundations")
+        let second = GitHub.Organization.Name("swift-compositions")
         let policy = try Institute.Inventory.Policy(
             organizations: [
                 .init(name: first, layer: .standards),
-                .init(name: second, layer: .foundations),
+                .init(name: second, layer: .compositions),
             ],
             denied: [],
             limit: .init(fixture: 1, items: 10)
@@ -520,11 +520,11 @@ extension Institute.Inventory.Test.Integration {
     private static func discovery(
         _ pages: [[GitHub.Repository.Summary]]
     ) async throws(Institute.Inventory.Error<Never>) -> Institute.Inventory.Discovery {
-        let owner = GitHub.Organization.Name("swift-foundations")
+        let owner = GitHub.Organization.Name("swift-compositions")
         let policy: Institute.Inventory.Policy
         do throws(Institute.Inventory.Policy.Error) {
             policy = try .init(
-                organizations: [.init(name: owner, layer: .foundations)],
+                organizations: [.init(name: owner, layer: .compositions)],
                 denied: [],
                 limit: .init(fixture: UInt(pages.count), items: 10)
             )

@@ -103,13 +103,13 @@ extension Institute.Xcode.Scheme.Test.Unit {
             .init(
                 location: "group:../slow",
                 role: .subject(
-                    try #require(Institute.Repository.Key(identity: "swift-primitives/slow"))
+                    try #require(Institute.Repository.Key(identity: "swift-atoms/slow"))
                 )
             ),
             .init(
                 location: "group:../fast",
                 role: .subject(
-                    try #require(Institute.Repository.Key(identity: "swift-primitives/fast"))
+                    try #require(Institute.Repository.Key(identity: "swift-atoms/fast"))
                 )
             ),
         ])
@@ -169,7 +169,7 @@ extension Institute.Xcode.Scheme.Test.Unit {
             .init(
                 location: "group:../hung",
                 role: .subject(
-                    try #require(Institute.Repository.Key(identity: "swift-primitives/hung"))
+                    try #require(Institute.Repository.Key(identity: "swift-atoms/hung"))
                 )
             )
         ])
@@ -186,7 +186,7 @@ extension Institute.Xcode.Scheme.Test.Unit {
             Issue.record("expected bounded manifest evaluation to fail")
         } catch {
             let diagnostic = "\(error)"
-            #expect(diagnostic.contains("swift-primitives/hung"))
+            #expect(diagnostic.contains("swift-atoms/hung"))
             #expect(diagnostic.contains("../hung"))
             #expect(diagnostic.contains("timedOut"))
         }

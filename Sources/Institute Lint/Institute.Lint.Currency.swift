@@ -36,7 +36,7 @@ extension Institute.Lint.Currency {
         .init(key: "engine", repository: Institute.Lint.repository),
         .init(
             key: "swift-primitives-linter-rules",
-            repository: "swift-primitives/swift-primitives-linter-rules"
+            repository: "swift-molecules/swift-primitives-linter-rules"
         ),
         .init(
             key: "swift-standards-linter-rules",
@@ -44,15 +44,15 @@ extension Institute.Lint.Currency {
         ),
         .init(
             key: "swift-institute-linter-rules",
-            repository: "swift-foundations/swift-institute-linter-rules"
+            repository: "swift-compositions/swift-institute-linter-rules"
         ),
         .init(
             key: "swift-linter-rules",
-            repository: "swift-foundations/swift-linter-rules"
+            repository: "swift-compositions/swift-linter-rules"
         ),
         .init(
             key: "swift-linter-primitives",
-            repository: "swift-primitives/swift-linter-primitives"
+            repository: "swift-molecules/swift-lint"
         ),
     ]
 

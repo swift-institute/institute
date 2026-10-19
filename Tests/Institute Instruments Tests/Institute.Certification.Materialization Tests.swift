@@ -18,7 +18,7 @@ extension Institute.Certification.Materialization {
         static func key() -> Institute.Repository.Key {
             guard
                 let key = Institute.Repository.Key(
-                    identity: "swift-foundations/swift-example"
+                    identity: "swift-compositions/swift-example"
                 )
             else {
                 fatalError("test fixture identity must be valid")
@@ -55,7 +55,7 @@ extension Institute.Certification.Materialization {
                 transformations: [
                     .init(
                         file: "Package.swift",
-                        dependency: "swift-foundations/swift-dependency",
+                        dependency: "swift-compositions/swift-dependency",
                         target: Self.revision("3")
                     )
                 ]
@@ -64,7 +64,7 @@ extension Institute.Certification.Materialization {
                 transformations: [
                     .init(
                         file: "Package.swift",
-                        dependency: "swift-foundations/swift-dependency",
+                        dependency: "swift-compositions/swift-dependency",
                         target: Self.revision("4")
                     )
                 ]
@@ -77,12 +77,12 @@ extension Institute.Certification.Materialization {
         func `transformation order cannot change identity`() throws {
             let a = try Institute.Certification.Materialization.Transformation(
                 file: "A/Package.swift",
-                dependency: "swift-foundations/swift-a",
+                dependency: "swift-compositions/swift-a",
                 target: Self.revision("3")
             )
             let b = try Institute.Certification.Materialization.Transformation(
                 file: "B/Package.swift",
-                dependency: "swift-foundations/swift-b",
+                dependency: "swift-compositions/swift-b",
                 target: Self.revision("4")
             )
             let forward = try Self.receipt(transformations: [a, b])
@@ -94,12 +94,12 @@ extension Institute.Certification.Materialization {
         func `duplicate transformations for one file are refused`() throws {
             let first = try Institute.Certification.Materialization.Transformation(
                 file: "Package.swift",
-                dependency: "swift-foundations/swift-a",
+                dependency: "swift-compositions/swift-a",
                 target: Self.revision("3")
             )
             let second = try Institute.Certification.Materialization.Transformation(
                 file: "Package.swift",
-                dependency: "swift-foundations/swift-b",
+                dependency: "swift-compositions/swift-b",
                 target: Self.revision("4")
             )
             #expect(throws: Institute.Error.self) {
@@ -133,7 +133,7 @@ extension Institute.Certification.Materialization {
                 transformations: [
                     .init(
                         file: "Package.swift",
-                        dependency: "swift-foundations/swift-dependency",
+                        dependency: "swift-compositions/swift-dependency",
                         target: Self.revision("3")
                     )
                 ]

@@ -75,9 +75,9 @@ extension Institute.Root.Test.`Edge Case` {
         let checkout = MainFixtureFiles.join(base, "Institute")
         defer { try? MainFixtureFiles.remove(base) }
         try MainFixtureFiles.createDirectory(checkout)
-        _ = MainFixtureFiles.createFile(MainFixtureFiles.join(base, "swift-foundations"), contents: Array("collision".utf8))
+        _ = MainFixtureFiles.createFile(MainFixtureFiles.join(base, "swift-compositions"), contents: Array("collision".utf8))
         let root = try Institute.Root(checkout: File.Directory(validating: checkout))
-        let target = root.hierarchy[directory: "swift-foundations"][directory: "swift-example"]
+        let target = root.hierarchy[directory: "swift-compositions"][directory: "swift-example"]
 
         #expect(throws: Institute.Error.self) {
             try root.preflight(target, under: root.hierarchy)
@@ -92,9 +92,9 @@ extension Institute.Root.Test.`Edge Case` {
         defer { try? MainFixtureFiles.remove(base) }
         try MainFixtureFiles.createDirectory(checkout)
         try MainFixtureFiles.createDirectory(outside)
-        try MainFixtureFiles.createSymbolicLink(MainFixtureFiles.join(base, "swift-foundations"), toURLOf: outside)
+        try MainFixtureFiles.createSymbolicLink(MainFixtureFiles.join(base, "swift-compositions"), toURLOf: outside)
         let root = try Institute.Root(checkout: File.Directory(validating: checkout))
-        let target = root.hierarchy[directory: "swift-foundations"][directory: "swift-example"]
+        let target = root.hierarchy[directory: "swift-compositions"][directory: "swift-example"]
 
         #expect(throws: Institute.Error.self) {
             try root.preflight(target, under: root.hierarchy)

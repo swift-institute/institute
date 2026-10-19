@@ -6,9 +6,9 @@ public import Institute_Source_Workspace
 extension Institute.Source.Profile {
   public func bundle(for repository: Institute.Repository) -> Institute.Source.Bundle {
     switch repository.layer {
-    case .primitives: .primitives
+    case .atoms, .molecules: .primitives
     case .standards: .standards
-    case .foundations, .components, .applications: .institute
+    case .compositions: .institute
     }
   }
 

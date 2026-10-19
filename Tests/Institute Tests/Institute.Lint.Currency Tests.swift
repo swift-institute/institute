@@ -206,7 +206,7 @@ struct `Institute Lint Currency Tests` {
         #expect(Institute.Lint.Prerequisite.currency.token == "currency")
         #expect(
             Institute.Lint.Prerequisite.currency.issue
-                == "https://github.com/swift-foundations/swift-linter/issues/33"
+                == "https://github.com/swift-compositions/swift-linter/issues/33"
         )
     }
 

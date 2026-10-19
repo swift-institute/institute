@@ -29,16 +29,16 @@ extension Institute.Selection.Test {
             swift: "6.3.3",
             xcode: "26.6",
             repositories: [
-                repository(owner: "swift-foundations", name: "swift-color", layer: .foundations),
+                repository(owner: "swift-compositions", name: "swift-color", layer: .compositions),
                 repository(
-                    owner: "swift-foundations",
+                    owner: "swift-compositions",
                     name: "swift-unselected",
-                    layer: .foundations
+                    layer: .compositions
                 ),
                 repository(
-                    owner: "swift-primitives",
+                    owner: "swift-atoms",
                     name: "swift-dimension-primitives",
-                    layer: .primitives
+                    layer: .atoms
                 ),
             ]
         )
@@ -73,11 +73,11 @@ extension Institute.Selection.Test.Unit {
             version: 1,
             repositories: [
                 Institute.Selection.Test.key(
-                    owner: "swift-primitives",
+                    owner: "swift-atoms",
                     name: "swift-dimension-primitives"
                 ),
                 Institute.Selection.Test.key(
-                    owner: "swift-foundations",
+                    owner: "swift-compositions",
                     name: "swift-color"
                 ),
             ]
@@ -98,14 +98,14 @@ extension Institute.Selection.Test.Unit {
     @Test
     func `Repository keys serialize as canonical owner and name identities`() throws {
         let key = Institute.Selection.Test.key(
-            owner: "swift-primitives",
+            owner: "swift-atoms",
             name: "swift-dimension-primitives"
         )
 
         let encoded = key.jsonString()
         let decoded = try Institute.Repository.Key(jsonString: encoded)
 
-        #expect(encoded == "\"swift-primitives/swift-dimension-primitives\"")
+        #expect(encoded == "\"swift-atoms/swift-dimension-primitives\"")
         #expect(decoded == key)
     }
 }
@@ -114,7 +114,7 @@ extension Institute.Selection.Test.`Edge Case` {
     @Test
     func `Unsupported version duplicate and empty selections fail closed`() {
         let key = Institute.Selection.Test.key(
-            owner: "swift-primitives",
+            owner: "swift-atoms",
             name: "swift-dimension-primitives"
         )
 
@@ -135,7 +135,7 @@ extension Institute.Selection.Test.`Edge Case` {
             version: 1,
             repositories: [
                 Institute.Selection.Test.key(
-                    owner: "swift-foundations",
+                    owner: "swift-compositions",
                     name: "swift-unknown"
                 )
             ]
@@ -156,7 +156,7 @@ extension Institute.Selection.Test.`Edge Case` {
                 jsonString: """
                     {
                       "version": 1,
-                      "repositories": ["swift-foundations"]
+                      "repositories": ["swift-compositions"]
                     }
                     """
             )
@@ -166,7 +166,7 @@ extension Institute.Selection.Test.`Edge Case` {
                 jsonString: """
                     {
                       "version": 1,
-                      "repositories": ["swift-foundations/swift-color"],
+                      "repositories": ["swift-compositions/swift-color"],
                       "scope": "proof"
                     }
                     """
@@ -177,8 +177,8 @@ extension Institute.Selection.Test.`Edge Case` {
                 jsonString: """
                     {
                       "version": 1,
-                      "repositories": ["swift-foundations/swift-color"],
-                      "repositories": ["swift-primitives/swift-dimension-primitives"]
+                      "repositories": ["swift-compositions/swift-color"],
+                      "repositories": ["swift-atoms/swift-dimension-primitives"]
                     }
                     """
             )
@@ -209,15 +209,15 @@ extension Institute.Selection.Test.Integration {
 
 extension Institute.Selection.Test {
     static var color: Institute.Repository.Key {
-        key(owner: "swift-foundations", name: "swift-color")
+        key(owner: "swift-compositions", name: "swift-color")
     }
 
     static var dimension: Institute.Repository.Key {
-        key(owner: "swift-primitives", name: "swift-dimension-primitives")
+        key(owner: "swift-atoms", name: "swift-dimension-primitives")
     }
 
     static var unselected: Institute.Repository.Key {
-        key(owner: "swift-foundations", name: "swift-unselected")
+        key(owner: "swift-compositions", name: "swift-unselected")
     }
 
     /// The committed policy the override tests depart from.
@@ -255,7 +255,7 @@ extension Institute.Selection.Test {
     static let committedDocument = """
         {
           "version": 1,
-          "repositories": ["swift-foundations/swift-color"]
+          "repositories": ["swift-compositions/swift-color"]
         }
         """
 }
@@ -301,7 +301,7 @@ extension Institute.Selection.Test.Unit {
         #expect(origin.description.contains("5 in effect"))
         #expect(
             origin.description.contains(
-                "Selection.local.json withholds: swift-foundations/swift-color"
+                "Selection.local.json withholds: swift-compositions/swift-color"
             )
         )
     }
@@ -362,7 +362,7 @@ extension Institute.Selection.Test.`Edge Case` {
         throws
     {
         let unknown = Institute.Selection.Test.key(
-            owner: "swift-foundations",
+            owner: "swift-compositions",
             name: "swift-unknown"
         )
         let merged = try Institute.Selection.Test.override(add: [unknown])
@@ -387,7 +387,7 @@ extension Institute.Selection.Test.`Edge Case` {
                 jsonString: """
                     {
                       "version": 1,
-                      "add": ["swift-primitives/swift-dimension-primitives"]
+                      "add": ["swift-atoms/swift-dimension-primitives"]
                     }
                     """
             )
@@ -399,7 +399,7 @@ extension Institute.Selection.Test.`Edge Case` {
                       "version": 1,
                       "add": [],
                       "remove": [],
-                      "repositories": ["swift-foundations/swift-color"]
+                      "repositories": ["swift-compositions/swift-color"]
                     }
                     """
             )
@@ -409,8 +409,8 @@ extension Institute.Selection.Test.`Edge Case` {
                 jsonString: """
                     {
                       "version": 1,
-                      "add": ["swift-foundations/swift-color"],
-                      "add": ["swift-primitives/swift-dimension-primitives"],
+                      "add": ["swift-compositions/swift-color"],
+                      "add": ["swift-atoms/swift-dimension-primitives"],
                       "remove": []
                     }
                     """
@@ -443,7 +443,7 @@ extension Institute.Selection.Test.Integration {
             override: """
                 {
                   "version": 1,
-                  "add": ["swift-primitives/swift-dimension-primitives"],
+                  "add": ["swift-atoms/swift-dimension-primitives"],
                   "remove": []
                 }
                 """
@@ -489,7 +489,7 @@ extension Institute.Selection.Test.Integration {
         let complete = """
             {
               "version": 1,
-              "add": ["swift-primitives/swift-dimension-primitives"],
+              "add": ["swift-atoms/swift-dimension-primitives"],
               "remove": []
             }
             """

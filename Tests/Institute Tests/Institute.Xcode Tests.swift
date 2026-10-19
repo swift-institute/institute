@@ -183,14 +183,14 @@ extension Institute.Xcode.Test.Unit {
                 role: .control(.continuousIntegration)
             ),
             .init(
-                location: "group:../swift-foundations/swift-linter/Runner",
+                location: "group:../swift-compositions/swift-linter/Runner",
                 role: .control(.linter)
             ),
             .init(
-                location: "group:../swift-primitives/swift-example",
+                location: "group:../swift-atoms/swift-example",
                 role: .subject(
                     try #require(
-                        Institute.Repository.Key(identity: "swift-primitives/swift-example")
+                        Institute.Repository.Key(identity: "swift-atoms/swift-example")
                     )
                 )
             ),
@@ -207,9 +207,9 @@ extension Institute.Xcode.Test.Unit {
 
     @Test
     func `local closure reports every missing Institute dependency in identity order`() throws {
-        let selected = Self.repository(owner: "swift-foundations", name: "swift-selected")
-        let first = Self.repository(owner: "swift-primitives", name: "swift-first")
-        let second = Self.repository(owner: "swift-foundations", name: "swift-second")
+        let selected = Self.repository(owner: "swift-compositions", name: "swift-selected")
+        let first = Self.repository(owner: "swift-atoms", name: "swift-first")
+        let second = Self.repository(owner: "swift-compositions", name: "swift-second")
         let specification = Self.specification(
             dependency: .localInstituteClosure,
             repositories: [selected]
@@ -227,7 +227,7 @@ extension Institute.Xcode.Test.Unit {
             #expect(
                 error.description
                     == "workspace local Institute dependency closure is incomplete; missing: "
-                    + "[swift-primitives/swift-first]"
+                    + "[swift-atoms/swift-first]"
             )
         }
 
@@ -245,15 +245,15 @@ extension Institute.Xcode.Test.Unit {
             #expect(
                 error.description
                     == "workspace local Institute dependency closure is incomplete; missing: "
-                    + "[swift-foundations/swift-second, swift-primitives/swift-first]"
+                    + "[swift-atoms/swift-first, swift-compositions/swift-second]"
             )
         }
     }
 
     @Test
     func `local closure admits selected Institute dependencies and external remotes`() throws {
-        let selected = Self.repository(owner: "swift-foundations", name: "swift-selected")
-        let dependency = Self.repository(owner: "swift-primitives", name: "swift-dependency")
+        let selected = Self.repository(owner: "swift-compositions", name: "swift-selected")
+        let dependency = Self.repository(owner: "swift-atoms", name: "swift-dependency")
         let specification = Self.specification(
             dependency: .localInstituteClosure,
             repositories: [selected, dependency]
@@ -274,8 +274,8 @@ extension Institute.Xcode.Test.Unit {
 
     @Test
     func `dependency binding rather than a workspace name selects closure enforcement`() throws {
-        let selected = Self.repository(owner: "swift-foundations", name: "swift-selected")
-        let dependency = Self.repository(owner: "swift-primitives", name: "swift-dependency")
+        let selected = Self.repository(owner: "swift-compositions", name: "swift-selected")
+        let dependency = Self.repository(owner: "swift-atoms", name: "swift-dependency")
         let local = Self.specification(
             dependency: .localInstituteClosure,
             repositories: [selected]
@@ -318,9 +318,9 @@ extension Institute.Xcode.Test.Unit {
         let repositories = [
             Institute.Repository(
                 name: "swift-example",
-                url: "https://github.com/swift-primitives/swift-example.git",
-                organization: "swift-primitives",
-                layer: .primitives
+                url: "https://github.com/swift-atoms/swift-example.git",
+                organization: "swift-atoms",
+                layer: .atoms
             ),
             Institute.Repository(
                 name: "swift-rfc-0000",
@@ -340,7 +340,7 @@ extension Institute.Xcode.Test.Unit {
                 if case .subject = member.role { true } else { false }
             }
         )
-        #expect(rendered.contains("group:../swift-primitives/swift-example"))
+        #expect(rendered.contains("group:../swift-atoms/swift-example"))
         #expect(rendered.contains("group:../swift-standards/swift-ietf/swift-rfc-0000"))
         #expect(!rendered.contains("/Users/"))
         #expect(!rendered.contains("absolute:"))
@@ -350,7 +350,7 @@ extension Institute.Xcode.Test.Unit {
         #expect(locations.count == document.references.count)
         #expect(
             locations.map(\.rawValue) == [
-                "group:../swift-primitives/swift-example",
+                "group:../swift-atoms/swift-example",
                 "group:../swift-standards/swift-ietf/swift-rfc-0000",
             ]
         )
@@ -363,9 +363,9 @@ extension Institute.Xcode.Test.Unit {
         let repositories = [
             Institute.Repository(
                 name: "swift-example",
-                url: "https://github.com/swift-primitives/swift-example.git",
-                organization: "swift-primitives",
-                layer: .primitives
+                url: "https://github.com/swift-atoms/swift-example.git",
+                organization: "swift-atoms",
+                layer: .atoms
             )
         ]
 
@@ -382,7 +382,7 @@ extension Institute.Xcode.Test.Unit {
         #expect(integration.members[1].role == .control(.application))
         #expect(
             integration.members[2].location
-                == "group:../swift-foundations/swift-linter/Runner"
+                == "group:../swift-compositions/swift-linter/Runner"
         )
         #expect(integration.members[2].role == .control(.linter))
         #expect(
@@ -431,7 +431,7 @@ extension Institute.Xcode.Test.Unit {
             name: name,
             url: "https://github.com/\(owner)/\(name).git",
             organization: owner,
-            layer: owner == "swift-primitives" ? .primitives : .foundations
+            layer: owner == "swift-atoms" ? .atoms : .compositions
         )
     }
 
@@ -498,9 +498,9 @@ extension Institute.Xcode.Test.Integration {
         let repositories = [
             Institute.Repository(
                 name: "swift-example",
-                url: "https://github.com/swift-foundations/swift-example.git",
-                organization: "swift-foundations",
-                layer: .foundations
+                url: "https://github.com/swift-compositions/swift-example.git",
+                organization: "swift-compositions",
+                layer: .compositions
             )
         ]
 
@@ -518,7 +518,7 @@ extension Institute.Xcode.Test.Integration {
         #expect(Institute.Xcode.current(specification, at: root))
         #expect(
             try #require(Institute.Xcode.contents(at: root)).contains(
-                "../swift-foundations/swift-example"
+                "../swift-compositions/swift-example"
             )
         )
 
@@ -531,7 +531,7 @@ extension Institute.Xcode.Test.Integration {
         // catch that; this one can.
         // Group locations are relative to the directory CONTAINING the
         // .xcworkspace bundle, which is the checkout itself.
-        try MainFixtureFiles.createDirectory(MainFixtureFiles.join(base, "swift-foundations/swift-example"))
+        try MainFixtureFiles.createDirectory(MainFixtureFiles.join(base, "swift-compositions/swift-example"))
         for reference in try Institute.Xcode.document(specification).references {
             guard case .file(let location) = reference, location.scheme == .group else {
                 Issue.record("unexpected non-group file reference \(reference)")
@@ -554,8 +554,8 @@ extension Institute.Xcode.Test.Integration {
             application,
             MainFixtureFiles.join(base, "institute"),
             MainFixtureFiles.join(base, "institute-continuous-integration"),
-            MainFixtureFiles.join(base, "swift-foundations/swift-linter/Runner"),
-            MainFixtureFiles.join(base, "swift-primitives/swift-example"),
+            MainFixtureFiles.join(base, "swift-compositions/swift-linter/Runner"),
+            MainFixtureFiles.join(base, "swift-atoms/swift-example"),
         ] {
             try MainFixtureFiles.createDirectory(directory)
             try MainFixtureFiles.write(
@@ -565,9 +565,9 @@ extension Institute.Xcode.Test.Integration {
         }
         let repository = Institute.Repository(
             name: "swift-example",
-            url: "https://github.com/swift-primitives/swift-example.git",
-            organization: "swift-primitives",
-            layer: .primitives
+            url: "https://github.com/swift-atoms/swift-example.git",
+            organization: "swift-atoms",
+            layer: .atoms
         )
         let root = try Institute.Root(checkout: File.Directory(validating: application))
         let specification = Institute.Workspace.Specification(dependency: .remoteAllowed, members: [
@@ -578,14 +578,14 @@ extension Institute.Xcode.Test.Integration {
                 role: .control(.continuousIntegration)
             ),
             .init(
-                location: "group:../swift-foundations/swift-linter/Runner",
+                location: "group:../swift-compositions/swift-linter/Runner",
                 role: .control(.linter)
             ),
             .init(
-                location: "group:../swift-primitives/swift-example",
+                location: "group:../swift-atoms/swift-example",
                 role: .subject(
                     try #require(
-                        Institute.Repository.Key(identity: "swift-primitives/swift-example")
+                        Institute.Repository.Key(identity: "swift-atoms/swift-example")
                     )
                 )
             ),
@@ -614,14 +614,14 @@ extension Institute.Xcode.Test.Integration {
                 "control:linter",
             ]
         )
-        #expect(cohort.admitted.map(\.identity) == ["swift-primitives/swift-example"])
+        #expect(cohort.admitted.map(\.identity) == ["swift-atoms/swift-example"])
         #expect(cohort.controls.map(\.identity).contains("control:linter"))
         #expect(
             cohort.measurable.map(\.identity) == [
                 "control:application",
                 "control:institute",
                 "control:continuous-integration",
-                "swift-primitives/swift-example",
+                "swift-atoms/swift-example",
             ]
         )
         #expect(cohort.reasons.isEmpty)

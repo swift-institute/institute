@@ -250,7 +250,7 @@ custom_rules:
     #     `MemberAttributeMacro`, `AccessorMacro`, and siblings): every
     #     role protocol names its requirement `static func expansion(...)`
     #     and ends the parameter list `in context: some MacroExpansionContext`
-    #     (verified against swift-foundations/swift-copy-on-write's
+    #     (verified against swift-molecules/swift-copy-on-write's
     #     `CoWMacro.swift`, the #219 red-A evidence) immediately before
     #     the untyped `throws`.
     # Each lookbehind anchors on the parameter's INTERNAL name
@@ -274,7 +274,7 @@ custom_rules:
     # both under one `throws(E)` clause without an API-breaking wrapper
     # error type. The stdlib itself uses untyped throws for exactly this
     # shape (`withThrowingTaskGroup`, `withCheckedThrowingContinuation`).
-    # Witness: swift-foundations/swift-resource-pool `ResourcePool.
+    # Witness: swift-compositions/swift-resource-pool `ResourcePool.
     # withResource(timeout:_:)` (head 8ca28f8) —
     #   public func withResource<T: Sendable>(
     #     timeout: Duration = .seconds(30),

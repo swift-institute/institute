@@ -26,18 +26,18 @@ extension Institute.Certification.Test.Closure {
             inventoryBlob: b,
             members: [
                 .init(
-                    key: key("swift-primitives/swift-color"),
+                    key: key("swift-atoms/swift-color"),
                     revision: .init(a),
-                    kind: .package(layer: .primitives)
+                    kind: .package(layer: .atoms)
                 ),
                 .init(
-                    key: key("swift-foundations/swift-sockets"),
+                    key: key("swift-compositions/swift-sockets"),
                     revision: .init(b),
-                    kind: .package(layer: .foundations)
+                    kind: .package(layer: .compositions)
                 ),
             ],
             exclusions: [
-                .init(key: key("swift-primitives/swift-legacy"), reason: .archived)
+                .init(key: key("swift-atoms/swift-legacy"), reason: .archived)
             ]
         )
     }
@@ -67,10 +67,10 @@ extension Institute.Certification.Test.Closure {
     @Test
     func `an exact managed checkout of a member passes`() throws {
         let proofs = Institute.Certification.Closure.proofs(
-            consumer: Self.key("swift-foundations/swift-sockets"),
+            consumer: Self.key("swift-compositions/swift-sockets"),
             resolution: .init(dependencies: [
                 Self.dependency(
-                    "https://github.com/swift-primitives/swift-color.git",
+                    "https://github.com/swift-atoms/swift-color.git",
                     Self.checkout(Self.a)
                 )
             ]),
@@ -78,18 +78,18 @@ extension Institute.Certification.Test.Closure {
         )
         #expect(proofs.count == 1)
         #expect(proofs[0].passes)
-        #expect(proofs[0].verdict == .exact(Self.key("swift-primitives/swift-color")))
+        #expect(proofs[0].verdict == .exact(Self.key("swift-atoms/swift-color")))
     }
 
     @Test
     func `a governed identity outside the population fails closed`() throws {
-        // The swift-tls class: swift-foundations is governed, swift-tls is
+        // The swift-tls class: swift-compositions is governed, swift-tls is
         // not an admitted member (institute-application#212).
         let proofs = Institute.Certification.Closure.proofs(
-            consumer: Self.key("swift-foundations/swift-sockets"),
+            consumer: Self.key("swift-compositions/swift-sockets"),
             resolution: .init(dependencies: [
                 Self.dependency(
-                    "https://github.com/swift-foundations/swift-tls.git",
+                    "https://github.com/swift-compositions/swift-tls.git",
                     Self.checkout(Self.a)
                 )
             ]),
@@ -98,17 +98,17 @@ extension Institute.Certification.Test.Closure {
         #expect(proofs.count == 1)
         #expect(!proofs[0].passes)
         #expect(
-            proofs[0].verdict == .ungoverned(Self.key("swift-foundations/swift-tls"))
+            proofs[0].verdict == .ungoverned(Self.key("swift-compositions/swift-tls"))
         )
     }
 
     @Test
     func `revision skew against the snapshot member fails`() throws {
         let proofs = Institute.Certification.Closure.proofs(
-            consumer: Self.key("swift-foundations/swift-sockets"),
+            consumer: Self.key("swift-compositions/swift-sockets"),
             resolution: .init(dependencies: [
                 Self.dependency(
-                    "https://github.com/swift-primitives/swift-color.git",
+                    "https://github.com/swift-atoms/swift-color.git",
                     Self.checkout(Self.b)
                 )
             ]),
@@ -120,7 +120,7 @@ extension Institute.Certification.Test.Closure {
             Issue.record("expected revisionSkew, got \(proofs[0].verdict)")
             return
         }
-        #expect(key == Self.key("swift-primitives/swift-color"))
+        #expect(key == Self.key("swift-atoms/swift-color"))
         #expect(resolved == Self.b)
         #expect(member == Self.a)
     }
@@ -128,10 +128,10 @@ extension Institute.Certification.Test.Closure {
     @Test
     func `an edge to a typed-excluded member is hard red`() throws {
         let proofs = Institute.Certification.Closure.proofs(
-            consumer: Self.key("swift-foundations/swift-sockets"),
+            consumer: Self.key("swift-compositions/swift-sockets"),
             resolution: .init(dependencies: [
                 Self.dependency(
-                    "https://github.com/swift-primitives/swift-legacy.git",
+                    "https://github.com/swift-atoms/swift-legacy.git",
                     Self.checkout(Self.a)
                 )
             ]),
@@ -140,17 +140,17 @@ extension Institute.Certification.Test.Closure {
         #expect(!proofs[0].passes)
         #expect(
             proofs[0].verdict
-                == .excludedMember(Self.key("swift-primitives/swift-legacy"))
+                == .excludedMember(Self.key("swift-atoms/swift-legacy"))
         )
     }
 
     @Test
     func `a noncanonical location is unclassifiable, never silently external`() throws {
         let proofs = Institute.Certification.Closure.proofs(
-            consumer: Self.key("swift-foundations/swift-sockets"),
+            consumer: Self.key("swift-compositions/swift-sockets"),
             resolution: .init(dependencies: [
                 Self.dependency(
-                    "git@github.com:swift-primitives/swift-color.git",
+                    "git@github.com:swift-atoms/swift-color.git",
                     Self.checkout(Self.a)
                 )
             ]),
@@ -164,7 +164,7 @@ extension Institute.Certification.Test.Closure {
     @Test
     func `a provably external https host produces no proof`() throws {
         let proofs = Institute.Certification.Closure.proofs(
-            consumer: Self.key("swift-foundations/swift-sockets"),
+            consumer: Self.key("swift-compositions/swift-sockets"),
             resolution: .init(dependencies: [
                 Self.dependency(
                     "https://gitlab.com/anything/at-all.git",
@@ -180,12 +180,12 @@ extension Institute.Certification.Test.Closure {
     func `coverage refuses a proof belonging to another consumer`() throws {
         #expect(throws: Institute.Error.self) {
             _ = try Institute.Certification.Closure.Coverage(
-                consumer: Self.key("swift-primitives/swift-color"),
+                consumer: Self.key("swift-atoms/swift-color"),
                 proofs: [
                     .init(
-                        consumer: Self.key("swift-foundations/swift-sockets"),
-                        location: "https://github.com/swift-primitives/swift-color.git",
-                        verdict: .exact(Self.key("swift-primitives/swift-color"))
+                        consumer: Self.key("swift-compositions/swift-sockets"),
+                        location: "https://github.com/swift-atoms/swift-color.git",
+                        verdict: .exact(Self.key("swift-atoms/swift-color"))
                     )
                 ]
             )
@@ -195,7 +195,7 @@ extension Institute.Certification.Test.Closure {
     @Test
     func `an external-organization edge produces no proof`() throws {
         let proofs = Institute.Certification.Closure.proofs(
-            consumer: Self.key("swift-foundations/swift-sockets"),
+            consumer: Self.key("swift-compositions/swift-sockets"),
             resolution: .init(dependencies: [
                 Self.dependency(
                     "https://github.com/apple/swift-syntax.git",
@@ -211,18 +211,18 @@ extension Institute.Certification.Test.Closure {
     func `a local path is an escape unless the mode accepts it`() throws {
         let resolution = Package.Resolution(dependencies: [
             Self.dependency(
-                "https://github.com/swift-primitives/swift-color.git",
+                "https://github.com/swift-atoms/swift-color.git",
                 .fileSystem(path: "/tmp/anywhere")
             )
         ])
         let strict = Institute.Certification.Closure.proofs(
-            consumer: Self.key("swift-foundations/swift-sockets"),
+            consumer: Self.key("swift-compositions/swift-sockets"),
             resolution: resolution,
             snapshot: try Self.snapshot()
         )
         #expect(!strict[0].passes)
         let composed = Institute.Certification.Closure.proofs(
-            consumer: Self.key("swift-foundations/swift-sockets"),
+            consumer: Self.key("swift-compositions/swift-sockets"),
             resolution: resolution,
             snapshot: try Self.snapshot(),
             accepting: [.localPath]
@@ -233,7 +233,7 @@ extension Institute.Certification.Test.Closure {
     @Test
     func `a failing proof fails the certificate`() throws {
         let obligation = Institute.Certification.Obligation(
-            key: Self.key("swift-primitives/swift-color"),
+            key: Self.key("swift-atoms/swift-color"),
             kind: .build,
             platform: .linux
         )
@@ -251,16 +251,16 @@ extension Institute.Certification.Test.Closure {
             exceptions: [],
             closure: [
                 try .init(
-                    consumer: Self.key("swift-primitives/swift-color"),
+                    consumer: Self.key("swift-atoms/swift-color"),
                     proofs: []
                 ),
                 try .init(
-                    consumer: Self.key("swift-foundations/swift-sockets"),
+                    consumer: Self.key("swift-compositions/swift-sockets"),
                     proofs: [
                         .init(
-                            consumer: Self.key("swift-foundations/swift-sockets"),
-                            location: "https://github.com/swift-foundations/swift-tls.git",
-                            verdict: .ungoverned(Self.key("swift-foundations/swift-tls"))
+                            consumer: Self.key("swift-compositions/swift-sockets"),
+                            location: "https://github.com/swift-compositions/swift-tls.git",
+                            verdict: .ungoverned(Self.key("swift-compositions/swift-tls"))
                         )
                     ]
                 ),

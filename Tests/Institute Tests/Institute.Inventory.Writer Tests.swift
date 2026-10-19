@@ -18,7 +18,7 @@ extension Institute.Inventory.Test.Unit {
     @Test
     func `Render is byte-identical for schema version one`() throws {
         let key = Institute.Repository.Key(
-            owner: .init("swift-primitives"),
+            owner: .init("swift-atoms"),
             name: .init("swift-alpha-primitives")
         )
         let configuration = Institute.Configuration(
@@ -31,7 +31,7 @@ extension Institute.Inventory.Test.Unit {
                     name: key.name.underlying,
                     url: key.url,
                     organization: key.owner.underlying,
-                    layer: .primitives
+                    layer: .atoms
                 )
             ]
         )
@@ -45,10 +45,10 @@ extension Institute.Inventory.Test.Unit {
                 {
                   "repositories": [
                     {
-                      "layer": "primitives",
+                      "layer": "atoms",
                       "name": "swift-alpha-primitives",
-                      "organization": "swift-primitives",
-                      "url": "https://github.com/swift-primitives/swift-alpha-primitives.git"
+                      "organization": "swift-atoms",
+                      "url": "https://github.com/swift-atoms/swift-alpha-primitives.git"
                     }
                   ],
                   "scope": "swift-institute",
@@ -64,14 +64,14 @@ extension Institute.Inventory.Test.Unit {
     @Test
     func `Render rejects unsupported schema duplicate names and noncanonical URLs`() {
         let key = Institute.Repository.Key(
-            owner: .init("swift-foundations"),
+            owner: .init("swift-compositions"),
             name: .init("swift-file")
         )
         let repository = Institute.Repository(
             name: key.name.underlying,
             url: key.url,
             organization: key.owner.underlying,
-            layer: .foundations
+            layer: .compositions
         )
         let unsupported = Institute.Configuration(
             version: 2,
@@ -97,7 +97,7 @@ extension Institute.Inventory.Test.Unit {
                     name: key.name.underlying,
                     url: "https://example.com/swift-file.git",
                     organization: key.owner.underlying,
-                    layer: .foundations
+                    layer: .compositions
                 )
             ]
         )
@@ -109,7 +109,7 @@ extension Institute.Inventory.Test.Unit {
 
     /// Positive control: "Change a scratch layer; layer consistency fires
     /// without changing orgs.yaml." A repository sitting directly in one of
-    /// the three layer-root organizations (here `swift-primitives`) must
+    /// the four layer-root organizations (here `swift-atoms`) must
     /// declare that same layer; this check reads only `Institute.Layer` and
     /// the repository's own `organization`/`layer` fields; `orgs.yaml`
     /// belongs to a different repository entirely and this module never
@@ -118,7 +118,7 @@ extension Institute.Inventory.Test.Unit {
     func `A repository whose layer disagrees with its layer-root organization is rejected`() throws
     {
         let key = Institute.Repository.Key(
-            owner: .init("swift-primitives"),
+            owner: .init("swift-atoms"),
             name: .init("swift-mislabeled")
         )
         let mismatched = Institute.Configuration(
@@ -131,9 +131,9 @@ extension Institute.Inventory.Test.Unit {
                     name: key.name.underlying,
                     url: key.url,
                     organization: key.owner.underlying,
-                    // swift-primitives is the primitives layer's root — this
+                    // swift-atoms is the primitives layer's root — this
                     // must fire.
-                    layer: .foundations
+                    layer: .compositions
                 )
             ]
         )
@@ -149,7 +149,7 @@ extension Institute.Inventory.Test.Unit {
                     name: key.name.underlying,
                     url: key.url,
                     organization: key.owner.underlying,
-                    layer: .primitives
+                    layer: .atoms
                 )
             ]
         )
@@ -234,9 +234,9 @@ extension Institute.Inventory.Test.Integration {
         )
         defer { fixture.remove() }
         let before = try MainFixtureFiles.readBytes(fixture.filePath)
-        let owner = GitHub.Organization.Name("swift-foundations")
+        let owner = GitHub.Organization.Name("swift-compositions")
         let policy = try Institute.Inventory.Policy(
-            organizations: [.init(name: owner, layer: .foundations)],
+            organizations: [.init(name: owner, layer: .compositions)],
             denied: [],
             limit: .init(fixture: 1, items: 1)
         )
@@ -284,9 +284,9 @@ extension Institute.Inventory.Test.Integration {
             configuration: configuration
         )
         defer { fixture.remove() }
-        let owner = GitHub.Organization.Name("swift-foundations")
+        let owner = GitHub.Organization.Name("swift-compositions")
         let policy = try Institute.Inventory.Policy(
-            organizations: [.init(name: owner, layer: .foundations)],
+            organizations: [.init(name: owner, layer: .compositions)],
             denied: [],
             limit: .init(fixture: 1, items: 1)
         )
@@ -340,9 +340,9 @@ extension Institute.Inventory.Test.Integration {
         let replace: @Sendable () throws(File.System.Write.Atomic.Error) -> Void = {
             try target.write.atomic(intervening)
         }
-        let owner = GitHub.Organization.Name("swift-foundations")
+        let owner = GitHub.Organization.Name("swift-compositions")
         let policy = try Institute.Inventory.Policy(
-            organizations: [.init(name: owner, layer: .foundations)],
+            organizations: [.init(name: owner, layer: .compositions)],
             denied: [],
             limit: .init(fixture: 1, items: 20)
         )
@@ -402,9 +402,9 @@ extension Institute.Inventory.Test.Integration {
         let existing = try Institute.Configuration.Document.load(at: fixture.root)
         let dirty = Swift.String(try configuration.rendered().dropLast())
         try MainFixtureFiles.write(bytes: Array(dirty.utf8), to: fixture.filePath)
-        let owner = GitHub.Organization.Name("swift-foundations")
+        let owner = GitHub.Organization.Name("swift-compositions")
         let policy = try Institute.Inventory.Policy(
-            organizations: [.init(name: owner, layer: .foundations)],
+            organizations: [.init(name: owner, layer: .compositions)],
             denied: [],
             limit: .init(fixture: 1, items: 1)
         )
@@ -460,9 +460,9 @@ extension Institute.Inventory.Test.Integration {
         )
         try MainFixtureFiles.write(bytes: Array(configuration.rendered().utf8), to: MainFixtureFiles.join(location, "Institute.json"))
         let existing = try Institute.Configuration.Document.load(at: root)
-        let owner = GitHub.Organization.Name("swift-foundations")
+        let owner = GitHub.Organization.Name("swift-compositions")
         let policy = try Institute.Inventory.Policy(
-            organizations: [.init(name: owner, layer: .foundations)],
+            organizations: [.init(name: owner, layer: .compositions)],
             denied: [],
             limit: .init(fixture: 1, items: 1)
         )

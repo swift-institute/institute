@@ -25,14 +25,14 @@ extension Institute.Lint.Ledger.Test.Unit {
         let repositories = Institute.Lint.Ledger.Test.repositories
         let disposition = try #require(
             Institute.Lint.Ledger.Disposition(
-                argument: "PLAT-ARCH-022=remediation@swift-foundations/swift-linter#20"
+                argument: "PLAT-ARCH-022=remediation@swift-compositions/swift-linter#20"
             )
         )
         let verification = try #require(
             Institute.Lint.Ledger.Verification(
-                argument: "swift-primitives/swift-alpha@"
+                argument: "swift-atoms/swift-alpha@"
                     + Swift.String(repeating: "A", count: 40)
-                    + "=https://github.com/swift-primitives/swift-alpha/actions/runs/42"
+                    + "=https://github.com/swift-atoms/swift-alpha/actions/runs/42"
             )
         )
         let report = try Institute.Lint.Ledger.Report(
@@ -44,8 +44,8 @@ extension Institute.Lint.Ledger.Test.Unit {
 
         #expect(
             report.packages.map(\.repository.identity) == [
-                "swift-primitives/swift-alpha",
-                "swift-primitives/swift-beta",
+                "swift-atoms/swift-alpha",
+                "swift-atoms/swift-beta",
                 "swift-standards/swift-gamma",
             ]
         )
@@ -61,11 +61,11 @@ extension Institute.Lint.Ledger.Test.Unit {
         #expect(report.packages[1].verification == nil)
         #expect(report.batches.count == 1)
         #expect(report.batches[0].rule == "PLAT-ARCH-022")
-        #expect(report.batches[0].owner.identity == "swift-foundations/swift-linter")
+        #expect(report.batches[0].owner.identity == "swift-compositions/swift-linter")
         #expect(
             report.batches[0].repositories.map(\.identity) == [
-                "swift-primitives/swift-alpha",
-                "swift-primitives/swift-beta",
+                "swift-atoms/swift-alpha",
+                "swift-atoms/swift-beta",
             ]
         )
         #expect(report.batches[0].findings == 2)
@@ -80,7 +80,7 @@ extension Institute.Lint.Ledger.Test.Unit {
     func `complete measured evidence distinguishes errors from compliance`() throws {
         let disposition = try #require(
             Institute.Lint.Ledger.Disposition(
-                argument: "PLAT-ARCH-022=remediation@swift-foundations/swift-linter#20"
+                argument: "PLAT-ARCH-022=remediation@swift-compositions/swift-linter#20"
             )
         )
         let repositories = Array(Institute.Lint.Ledger.Test.repositories.prefix(2))
@@ -111,7 +111,7 @@ extension Institute.Lint.Ledger.Test.Unit {
         let repositories = Institute.Lint.Ledger.Test.repositories
         let disposition = try #require(
             Institute.Lint.Ledger.Disposition(
-                argument: "PLAT-ARCH-022=retention@swift-foundations/swift-linter#20"
+                argument: "PLAT-ARCH-022=retention@swift-compositions/swift-linter#20"
             )
         )
         let forward = try Institute.Lint.Ledger.Report(
@@ -272,15 +272,15 @@ extension Institute.Lint.Ledger.Test {
     fileprivate static let repositories = [
         Institute.Repository(
             name: "swift-alpha",
-            url: "https://github.com/swift-primitives/swift-alpha.git",
-            organization: "swift-primitives",
-            layer: .primitives
+            url: "https://github.com/swift-atoms/swift-alpha.git",
+            organization: "swift-atoms",
+            layer: .atoms
         ),
         Institute.Repository(
             name: "swift-beta",
-            url: "https://github.com/swift-primitives/swift-beta.git",
-            organization: "swift-primitives",
-            layer: .primitives
+            url: "https://github.com/swift-atoms/swift-beta.git",
+            organization: "swift-atoms",
+            layer: .atoms
         ),
         Institute.Repository(
             name: "swift-gamma",

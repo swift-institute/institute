@@ -76,7 +76,7 @@ extension Institute.Workspace.Control {
         case .continuousIntegration:
             "group:../institute-continuous-integration"
         case .linter:
-            "group:../swift-foundations/swift-linter/Runner"
+            "group:../swift-compositions/swift-linter/Runner"
         }
     }
 }

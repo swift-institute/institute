@@ -24,7 +24,7 @@ extension Institute.Certification.Test.Derivation {
     private static func repository(
         _ organization: Swift.String,
         _ name: Swift.String,
-        layer: Institute.Layer = .primitives
+        layer: Institute.Layer = .atoms
     ) -> Institute.Repository {
         .init(
             name: name,
@@ -66,12 +66,12 @@ extension Institute.Certification.Test.Derivation {
     func `every inventory member lands at its exact revision`() throws {
         let derivation = try Self.fixture(
             repositories: [
-                Self.repository("swift-primitives", "swift-color"),
-                Self.repository("swift-foundations", "swift-html", layer: .foundations),
+                Self.repository("swift-atoms", "swift-color"),
+                Self.repository("swift-compositions", "swift-html", layer: .compositions),
             ],
             heads: [
-                "swift-primitives/swift-color": Self.a,
-                "swift-foundations/swift-html": Self.b,
+                "swift-atoms/swift-color": Self.a,
+                "swift-compositions/swift-html": Self.b,
             ]
         )
         let snapshot = try derivation.snapshot(
@@ -82,7 +82,7 @@ extension Institute.Certification.Test.Derivation {
         )
         #expect(snapshot.members.count == 3)
         #expect(
-            snapshot[Self.key("swift-primitives/swift-color")]?.revision.sha == Self.a
+            snapshot[Self.key("swift-atoms/swift-color")]?.revision.sha == Self.a
         )
         #expect(
             snapshot[Self.key("swift-institute/institute")]?.kind == .controlPlane
@@ -93,10 +93,10 @@ extension Institute.Certification.Test.Derivation {
     func `an unreadable unexcluded member fails the derivation`() throws {
         let derivation = try Self.fixture(
             repositories: [
-                Self.repository("swift-primitives", "swift-color"),
-                Self.repository("swift-primitives", "swift-broken"),
+                Self.repository("swift-atoms", "swift-color"),
+                Self.repository("swift-atoms", "swift-broken"),
             ],
-            heads: ["swift-primitives/swift-color": Self.a]
+            heads: ["swift-atoms/swift-color": Self.a]
         )
         #expect(throws: Institute.Error.self) {
             _ = try derivation.snapshot(
@@ -112,10 +112,10 @@ extension Institute.Certification.Test.Derivation {
     func `an explicit typed exclusion covers an unreadable member`() throws {
         let derivation = try Self.fixture(
             repositories: [
-                Self.repository("swift-primitives", "swift-color"),
-                Self.repository("swift-primitives", "swift-broken"),
+                Self.repository("swift-atoms", "swift-color"),
+                Self.repository("swift-atoms", "swift-broken"),
             ],
-            heads: ["swift-primitives/swift-color": Self.a]
+            heads: ["swift-atoms/swift-color": Self.a]
         )
         let snapshot = try derivation.snapshot(
             inventoryCommit: .init(Self.c),
@@ -123,7 +123,7 @@ extension Institute.Certification.Test.Derivation {
             centrals: [:],
             exclusions: [
                 .init(
-                    key: Self.key("swift-primitives/swift-broken"),
+                    key: Self.key("swift-atoms/swift-broken"),
                     reason: .inaccessible
                 )
             ]
@@ -135,8 +135,8 @@ extension Institute.Certification.Test.Derivation {
     @Test
     func `an abbreviated head fails rather than being padded or accepted`() throws {
         let derivation = try Self.fixture(
-            repositories: [Self.repository("swift-primitives", "swift-color")],
-            heads: ["swift-primitives/swift-color": "abc1234"]
+            repositories: [Self.repository("swift-atoms", "swift-color")],
+            heads: ["swift-atoms/swift-color": "abc1234"]
         )
         #expect(throws: Institute.Error.self) {
             _ = try derivation.snapshot(

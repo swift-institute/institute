@@ -219,9 +219,9 @@ extension Institute.Doctor.Test.Integration {
     {
         let repository = Institute.Repository(
             name: "swift-example",
-            url: "https://github.com/swift-foundations/swift-example.git",
-            organization: "swift-foundations",
-            layer: .foundations
+            url: "https://github.com/swift-compositions/swift-example.git",
+            organization: "swift-compositions",
+            layer: .compositions
         )
         let fixture = try Institute.Doctor.Fixture(repositories: [repository])
         defer { fixture.remove() }
@@ -253,9 +253,9 @@ extension Institute.Doctor.Test.Integration {
     {
         let repository = Institute.Repository(
             name: "swift-example",
-            url: "https://github.com/swift-foundations/swift-example.git",
-            organization: "swift-foundations",
-            layer: .foundations
+            url: "https://github.com/swift-compositions/swift-example.git",
+            organization: "swift-compositions",
+            layer: .compositions
         )
         let fixture = try Institute.Doctor.Fixture(repositories: [repository])
         defer { fixture.remove() }
@@ -280,9 +280,9 @@ extension Institute.Doctor.Test.Integration {
     {
         let repository = Institute.Repository(
             name: "swift-example",
-            url: "https://github.com/swift-foundations/swift-example.git",
-            organization: "swift-foundations",
-            layer: .foundations
+            url: "https://github.com/swift-compositions/swift-example.git",
+            organization: "swift-compositions",
+            layer: .compositions
         )
         let fixture = try Institute.Doctor.Fixture(repositories: [repository])
         defer { fixture.remove() }
@@ -305,9 +305,9 @@ extension Institute.Doctor.Test.Integration {
     func `neither canonical nor legacy repository is reported as materialized`() async throws {
         let repository = Institute.Repository(
             name: "swift-example",
-            url: "https://github.com/swift-foundations/swift-example.git",
-            organization: "swift-foundations",
-            layer: .foundations
+            url: "https://github.com/swift-compositions/swift-example.git",
+            organization: "swift-compositions",
+            layer: .compositions
         )
         let fixture = try Institute.Doctor.Fixture(repositories: [repository])
         defer { fixture.remove() }
@@ -328,15 +328,15 @@ extension Institute.Doctor.Test.Integration {
     func `Contributor checks ignore unselected inventory repositories`() async throws {
         let selected = Institute.Repository(
             name: "swift-selected",
-            url: "https://github.com/swift-foundations/swift-selected.git",
-            organization: "swift-foundations",
-            layer: .foundations
+            url: "https://github.com/swift-compositions/swift-selected.git",
+            organization: "swift-compositions",
+            layer: .compositions
         )
         let unselected = Institute.Repository(
             name: "swift-unselected",
-            url: "https://github.com/swift-foundations/swift-unselected.git",
-            organization: "swift-foundations",
-            layer: .foundations
+            url: "https://github.com/swift-compositions/swift-unselected.git",
+            organization: "swift-compositions",
+            layer: .compositions
         )
         let fixture = try Institute.Doctor.Fixture(
             repositories: [selected, unselected],
@@ -346,7 +346,7 @@ extension Institute.Doctor.Test.Integration {
         try fixture.materialize(unselected.name)
         try fixture.write(
             "not resolved-state JSON",
-            to: "swift-foundations/swift-unselected/Package.resolved"
+            to: "swift-compositions/swift-unselected/Package.resolved"
         )
         try Institute.Xcode.write(
             try Institute.Xcode.integration(fixture.selection.repositories),
@@ -386,9 +386,9 @@ extension Institute.Doctor.Test.Integration {
         let fixture = try Institute.Doctor.Fixture(repositories: [
             .init(
                 name: "swift-example",
-                url: "https://github.com/swift-foundations/swift-example.git",
-                organization: "swift-foundations",
-                layer: .foundations
+                url: "https://github.com/swift-compositions/swift-example.git",
+                organization: "swift-compositions",
+                layer: .compositions
             )
         ])
         defer { fixture.remove() }
@@ -431,9 +431,9 @@ extension Institute.Doctor.Test.Integration {
         let fixture = try Institute.Doctor.Fixture(repositories: [
             .init(
                 name: "swift-example",
-                url: "https://github.com/swift-foundations/swift-example.git",
-                organization: "swift-foundations",
-                layer: .foundations
+                url: "https://github.com/swift-compositions/swift-example.git",
+                organization: "swift-compositions",
+                layer: .compositions
             )
         ])
         defer { fixture.remove() }
@@ -441,8 +441,8 @@ extension Institute.Doctor.Test.Integration {
             repositories: [
                 .init(
                     id: .init(1),
-                    key: .init(owner: .init("swift-foundations"), name: .init("swift-example")),
-                    layer: .foundations
+                    key: .init(owner: .init("swift-compositions"), name: .init("swift-example")),
+                    layer: .compositions
                 )
             ],
             exclusions: []
@@ -459,9 +459,9 @@ extension Institute.Doctor.Test.Integration {
         let fixture = try Institute.Doctor.Fixture(repositories: [
             .init(
                 name: "swift-example",
-                url: "https://github.com/swift-foundations/swift-example.git",
-                organization: "swift-foundations",
-                layer: .foundations
+                url: "https://github.com/swift-compositions/swift-example.git",
+                organization: "swift-compositions",
+                layer: .compositions
             )
         ])
         defer { fixture.remove() }
@@ -484,14 +484,14 @@ extension Institute.Doctor.Test.Integration {
     {
         // Institute#84, shape (a): the bare-name join used to consider
         // this current because "swift-example" matches on both sides —
-        // hiding that the organization moved from swift-foundations to
-        // swift-primitives.
+        // hiding that the organization moved from swift-compositions to
+        // swift-atoms.
         let fixture = try Institute.Doctor.Fixture(repositories: [
             .init(
                 name: "swift-example",
-                url: "https://github.com/swift-foundations/swift-example.git",
-                organization: "swift-foundations",
-                layer: .foundations
+                url: "https://github.com/swift-compositions/swift-example.git",
+                organization: "swift-compositions",
+                layer: .compositions
             )
         ])
         defer { fixture.remove() }
@@ -499,8 +499,8 @@ extension Institute.Doctor.Test.Integration {
             repositories: [
                 .init(
                     id: .init(1),
-                    key: .init(owner: .init("swift-primitives"), name: .init("swift-example")),
-                    layer: .primitives
+                    key: .init(owner: .init("swift-atoms"), name: .init("swift-example")),
+                    layer: .atoms
                 )
             ],
             exclusions: []
@@ -514,8 +514,8 @@ extension Institute.Doctor.Test.Integration {
             currency?.findings.contains {
                 $0.message.contains("swift-example")
                     && $0.message.contains("organization mismatch")
-                    && $0.message.contains("swift-foundations")
-                    && $0.message.contains("swift-primitives")
+                    && $0.message.contains("swift-compositions")
+                    && $0.message.contains("swift-atoms")
             } == true
         )
     }
@@ -530,9 +530,9 @@ extension Institute.Doctor.Test.Integration {
         let fixture = try Institute.Doctor.Fixture(repositories: [
             .init(
                 name: "swift-example",
-                url: "https://github.com/swift-foundations/swift-example.git",
-                organization: "swift-foundations",
-                layer: .primitives
+                url: "https://github.com/swift-compositions/swift-example.git",
+                organization: "swift-compositions",
+                layer: .atoms
             )
         ])
         defer { fixture.remove() }
@@ -540,8 +540,8 @@ extension Institute.Doctor.Test.Integration {
             repositories: [
                 .init(
                     id: .init(1),
-                    key: .init(owner: .init("swift-foundations"), name: .init("swift-example")),
-                    layer: .foundations
+                    key: .init(owner: .init("swift-compositions"), name: .init("swift-example")),
+                    layer: .compositions
                 )
             ],
             exclusions: []
@@ -555,8 +555,8 @@ extension Institute.Doctor.Test.Integration {
             currency?.findings.contains {
                 $0.message.contains("swift-example")
                     && $0.message.contains("layer mismatch")
-                    && $0.message.contains("primitives")
-                    && $0.message.contains("foundations")
+                    && $0.message.contains("atoms")
+                    && $0.message.contains("compositions")
             } == true
         )
     }
@@ -593,9 +593,9 @@ extension Institute.Doctor.Test.Integration {
     private static func repository(_ name: Swift.String) -> Institute.Repository {
         .init(
             name: name,
-            url: "https://github.com/swift-foundations/\(name).git",
-            organization: "swift-foundations",
-            layer: .foundations
+            url: "https://github.com/swift-compositions/\(name).git",
+            organization: "swift-compositions",
+            layer: .compositions
         )
     }
 
@@ -710,10 +710,10 @@ extension Institute.Doctor.Test.Unit {
             outcomes: [Self.outcome("a", .ok(population: 2))],
             origin: .overridden(
                 committed: 5,
-                added: [.init(owner: .init("swift-foundations"), name: .init("swift-color"))],
+                added: [.init(owner: .init("swift-compositions"), name: .init("swift-color"))],
                 removed: [
                     .init(
-                        owner: .init("swift-primitives"),
+                        owner: .init("swift-atoms"),
                         name: .init("swift-dimension-primitives")
                     )
                 ]
@@ -724,7 +724,7 @@ extension Institute.Doctor.Test.Unit {
         #expect(overridden.description.contains("Selection.local.json — 1 added, 1 removed"))
         #expect(
             overridden.description.contains(
-                "Selection.local.json withholds: swift-primitives/swift-dimension-primitives"
+                "Selection.local.json withholds: swift-atoms/swift-dimension-primitives"
             )
         )
         #expect(overridden.status == 0)

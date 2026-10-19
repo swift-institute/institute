@@ -22,7 +22,7 @@ extension Institute.Verification {
 }
 
 extension Institute.Verification.Test {
-    static let coordinate = Institute.Repository.Key(identity: "swift-primitives/swift-example")!
+    static let coordinate = Institute.Repository.Key(identity: "swift-atoms/swift-example")!
     static let head = "1111111111111111111111111111111111111111"
 
     static func operation(
@@ -82,7 +82,7 @@ extension Institute.Verification.Test {
             coordinate: coordinate,
             visibility: .private,
             defaultBranch: "main",
-            layer: .primitives,
+            layer: .atoms,
             inventoryDigest: inventoryDigest,
             workspaceRevision: workspaceRevision,
             policyRevision: policyRevision,
@@ -245,7 +245,7 @@ extension Institute.Verification.Test.`Edge Case` {
             coordinate: Institute.Verification.Test.coordinate,
             visibility: .private,
             defaultBranch: "main",
-            layer: .primitives,
+            layer: .atoms,
             inventoryDigest: .measured(Swift.String(repeating: "a", count: 64)),
             workspaceRevision: "2222222222222222222222222222222222222222",
             policyRevision: "policy-1",
@@ -261,7 +261,7 @@ extension Institute.Verification.Test.`Edge Case` {
                     Institute.Verification.Test.operation(
                         .lint,
                         findings: [
-                            "/Users/coen/Developer/coenttb/swift-primitives/Secret.swift:1:1: note"
+                            "/Users/coen/Developer/coenttb/swift-atoms/Secret.swift:1:1: note"
                         ]
                     )
                 },
@@ -470,7 +470,7 @@ extension Institute.Verification.Test.Check {
                 dirty: false
             ),
             inventoryDigest: .measured(Swift.String(repeating: "a", count: 64)),
-            layer: .primitives,
+            layer: .atoms,
             workspaceRevision: "2222222222222222222222222222222222222222",
             policyRevision: "policy-1",
             environment: Institute.Verification.Test.environment(),

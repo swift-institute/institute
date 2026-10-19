@@ -240,9 +240,9 @@ struct `Institute Lint Install Tests` {
             repositories: [
                 .init(
                     name: "swift-absent",
-                    url: "https://github.com/swift-primitives/swift-absent.git",
-                    organization: "swift-primitives",
-                    layer: .primitives
+                    url: "https://github.com/swift-atoms/swift-absent.git",
+                    organization: "swift-atoms",
+                    layer: .atoms
                 )
             ]
         )

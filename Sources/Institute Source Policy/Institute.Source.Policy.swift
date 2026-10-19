@@ -106,7 +106,7 @@ extension Institute.Source {
                         ),
                         origin: .release(
                             base:
-                                "https://github.com/swift-foundations/swift-linter/releases/download/ci-binaries"
+                                "https://github.com/swift-compositions/swift-linter/releases/download/ci-binaries"
                         )
                     ),
                     manifest: nil,
@@ -118,13 +118,12 @@ extension Institute.Source {
             self.externallyStandardizedTargets = [.init("CSS")]
             self.commitment = .init(
                 repositories: [
-                    "swift-foundations/swift-linter",
-                    "swift-foundations/swift-linter-rules",
-                    "swift-foundations/swift-institute-linter-rules",
-                    "swift-foundations/swift-source",
-                    "swift-primitives/swift-linter-primitives",
-                    "swift-primitives/swift-primitives-linter-rules",
-                    "swift-primitives/swift-source-primitives",
+                    "swift-compositions/swift-linter",
+                    "swift-compositions/swift-linter-rules",
+                    "swift-compositions/swift-institute-linter-rules",
+                    "swift-molecules/swift-lint",
+                    "swift-molecules/swift-primitives-linter-rules",
+                    "swift-molecules/swift-source",
                     "swift-standards/swift-standards-linter-rules",
                 ],
                 controls: ["application", "institute", "continuous-integration"],

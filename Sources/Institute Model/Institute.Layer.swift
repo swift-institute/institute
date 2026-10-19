@@ -1,12 +1,17 @@
 public import JSON
 
 extension Institute {
+    /// The four Institute layers, one root organization each, in dependency order.
+    ///
+    /// They follow `swift-institute/.github`'s `.github/policy/fleet.json`: L1 `swift-atoms`, L2
+    /// `swift-molecules`, L3 `swift-standards` (with the specification authorities and vendors nested
+    /// under it), L4 `swift-compositions`. A package depends only on its own layer and the layers
+    /// below it.
     public enum Layer: Swift.String, Swift.CaseIterable, Sendable, JSON.Serializable {
-        case primitives
+        case atoms
+        case molecules
         case standards
-        case foundations
-        case components
-        case applications
+        case compositions
     }
 }
 
@@ -21,21 +26,19 @@ extension Institute.Layer {
     /// nest under their layer's root per ruling 139.
     public var organization: Swift.String {
         switch self {
-        case .primitives: "swift-primitives"
+        case .atoms: "swift-atoms"
+        case .molecules: "swift-molecules"
         case .standards: "swift-standards"
-        case .foundations: "swift-foundations"
-        case .components: "swift-components"
-        case .applications: "swift-applications"
+        case .compositions: "swift-compositions"
         }
     }
 
     package var order: Int {
         switch self {
-        case .primitives: 1
-        case .standards: 2
-        case .foundations: 3
-        case .components: 4
-        case .applications: 5
+        case .atoms: 1
+        case .molecules: 2
+        case .standards: 3
+        case .compositions: 4
         }
     }
 

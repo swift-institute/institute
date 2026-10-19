@@ -21,7 +21,7 @@ extension Institute.Inventory.Test.Unit {
     @Test
     func `A repository missing from the committed inventory is restored by regeneration`() throws {
         let key = Institute.Repository.Key(
-            owner: .init("swift-primitives"),
+            owner: .init("swift-atoms"),
             name: .init("swift-deleted-by-mistake")
         )
         let existing = Institute.Configuration(
@@ -32,7 +32,7 @@ extension Institute.Inventory.Test.Unit {
             repositories: []
         )
         let discovery = Institute.Inventory.Discovery(
-            repositories: [.init(id: .init(1), key: key, layer: .primitives)],
+            repositories: [.init(id: .init(1), key: key, layer: .atoms)],
             exclusions: []
         )
 
@@ -50,11 +50,11 @@ extension Institute.Inventory.Test.Unit {
     @Test
     func `A repository no longer live is dropped as stale by regeneration`() throws {
         let survivor = Institute.Repository.Key(
-            owner: .init("swift-foundations"),
+            owner: .init("swift-compositions"),
             name: .init("swift-survivor")
         )
         let stale = Institute.Repository.Key(
-            owner: .init("swift-foundations"),
+            owner: .init("swift-compositions"),
             name: .init("swift-gone-private")
         )
         let existing = Institute.Configuration(
@@ -67,13 +67,13 @@ extension Institute.Inventory.Test.Unit {
                     name: survivor.name.underlying,
                     url: survivor.url,
                     organization: survivor.owner.underlying,
-                    layer: .foundations
+                    layer: .compositions
                 ),
                 .init(
                     name: stale.name.underlying,
                     url: stale.url,
                     organization: stale.owner.underlying,
-                    layer: .foundations
+                    layer: .compositions
                 ),
             ]
         )
@@ -81,7 +81,7 @@ extension Institute.Inventory.Test.Unit {
         // private, was archived, or was deleted; from Merge's perspective
         // the reason is immaterial, only that discovery no longer reports it.
         let discovery = Institute.Inventory.Discovery(
-            repositories: [.init(id: .init(1), key: survivor, layer: .foundations)],
+            repositories: [.init(id: .init(1), key: survivor, layer: .compositions)],
             exclusions: []
         )
 
@@ -93,10 +93,10 @@ extension Institute.Inventory.Test.Unit {
 
     @Test
     func `Merge preserves exact-key annotations and sorts layer owner name`() throws {
-        let foundations = GitHub.Organization.Name("swift-foundations")
+        let compositions = GitHub.Organization.Name("swift-compositions")
         let standards = GitHub.Organization.Name("swift-standards")
         let annotated = Institute.Repository.Key(
-            owner: foundations,
+            owner: compositions,
             name: .init("swift-zeta")
         )
         let existing = Institute.Configuration(
@@ -109,7 +109,7 @@ extension Institute.Inventory.Test.Unit {
                     name: annotated.name.underlying,
                     url: annotated.url,
                     organization: annotated.owner.underlying,
-                    layer: .components
+                    layer: .molecules
                 )
             ]
         )
@@ -118,7 +118,7 @@ extension Institute.Inventory.Test.Unit {
                 .init(
                     id: .init(2),
                     key: annotated,
-                    layer: .foundations
+                    layer: .compositions
                 ),
                 .init(
                     id: .init(1),
@@ -131,9 +131,9 @@ extension Institute.Inventory.Test.Unit {
 
         let merged = try Institute.Inventory.Merge()(discovery, into: existing)
 
-        #expect(merged.repositories.map(\.name) == ["swift-alpha", "swift-zeta"])
-        #expect(merged.repositories.map(\.layer) == [.standards, .components])
-        #expect(merged.repositories[1].url == annotated.url)
+        #expect(merged.repositories.map(\.name) == ["swift-zeta", "swift-alpha"])
+        #expect(merged.repositories.map(\.layer) == [.molecules, .standards])
+        #expect(merged.repositories[0].url == annotated.url)
     }
 }
 
@@ -141,14 +141,14 @@ extension Institute.Inventory.Test.`Edge Case` {
     @Test
     func `Duplicate existing key is rejected`() {
         let key = Institute.Repository.Key(
-            owner: .init("swift-foundations"),
+            owner: .init("swift-compositions"),
             name: .init("swift-file")
         )
         let repository = Institute.Repository(
             name: key.name.underlying,
             url: key.url,
             organization: key.owner.underlying,
-            layer: .foundations
+            layer: .compositions
         )
         let existing = Institute.Configuration(
             version: 1,
@@ -169,13 +169,13 @@ extension Institute.Inventory.Test.`Edge Case` {
     @Test
     func `Duplicate candidate key is rejected`() {
         let key = Institute.Repository.Key(
-            owner: .init("swift-foundations"),
+            owner: .init("swift-compositions"),
             name: .init("swift-file")
         )
         let candidate = Institute.Inventory.Repository(
             id: .init(1),
             key: key,
-            layer: .foundations
+            layer: .compositions
         )
         let existing = Institute.Configuration(
             version: 1,
@@ -200,7 +200,7 @@ extension Institute.Inventory.Test.`Edge Case` {
             name: .init("swift-moved")
         )
         let new = Institute.Repository.Key(
-            owner: .init("swift-foundations"),
+            owner: .init("swift-compositions"),
             name: old.name
         )
         let existing = Institute.Configuration(
@@ -218,7 +218,7 @@ extension Institute.Inventory.Test.`Edge Case` {
             ]
         )
         let discovery = Institute.Inventory.Discovery(
-            repositories: [.init(id: .init(1), key: new, layer: .foundations)],
+            repositories: [.init(id: .init(1), key: new, layer: .compositions)],
             exclusions: []
         )
 
@@ -235,7 +235,7 @@ extension Institute.Inventory.Test.`Edge Case` {
             #expect(from == old)
             #expect(to == new)
             #expect(annotation == .standards)
-            #expect(layer == .foundations)
+            #expect(layer == .compositions)
         }
     }
 
@@ -250,9 +250,9 @@ extension Institute.Inventory.Test.`Edge Case` {
               "repositories": [
                 {
                   "name": "swift-example",
-                  "url": "https://github.com/swift-foundations/swift-example.git",
-                  "organization": "swift-foundations",
-                  "layer": "foundations",
+                  "url": "https://github.com/swift-compositions/swift-example.git",
+                  "organization": "swift-compositions",
+                  "layer": "compositions",
                   "annotation": "must-survive"
                 }
               ]

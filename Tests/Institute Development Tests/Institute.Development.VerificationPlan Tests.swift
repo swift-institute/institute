@@ -45,12 +45,12 @@ extension Institute.Development.VerificationPlan.Test {
             root = DevelopmentFixtureFiles.directoryPath(workspaceRoot.checkout.description)
             resolved = DevelopmentFixtureFiles.join(
                 base,
-                "swift-foundations/example/consumer/Package.resolved"
+                "swift-compositions/example/consumer/Package.resolved"
             )
 
             for directory in [
-                "swift-foundations/example/consumer",
-                "swift-foundations/example/consumer-b",
+                "swift-compositions/example/consumer",
+                "swift-compositions/example/consumer-b",
                 "swift-standards/example/swift-dep-a",
                 "swift-standards/example/swift-dep-b",
                 "swift-standards/example/swift-closure",
@@ -59,11 +59,11 @@ extension Institute.Development.VerificationPlan.Test {
             }
             try DevelopmentFixtureFiles.write(
                 Self.consumerSource,
-                to: DevelopmentFixtureFiles.join(base, "swift-foundations/example/consumer/Package.swift")
+                to: DevelopmentFixtureFiles.join(base, "swift-compositions/example/consumer/Package.swift")
             )
             try DevelopmentFixtureFiles.write(
                 Self.consumerBSource,
-                to: DevelopmentFixtureFiles.join(base, "swift-foundations/example/consumer-b/Package.swift")
+                to: DevelopmentFixtureFiles.join(base, "swift-compositions/example/consumer-b/Package.swift")
             )
             try DevelopmentFixtureFiles.write(Self.resolvedSentinel, to: resolved)
 
@@ -79,13 +79,13 @@ extension Institute.Development.VerificationPlan.Test {
                             name: "consumer",
                             url: "https://github.com/example/consumer.git",
                             organization: "example",
-                            layer: .foundations
+                            layer: .compositions
                         ),
                         .init(
                             name: "consumer-b",
                             url: "https://github.com/example/consumer-b.git",
                             organization: "example",
-                            layer: .foundations
+                            layer: .compositions
                         ),
                         .init(
                             name: "swift-dep-a",
@@ -139,14 +139,14 @@ extension Institute.Development.VerificationPlan.Test {
         // no `E` to name.
         func read(_ consumer: Swift.String) throws -> Swift.String {
             try DevelopmentFixtureFiles.readStrictUTF8(
-                DevelopmentFixtureFiles.join(base, "swift-foundations/example/\(consumer)/Package.swift")
+                DevelopmentFixtureFiles.join(base, "swift-compositions/example/\(consumer)/Package.swift")
             )
         }
 
         func write(_ source: Swift.String, consumer: Swift.String) throws {
             try DevelopmentFixtureFiles.write(
                 source,
-                to: DevelopmentFixtureFiles.join(base, "swift-foundations/example/\(consumer)/Package.swift")
+                to: DevelopmentFixtureFiles.join(base, "swift-compositions/example/\(consumer)/Package.swift")
             )
         }
 
@@ -310,7 +310,7 @@ extension Institute.Development.VerificationPlan.Test.Fixture {
     func readDuringVerification() throws(Institute.Error) -> Swift.String {
         do {
             return try DevelopmentFixtureFiles.readStrictUTF8(
-                DevelopmentFixtureFiles.join(base, "swift-foundations/example/consumer/Package.swift")
+                DevelopmentFixtureFiles.join(base, "swift-compositions/example/consumer/Package.swift")
             )
         } catch {
             throw .composition("cannot read the composed manifest: \(error)")
@@ -436,7 +436,7 @@ extension Institute.Development.VerificationPlan.Test.`Edge Case` {
             consumer: "consumer",
             manifest: File(
                 try File.Path(
-                    "\(fixture.base)/swift-foundations/example/consumer/Package.swift"
+                    "\(fixture.base)/swift-compositions/example/consumer/Package.swift"
                 )
             ),
             source: source,

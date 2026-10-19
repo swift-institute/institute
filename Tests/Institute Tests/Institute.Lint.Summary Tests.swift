@@ -13,7 +13,7 @@ import Testing
 @Suite
 struct `Institute Lint Summary Tests` {
     /// The line below is a verbatim capture from the released macOS
-    /// binary run against `swift-foundations/swift-github`, not a
+    /// binary run against `swift-compositions/swift-github`, not a
     /// reconstruction from the reporter's source. A parser tested only
     /// against strings its author invented proves that the author is
     /// self-consistent.
@@ -34,7 +34,7 @@ struct `Institute Lint Summary Tests` {
         #expect(summary.findings == nil)
     }
 
-    /// swift-foundations/swift-linter PR #24 (Refs #22) appends a fifth
+    /// swift-compositions/swift-linter PR #24 (Refs #22) appends a fifth
     /// `<N> findings` field to the summary line. A machine carrying a
     /// #24-built engine must not read every package on it as UNMEASURED
     /// the moment that engine installs (swift-institute/institute-application#106) —

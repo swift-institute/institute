@@ -23,9 +23,9 @@ extension Institute.Certification.Test.Execution {
     private static func repository() -> Institute.Repository {
         .init(
             name: "swift-color",
-            url: "https://github.com/swift-primitives/swift-color.git",
-            organization: "swift-primitives",
-            layer: .primitives
+            url: "https://github.com/swift-atoms/swift-color.git",
+            organization: "swift-atoms",
+            layer: .atoms
         )
     }
 
@@ -35,9 +35,9 @@ extension Institute.Certification.Test.Execution {
             inventoryBlob: b,
             members: [
                 .init(
-                    key: key("swift-primitives/swift-color"),
+                    key: key("swift-atoms/swift-color"),
                     revision: .init(a),
-                    kind: .package(layer: .primitives)
+                    kind: .package(layer: .atoms)
                 )
             ],
             exclusions: []
@@ -52,7 +52,7 @@ extension Institute.Certification.Test.Execution {
     ) throws -> Institute.Certification.Execution {
         let temporary = try TemporaryDirectory.make(
             prefix: "certification-execution",
-            creating: ["swift-institute/institute", "swift-primitives/swift-color"]
+            creating: ["swift-institute/institute", "swift-atoms/swift-color"]
         )
         return try .init(
             root: Institute.Root(
@@ -87,7 +87,7 @@ extension Institute.Certification.Test.Execution {
         let accounts = execution.accounts(
             for: [
                 .init(
-                    key: Self.key("swift-primitives/swift-color"),
+                    key: Self.key("swift-atoms/swift-color"),
                     kind: .build,
                     platform: .windows
                 )
@@ -111,7 +111,7 @@ extension Institute.Certification.Test.Execution {
         let accounts = execution.accounts(
             for: [
                 .init(
-                    key: Self.key("swift-primitives/swift-color"),
+                    key: Self.key("swift-atoms/swift-color"),
                     kind: .test,
                     platform: .macos
                 )
@@ -130,7 +130,7 @@ extension Institute.Certification.Test.Execution {
         let accounts = execution.accounts(
             for: [
                 .init(
-                    key: Self.key("swift-primitives/swift-color"),
+                    key: Self.key("swift-atoms/swift-color"),
                     kind: .build,
                     platform: .macos
                 )
@@ -154,7 +154,7 @@ extension Institute.Certification.Test.Execution {
         let accounts = execution.accounts(
             for: [
                 .init(
-                    key: Self.key("swift-primitives/swift-color"),
+                    key: Self.key("swift-atoms/swift-color"),
                     kind: .build,
                     platform: .macos
                 )
@@ -176,7 +176,7 @@ extension Institute.Certification.Test.Execution {
         let accounts = execution.accounts(
             for: [
                 .init(
-                    key: Self.key("swift-primitives/swift-absent"),
+                    key: Self.key("swift-atoms/swift-absent"),
                     kind: .build,
                     platform: .macos
                 )
@@ -187,6 +187,6 @@ extension Institute.Certification.Test.Execution {
             Issue.record("expected failed, got \(accounts[0].outcome)")
             return
         }
-        #expect(diagnostic.contains("swift-primitives/swift-absent"))
+        #expect(diagnostic.contains("swift-atoms/swift-absent"))
     }
 }

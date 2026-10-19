@@ -20,7 +20,7 @@ extension Institute.Composition.BuildPlan.Test {
     ) -> Institute.Composition.BuildPlan.Package {
         .init(
             identity: identity,
-            reference: reference ?? "../swift-primitives/\(identity)",
+            reference: reference ?? "../swift-atoms/\(identity)",
             libraryProducts: libraries,
             buildableTargetCount: targets
         )
@@ -105,8 +105,8 @@ extension Institute.Composition.BuildPlan.Test {
             resolvingSymlinks: true,
             DevelopmentFixtureFiles.uniqueName()
         )
-        let rootOne = DevelopmentFixtureFiles.join(base, "one/swift-primitives/swift-a-primitives")
-        let rootTwo = DevelopmentFixtureFiles.join(base, "two/swift-primitives/swift-b-primitives")
+        let rootOne = DevelopmentFixtureFiles.join(base, "one/swift-atoms/swift-a-primitives")
+        let rootTwo = DevelopmentFixtureFiles.join(base, "two/swift-atoms/swift-b-primitives")
         let workspaceDirectory = DevelopmentFixtureFiles.join(base, "workspaces")
         for directory in [rootOne, rootTwo, workspaceDirectory] {
             try DevelopmentFixtureFiles.createDirectory(directory)
@@ -130,9 +130,9 @@ extension Institute.Composition.BuildPlan.Test {
             .init(
                 repository: .init(
                     name: "swift-a-primitives",
-                    url: "https://github.com/swift-primitives/swift-a-primitives.git",
-                    organization: "swift-primitives",
-                    layer: .primitives
+                    url: "https://github.com/swift-atoms/swift-a-primitives.git",
+                    organization: "swift-atoms",
+                    layer: .atoms
                 ),
                 hierarchy: try Institute.Hierarchy.ID("one"),
                 directory: try File.Directory(validating: rootOne),
@@ -142,9 +142,9 @@ extension Institute.Composition.BuildPlan.Test {
             .init(
                 repository: .init(
                     name: "swift-b-primitives",
-                    url: "https://github.com/swift-primitives/swift-b-primitives.git",
-                    organization: "swift-primitives",
-                    layer: .primitives
+                    url: "https://github.com/swift-atoms/swift-b-primitives.git",
+                    organization: "swift-atoms",
+                    layer: .atoms
                 ),
                 hierarchy: try Institute.Hierarchy.ID("two"),
                 directory: try File.Directory(validating: rootTwo),

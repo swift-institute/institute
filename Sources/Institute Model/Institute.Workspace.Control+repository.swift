@@ -13,7 +13,7 @@ extension Institute.Workspace.Control {
                 name: .init("institute-continuous-integration")
             )
         case .linter:
-            .init(owner: .init("swift-foundations"), name: .init("swift-linter"))
+            .init(owner: .init("swift-compositions"), name: .init("swift-linter"))
         }
     }
 }

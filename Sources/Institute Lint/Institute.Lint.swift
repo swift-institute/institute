@@ -6,7 +6,7 @@ extension Institute {
     /// Reproducible local swift-linter, running exactly what CI runs.
     ///
     /// swift-linter is a third-party tool published by
-    /// `swift-foundations/swift-linter`. Institute owns only the
+    /// `swift-compositions/swift-linter`. Institute owns only the
     /// installation boundary, the invocation, and the measurement
     /// discipline around it — never the rules, the severities, or the
     /// exit policy, all of which come from the same binaries and the
@@ -159,7 +159,7 @@ extension Institute.Lint {
 
 extension Institute.Lint {
     /// The repository publishing the linter binaries CI consumes.
-    public static let repository = "swift-foundations/swift-linter"
+    public static let repository = "swift-compositions/swift-linter"
 
     /// The rolling, non-semver release tag CI downloads from.
     ///

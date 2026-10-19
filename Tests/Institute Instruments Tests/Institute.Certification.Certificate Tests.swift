@@ -25,9 +25,9 @@ extension Institute.Certification.Test.Certificate {
             inventoryBlob: b,
             members: [
                 .init(
-                    key: key("swift-primitives/swift-color"),
+                    key: key("swift-atoms/swift-color"),
                     revision: .init(a),
-                    kind: .package(layer: .primitives)
+                    kind: .package(layer: .atoms)
                 )
             ],
             exclusions: []
@@ -41,7 +41,7 @@ extension Institute.Certification.Test.Certificate {
     }
 
     private static func coverage() throws -> [Institute.Certification.Closure.Coverage] {
-        [try .init(consumer: key("swift-primitives/swift-color"), proofs: [])]
+        [try .init(consumer: key("swift-atoms/swift-color"), proofs: [])]
     }
 
     private static func control() throws -> Institute.Certification.Control {
@@ -57,7 +57,7 @@ extension Institute.Certification.Test.Certificate {
         _ kind: Institute.Certification.Obligation.Kind,
         _ platform: Institute.Certification.Platform
     ) -> Institute.Certification.Obligation {
-        .init(key: key("swift-primitives/swift-color"), kind: kind, platform: platform)
+        .init(key: key("swift-atoms/swift-color"), kind: kind, platform: platform)
     }
 
     @Test
@@ -324,7 +324,7 @@ extension Institute.Certification.Test.Certificate {
             closure: try Self.coverage(),
             coherenceReceipts: []
         )
-        let member = Self.key("swift-primitives/swift-color")
+        let member = Self.key("swift-atoms/swift-color")
         #expect(
             try certificate.status(against: [member: .init(Self.a)], control: Self.control())
                 == .current

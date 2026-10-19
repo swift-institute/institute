@@ -17,10 +17,10 @@ extension Institute.Inventory.Test.Unit {
     func `Private discovery admits a private repository and records every eligibility reason`()
         async throws
     {
-        let owner = GitHub.Organization.Name("swift-foundations")
+        let owner = GitHub.Organization.Name("swift-compositions")
         let denied = Institute.Repository.Key(owner: owner, name: .init("swift-denied"))
         let policy = try Institute.Inventory.Policy(
-            organizations: [.init(name: owner, layer: .foundations)],
+            organizations: [.init(name: owner, layer: .compositions)],
             denied: [denied],
             limit: .init(fixture: 1, items: 20)
         )
@@ -93,9 +93,9 @@ extension Institute.Inventory.Test.Unit {
     /// covers both causes without this type needing to tell them apart.
     @Test
     func `A repository with no readable Package.swift is excluded, never admitted`() async throws {
-        let owner = GitHub.Organization.Name("swift-foundations")
+        let owner = GitHub.Organization.Name("swift-compositions")
         let policy = try Institute.Inventory.Policy(
-            organizations: [.init(name: owner, layer: .foundations)],
+            organizations: [.init(name: owner, layer: .compositions)],
             denied: [],
             limit: .init(fixture: 1, items: 20)
         )
@@ -134,13 +134,13 @@ extension Institute.Inventory.Test.`Edge Case` {
     /// halt the sibling repository's own result.
     @Test
     func `An inaccessible known private repository becomes unmeasured, not deleted`() async throws {
-        let owner = GitHub.Organization.Name("swift-foundations")
+        let owner = GitHub.Organization.Name("swift-compositions")
         let inaccessible = Institute.Repository.Key(
             owner: owner,
             name: .init("swift-lost-grant")
         )
         let policy = try Institute.Inventory.Policy(
-            organizations: [.init(name: owner, layer: .foundations)],
+            organizations: [.init(name: owner, layer: .compositions)],
             denied: [],
             limit: .init(fixture: 1, items: 20)
         )
@@ -186,11 +186,11 @@ extension Institute.Inventory.Test.`Edge Case` {
         async throws
     {
         let failing = GitHub.Organization.Name("swift-standards")
-        let healthy = GitHub.Organization.Name("swift-foundations")
+        let healthy = GitHub.Organization.Name("swift-compositions")
         let policy = try Institute.Inventory.Policy(
             organizations: [
                 .init(name: failing, layer: .standards),
-                .init(name: healthy, layer: .foundations),
+                .init(name: healthy, layer: .compositions),
             ],
             denied: [],
             limit: .init(fixture: 1, items: 20)

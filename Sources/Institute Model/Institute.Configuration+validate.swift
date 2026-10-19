@@ -33,11 +33,11 @@ extension Institute.Configuration {
                 )
             }
             // A repository sitting directly in a layer's *root* organization
-            // (swift-primitives, swift-standards, swift-foundations) must
-            // declare that same layer. Sub-organizations nested under a root
+            // (swift-atoms, swift-molecules, swift-standards, swift-compositions)
+            // must declare that same layer. Sub-organizations nested under a root
             // per ruling 139 (swift-ietf, swift-arm-ltd, and so on) are not
             // roots themselves and are exempt — `Layer.organization` only
-            // names the three roots, so this loop is a no-op for every
+            // names the four roots, so this loop is a no-op for every
             // other organization by construction. This never reads or
             // writes `orgs.yaml`: the check is entirely over `Layer`, a
             // Institute-owned fact, and the organization string already

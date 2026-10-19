@@ -22,7 +22,7 @@ extension Institute.Certification.Test.Unit {
     private static func member(
         _ identity: Swift.String,
         _ sha: Swift.String,
-        kind: Institute.Certification.Member.Kind = .package(layer: .primitives)
+        kind: Institute.Certification.Member.Kind = .package(layer: .atoms)
     ) throws -> Institute.Certification.Member {
         try .init(key: key(identity), revision: .init(sha), kind: kind)
     }
@@ -81,8 +81,8 @@ extension Institute.Certification.Test.Unit {
                 inventoryCommit: .init(Self.a),
                 inventoryBlob: Self.b,
                 members: [
-                    Self.member("swift-primitives/swift-color", Self.a),
-                    Self.member("swift-primitives/swift-color", Self.b),
+                    Self.member("swift-atoms/swift-color", Self.a),
+                    Self.member("swift-atoms/swift-color", Self.b),
                 ],
                 exclusions: []
             )
@@ -95,10 +95,10 @@ extension Institute.Certification.Test.Unit {
             _ = try Institute.Certification.Snapshot(
                 inventoryCommit: .init(Self.a),
                 inventoryBlob: Self.b,
-                members: [Self.member("swift-primitives/swift-color", Self.a)],
+                members: [Self.member("swift-atoms/swift-color", Self.a)],
                 exclusions: [
                     .init(
-                        key: Self.key("swift-primitives/swift-color"),
+                        key: Self.key("swift-atoms/swift-color"),
                         reason: .archived
                     )
                 ]
@@ -112,8 +112,8 @@ extension Institute.Certification.Test.Unit {
             inventoryCommit: .init(Self.a),
             inventoryBlob: Self.b,
             members: [
-                Self.member("swift-primitives/swift-color", Self.a),
-                Self.member("swift-foundations/swift-html", Self.b),
+                Self.member("swift-atoms/swift-color", Self.a),
+                Self.member("swift-compositions/swift-html", Self.b),
                 Self.member(
                     "swift-institute/institute",
                     Self.c,
@@ -131,8 +131,8 @@ extension Institute.Certification.Test.Unit {
                     Self.c,
                     kind: .controlPlane
                 ),
-                Self.member("swift-foundations/swift-html", Self.b),
-                Self.member("swift-primitives/swift-color", Self.a),
+                Self.member("swift-compositions/swift-html", Self.b),
+                Self.member("swift-atoms/swift-color", Self.a),
             ],
             exclusions: []
         )
@@ -146,7 +146,7 @@ extension Institute.Certification.Test.Unit {
             try .init(
                 inventoryCommit: .init(Self.a),
                 inventoryBlob: Self.b,
-                members: [Self.member("swift-primitives/swift-color", sha)],
+                members: [Self.member("swift-atoms/swift-color", sha)],
                 exclusions: []
             )
         }
@@ -159,7 +159,7 @@ extension Institute.Certification.Test.Unit {
             inventoryCommit: .init(Self.a),
             inventoryBlob: Self.b,
             members: [
-                Self.member("swift-primitives/swift-color", Self.a),
+                Self.member("swift-atoms/swift-color", Self.a),
                 Self.member(
                     "swift-institute/.github",
                     Self.c,
@@ -168,7 +168,7 @@ extension Institute.Certification.Test.Unit {
             ],
             exclusions: [
                 .init(
-                    key: Self.key("swift-primitives/swift-legacy"),
+                    key: Self.key("swift-atoms/swift-legacy"),
                     reason: .archived
                 )
             ]
@@ -185,18 +185,18 @@ extension Institute.Certification.Test.Unit {
         let snapshot = try Institute.Certification.Snapshot(
             inventoryCommit: .init(Self.a),
             inventoryBlob: Self.b,
-            members: [Self.member("swift-primitives/swift-color", Self.c)],
+            members: [Self.member("swift-atoms/swift-color", Self.c)],
             exclusions: []
         )
         #expect(
-            snapshot[Self.key("swift-primitives/swift-color")]?.revision.sha == Self.c
+            snapshot[Self.key("swift-atoms/swift-color")]?.revision.sha == Self.c
         )
-        #expect(snapshot[Self.key("swift-primitives/swift-absent")] == nil)
+        #expect(snapshot[Self.key("swift-atoms/swift-absent")] == nil)
     }
 
     @Test
     func `member kinds serialize distinguishably`() throws {
-        let package = try Self.member("swift-primitives/swift-color", Self.a)
+        let package = try Self.member("swift-atoms/swift-color", Self.a)
         let central = try Self.member(
             "swift-institute/institute",
             Self.b,

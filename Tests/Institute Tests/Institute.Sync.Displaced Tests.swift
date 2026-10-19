@@ -24,8 +24,8 @@ struct `Institute Sync Displaced Tests` {
         // The exact pair that defeated the first implementation.
         #expect(
             Institute.Sync.sameRepository(
-                "git@github.com:swift-foundations/swift-json.git",
-                "https://github.com/swift-foundations/swift-json.git"
+                "git@github.com:swift-compositions/swift-json.git",
+                "https://github.com/swift-compositions/swift-json.git"
             )
         )
     }
@@ -34,14 +34,14 @@ struct `Institute Sync Displaced Tests` {
     func `trailing .git and trailing slash do not affect identity`() {
         #expect(
             Institute.Sync.sameRepository(
-                "https://github.com/swift-foundations/swift-json",
-                "https://github.com/swift-foundations/swift-json.git"
+                "https://github.com/swift-compositions/swift-json",
+                "https://github.com/swift-compositions/swift-json.git"
             )
         )
         #expect(
             Institute.Sync.sameRepository(
-                "https://github.com/swift-foundations/swift-json/",
-                "https://github.com/swift-foundations/swift-json.git"
+                "https://github.com/swift-compositions/swift-json/",
+                "https://github.com/swift-compositions/swift-json.git"
             )
         )
     }
@@ -50,8 +50,8 @@ struct `Institute Sync Displaced Tests` {
     func `ssh scheme form compares equal to scp form`() {
         #expect(
             Institute.Sync.sameRepository(
-                "ssh://git@github.com/swift-foundations/swift-json.git",
-                "git@github.com:swift-foundations/swift-json.git"
+                "ssh://git@github.com/swift-compositions/swift-json.git",
+                "git@github.com:swift-compositions/swift-json.git"
             )
         )
     }
@@ -63,20 +63,20 @@ struct `Institute Sync Displaced Tests` {
     func `different repositories, owners, and hosts compare unequal`() {
         #expect(
             !Institute.Sync.sameRepository(
-                "https://github.com/swift-foundations/swift-json.git",
-                "https://github.com/swift-foundations/swift-json-feed.git"
+                "https://github.com/swift-compositions/swift-json.git",
+                "https://github.com/swift-compositions/swift-json-feed.git"
             )
         )
         #expect(
             !Institute.Sync.sameRepository(
-                "https://github.com/swift-foundations/swift-json.git",
-                "https://github.com/swift-primitives/swift-json.git"
+                "https://github.com/swift-compositions/swift-json.git",
+                "https://github.com/swift-atoms/swift-json.git"
             )
         )
         #expect(
             !Institute.Sync.sameRepository(
-                "https://github.com/swift-foundations/swift-json.git",
-                "https://gitlab.com/swift-foundations/swift-json.git"
+                "https://github.com/swift-compositions/swift-json.git",
+                "https://gitlab.com/swift-compositions/swift-json.git"
             )
         )
     }
@@ -85,8 +85,8 @@ struct `Institute Sync Displaced Tests` {
     func `case differences in host and owner do not defeat identity`() {
         #expect(
             Institute.Sync.sameRepository(
-                "https://GitHub.com/Swift-Foundations/swift-json.git",
-                "https://github.com/swift-foundations/swift-json.git"
+                "https://GitHub.com/Swift-Compositions/swift-json.git",
+                "https://github.com/swift-compositions/swift-json.git"
             )
         )
     }
