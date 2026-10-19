@@ -1,3 +1,4 @@
+internal import File_System
 public import Institute_Development
 public import Institute_Inventory
 public import Institute_Lint
@@ -93,7 +94,13 @@ extension Institute.Doctor {
             ]
 
         case .residence(let tool, let resolved, let developer):
-            guard !resolved.hasPrefix(developer) else { return [] }
+            let resides: Swift.Bool
+            do throws(File.Path.Error) {
+                resides = try File.Path(resolved).hasPrefix(try File.Path(developer))
+            } catch {
+                resides = false
+            }
+            guard !resides else { return [] }
             return [
                 .init(
                     severity: .error,
@@ -134,7 +141,7 @@ extension Institute.Doctor {
                         output: try tool("xcodebuild", ["-version"])
                     ),
                     .override(variable: "TOOLCHAINS", value: environment("TOOLCHAINS")),
-                    .residence(tool: "swift", resolved: resolved, developer: developer),
+                    Toolchain.residence(of: "swift", resolved: resolved, developer: developer),
                 ],
                 inventory: 4
             )

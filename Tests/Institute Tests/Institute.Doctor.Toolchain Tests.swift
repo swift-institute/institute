@@ -73,6 +73,103 @@ extension Institute.Doctor.Test.Unit {
     }
 }
 
+// MARK: - Residence is judged on canonical paths
+
+extension Institute.Doctor.Test.Unit {
+    /// GitHub's macOS images: `xcode-select --switch /Applications/Xcode_27.1.app`
+    /// selects a link, `xcrun --find swift` reports the real bundle behind it.
+    /// Builds that layout on disk under `base` and returns both reports.
+    private static func linkedXcode(
+        at base: Swift.String,
+        selecting link: Swift.String = "Xcode_27.1.app",
+        to bundle: Swift.String = "Xcode_27.1_Release_Candidate.app"
+    ) throws -> (resolved: Swift.String, developer: Swift.String) {
+        let developer = MainFixtureFiles.join(base, "\(bundle)/Contents/Developer")
+        let bin = MainFixtureFiles.join(developer, "Toolchains/XcodeDefault.xctoolchain/usr/bin")
+        try MainFixtureFiles.createDirectory(bin)
+        let swift = MainFixtureFiles.join(bin, "swift")
+        try MainFixtureFiles.write(bytes: [], to: swift)
+        try MainFixtureFiles.createSymbolicLink(
+            atPath: MainFixtureFiles.join(base, link),
+            destinationPath: MainFixtureFiles.join(base, bundle)
+        )
+        return (swift, MainFixtureFiles.join(base, "\(link)/Contents/Developer"))
+    }
+
+    /// The runner-image false positive: the selected Xcode reached through
+    /// its versioned link is the Xcode the tool lives in. Under raw string
+    /// prefixes this fired on every runner (contributor-path 39244873288).
+    @Test
+    func `a swift inside the selected Xcode reached through a link passes`() throws {
+        let base = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+        defer { try? MainFixtureFiles.remove(base) }
+        let paths = try Self.linkedXcode(at: base)
+        let reported = Institute.Doctor.toolchain.run(
+            population: [
+                .residence(tool: "swift", resolved: paths.resolved, developer: paths.developer)
+            ],
+            inventory: 1
+        )
+        // Positive control: compared as reported, the runner layout fires.
+        #expect(reported.result == .finding(severity: .error, population: 1))
+
+        let outcome = Institute.Doctor.toolchain.run(
+            population: [
+                Institute.Doctor.Toolchain.residence(
+                    of: "swift",
+                    resolved: paths.resolved,
+                    developer: paths.developer
+                )
+            ],
+            inventory: 1
+        )
+
+        #expect(outcome.result == .ok(population: 1))
+    }
+
+    @Test
+    func `a link selecting another Xcode still fires`() throws {
+        let base = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+        defer { try? MainFixtureFiles.remove(base) }
+        let paths = try Self.linkedXcode(at: base)
+        let other = try Self.linkedXcode(
+            at: base,
+            selecting: "Xcode_27.0.app",
+            to: "Xcode_27.0_Release.app"
+        )
+
+        let outcome = Institute.Doctor.toolchain.run(
+            population: [
+                Institute.Doctor.Toolchain.residence(
+                    of: "swift",
+                    resolved: paths.resolved,
+                    developer: other.developer
+                )
+            ],
+            inventory: 1
+        )
+
+        #expect(outcome.result == .finding(severity: .error, population: 1))
+    }
+
+    @Test
+    func `a developer directory sharing only a name prefix does not contain the tool`() {
+        let outcome = Institute.Doctor.toolchain.run(
+            population: [
+                .residence(
+                    tool: "swift",
+                    resolved: Institute.Doctor.Fixture.developer
+                        + "2/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift",
+                    developer: Institute.Doctor.Fixture.developer
+                )
+            ],
+            inventory: 1
+        )
+
+        #expect(outcome.result == .finding(severity: .error, population: 1))
+    }
+}
+
 // MARK: - The version requirement is a floor, not a pin (#57)
 
 extension Institute.Doctor.Test.Unit {

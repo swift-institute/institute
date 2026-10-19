@@ -1,4 +1,5 @@
 public import Environment
+internal import File_System
 public import Institute_Inventory
 public import Institute_Model
 public import Process
@@ -73,7 +74,26 @@ extension Institute.Navigation {
         guard !server.isEmpty else {
             throw .configuration("xcrun resolved no sourcekit-lsp")
         }
-        guard server.hasPrefix(developer + "/") else {
+        // Compared in canonical form: xcode-select reports the selected path,
+        // links included, and xcrun the real one. On GitHub's macOS images the
+        // versioned Xcode names are links, so raw strings disagree for the
+        // selected toolchain itself.
+        let canonicalServer: File.Path
+        let canonicalDeveloper: File.Path
+        do throws(File.Path.Error) {
+            canonicalServer = try File.Path(server)
+            canonicalDeveloper = try File.Path(developer)
+        } catch {
+            throw .configuration("cannot read the sourcekit-lsp or developer path: \(error)")
+        }
+        let resides: Swift.Bool
+        do throws(File.System.Canonical.Error) {
+            resides = try File.System.Canonical.resolve(canonicalServer)
+                .hasPrefix(try File.System.Canonical.resolve(canonicalDeveloper))
+        } catch {
+            throw .configuration("cannot resolve the sourcekit-lsp or developer path: \(error)")
+        }
+        guard resides else {
             throw .configuration(
                 "sourcekit-lsp resolves to \(server), outside the selected Xcode at \(developer)"
             )
