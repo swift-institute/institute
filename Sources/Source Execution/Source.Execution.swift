@@ -17,9 +17,10 @@ extension Source {
             engines selected: Set<Engine.ID>? = nil
         ) async -> [Measurement] {
             var measurements: [Measurement] = []
+            let governed = subject.governed
             for engine in profile.engines {
                 if let selected, !selected.contains(engine.id) { continue }
-                let artifacts = subject.artifacts.filter { engine.artifactKinds.contains($0.kind) }
+                let artifacts = governed.artifacts.filter { engine.artifactKinds.contains($0.kind) }
                 guard let driver = drivers[engine.id] else {
                     measurements.append(
                         .init(
@@ -38,9 +39,98 @@ extension Source {
                     )
                     continue
                 }
-                measurements.append(await driver.measure(subject, engine))
+                let measurement = await driver.measure(governed, engine)
+                let controls = await self.controls(of: subject, engine: engine, driver: driver)
+                measurements.append(
+                    .init(
+                        engine: measurement.engine,
+                        subject: subject,
+                        activeRules: measurement.activeRules,
+                        applicableRules: measurement.applicableRules,
+                        files: measurement.files,
+                        observations: measurement.observations,
+                        suppressions: measurement.suppressions,
+                        repairs: measurement.repairs,
+                        controls: measurement.controls + controls,
+                        verdict: measurement.verdict
+                    )
+                )
             }
             return measurements.sorted { $0.engine.token < $1.engine.token }
+        }
+
+        /// Measures each control artifact whose predicate `engine` owns on its
+        /// own, and compares the predicate's findings in it with the declared
+        /// expectation. The artifact's other findings are not evidence of
+        /// anything and are dropped; it is not governed source.
+        private func controls(
+            of subject: Subject,
+            engine: Profile.Engine,
+            driver: Engine.Driver
+        ) async -> [Rule.Control.Evidence] {
+            let declared = subject.artifacts.compactMap {
+                artifact -> (artifact: Artifact, control: Artifact.Purpose.Control)? in
+                guard case .control(let control) = artifact.purpose,
+                    control.predicate.engine == engine.id,
+                    engine.artifactKinds.contains(artifact.kind)
+                else { return nil }
+                return (artifact, control)
+            }
+            guard !declared.isEmpty else { return [] }
+            let probe = await driver.measure(
+                Subject(identity: subject.identity, root: subject.root, artifacts: declared.map(\.artifact)),
+                engine
+            )
+            let prefix = subject.root.hasSuffix("/") ? subject.root : subject.root + "/"
+            return declared.map { declaration in
+                let control = declaration.control
+                let expected: Swift.Int
+                switch control.expectation {
+                case .clean: expected = 0
+                case .findings(let count): expected = count
+                }
+                let findings: [Finding]
+                switch probe.verdict {
+                case .clean:
+                    findings = []
+                case .findings(let reported):
+                    findings = reported
+                case .unmeasured(let reasons):
+                    return .init(
+                        identity: control.identity,
+                        rule: control.predicate,
+                        expectation: control.expectation,
+                        actualFindings: 0,
+                        verdict: .unmeasured(reasons)
+                    )
+                case .notRequested:
+                    return .init(
+                        identity: control.identity,
+                        rule: control.predicate,
+                        expectation: control.expectation,
+                        actualFindings: 0,
+                        verdict: .unmeasured([.init(code: "control-not-requested", detail: control.identity)])
+                    )
+                }
+                let actual = findings.count {
+                    $0.rule == control.predicate
+                        && $0.diagnostic.location.filePath == prefix + declaration.artifact.path
+                }
+                return .init(
+                    identity: control.identity,
+                    rule: control.predicate,
+                    expectation: control.expectation,
+                    actualFindings: actual,
+                    verdict: actual == expected
+                        ? .clean
+                        : .findings([
+                            .init(
+                                code: "control-failed",
+                                detail: "\(control.identity): expected \(expected) \(control.predicate.token) findings, found \(actual)"
+                            )
+                        ])
+                )
+            }
         }
 
         public func plan(
@@ -61,7 +151,7 @@ extension Source {
                     planned.append(measurement)
                     continue
                 }
-                let proposal = await driver.repair(subject, engine)
+                let proposal = await driver.repair(subject.governed, engine)
                 var repairs: [Repair.Evidence] = proposal.edits.map { edit in
                     let disposition: Repair.Evidence.Disposition
                     if subject.artifacts.contains(where: {

@@ -148,7 +148,7 @@ extension Institute.Source.Application {
         var requirements: [Source_Report.Source.Report.Commitment.Requirement] = []
         for entry in entries {
             let bundle = entry.bundle
-            let artifacts = entry.subject.artifacts.filter { $0.kind == .swift }.map(\.path)
+            let artifacts = entry.subject.governed.paths(of: .swift)
             for engine in policy.requiredEngines where engines?.contains(engine) ?? true {
                 let rules: [Source_Measurement.Source.Rule.ID]
                 switch engine.token {
@@ -187,7 +187,7 @@ extension Institute.Source.Application {
                         subject: subject,
                         activeRules: [],
                         applicableRules: [],
-                        files: subject.paths(of: .swift),
+                        files: subject.governed.paths(of: .swift),
                         verdict: .unmeasured([
                             .init(code: "unverified-profile", detail: bundle.rawValue)
                         ])
@@ -201,7 +201,7 @@ extension Institute.Source.Application {
                         subject: subject,
                         activeRules: [],
                         applicableRules: [],
-                        files: subject.paths(of: .swift),
+                        files: subject.governed.paths(of: .swift),
                         verdict: .unmeasured([
                             .init(code: "stale-configuration", detail: linterConfiguration)
                         ])
@@ -222,7 +222,7 @@ extension Institute.Source.Application {
                         subject: subject,
                         activeRules: $0.rules,
                         applicableRules: [],
-                        files: subject.paths(of: .swift),
+                        files: subject.governed.paths(of: .swift),
                         verdict: .unmeasured([.init(code: "stale-profile", detail: bundle.rawValue)]
                         )
                     )
@@ -242,7 +242,7 @@ extension Institute.Source.Application {
                         subject: subject,
                         activeRules: $0.rules,
                         applicableRules: [],
-                        files: subject.paths(of: .swift),
+                        files: subject.governed.paths(of: .swift),
                         verdict: .unmeasured([
                             .init(code: "source-changed", detail: "\(error)")
                         ])
@@ -256,7 +256,7 @@ extension Institute.Source.Application {
                         subject: subject,
                         activeRules: $0.rules,
                         applicableRules: [],
-                        files: subject.paths(of: .swift),
+                        files: subject.governed.paths(of: .swift),
                         verdict: .unmeasured([
                             .init(code: "source-changed", detail: subject.identity)
                         ])

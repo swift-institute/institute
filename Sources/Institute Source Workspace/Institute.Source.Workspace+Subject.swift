@@ -3,6 +3,7 @@ internal import FIPS_180_4
 public import File_System
 public import Git_Foundation
 public import Institute_Model
+internal import Institute_Source_Policy
 internal import SPM_Standard
 public import Source_Measurement
 
@@ -92,6 +93,16 @@ extension Institute.Source.Workspace {
         where !packages.contains(where: { path.split(separator: "/").starts(with: $0) }) {
             candidates.insert(path)
         }
+        let controls = Institute.Source.Policy.current.negativeControls(
+            for: repository(of: identity)
+        )
+        // A declaration whose fixture is gone would leave its rule without a
+        // control, so it is an error — once there are sources to look in. An
+        // empty enumeration is a binding without sources (the target catalog's),
+        // where nothing is missing.
+        for path in controls.keys.sorted() where !paths.isEmpty && !candidates.contains(path) {
+            throw .configuration("declared negative control is not a source artifact: \(path)")
+        }
         var canonicalFiles: Swift.Set<Swift.String> = []
         var artifacts: [Source.Artifact] = []
         for path in candidates.sorted() {
@@ -120,13 +131,33 @@ extension Institute.Source.Workspace {
                 .init(
                     path: path,
                     kind: .swift,
-                    purpose: .governedSource,
+                    purpose: controls[path].map {
+                        .control(
+                            .init(
+                                identity: $0.identity,
+                                predicate: $0.rule,
+                                expectation: .findings($0.findings)
+                            )
+                        )
+                    } ?? .governedSource,
                     provenance: .authored,
                     digest: try digest(file)
                 )
             )
         }
         return .init(identity: identity, root: rootPath, artifacts: artifacts)
+    }
+
+    /// The `owner/name` a subject identity measures: a workspace subject
+    /// is named by its repository, a workspace control by its role, and a
+    /// CI subject by `repository@revision`.
+    private static func repository(of identity: Swift.String) -> Swift.String {
+        if identity.hasPrefix("control:"),
+            let control = Institute.Workspace.Control(rawValue: Swift.String(identity.dropFirst(8)))
+        {
+            return control.repository.identity
+        }
+        return Swift.String(identity.prefix { $0 != "@" })
     }
 
     private static func bytes(

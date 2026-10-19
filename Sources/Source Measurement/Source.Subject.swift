@@ -10,6 +10,19 @@ extension Source {
             self.artifacts = artifacts.sorted { $0.path < $1.path }
         }
 
+        /// The subject without its control artifacts: what engines measure
+        /// and repair as governed source.
+        public var governed: Self {
+            .init(
+                identity: identity,
+                root: root,
+                artifacts: artifacts.filter {
+                    if case .control = $0.purpose { return false }
+                    return true
+                }
+            )
+        }
+
         public func paths(of kind: Artifact.Kind) -> [Swift.String] {
             artifacts.lazy.filter { $0.kind == kind }.map(\.path)
         }

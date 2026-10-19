@@ -14,6 +14,7 @@ extension Institute.Source {
         public let engines: [Engine]
         public let bundles: [Bundle]
         public let externallyStandardizedTargets: [ExternallyStandardizedTarget]
+        public let negativeControls: [NegativeControl]
         public let commitment: Commitment
         public let configuration: Configuration
 
@@ -116,6 +117,24 @@ extension Institute.Source {
             ]
             self.bundles = Bundle.allCases
             self.externallyStandardizedTargets = [.init("CSS")]
+            let linterID = Source_Profile.Source.Engine.ID("swift-linter")
+            self.negativeControls = [
+                .init(
+                    repository: "swift-institute/institute",
+                    path: "Tests/Institute CI Validation Tests/Fixtures/test-009/fail/swift-compound-names/Tests/Foo Primitives Tests/FooBufferTests.swift",
+                    rule: .init(engine: linterID, token: "test file suffix")
+                ),
+                .init(
+                    repository: "swift-institute/institute",
+                    path: "Tests/Institute CI Validation Tests/Fixtures/test-009/fail/swift-dot-before-tests/Tests/Foo Primitives Tests/Foo.Buffer.Tests.swift",
+                    rule: .init(engine: linterID, token: "test file suffix")
+                ),
+                .init(
+                    repository: "swift-compositions/swift-linter",
+                    path: "Tests/Fixtures/runner-controls/error/Sources/Naming Core/ImplBinding.swift",
+                    rule: .init(engine: linterID, token: "variable named impl")
+                ),
+            ]
             self.commitment = .init(
                 repositories: [
                     "swift-compositions/swift-linter",
