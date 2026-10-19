@@ -1,9 +1,10 @@
-import struct Swift.String
-import Standard_Library_Extensions
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
 public import Institute_CI_Workflow
+public import Institute_Model
+import Standard_Library_Extensions
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// `[CI-040]` no `.build/` cache, and `[CI-042]` no `restore-keys`.
@@ -46,8 +47,11 @@ extension Institute.CI.Validation {
                     for step in job.steps where Self.invokesCache(step) {
                         guard let with = step["with"]?.mapping else { continue }
                         findings += Self.findings(
-                            in: with, repository: subject.repository,
-                            document: document.name, job: job.name)
+                            in: with,
+                            repository: subject.repository,
+                            document: document.name,
+                            job: job.name
+                        )
                     }
                 }
             }
@@ -62,25 +66,38 @@ extension Institute.CI.Validation {
         /// The violations one cache step's `with:` block carries. A step
         /// can carry both.
         static func findings(
-            in with: Institute.CI.Workflow.YAML.Mapping, repository: String, document: String, job: String
+            in with: Institute.CI.Workflow.YAML.Mapping,
+            repository: String,
+            document: String,
+            job: String
         ) -> [Finding] {
             var findings: [Finding] = []
             if let path = with["path"]?.text, Self.namesBuildDirectory(path) {
                 findings.append(
                     Finding(
-                        repository: repository, rule: "CI-040",
+                        repository: repository,
+                        rule: "CI-040",
                         message: Self.buildCacheMessage(
-                            document: document, job: job,
-                            path: Institute.CI.Workflow.YAML.Node.repr(path))))
+                            document: document,
+                            job: job,
+                            path: Institute.CI.Workflow.YAML.Node.repr(path)
+                        )
+                    )
+                )
             }
             if let keys = with["restore-keys"] {
                 let preview = Self.preview(of: keys.pythonString)
                 findings.append(
                     Finding(
-                        repository: repository, rule: "CI-042",
+                        repository: repository,
+                        rule: "CI-042",
                         message: Self.restoreKeysMessage(
-                            document: document, job: job,
-                            preview: Institute.CI.Workflow.YAML.Node.repr(preview))))
+                            document: document,
+                            job: job,
+                            preview: Institute.CI.Workflow.YAML.Node.repr(preview)
+                        )
+                    )
+                )
             }
             return findings
         }

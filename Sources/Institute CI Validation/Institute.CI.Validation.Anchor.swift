@@ -1,9 +1,10 @@
-import struct Swift.String
-public import Institute_Model
-public import Institute_CI_Model
-public import Institute_CI_Workflow
 import GitHub_Standard
 public import Institute_CI_Inventory
+public import Institute_CI_Model
+public import Institute_CI_Workflow
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// `[CI-ANCHOR-001]` — the trust anchor's shipped block equals what

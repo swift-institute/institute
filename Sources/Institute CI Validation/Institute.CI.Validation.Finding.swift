@@ -1,7 +1,8 @@
-import struct Swift.String
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// One rule violation, in the shape `validate-base.yml` aggregates.

@@ -1,8 +1,9 @@
-import struct Swift.String
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
 public import Institute_CI_Workflow
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// `[CI-080]` — every in-scope job's first step is a SHA-pinned
@@ -43,23 +44,30 @@ extension Institute.CI.Validation {
             for document in documents {
                 for job in document.jobs {
                     guard !Self.isRouting(job), !Self.aggregators.contains(job.name),
-                          let first = Self.firstStep(job)
+                        let first = Self.firstStep(job)
                     else { continue }
                     let uses = (first["uses"] ?? .text("")).pythonString
                     let quoted = Institute.CI.Workflow.YAML.Node.repr(uses)
                     let message: String? =
                         if !uses.hasPrefix(Self.action) {
                             Self.absentMessage(
-                                document: document.name, job: job.name, uses: quoted)
+                                document: document.name,
+                                job: job.name,
+                                uses: quoted
+                            )
                         } else if !Self.isPinnedToDigest(uses) {
                             Self.unpinnedMessage(
-                                document: document.name, job: job.name, uses: quoted)
+                                document: document.name,
+                                job: job.name,
+                                uses: quoted
+                            )
                         } else {
                             nil
                         }
                     guard let message else { continue }
                     findings.append(
-                        Finding(repository: subject.repository, rule: rule, message: message))
+                        Finding(repository: subject.repository, rule: rule, message: message)
+                    )
                 }
             }
             return findings

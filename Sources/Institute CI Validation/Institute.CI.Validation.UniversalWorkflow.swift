@@ -1,8 +1,9 @@
-import struct Swift.String
-public import Institute_Model
+import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_CI_Workflow
-import GitHub_Standard
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// The Institute policy over the planner-driven universal workflow.

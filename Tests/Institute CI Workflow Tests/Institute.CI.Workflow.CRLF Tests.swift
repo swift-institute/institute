@@ -1,6 +1,6 @@
-public import Institute_Model
-import Institute_CI_Model
 import GitHub_Standard
+import Institute_CI_Model
+public import Institute_Model
 import Testing
 
 @testable import Institute_CI_Workflow
@@ -44,9 +44,13 @@ struct CIWorkflowCRLFTests {
         let crlf = lf.replacing("\n", with: "\r\n")
 
         let lfDocument = try Institute.CI.Workflow.Document(
-            name: "ci.yml", text: lf)
+            name: "ci.yml",
+            text: lf
+        )
         let crlfDocument = try Institute.CI.Workflow.Document(
-            name: "ci.yml", text: crlf)
+            name: "ci.yml",
+            text: crlf
+        )
 
         #expect(crlfDocument.jobs.map(\.name) == lfDocument.jobs.map(\.name))
         #expect(crlfDocument.jobs.map(\.name) == ["ci", "lint"])
@@ -57,7 +61,9 @@ struct CIWorkflowCRLFTests {
         let cr = lf.replacing("\n", with: "\r")
 
         let document = try Institute.CI.Workflow.Document(
-            name: "ci.yml", text: cr)
+            name: "ci.yml",
+            text: cr
+        )
         #expect(document.jobs.map(\.name) == ["ci", "lint"])
     }
 }

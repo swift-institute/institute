@@ -437,7 +437,6 @@ func `An apostrophe in a one-line formatter message does not absorb the next dia
     #expect(findings[0].diagnostic.message == "don't document this")
 }
 
-
 extension Source.Measurement {
     @Suite struct Severity {
         @Suite struct Unit {}
@@ -449,9 +448,11 @@ extension Source.Measurement.Severity.Unit {
     func `SwiftLint preserves configured severity and accepts matching process status`(
         severities: [Swift::String]
     ) {
-        let output = "[" + severities.enumerated().map { index, severity in
-            swiftLintFinding("Sources/A.swift", line: index + 1, rule: "line_length", severity: severity)
-        }.joined(separator: ",") + "]"
+        let output =
+            "["
+            + severities.enumerated().map { index, severity in
+                swiftLintFinding("Sources/A.swift", line: index + 1, rule: "line_length", severity: severity)
+            }.joined(separator: ",") + "]"
         let status: Swift::Int32 = severities.contains("Error") ? 2 : 0
         let measurement = Source.Measurement.swiftLint(
             engine: swiftLintEngine,
@@ -493,7 +494,6 @@ extension Source.Measurement.Severity.Unit {
         }
     }
 }
-
 
 extension Source.Measurement.Severity.Unit {
     @Test(arguments: ["not JSON", "{}", "[{}]", "[" + swiftLintFinding("Sources/A.swift", line: 1, rule: "line_length", severity: "Unknown") + "]"])

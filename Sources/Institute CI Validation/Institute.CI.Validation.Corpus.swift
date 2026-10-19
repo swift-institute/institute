@@ -1,7 +1,8 @@
-import struct Swift.String
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// The fixture corpus: `<root>/<rule-id>/{pass,fail,edge}/<scenario>/`.
@@ -66,7 +67,8 @@ extension Institute.CI.Validation {
             guard let names = Institute.CI.Validation.names(at: root) else {
                 throw EnvironmentDefect.unreadableSubject(root: root)
             }
-            return names
+            return
+                names
                 .filter { $0.hasPrefix(prefix) }
                 .filter { isDirectory("\(root)/\($0)") }
                 .sorted()
@@ -83,8 +85,12 @@ extension Institute.CI.Validation {
                 for name in names.sorted() where isDirectory("\(path)/\(name)") {
                     scenarios.append(
                         Scenario(
-                            directory: directory, expectation: expectation, name: name,
-                            root: "\(path)/\(name)"))
+                            directory: directory,
+                            expectation: expectation,
+                            name: name,
+                            root: "\(path)/\(name)"
+                        )
+                    )
                 }
             }
             return scenarios

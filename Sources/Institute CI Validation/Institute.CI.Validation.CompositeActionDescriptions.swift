@@ -1,8 +1,9 @@
-import struct Swift.String
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
 public import Institute_CI_Workflow
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// `[CI-102]` — no `description:` field of a composite action may
@@ -37,13 +38,20 @@ extension Institute.CI.Validation {
                 } catch {
                     findings.append(
                         Finding(
-                            repository: subject.repository, rule: rule,
-                            message: "\(name)/action.yml: YAML parse failed: \(error.message)"))
+                            repository: subject.repository,
+                            rule: rule,
+                            message: "\(name)/action.yml: YAML parse failed: \(error.message)"
+                        )
+                    )
                     continue
                 }
                 guard let body = document.body else { continue }
                 findings += Self.findings(
-                    in: body, action: name, repository: subject.repository, rule: rule)
+                    in: body,
+                    action: name,
+                    repository: subject.repository,
+                    rule: rule
+                )
             }
             return findings
         }
@@ -58,7 +66,7 @@ extension Institute.CI.Validation {
         /// asks for.
         static func actionDirectories(in subject: Subject) throws(EnvironmentDefect) -> [String] {
             let directory = subject.path(".github/actions")
-                        guard Institute.CI.Validation.isDirectory(directory)
+            guard Institute.CI.Validation.isDirectory(directory)
             else { return [] }
             guard let names = Institute.CI.Validation.names(at: directory) else {
                 throw EnvironmentDefect.unreadableFile(path: directory)
@@ -69,15 +77,21 @@ extension Institute.CI.Validation {
         }
 
         static func findings(
-            in body: Institute.CI.Workflow.YAML.Mapping, action: String, repository: String, rule: Rule
+            in body: Institute.CI.Workflow.YAML.Mapping,
+            action: String,
+            repository: String,
+            rule: Rule
         ) -> [Finding] {
             var findings: [Finding] = []
             func scan(_ node: Institute.CI.Workflow.YAML.Node?, at location: String) {
                 guard let text = node?.text, text.containsExpression else { return }
                 findings.append(
                     Finding(
-                        repository: repository, rule: rule,
-                        message: message(action: action, location: location)))
+                        repository: repository,
+                        rule: rule,
+                        message: message(action: action, location: location)
+                    )
+                )
             }
             scan(body["description"], at: "top-level")
             for section in ["inputs", "outputs"] {

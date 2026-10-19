@@ -1,6 +1,6 @@
-public import Institute_Model
-import Institute_CI_Model
 import GitHub_Standard
+import Institute_CI_Model
+public import Institute_Model
 import Testing
 
 @testable import Institute_CI_Workflow
@@ -46,7 +46,8 @@ struct CIWorkflowYAMLTests {
 
         @Test func `flow collections`() throws {
             let node = try YAML.Parser.parse(
-                "branches: [main, 'release/*']\nwith: {fetch-depth: 0}\n")
+                "branches: [main, 'release/*']\nwith: {fetch-depth: 0}\n"
+            )
             #expect(node["branches"] == .sequence([.text("main"), .text("release/*")]))
             #expect(node["with"]?["fetch-depth"] == .integer(0))
         }
@@ -59,7 +60,8 @@ struct CIWorkflowYAMLTests {
                   - name: Build
                     run: swift build
                     continue-on-error: true
-                """)
+                """
+            )
             let steps = try #require(node["steps"]?.sequence)
             #expect(steps.count == 2)
             #expect(steps[0]["uses"] == .text("actions/checkout@v6"))
@@ -74,7 +76,8 @@ struct CIWorkflowYAMLTests {
                   echo one
                   # not a comment here
                 name: after
-                """)
+                """
+            )
             #expect(node["run"] == .text("echo one\n# not a comment here\n"))
             #expect(node["name"] == .text("after"))
         }
@@ -93,7 +96,8 @@ struct CIWorkflowYAMLTests {
             // resolves the key `on` to `true`, so a string lookup misses
             // and callers must recover through the boolean.
             let body = try #require(
-                YAML.Parser.parse("on:\n  push:\n    branches: [main]\n").mapping)
+                YAML.Parser.parse("on:\n  push:\n    branches: [main]\n").mapping
+            )
             #expect(body["on"] == nil)
             #expect(body[node: .boolean(true)] != nil)
         }
@@ -113,7 +117,8 @@ struct CIWorkflowYAMLTests {
                 # leading comment
                 name: CI   # trailing comment
                 colour: '#ffffff'
-                """)
+                """
+            )
             #expect(node["name"] == .text("CI"))
             #expect(node["colour"] == .text("#ffffff"))
         }
@@ -128,7 +133,9 @@ struct CIWorkflowYAMLTests {
                       build: &inline
                         runs-on: ubuntu-latest
                       mirror: *inline
-                    """)["jobs"]?.mapping)
+                    """
+                )["jobs"]?.mapping
+            )
             #expect(jobs["build"] == jobs["mirror"])
             #expect(jobs["mirror"]?["runs-on"] == .text("ubuntu-latest"))
         }
@@ -165,14 +172,16 @@ struct CIWorkflowYAMLTests {
                   ci:
                     uses: swift-primitives/.github/.github/workflows/swift-ci.yml@main
                     secrets: inherit
-                """)
+                """
+            )
             // Key-sorted, so `true` (the resolved `on` key) sorts last.
             #expect(
                 YAML.Canonical.json(node) == """
                     {"jobs":{"ci":{"secrets":"inherit",\
                     "uses":"swift-primitives/.github/.github/workflows/swift-ci.yml@main"}},\
                     "name":"CI","true":{"push":{"branches":["main"]}}}
-                    """)
+                    """
+            )
         }
     }
 }

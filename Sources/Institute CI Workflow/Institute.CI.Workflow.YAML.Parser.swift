@@ -1,6 +1,6 @@
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
+public import Institute_Model
 
 extension Institute.CI.Workflow.YAML {
     /// Reads a workflow document's text into a `Node`.
@@ -48,7 +48,8 @@ extension Institute.CI.Workflow.YAML {
             guard cursor >= lines.count else {
                 throw Error.unsupported(
                     line: lines[cursor].number,
-                    construct: "trailing content after the document body")
+                    construct: "trailing content after the document body"
+                )
             }
             return node
         }
@@ -69,8 +70,8 @@ extension Institute.CI.Workflow.YAML {
             while true {
                 skipBlanks()
                 guard cursor < lines.count,
-                      lines[cursor].indent == indent,
-                      lines[cursor].isSequenceItem
+                    lines[cursor].indent == indent,
+                    lines[cursor].isSequenceItem
                 else { break }
 
                 let line = lines[cursor]
@@ -93,18 +94,24 @@ extension Institute.CI.Workflow.YAML {
         /// The content that followed `- ` on the item line, plus any
         /// continuation lines indented to the same column.
         private mutating func inlineItem(
-            _ inline: String, column: Int, of line: Line
+            _ inline: String,
+            column: Int,
+            of line: Line
         ) throws(Error) -> Node {
             if inline.hasPrefix("- ") || inline == "-" {
                 throw Error.unsupported(
-                    line: line.number, construct: "a sequence nested inline in a sequence item")
+                    line: line.number,
+                    construct: "a sequence nested inline in a sequence item"
+                )
             }
             if inline.hasPrefix("&") {
                 // Anchors are supported on mapping values, where the
                 // corpus uses them. Refused here rather than mis-read as
                 // a plain scalar beginning with `&`.
                 throw Error.unsupported(
-                    line: line.number, construct: "an anchor on a sequence item")
+                    line: line.number,
+                    construct: "an anchor on a sequence item"
+                )
             }
             guard let entry = Line.splitKey(inline) else {
                 return try scalar(inline, on: line)
@@ -121,24 +128,29 @@ extension Institute.CI.Workflow.YAML {
             guard !entries.isEmpty else {
                 let line = lines[min(cursor, lines.count - 1)]
                 throw Error.unsupported(
-                    line: line.number, construct: "a block node that is neither mapping nor sequence")
+                    line: line.number,
+                    construct: "a block node that is neither mapping nor sequence"
+                )
             }
             return .mapping(Mapping(entries))
         }
 
         private mutating func appendEntries(
-            at indent: Int, into entries: inout [Mapping.Entry]
+            at indent: Int,
+            into entries: inout [Mapping.Entry]
         ) throws(Error) {
             while true {
                 skipBlanks()
                 guard cursor < lines.count,
-                      lines[cursor].indent == indent,
-                      !lines[cursor].isSequenceItem
+                    lines[cursor].indent == indent,
+                    !lines[cursor].isSequenceItem
                 else { break }
                 let line = lines[cursor]
                 guard let entry = Line.splitKey(line.content) else {
                     throw Error.unsupported(
-                        line: line.number, construct: "a plain scalar where a mapping key was expected")
+                        line: line.number,
+                        construct: "a plain scalar where a mapping key was expected"
+                    )
                 }
                 cursor += 1
                 try appendEntry(entry, at: indent, on: line, into: &entries)
@@ -194,7 +206,9 @@ extension Institute.CI.Workflow.YAML {
                 let name = String(text.dropFirst())
                 guard let node = anchors[name] else {
                     throw Error.unsupported(
-                        line: line.number, construct: "an alias to an undefined anchor '\(name)'")
+                        line: line.number,
+                        construct: "an alias to an undefined anchor '\(name)'"
+                    )
                 }
                 return node
             }
@@ -210,7 +224,8 @@ extension Institute.CI.Workflow.YAML {
         }
 
         private mutating func blockScalar(
-            _ indicator: BlockScalar.Indicator, deeperThan indent: Int
+            _ indicator: BlockScalar.Indicator,
+            deeperThan indent: Int
         ) -> String {
             var raw: [Line] = []
             while cursor < lines.count {

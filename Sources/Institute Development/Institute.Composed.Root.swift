@@ -1,5 +1,5 @@
-public import Institute_Build_Coordinator
 public import File_System
+public import Institute_Build_Coordinator
 public import Institute_Inventory
 public import Institute_Model
 
@@ -64,8 +64,7 @@ extension Institute.Composed.Root {
     /// count of every contributing repository. See ``Composed``'s
     /// documentation for why a repository with no library product is
     /// excluded here rather than silently folded in.
-    public static func expectedTargetCount(in manifests: [Institute.Composed.Manifest]) -> Swift.Int
-    {
+    public static func expectedTargetCount(in manifests: [Institute.Composed.Manifest]) -> Swift.Int {
         contributing(manifests).reduce(0) { $0 + $1.buildableTargetCount }
     }
 

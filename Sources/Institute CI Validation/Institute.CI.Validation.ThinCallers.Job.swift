@@ -1,7 +1,8 @@
-import struct Swift.String
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation.ThinCallers {
     /// One top-level job under `jobs:`, with its body lines.
@@ -86,8 +87,7 @@ extension Institute.CI.Validation.ThinCallers.Job {
             if let indent = openerIndent {
                 if line.isBlankOrComment { continue }
                 if line.indent > indent {
-                    if let value = line.value(after: "\(key):"), !value.beforeComment.trimmed.isEmpty
-                    {
+                    if let value = line.value(after: "\(key):"), !value.beforeComment.trimmed.isEmpty {
                         return value.beforeComment.trimmed
                     }
                     continue

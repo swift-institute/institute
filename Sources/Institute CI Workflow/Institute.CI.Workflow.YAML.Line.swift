@@ -1,6 +1,6 @@
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
+public import Institute_Model
 
 extension Institute.CI.Workflow.YAML {
     /// One physical line, pre-measured for the indentation-driven parse.
@@ -58,7 +58,8 @@ extension Institute.CI.Workflow.YAML {
                         indent: raw.prefix(while: { $0 == " " }).count,
                         raw: raw,
                         content: stripComment(raw).trimmedTrailing()
-                            .drop(while: { $0 == " " }).description)
+                            .drop(while: { $0 == " " }).description
+                    )
                 }
         }
 

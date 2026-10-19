@@ -1,6 +1,6 @@
-public import Institute_Build_Coordinator
 public import File_System
 public import Git_Foundation
+public import Institute_Build_Coordinator
 public import Institute_Development
 public import Institute_Doctor
 public import Institute_Inventory
@@ -59,9 +59,7 @@ extension Institute.Coherence {
             priorGreen: Receipt? = nil,
             buildPath: Institute.Coherence.BuildPath = .xcodebuildMerged,
             sync:
-                @escaping @Sendable (Institute.Root, Institute.Selection.Resolved) async throws(
-                    Institute.Error
-                )
+                @escaping @Sendable (Institute.Root, Institute.Selection.Resolved) async throws(Institute.Error)
                 -> Void = Self.realSync,
             doctor:
                 @escaping @Sendable (

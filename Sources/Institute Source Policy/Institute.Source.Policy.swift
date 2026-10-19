@@ -144,28 +144,29 @@ extension Institute.Source {
                 engine: .init("swift-linter"),
                 token: "compound identifier"
             )
-            let applicability: JSON = if rules.contains(compoundIdentifier) {
-                .array([
-                    .object([
-                        ("rule", JSON(stringLiteral: compoundIdentifier.token)),
-                        (
-                            "excludedTargets",
-                            .array(
-                                externallyStandardizedTargets.sorted {
-                                    $0.identity < $1.identity
-                                }.map { target in
-                                    .object([
-                                        ("identity", JSON(stringLiteral: target.identity)),
-                                        ("sourceRoot", JSON(stringLiteral: target.sourceRoot)),
-                                    ])
-                                }
-                            )
-                        ),
+            let applicability: JSON =
+                if rules.contains(compoundIdentifier) {
+                    .array([
+                        .object([
+                            ("rule", JSON(stringLiteral: compoundIdentifier.token)),
+                            (
+                                "excludedTargets",
+                                .array(
+                                    externallyStandardizedTargets.sorted {
+                                        $0.identity < $1.identity
+                                    }.map { target in
+                                        .object([
+                                            ("identity", JSON(stringLiteral: target.identity)),
+                                            ("sourceRoot", JSON(stringLiteral: target.sourceRoot)),
+                                        ])
+                                    }
+                                )
+                            ),
+                        ])
                     ])
-                ])
-            } else {
-                .array([])
-            }
+                } else {
+                    .array([])
+                }
             let document = JSON.object([
                 ("schema", 2),
                 ("revision", JSON(stringLiteral: revision)),
@@ -186,19 +187,16 @@ extension Institute.Source {
         }
 
         public func profile(
-            swiftFormatExecutable: Swift.String,
-            swiftFormatTool: Source_Profile.Source.Profile.Digest,
-            swiftFormatConfigurationPath: Swift.String,
-            swiftLintExecutable: Swift.String,
-            swiftLintTool: Source_Profile.Source.Profile.Digest,
-            swiftLintConfigurationPath: Swift.String,
-            linterExecutable: Swift.String,
-            linterTool: Source_Profile.Source.Profile.Digest,
-            linterConfigurationPath: Swift.String,
+            swiftFormat formatInstallation: (executable: Swift.String, tool: Source_Profile.Source.Profile.Digest, configurationPath: Swift.String),
+            swiftLint lintInstallation: (executable: Swift.String, tool: Source_Profile.Source.Profile.Digest, configurationPath: Swift.String),
+            linter linterInstallation: (executable: Swift.String, tool: Source_Profile.Source.Profile.Digest, configurationPath: Swift.String),
             bundle: Bundle,
             linterRules: [Source_Profile.Source.Rule.ID],
             repair: Swift.Bool = false
         ) -> Source_Profile.Source.Profile {
+            let (swiftFormatExecutable, swiftFormatTool, swiftFormatConfigurationPath) = formatInstallation
+            let (swiftLintExecutable, swiftLintTool, swiftLintConfigurationPath) = lintInstallation
+            let (linterExecutable, linterTool, linterConfigurationPath) = linterInstallation
             let swiftFormatID = Source_Profile.Source.Engine.ID("swift-format")
             let swiftLintID = Source_Profile.Source.Engine.ID("swiftlint")
             let linterID = Source_Profile.Source.Engine.ID("swift-linter")

@@ -115,8 +115,7 @@ extension Institute.Inventory.Test.Unit {
     /// belongs to a different repository entirely and this module never
     /// opens it.
     @Test
-    func `A repository whose layer disagrees with its layer-root organization is rejected`() throws
-    {
+    func `A repository whose layer disagrees with its layer-root organization is rejected`() throws {
         let key = Institute.Repository.Key(
             owner: .init("swift-atoms"),
             name: .init("swift-mislabeled")

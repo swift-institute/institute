@@ -1,5 +1,5 @@
-public import Institute_Model
 public import Institute_CI_Model
+public import Institute_Model
 
 extension Institute.CI {
     /// Whether `text` is a `YYYY-MM-DD` calendar date.

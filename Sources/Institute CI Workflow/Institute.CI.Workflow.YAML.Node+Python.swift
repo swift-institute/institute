@@ -1,6 +1,6 @@
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
+public import Institute_Model
 
 extension Institute.CI.Workflow.YAML.Node {
     /// The node as `str()` renders the object PyYAML loaded from it.
@@ -57,7 +57,7 @@ extension Institute.CI.Workflow.YAML.Node {
             case "\n": result += #"\n"#
             case "\r": result += #"\r"#
             case "\t": result += #"\t"#
-            case Unicode.Scalar(String(quote).unicodeScalars.first!):
+            case let scalar where String(scalar) == String(quote):
                 result += "\\\(quote)"
             case let scalar where scalar.value < 0x20 || scalar.value == 0x7F:
                 result += "\\x" + Self.hexadecimal(scalar.value)

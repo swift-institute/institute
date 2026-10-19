@@ -1,6 +1,6 @@
-public import Institute_Model
 import Byte
 import FIPS_180_4
+public import Institute_Model
 
 extension Institute.Repository.Policy {
     /// The versioned, body-owned portion of an Issue record. Native GitHub
@@ -81,8 +81,7 @@ extension Institute.Repository.Policy.Issue {
         public let status: String
         public let supersededBy: String?
 
-        public init(grammarVersion: Int, status: String, supersededBy: String? = nil) throws(Error)
-        {
+        public init(grammarVersion: Int, status: String, supersededBy: String? = nil) throws(Error) {
             guard grammarVersion == 1 else {
                 throw Error.unsupportedVersion(grammarVersion)
             }

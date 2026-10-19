@@ -53,8 +53,7 @@ extension Institute.Peer.Fixture {
 
     /// Writes `contents` at `relative` under the peer's root, creating
     /// intermediate directories.
-    func write(_ contents: Swift.String, at relative: Swift.String, for peer: Institute.Peer) throws
-    {
+    func write(_ contents: Swift.String, at relative: Swift.String, for peer: Institute.Peer) throws {
         let destination = base.appending(path: peer.name).appending(path: relative)
         try FileManager.default.createDirectory(
             at: destination.deletingLastPathComponent(),

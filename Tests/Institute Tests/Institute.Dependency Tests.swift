@@ -406,13 +406,13 @@ extension Institute.Dependency.Test.Integration {
                     .available(
                         [Byte](
                             utf8: #"""
-                            .package(url: "https://github.com/old/vendor.git", branch: "main"),
-                            .package(name: "swift-numerics", url: "https://github.com/swift-compositions/swift-numerics.git", branch: "main"),
-                            .package(url: "https://github.com/coenttb/personal.git", branch: "main"),
-                            .package(url: "https://github.com/apple/swift-crypto.git", branch: "main"),
-                            .package(url: "https://github.com/public/restricted.git", branch: "main"),
-                            .package(path: ".."),
-                            """#
+                                .package(url: "https://github.com/old/vendor.git", branch: "main"),
+                                .package(name: "swift-numerics", url: "https://github.com/swift-compositions/swift-numerics.git", branch: "main"),
+                                .package(url: "https://github.com/coenttb/personal.git", branch: "main"),
+                                .package(url: "https://github.com/apple/swift-crypto.git", branch: "main"),
+                                .package(url: "https://github.com/public/restricted.git", branch: "main"),
+                                .package(path: ".."),
+                                """#
                         )
                     )
 

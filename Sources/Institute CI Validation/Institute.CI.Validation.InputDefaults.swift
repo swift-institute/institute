@@ -1,8 +1,9 @@
-import struct Swift.String
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
 public import Institute_CI_Workflow
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// `[CI-058]` — a reusable that declares `enable-private-repos` must
@@ -44,10 +45,14 @@ extension Institute.CI.Validation {
                 guard declared != .boolean(true) else { continue }
                 findings.append(
                     Finding(
-                        repository: subject.repository, rule: rule,
+                        repository: subject.repository,
+                        rule: rule,
                         message: Self.message(
                             document: document.name,
-                            declared: declared?.pythonRepr ?? "None")))
+                            declared: declared?.pythonRepr ?? "None"
+                        )
+                    )
+                )
             }
             return findings
         }

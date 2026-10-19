@@ -77,7 +77,7 @@ extension Institute.CI {
                 }
             }
             for job in results.keys.sorted() where job != "plan" {
-                let result = results[job]!
+                guard let result = results[job] else { continue }
                 let expected = gatingSet.contains(job) ? "success" : "skipped"
                 if result != expected {
                     if expected == "success" {

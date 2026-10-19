@@ -1,7 +1,8 @@
-import struct Swift.String
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// Runs registered validators against the fixture corpus and reports
@@ -66,7 +67,7 @@ extension Institute.CI.Validation {
 
             for directory in try corpus.ruleDirectories(matching: prefix) {
                 guard let rule = rule(forCorpusDirectory: directory),
-                      let validator = validator(for: rule)
+                    let validator = validator(for: rule)
                 else {
                     unowned.append(directory)
                     continue
@@ -75,7 +76,8 @@ extension Institute.CI.Validation {
                     let findings = try validator.findings(in: scenario.subject)
                         .filter { $0.rule == rule }
                     outcomes.append(
-                        Outcome(rule: rule, scenario: scenario, findings: findings))
+                        Outcome(rule: rule, scenario: scenario, findings: findings)
+                    )
                 }
             }
             return Report(outcomes: outcomes, unownedRuleDirectories: unowned)

@@ -1,12 +1,13 @@
-public import Institute_Model
-import struct Swift.String
 import ASCII
 import Byte
 import Environment
 import File_System
-public import Institute_CI_Model
 public import Institute_CI_Canon
+public import Institute_CI_Model
+public import Institute_Model
 import Process
+
+import struct Swift.String
 
 #if os(Windows)
     import WinSDK
@@ -185,7 +186,7 @@ extension Institute.CI.Validation {
 
         public func findings(in subject: Subject) throws(EnvironmentDefect) -> [Finding] {
             // A root that is not there is not a repository of any class.
-                        guard Institute.CI.Validation.isDirectory(subject.root)
+            guard Institute.CI.Validation.isDirectory(subject.root)
             else { return [] }
             try Self.validateRepositoryEnvironment(subject.root)
 
@@ -435,7 +436,7 @@ extension Institute.CI.Validation.Gitignore {
         _ operation: () throws -> T
     ) throws -> T {
         #if os(Windows)
-            var lastError: Swift.Error!
+            var lastError: Swift.Error?
             for attempt in 0..<attempts {
                 do {
                     return try operation()
@@ -456,7 +457,10 @@ extension Institute.CI.Validation.Gitignore {
                     }
                 }
             }
-            throw lastError!
+            guard let lastError else {
+                preconditionFailure("a retried operation runs at least once")
+            }
+            throw lastError
         #else
             return try operation()
         #endif
@@ -595,8 +599,7 @@ extension Institute.CI.Validation.Gitignore {
         guard result.status == 0 else { throw .unreadableSubject(root: root) }
         if result.output.isEmpty { return [] }
         var paths: [String] = []
-        for record in result.output.split(separator: 0, omittingEmptySubsequences: false).dropLast()
-        {
+        for record in result.output.split(separator: 0, omittingEmptySubsequences: false).dropLast() {
             guard let tab = record.firstIndex(of: 9) else { throw .unreadableSubject(root: root) }
             let header = record[..<tab].split(separator: 32)
             let path = Swift.String(

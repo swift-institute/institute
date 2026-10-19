@@ -1,6 +1,6 @@
-public import Institute_Model
 private import Environment
 internal import File_System
+public import Institute_Model
 private import Kernel
 internal import Process
 

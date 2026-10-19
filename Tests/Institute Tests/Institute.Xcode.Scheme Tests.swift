@@ -19,25 +19,28 @@ extension Institute.Xcode.Scheme {
 }
 
 extension Institute.Xcode.Scheme.Test.Unit {
-    private static let plan = Institute.Xcode.Scheme.Plan(buildables: [
-        Institute.Xcode.Scheme.Buildable(
-            reference: "../swift-atoms/swift-dimension-primitives",
-            target: "Dimension Primitives"
-        ),
-        Institute.Xcode.Scheme.Buildable(
-            reference: "../swift-standards/swift-color-standard",
-            target: "Color Standard"
-        ),
-        Institute.Xcode.Scheme.Buildable(
-            reference: "../swift-standards/swift-color-standard",
-            target: "Theme"
-        ),
-    ], testables: [
-        .init(
-            reference: "../swift-standards/swift-color-standard",
-            target: "Color Standard Tests"
-        )
-    ])
+    private static let plan = Institute.Xcode.Scheme.Plan(
+        buildables: [
+            Institute.Xcode.Scheme.Buildable(
+                reference: "../swift-atoms/swift-dimension-primitives",
+                target: "Dimension Primitives"
+            ),
+            Institute.Xcode.Scheme.Buildable(
+                reference: "../swift-standards/swift-color-standard",
+                target: "Color Standard"
+            ),
+            Institute.Xcode.Scheme.Buildable(
+                reference: "../swift-standards/swift-color-standard",
+                target: "Theme"
+            ),
+        ],
+        testables: [
+            .init(
+                reference: "../swift-standards/swift-color-standard",
+                target: "Color Standard Tests"
+            )
+        ]
+    )
 
     @Test
     func `one scheme names buildables in more than one container`() {

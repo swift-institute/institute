@@ -1,9 +1,10 @@
-import struct Swift.String
-public import Institute_Model
 import File_System
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
 public import Institute_CI_Workflow
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation.BranchPins {
     /// The Institute organization set, read from the canonical manifest.

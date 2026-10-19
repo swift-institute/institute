@@ -1,7 +1,7 @@
-public import Institute_Model
+import GitHub_Standard
 import Institute_CI_Model
 import Institute_CI_Validation
-import GitHub_Standard
+public import Institute_Model
 import Testing
 
 @testable import Institute_CI_Validation
@@ -101,8 +101,7 @@ struct InstituteValidationCorpusTests {
         }
     }
 
-    static func run(in corpus: Validation.Corpus) throws -> (outcomes: [Outcome], unowned: [String])
-    {
+    static func run(in corpus: Validation.Corpus) throws -> (outcomes: [Outcome], unowned: [String]) {
         var outcomes: [Outcome] = []
         var unowned: [String] = []
         for directory in try corpus.ruleDirectories() {

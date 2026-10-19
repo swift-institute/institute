@@ -68,8 +68,7 @@ struct `Build Institute Tests` {
     }
 
     @Test
-    func `the native slice only, so the workspace path measures what swift build measures`() throws
-    {
+    func `the native slice only, so the workspace path measures what swift build measures`() throws {
         // `swift build` compiles the native slice. `xcodebuild` compiles every
         // architecture in the destination unless told otherwise, which would
         // make the two paths disagree about a package that only fails in a

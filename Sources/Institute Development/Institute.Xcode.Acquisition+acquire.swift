@@ -141,7 +141,8 @@ extension Institute.Xcode.Acquisition {
             }
             guard Set(entries.map(\.toolchain)).count == 1 else {
                 throw .configuration(
-                    "workspace target catalogs were acquired by multiple toolchains")
+                    "workspace target catalogs were acquired by multiple toolchains"
+                )
             }
             return .init(entries: entries)
         }

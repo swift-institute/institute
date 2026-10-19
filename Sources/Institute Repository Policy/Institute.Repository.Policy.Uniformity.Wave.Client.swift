@@ -1,6 +1,5 @@
 public import Institute_Model
 
-
 extension Institute.Repository.Policy.Uniformity.Wave {
     /// The uniformity wave's effect surface. Refines the caller wave's
     /// client so every shared primitive — capacity, enumeration, heads,

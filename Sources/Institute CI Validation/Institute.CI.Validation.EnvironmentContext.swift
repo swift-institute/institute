@@ -1,8 +1,9 @@
-import struct Swift.String
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
 public import Institute_CI_Workflow
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// `[CI-103]` — a job's `runs-on:` and `container:` must not
@@ -36,7 +37,11 @@ extension Institute.CI.Validation {
             for document in documents {
                 for job in document.jobs {
                     findings += Self.findings(
-                        in: job, of: document, repository: subject.repository, rule: rule)
+                        in: job,
+                        of: document,
+                        repository: subject.repository,
+                        rule: rule
+                    )
                 }
             }
             return findings
@@ -46,15 +51,20 @@ extension Institute.CI.Validation {
         /// them: `runs-on:` first, then `container:`. A job can violate
         /// both and is reported twice.
         static func findings(
-            in job: Institute.CI.Workflow.Job, of document: Institute.CI.Workflow.Document,
-            repository: String, rule: Rule
+            in job: Institute.CI.Workflow.Job,
+            of document: Institute.CI.Workflow.Document,
+            repository: String,
+            rule: Rule
         ) -> [Finding] {
             var findings: [Finding] = []
             if let runsOn = job.runsOn, runsOn != .null, referencesEnvironment(runsOn) {
                 findings.append(
                     Finding(
-                        repository: repository, rule: rule,
-                        message: runsOnMessage(document: document.name, job: job.name)))
+                        repository: repository,
+                        rule: rule,
+                        message: runsOnMessage(document: document.name, job: job.name)
+                    )
+                )
             }
             guard let container = job.body["container"], container != .null else {
                 return findings
@@ -64,15 +74,21 @@ extension Institute.CI.Validation {
                 if referencesEnvironment(container) {
                     findings.append(
                         Finding(
-                            repository: repository, rule: rule,
-                            message: containerMessage(document: document.name, job: job.name)))
+                            repository: repository,
+                            rule: rule,
+                            message: containerMessage(document: document.name, job: job.name)
+                        )
+                    )
                 }
             case .mapping(let mapping):
                 if let image = mapping["image"], referencesEnvironment(image) {
                     findings.append(
                         Finding(
-                            repository: repository, rule: rule,
-                            message: imageMessage(document: document.name, job: job.name)))
+                            repository: repository,
+                            rule: rule,
+                            message: imageMessage(document: document.name, job: job.name)
+                        )
+                    )
                 }
             default:
                 break
@@ -151,9 +167,9 @@ extension String {
                 cursor += 1
             }
             if cursor + keyword.count <= characters.count,
-               Array(characters[cursor..<(cursor + keyword.count)]) == keyword,
-               cursor + keyword.count < characters.count,
-               characters[cursor + keyword.count].isExpressionWord
+                Array(characters[cursor..<(cursor + keyword.count)]) == keyword,
+                cursor + keyword.count < characters.count,
+                characters[cursor + keyword.count].isExpressionWord
             {
                 return true
             }

@@ -181,8 +181,9 @@ extension Institute.CI {
                 }
             }
             var descheduled: [Descheduled] = []
-            for id in legIds where deschedule[id] != nil {
-                descheduled.append(.init(leg: Leg(id), reason: deschedule[id]!))
+            for id in legIds {
+                guard let reason = deschedule[id] else { continue }
+                descheduled.append(.init(leg: Leg(id), reason: reason))
             }
             legIds.removeAll { deschedule[$0] != nil }
             self.descheduled = descheduled

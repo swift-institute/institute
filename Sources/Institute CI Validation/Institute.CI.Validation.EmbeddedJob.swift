@@ -1,8 +1,9 @@
-import struct Swift.String
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
 public import Institute_CI_Workflow
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// `[CI-021]` — a `swift-ci.yml` that declares an `embedded` job must
@@ -44,8 +45,10 @@ extension Institute.CI.Validation {
             } catch {
                 return [
                     Finding(
-                        repository: subject.repository, rule: rule,
-                        message: "swift-ci.yml: YAML parse failed: \(error.message)")
+                        repository: subject.repository,
+                        rule: rule,
+                        message: "swift-ci.yml: YAML parse failed: \(error.message)"
+                    )
                 ]
             }
             guard let embedded = document.jobs.first(where: { $0.name == "embedded" }) else {

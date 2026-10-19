@@ -177,8 +177,7 @@ extension Institute.Doctor.Test.Unit {
 
 extension Institute.Doctor.Test.Integration {
     @Test
-    func `a run with TOOLCHAINS set fails with a specific error naming the variable`() async throws
-    {
+    func `a run with TOOLCHAINS set fails with a specific error naming the variable`() async throws {
         let fixture = try Institute.Doctor.Fixture(repositories: [])
         defer { fixture.remove() }
         try Institute.Xcode.write(try Institute.Xcode.specification([]), at: fixture.directory)

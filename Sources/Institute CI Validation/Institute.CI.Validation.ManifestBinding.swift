@@ -1,8 +1,9 @@
-import struct Swift.String
-public import Institute_Model
+import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_CI_Workflow
-import GitHub_Standard
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// `[CI-MANIFEST-BINDING]` — `validators-manifest.yaml` is internally
@@ -273,7 +274,7 @@ extension Institute.CI.Validation {
             finding: (String) -> Finding
         ) throws(EnvironmentDefect) -> [Finding] {
             let directory = subject.path(".github/scripts")
-                        guard Institute.CI.Validation.isDirectory(directory)
+            guard Institute.CI.Validation.isDirectory(directory)
             else { return [] }
             // An unlistable directory is exactly the defect raised here.
             guard let names = Institute.CI.Validation.names(at: directory) else {

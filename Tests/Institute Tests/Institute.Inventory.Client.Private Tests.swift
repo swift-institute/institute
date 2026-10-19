@@ -228,8 +228,7 @@ extension Institute.Inventory.Test.`Edge Case` {
     }
 
     @Test
-    func `Cancellation during private discovery is not erased into a client failure`() async throws
-    {
+    func `Cancellation during private discovery is not erased into a client failure`() async throws {
         let policy = Institute.Inventory.Policy.institute()
         let repositories = GitHub.Organization.Repositories.Client { _ in
             .init(response: .init(repositories: []), next: nil)

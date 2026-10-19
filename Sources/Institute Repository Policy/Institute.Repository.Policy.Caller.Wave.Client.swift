@@ -1,5 +1,5 @@
-public import Institute_Model
 public import Byte
+public import Institute_Model
 
 extension Institute.Repository.Policy.Caller.Wave {
     public protocol Client: Sendable {

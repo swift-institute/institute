@@ -1,9 +1,10 @@
-import struct Swift.String
-import Standard_Library_Extensions
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
+public import Institute_Model
 import JSON
+import Standard_Library_Extensions
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// `[GH-REPO-063]` — `metadata-schema.json` ↔ consumer
@@ -234,11 +235,8 @@ extension Institute.CI.Validation.SchemaCorrespondence {
             for character in remainder {
                 let isLetter = ("a"..."z").contains(character) || ("A"..."Z").contains(character)
                 let isDigit = ("0"..."9").contains(character)
-                if key.isEmpty ? isLetter : (isLetter || isDigit) {
-                    key.append(character)
-                } else {
-                    break
-                }
+                guard key.isEmpty ? isLetter : (isLetter || isDigit) else { break }
+                key.append(character)
             }
             if !key.isEmpty { keys.insert(key) }
         }

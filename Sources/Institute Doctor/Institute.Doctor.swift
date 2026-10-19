@@ -152,8 +152,7 @@ extension Institute.Doctor {
 
     /// The repository's on-disk checkout, when its path holds a Git
     /// repository.
-    func materialized(_ repository: Institute.Repository) -> (Institute.Repository, File.Directory)?
-    {
+    func materialized(_ repository: Institute.Repository) -> (Institute.Repository, File.Directory)? {
         do throws(Institute.Error) {
             let path = try path(for: repository)
             let materialized = try execute { () throws(Git.Client.Error) -> Bool in

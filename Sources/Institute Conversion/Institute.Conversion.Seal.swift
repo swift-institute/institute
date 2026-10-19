@@ -27,8 +27,7 @@ extension Institute.Conversion {
         public let pages:
             @Sendable (Institute.Root, Institute.Selection.Resolved) async ->
                 Institute.Pages.Inventory
-        public let head:
-            @Sendable (Institute.Root, Institute.Repository) throws(Institute.Error) -> Swift.String
+        public let head: @Sendable (Institute.Root, Institute.Repository) throws(Institute.Error) -> Swift.String
         public let blob:
             @Sendable (Institute.Root, Institute.Repository, Swift.String) throws(Institute.Error)
                 ->

@@ -125,15 +125,9 @@ struct `Institute source policy` {
         let linter = Source.Engine.ID("swift-linter")
         let rules = [Source.Rule.ID(engine: linter, token: "rule")]
         let profile = policy.profile(
-            swiftFormatExecutable: "/swift-format",
-            swiftFormatTool: .init("format-tool"),
-            swiftFormatConfigurationPath: "/.swift-format",
-            swiftLintExecutable: "/swiftlint",
-            swiftLintTool: .init("swiftlint-tool"),
-            swiftLintConfigurationPath: "/.swiftlint.yml",
-            linterExecutable: "/swift-linter",
-            linterTool: .init("linter-tool"),
-            linterConfigurationPath: "/source-linter-profile.json",
+            swiftFormat: (executable: "/swift-format", tool: .init("format-tool"), configurationPath: "/.swift-format"),
+            swiftLint: (executable: "/swiftlint", tool: .init("swiftlint-tool"), configurationPath: "/.swiftlint.yml"),
+            linter: (executable: "/swift-linter", tool: .init("linter-tool"), configurationPath: "/source-linter-profile.json"),
             bundle: .institute,
             linterRules: rules
         )
@@ -152,15 +146,9 @@ struct `Institute source policy` {
         #expect(
             profile.digest
                 == policy.profile(
-                    swiftFormatExecutable: "/swift-format",
-                    swiftFormatTool: .init("format-tool"),
-                    swiftFormatConfigurationPath: "/.swift-format",
-                    swiftLintExecutable: "/swiftlint",
-                    swiftLintTool: .init("swiftlint-tool"),
-                    swiftLintConfigurationPath: "/.swiftlint.yml",
-                    linterExecutable: "/swift-linter",
-                    linterTool: .init("linter-tool"),
-                    linterConfigurationPath: "/source-linter-profile.json",
+                    swiftFormat: (executable: "/swift-format", tool: .init("format-tool"), configurationPath: "/.swift-format"),
+                    swiftLint: (executable: "/swiftlint", tool: .init("swiftlint-tool"), configurationPath: "/.swiftlint.yml"),
+                    linter: (executable: "/swift-linter", tool: .init("linter-tool"), configurationPath: "/source-linter-profile.json"),
                     bundle: .institute,
                     linterRules: rules
                 ).digest
@@ -174,15 +162,9 @@ struct `Institute source policy` {
         let rules = [Source.Rule.ID(engine: linter, token: "rule")]
         func profile(repair: Bool) -> Source.Profile {
             policy.profile(
-                swiftFormatExecutable: "/swift-format",
-                swiftFormatTool: .init("format-tool"),
-                swiftFormatConfigurationPath: "/.swift-format",
-                swiftLintExecutable: "/swiftlint",
-                swiftLintTool: .init("swiftlint-tool"),
-                swiftLintConfigurationPath: "/.swiftlint.yml",
-                linterExecutable: "/swift-linter",
-                linterTool: .init("linter-tool"),
-                linterConfigurationPath: "/source-linter-profile.json",
+                swiftFormat: (executable: "/swift-format", tool: .init("format-tool"), configurationPath: "/.swift-format"),
+                swiftLint: (executable: "/swiftlint", tool: .init("swiftlint-tool"), configurationPath: "/.swiftlint.yml"),
+                linter: (executable: "/swift-linter", tool: .init("linter-tool"), configurationPath: "/source-linter-profile.json"),
                 bundle: .institute,
                 linterRules: rules,
                 repair: repair
@@ -213,7 +195,6 @@ struct `Institute source policy` {
         return decoded
     }
 }
-
 
 extension `Institute source policy` {
     @Test

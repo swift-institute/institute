@@ -1,10 +1,10 @@
-public import Institute_Model
-public import Institute_Build_Coordinator
-public import Institute_Development
 import File_System
 import Git_Foundation
-import Package_Manager
+public import Institute_Build_Coordinator
+public import Institute_Development
+public import Institute_Model
 import JSON
+import Package_Manager
 
 extension Institute.Certification {
     /// Composed exact-S fleet evaluation: every package member is

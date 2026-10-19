@@ -30,7 +30,8 @@ extension Institute.Source.Workspace {
                 switch $0.role {
                 case .subject: return $0.repository != nil
                 case .control(.application), .control(.institute),
-                    .control(.continuousIntegration): return true
+                    .control(.continuousIntegration):
+                    return true
                 case .control(.linter): return false
                 }
             }

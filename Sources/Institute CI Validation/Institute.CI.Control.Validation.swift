@@ -1,7 +1,8 @@
-import struct Swift.String
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI {
     /// Deterministic validation of an untrusted control-plane checkout.
@@ -42,7 +43,7 @@ extension Institute.CI.Control {
             repository: String,
             root: String
         ) -> Institute.CI.Validation.Run {
-                        guard Institute.CI.Validation.isDirectory(root)
+            guard Institute.CI.Validation.isDirectory(root)
             else {
                 return .init(findings: [], defect: .unreadableSubject(root: root))
             }

@@ -1,7 +1,7 @@
-public import Institute_Model
-public import Institute_CI_Model
 public import Byte
 import FIPS_180_4
+public import Institute_CI_Model
+public import Institute_Model
 
 extension Institute.CI.Bootstrap {
     /// The complete frozen package-inputs tuple that identifies one

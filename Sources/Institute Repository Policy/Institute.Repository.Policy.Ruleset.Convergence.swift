@@ -1,7 +1,6 @@
 public import Institute_Model
 public import JSON
 
-
 extension Institute.Repository.Policy.Ruleset {
     /// Which posture the `rulesets` job runs under when an Institute ruleset
     /// (of either class) is absent from a target repository

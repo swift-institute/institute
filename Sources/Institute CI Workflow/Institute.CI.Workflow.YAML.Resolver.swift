@@ -1,6 +1,6 @@
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
+public import Institute_Model
 
 extension Institute.CI.Workflow.YAML {
     /// Plain-scalar resolution under **YAML 1.1**, matching PyYAML's
@@ -46,7 +46,9 @@ extension Institute.CI.Workflow.YAML {
         private static func integer(_ text: String) -> Int? {
             var body = Substring(text)
             var negative = false
-            if body.first == "+" { body = body.dropFirst() } else if body.first == "-" {
+            if body.first == "+" {
+                body = body.dropFirst()
+            } else if body.first == "-" {
                 negative = true
                 body = body.dropFirst()
             }

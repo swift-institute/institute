@@ -1,6 +1,6 @@
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
+public import Institute_Model
 
 extension Institute.CI.Workflow.YAML {
     /// Reader for a single-line flow collection — `[main]`,
@@ -43,13 +43,18 @@ extension Institute.CI.Workflow.YAML {
             index += 1
             var elements: [Node] = []
             skipSpaces()
-            if peek() == "]" { index += 1; return .sequence(elements) }
+            if peek() == "]" {
+                index += 1
+                return .sequence(elements)
+            }
             while true {
                 elements.append(try value(on: line))
                 skipSpaces()
                 switch peek() {
                 case ",": index += 1
-                case "]": index += 1; return .sequence(elements)
+                case "]":
+                    index += 1
+                    return .sequence(elements)
                 default:
                     throw Error.unsupported(line: line, construct: "an unterminated flow sequence")
                 }
@@ -60,7 +65,10 @@ extension Institute.CI.Workflow.YAML {
             index += 1
             var entries: [Mapping.Entry] = []
             skipSpaces()
-            if peek() == "}" { index += 1; return .mapping(Mapping(entries)) }
+            if peek() == "}" {
+                index += 1
+                return .mapping(Mapping(entries))
+            }
             while true {
                 let key = try value(on: line)
                 skipSpaces()
@@ -72,7 +80,9 @@ extension Institute.CI.Workflow.YAML {
                 skipSpaces()
                 switch peek() {
                 case ",": index += 1
-                case "}": index += 1; return .mapping(Mapping(entries))
+                case "}":
+                    index += 1
+                    return .mapping(Mapping(entries))
                 default:
                     throw Error.unsupported(line: line, construct: "an unterminated flow mapping")
                 }

@@ -1,6 +1,5 @@
 public import Institute_Model
 
-
 extension Institute.Repository.Policy.Caller.Wave {
     public static func recensus(
         original: Population,

@@ -1,7 +1,7 @@
+internal import File_System
 // Internal rather than private: `remove(_:after:)` is shared with the
 // workspace operation in another file, and its parameter is a `File` type.
 public import Institute_Model
-internal import File_System
 private import Kernel_System
 private import Kernel_Thread
 internal import Process

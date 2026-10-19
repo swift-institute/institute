@@ -1,9 +1,9 @@
-public import Institute_Model
-public import Institute_Build_Coordinator
 import File_System
 import Git_Foundation
-import Package_Manager
+public import Institute_Build_Coordinator
+public import Institute_Model
 import JSON
+import Package_Manager
 
 extension Institute.Certification {
     /// Ephemeral exact-revision fleet evaluation: each member is cloned

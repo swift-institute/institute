@@ -1,5 +1,5 @@
-public import Institute_Model
 import Institute_CI_Model
+public import Institute_Model
 import Testing
 
 @Suite
@@ -444,7 +444,7 @@ struct ContinuousIntegrationAggregateTests {
         let verdict = Institute.CI.AggregateVerdict(
             planResult: "success",
             results: needs([
-                "source": "success",
+                "source": "success"
             ]),
             gating: ["source"],
             subjectRepository: "o/r",
@@ -525,7 +525,7 @@ struct ContinuousIntegrationAggregateTests {
         let verdict = Institute.CI.AggregateVerdict(
             planResult: "success",
             results: needs([
-                "source": "success",
+                "source": "success"
             ]),
             gating: ["source"],
             subjectRepository: "o/r",

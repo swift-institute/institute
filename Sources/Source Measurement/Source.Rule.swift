@@ -1,3 +1,3 @@
 extension Source {
-  public enum Rule {}
+    public enum Rule {}
 }

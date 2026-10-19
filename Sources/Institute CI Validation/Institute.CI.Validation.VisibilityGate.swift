@@ -1,8 +1,9 @@
-import struct Swift.String
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
 public import Institute_CI_Workflow
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// `[CI-032]` — every job in every intra-Institute `workflow_call`
@@ -53,9 +54,15 @@ extension Institute.CI.Validation {
                     guard !text.contains(Self.gate) else { continue }
                     findings.append(
                         Finding(
-                            repository: subject.repository, rule: rule,
+                            repository: subject.repository,
+                            rule: rule,
                             message: Self.message(
-                                document: document.name, job: job.name, clause: text)))
+                                document: document.name,
+                                job: job.name,
+                                clause: text
+                            )
+                        )
+                    )
                 }
             }
             return findings
@@ -112,7 +119,7 @@ extension Institute.CI.Validation {
             case .some(.boolean(let value)): value ? "True" : "False"
             case .some(.integer(let value)): String(value)
             case .some(.number(let value)): String(value)
-            case .some(.sequence), .some(.mapping): "\(clause!)"
+            case .some(let node): "\(node)"
             }
         }
 

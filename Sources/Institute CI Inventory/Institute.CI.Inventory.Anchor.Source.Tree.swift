@@ -1,7 +1,7 @@
-public import Institute_Model
+import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_CI_Workflow
-import GitHub_Standard
+public import Institute_Model
 
 extension Institute.CI.Inventory.Anchor.Source {
     /// The content identity of a pinned source: which subtree is

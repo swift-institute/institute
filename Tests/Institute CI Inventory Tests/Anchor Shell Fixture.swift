@@ -6,7 +6,8 @@ struct AnchorShellFixture {
     let workspace: Swift.String
 
     init() throws {
-        workspace = FileManager.default.temporaryDirectory
+        workspace =
+            FileManager.default.temporaryDirectory
             .appending(path: "anchor-shell-\(UUID().uuidString)").path
         try FileManager.default.createDirectory(
             atPath: workspace,

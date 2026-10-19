@@ -1,8 +1,9 @@
-import struct Swift.String
-public import Institute_Model
 import Byte
 import File_System
 public import Institute_CI_Model
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation.SkillHygiene {
     /// The scanned repository as a set of files.

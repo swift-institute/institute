@@ -1,5 +1,5 @@
-public import Institute_Model
 public import Institute_CI_Model
+public import Institute_Model
 
 extension Institute.CI {
     /// The structural inventory of the shipped CI verdict — every job of

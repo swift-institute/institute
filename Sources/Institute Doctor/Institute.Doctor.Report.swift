@@ -23,8 +23,7 @@ extension Institute.Doctor {
         /// report tests that assert on statuses and summaries. The one
         /// production caller, ``Institute/Doctor/run(access:)``, always
         /// passes the origin it measured.
-        public init(outcomes: [Outcome], origin: Institute.Selection.Origin = .committed(count: 0))
-        {
+        public init(outcomes: [Outcome], origin: Institute.Selection.Origin = .committed(count: 0)) {
             self.outcomes = outcomes
             self.origin = origin
         }

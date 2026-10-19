@@ -11,8 +11,7 @@ extension Institute.Hierarchy {
     /// component rule ``Institute/Peer/Registry`` already applies to a peer
     /// name. It is stable across a locator change; only ``Institute/
     /// Hierarchy/Registry`` decides whether two ids may coexist.
-    public struct ID: Swift.Equatable, Swift.Hashable, Swift.Sendable, Swift.CustomStringConvertible
-    {
+    public struct ID: Swift.Equatable, Swift.Hashable, Swift.Sendable, Swift.CustomStringConvertible {
         public let value: Swift.String
 
         public init(_ value: Swift.String) throws(Institute.Error) {

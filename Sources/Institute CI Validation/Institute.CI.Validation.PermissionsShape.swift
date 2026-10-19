@@ -1,8 +1,9 @@
-import struct Swift.String
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
 public import Institute_CI_Workflow
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// `[CI-090]` workflow-level `permissions:` per trigger shape, and
@@ -60,12 +61,17 @@ extension Institute.CI.Validation {
                             rule: denyAll ? "CI-097" : "CI-090",
                             message: denyAll
                                 ? Self.denyAllMessage(document: document.name)
-                                : Self.reusableMessage(document: document.name)))
+                                : Self.reusableMessage(document: document.name)
+                        )
+                    )
                 } else if isStandalone, declared == nil {
                     findings.append(
                         Finding(
-                            repository: subject.repository, rule: "CI-090",
-                            message: Self.standaloneMessage(document: document.name)))
+                            repository: subject.repository,
+                            rule: "CI-090",
+                            message: Self.standaloneMessage(document: document.name)
+                        )
+                    )
                 }
             }
             return findings

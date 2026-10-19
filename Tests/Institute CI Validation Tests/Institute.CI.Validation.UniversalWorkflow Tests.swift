@@ -1,5 +1,5 @@
-public import Institute_Model
 import Institute_CI_Model
+public import Institute_Model
 import Testing
 
 @testable import Institute_CI_Validation

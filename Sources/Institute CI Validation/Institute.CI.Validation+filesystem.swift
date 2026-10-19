@@ -1,8 +1,9 @@
-public import Institute_Model
-import struct Swift.String
 import Byte
-public import Institute_CI_Model
 import File_System
+public import Institute_CI_Model
+public import Institute_Model
+
+import struct Swift.String
 
 // The validation rules read repository trees through these accessors so
 // each rule states *what* it reads — a file's text, a directory's entry

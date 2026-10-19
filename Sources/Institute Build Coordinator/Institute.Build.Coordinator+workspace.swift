@@ -1,5 +1,5 @@
-public import Institute_Model
 private import File_System
+public import Institute_Model
 internal import Process
 
 extension Institute.Build.Coordinator {

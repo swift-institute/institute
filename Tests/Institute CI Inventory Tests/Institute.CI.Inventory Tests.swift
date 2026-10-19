@@ -1,7 +1,7 @@
-public import Institute_Model
+import GitHub_Standard
 import Institute_CI_Model
 import Institute_CI_Workflow
-import GitHub_Standard
+public import Institute_Model
 import Testing
 
 @testable import Institute_CI_Inventory

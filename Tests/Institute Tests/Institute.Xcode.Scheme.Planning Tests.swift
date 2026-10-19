@@ -97,22 +97,25 @@ extension Institute.Xcode.Scheme.Test.Unit {
             name: "fast",
             targets: [("Fast", false), ("Fast Tests", true)]
         )
-        let specification = Institute.Workspace.Specification(dependency: .remoteAllowed, members: [
-            .init(location: "group:../institute", role: .control(.institute)),
-            .init(location: "group:.", role: .control(.application)),
-            .init(
-                location: "group:../slow",
-                role: .subject(
-                    try #require(Institute.Repository.Key(identity: "swift-atoms/slow"))
-                )
-            ),
-            .init(
-                location: "group:../fast",
-                role: .subject(
-                    try #require(Institute.Repository.Key(identity: "swift-atoms/fast"))
-                )
-            ),
-        ])
+        let specification = Institute.Workspace.Specification(
+            dependency: .remoteAllowed,
+            members: [
+                .init(location: "group:../institute", role: .control(.institute)),
+                .init(location: "group:.", role: .control(.application)),
+                .init(
+                    location: "group:../slow",
+                    role: .subject(
+                        try #require(Institute.Repository.Key(identity: "swift-atoms/slow"))
+                    )
+                ),
+                .init(
+                    location: "group:../fast",
+                    role: .subject(
+                        try #require(Institute.Repository.Key(identity: "swift-atoms/fast"))
+                    )
+                ),
+            ]
+        )
         let root = try Institute.Root(checkout: File.Directory(validating: application))
 
         let plan = try await Institute.Xcode.Scheme.plan(
@@ -125,7 +128,8 @@ extension Institute.Xcode.Scheme.Test.Unit {
         #expect(Array(plan.buildables.prefix(21)).allSatisfy { $0.reference == "../institute" })
         #expect(Array(plan.buildables.dropFirst(21).prefix(27)).allSatisfy { $0.reference == "." })
         #expect(
-            Array(plan.buildables.dropFirst(48).prefix(6)).allSatisfy { $0.reference == "../slow" })
+            Array(plan.buildables.dropFirst(48).prefix(6)).allSatisfy { $0.reference == "../slow" }
+        )
         #expect(plan.buildables.last?.reference == "../fast")
         #expect(
             plan.testables.map(\.target) == [
@@ -145,7 +149,8 @@ extension Institute.Xcode.Scheme.Test.Unit {
                 "Institute Architecture Tests",
                 "Slow Tests",
                 "Fast Tests",
-            ])
+            ]
+        )
     }
 
     @Test
@@ -165,14 +170,17 @@ extension Institute.Xcode.Scheme.Test.Unit {
         try Self.package(at: hung, name: "hung", targets: [("Hung", false)])
         try MainFixtureFiles.write(bytes: Array(script.utf8), to: executable)
         try MainFixtureFiles.setPermissions(executable, posix: 0o755)
-        let specification = Institute.Workspace.Specification(dependency: .remoteAllowed, members: [
-            .init(
-                location: "group:../hung",
-                role: .subject(
-                    try #require(Institute.Repository.Key(identity: "swift-atoms/hung"))
+        let specification = Institute.Workspace.Specification(
+            dependency: .remoteAllowed,
+            members: [
+                .init(
+                    location: "group:../hung",
+                    role: .subject(
+                        try #require(Institute.Repository.Key(identity: "swift-atoms/hung"))
+                    )
                 )
-            )
-        ])
+            ]
+        )
         let root = try Institute.Root(checkout: File.Directory(validating: application))
 
         do throws(Institute.Error) {

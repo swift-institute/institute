@@ -1,8 +1,9 @@
-import struct Swift.String
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
 public import Institute_CI_Workflow
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// The repository a rule is asked about: its reporting name and its
@@ -55,12 +56,13 @@ extension Institute.CI.Validation {
         /// Python implementation that sorted the same way.
         public func workflowPaths() throws(EnvironmentDefect) -> [String] {
             let directory = path(".github/workflows")
-                        guard Institute.CI.Validation.isDirectory(directory)
+            guard Institute.CI.Validation.isDirectory(directory)
             else { return [] }
             guard let names = Institute.CI.Validation.names(at: directory) else {
                 throw EnvironmentDefect.unreadableFile(path: directory)
             }
-            return names
+            return
+                names
                 .filter { $0.hasSuffix(".yml") || $0.hasSuffix(".yaml") }
                 .map { "\(directory)/\($0)" }
                 .sorted()
@@ -87,12 +89,18 @@ extension Institute.CI.Validation {
                 do {
                     documents.append(
                         try Institute.CI.Workflow.Document(
-                            name: name, text: text))
+                            name: name,
+                            text: text
+                        )
+                    )
                 } catch {
                     refusals.append(
                         Finding(
-                            repository: repository, rule: rule,
-                            message: "\(name): YAML parse failed: \(error.message)"))
+                            repository: repository,
+                            rule: rule,
+                            message: "\(name): YAML parse failed: \(error.message)"
+                        )
+                    )
                 }
             }
             return (documents, refusals)

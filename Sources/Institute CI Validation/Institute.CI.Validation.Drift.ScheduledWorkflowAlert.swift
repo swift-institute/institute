@@ -1,8 +1,9 @@
-import struct Swift.String
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
 public import Institute_CI_Workflow
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation.Drift {
     /// `[SCHEDULED-WORKFLOW-ALERT-DRIFT]` — the alert workflow's watch
@@ -47,7 +48,7 @@ extension Institute.CI.Validation.Drift {
             in subject: Institute.CI.Validation.Subject
         ) throws(Institute.CI.Validation.EnvironmentDefect) -> [Finding] {
             let directory = subject.path(Self.workflowsDirectory)
-                        guard Institute.CI.Validation.isDirectory(directory)
+            guard Institute.CI.Validation.isDirectory(directory)
             else { throw .missingSupportFile(path: directory) }
             guard let alertText = try subject.text(at: Self.alertPath) else {
                 throw .missingSupportFile(path: subject.path(Self.alertPath))
@@ -79,8 +80,10 @@ extension Institute.CI.Validation.Drift {
 
             return Self.drift(scheduled: scheduled, watched: watched).map { gap in
                 Finding(
-                    repository: subject.repository, rule: rules[0],
-                    message: "\(gap.surface.rawValue): \(gap.message)")
+                    repository: subject.repository,
+                    rule: rules[0],
+                    message: "\(gap.surface.rawValue): \(gap.message)"
+                )
             }
         }
 
@@ -96,19 +99,25 @@ extension Institute.CI.Validation.Drift {
             for name in scheduled.keys.sorted() where !watched.contains(name) {
                 gaps.append(
                     Gap(
-                        name: name, surface: .missing,
+                        name: name,
+                        surface: .missing,
                         message: "'\(scheduled[name] ?? "")' has a schedule: trigger (workflow "
                             + "name '\(name)') but is absent from "
                             + "alert-scheduled-workflow-failure.yml's on.workflow_run.workflows "
-                            + "list"))
+                            + "list"
+                    )
+                )
             }
             for name in watched.sorted() where scheduled[name] == nil {
                 gaps.append(
                     Gap(
-                        name: name, surface: .stale,
+                        name: name,
+                        surface: .stale,
                         message: "'\(name)' is listed in alert-scheduled-workflow-failure.yml's "
                             + "on.workflow_run.workflows list but no workflow in the workflows "
-                            + "directory currently has a schedule: trigger with that name"))
+                            + "directory currently has a schedule: trigger with that name"
+                    )
+                )
             }
             return gaps
         }
@@ -121,15 +130,18 @@ extension Institute.CI.Validation.Drift {
         ) throws(Institute.CI.Validation.EnvironmentDefect) -> Set<String> {
             guard let mapping = alert.mapping, let triggers = triggers(of: mapping) else {
                 throw .missingSupportFile(
-                    path: "alert workflow's on: block has no workflow_run: mapping")
+                    path: "alert workflow's on: block has no workflow_run: mapping"
+                )
             }
             guard let run = triggers["workflow_run"]?.mapping else {
                 throw .missingSupportFile(
-                    path: "alert workflow's on: block has no workflow_run: mapping")
+                    path: "alert workflow's on: block has no workflow_run: mapping"
+                )
             }
             guard let workflows = run["workflows"]?.sequence else {
                 throw .missingSupportFile(
-                    path: "alert workflow's on.workflow_run has no workflows: list")
+                    path: "alert workflow's on.workflow_run has no workflows: list"
+                )
             }
             return Set(workflows.compactMap(\.text))
         }
@@ -151,7 +163,8 @@ extension Institute.CI.Validation.Drift {
         /// because a checker that skipped what it could not read would
         /// under-report the scheduled set and call the watch list clean.
         static func parse(
-            _ text: String, at path: String
+            _ text: String,
+            at path: String
         ) throws(Institute.CI.Validation.EnvironmentDefect) -> Institute.CI.Workflow.YAML.Node {
             do throws(Institute.CI.Workflow.YAML.Error) {
                 return try Institute.CI.Workflow.YAML.Parser.parse(text)

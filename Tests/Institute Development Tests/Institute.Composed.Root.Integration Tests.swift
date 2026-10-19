@@ -1,5 +1,5 @@
-import Institute_Build_Coordinator
 import File_System
+import Institute_Build_Coordinator
 import Package_Manager
 import SPM_Standard
 import Testing
@@ -194,7 +194,9 @@ extension Institute.Composed.Root.Integration {
         let root = DevelopmentFixtureFiles.join(base, "root/swift-atoms")
         try DevelopmentFixtureFiles.createDirectory(checkout)
         try DevelopmentFixtureFiles.createDirectory(root)
-        try DevelopmentFixtureFiles.copy(DevelopmentFixtureFiles.join(Self.fixtures, "IdentityDivergence/swift-divergent-primitives"), to: DevelopmentFixtureFiles.join(root, "swift-divergent-primitives")
+        try DevelopmentFixtureFiles.copy(
+            DevelopmentFixtureFiles.join(Self.fixtures, "IdentityDivergence/swift-divergent-primitives"),
+            to: DevelopmentFixtureFiles.join(root, "swift-divergent-primitives")
         )
 
         let checkoutDirectory = try File.Directory(validating: checkout)
@@ -242,15 +244,23 @@ extension Institute.Composed.Root.Integration {
         let two = DevelopmentFixtureFiles.join(base, "beta/elsewhere")
         try DevelopmentFixtureFiles.createDirectory(one)
         try DevelopmentFixtureFiles.createDirectory(two)
-        try DevelopmentFixtureFiles.copy(DevelopmentFixtureFiles.join(Self.fixtures, "MixedRoots/root-one/B"), to: DevelopmentFixtureFiles.join(one, "B")
+        try DevelopmentFixtureFiles.copy(
+            DevelopmentFixtureFiles.join(Self.fixtures, "MixedRoots/root-one/B"),
+            to: DevelopmentFixtureFiles.join(one, "B")
         )
-        try DevelopmentFixtureFiles.copy(DevelopmentFixtureFiles.join(Self.fixtures, "MixedRoots/root-two/D"), to: DevelopmentFixtureFiles.join(two, "D")
+        try DevelopmentFixtureFiles.copy(
+            DevelopmentFixtureFiles.join(Self.fixtures, "MixedRoots/root-two/D"),
+            to: DevelopmentFixtureFiles.join(two, "D")
         )
         let consumer = DevelopmentFixtureFiles.join(base, "consumer/E")
         try DevelopmentFixtureFiles.createDirectory(consumer)
-        try DevelopmentFixtureFiles.copy(DevelopmentFixtureFiles.join(Self.fixtures, "MixedRoots/E/Sources"), to: DevelopmentFixtureFiles.join(consumer, "Sources")
+        try DevelopmentFixtureFiles.copy(
+            DevelopmentFixtureFiles.join(Self.fixtures, "MixedRoots/E/Sources"),
+            to: DevelopmentFixtureFiles.join(consumer, "Sources")
         )
-        try DevelopmentFixtureFiles.copy(DevelopmentFixtureFiles.join(Self.fixtures, "MixedRoots/E/Package.template.swift"), to: DevelopmentFixtureFiles.join(consumer, "Package.template.swift")
+        try DevelopmentFixtureFiles.copy(
+            DevelopmentFixtureFiles.join(Self.fixtures, "MixedRoots/E/Package.template.swift"),
+            to: DevelopmentFixtureFiles.join(consumer, "Package.template.swift")
         )
         try Self.instantiate(
             DevelopmentFixtureFiles.join(consumer, "Package.template.swift"),
@@ -341,7 +351,9 @@ extension Institute.Composed.Root.Integration {
         let outside = DevelopmentFixtureFiles.join(base, "outside/swift-escapee")
         try DevelopmentFixtureFiles.createDirectory(root)
         try DevelopmentFixtureFiles.createDirectory(outside)
-        try DevelopmentFixtureFiles.createSymbolicLink(DevelopmentFixtureFiles.join(root, "swift-atoms"), to: DevelopmentFixtureFiles.join(base, "outside")
+        try DevelopmentFixtureFiles.createSymbolicLink(
+            DevelopmentFixtureFiles.join(root, "swift-atoms"),
+            to: DevelopmentFixtureFiles.join(base, "outside")
         )
 
         #expect(throws: Institute.Error.self) {

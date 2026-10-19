@@ -1,7 +1,7 @@
-public import Institute_Model
+import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_CI_Workflow
-import GitHub_Standard
+public import Institute_Model
 
 extension Institute.CI.Inventory {
     /// The universal reusable workflow (`.github/workflows/swift-ci.yml`),
@@ -204,7 +204,7 @@ extension Institute.CI.Inventory {
             // resolves it the other way, which is why it compiled on a
             // developer machine and failed on the runner (canary
             // 31165009465).
-            let depth = 1 + declared.map { Self.wave(of: $0, needs: needs, cache: &cache) }.max()!
+            let depth = 1 + (declared.map { Self.wave(of: $0, needs: needs, cache: &cache) }.max() ?? 0)
             cache[id] = depth
             return depth
         }

@@ -1,5 +1,5 @@
-public import Institute_Model
 public import Institute_CI_Model
+public import Institute_Model
 
 extension Institute.CI.Inventory {
     /// What one job of the universal workflow contributes to the verdict.

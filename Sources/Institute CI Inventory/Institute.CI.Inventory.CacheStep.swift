@@ -1,7 +1,7 @@
-public import Institute_Model
+import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_CI_Workflow
-import GitHub_Standard
+public import Institute_Model
 
 extension Institute.CI.Inventory {
     /// One `actions/cache` step, and what it caches.

@@ -1,5 +1,5 @@
-public import Institute_Model
 public import Institute_CI_Model
+public import Institute_Model
 
 extension Institute.CI.Canon {
     /// A complete generated repository `.gitignore` policy.

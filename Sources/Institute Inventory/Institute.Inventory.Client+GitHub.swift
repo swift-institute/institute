@@ -5,13 +5,15 @@ internal import JSON
 
 extension Institute.Inventory {
     public static func client(
-        _ execute: @escaping @Sendable ([Swift.String]) async throws(Transport.Error)
+        _ execute:
+            @escaping @Sendable ([Swift.String]) async throws(Transport.Error)
             -> Transport.Response = Transport.githubCLI
     ) -> Client<Transport.Error> {
         .init(
-            repositories: .init { request async throws(Either<
-                Async.Lifecycle.Error, GitHub.Organization.Repositories.Page.Error
-            >) in
+            repositories: .init {
+                request async throws(Either<
+                    Async.Lifecycle.Error, GitHub.Organization.Repositories.Page.Error
+                >) in
                 let response: Transport.Response
                 do {
                     response = try await execute([

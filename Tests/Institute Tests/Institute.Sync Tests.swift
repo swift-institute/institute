@@ -262,22 +262,24 @@ extension Institute.Sync.Test.Unit {
 
         let plan = try await Institute.Xcode.Scheme.plan(for: specification, at: sync.root)
 
-        #expect(plan.testables.map(\.target) == [
-            "Institute CI Canon Tests",
-            "Institute CI Inventory Tests",
-            "Institute CI Model Tests",
-            "Institute CI Validation Tests",
-            "Institute CI Workflow Tests",
-            "Institute Development Tests",
-            "Institute Instruments Tests",
-            "Institute Source Policy Tests",
-            "Institute Tests",
-            "Institute CI Application Tests",
-            "Institute Repository Application Tests",
-            "Institute Source Application Tests",
-            "Institute Application Tests",
-            "Institute Architecture Tests",
-            "Source Tests",
-        ])
+        #expect(
+            plan.testables.map(\.target) == [
+                "Institute CI Canon Tests",
+                "Institute CI Inventory Tests",
+                "Institute CI Model Tests",
+                "Institute CI Validation Tests",
+                "Institute CI Workflow Tests",
+                "Institute Development Tests",
+                "Institute Instruments Tests",
+                "Institute Source Policy Tests",
+                "Institute Tests",
+                "Institute CI Application Tests",
+                "Institute Repository Application Tests",
+                "Institute Source Application Tests",
+                "Institute Application Tests",
+                "Institute Architecture Tests",
+                "Source Tests",
+            ]
+        )
     }
 }

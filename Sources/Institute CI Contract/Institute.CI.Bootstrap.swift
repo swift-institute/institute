@@ -1,5 +1,5 @@
-public import Institute_Model
 public import Institute_CI_Model
+public import Institute_Model
 
 extension Institute.CI {
     /// Bootstrap identity and cache-entry provenance for the exact-main

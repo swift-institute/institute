@@ -1,5 +1,5 @@
-public import Institute_Model
 public import Byte
+public import Institute_Model
 public import JSON
 
 extension Institute.Repository.Policy.Uniformity.Wave {

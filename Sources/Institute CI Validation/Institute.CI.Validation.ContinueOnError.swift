@@ -1,8 +1,9 @@
-import struct Swift.String
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
 public import Institute_CI_Workflow
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// `[CI-105]` — `continue-on-error: true` must not sit at job level on
@@ -43,8 +44,11 @@ extension Institute.CI.Validation {
                     guard Self.declaresTruthyContinueOnError(job) else { continue }
                     findings.append(
                         Finding(
-                            repository: subject.repository, rule: rule,
-                            message: Self.message(document: document.name, job: job.name)))
+                            repository: subject.repository,
+                            rule: rule,
+                            message: Self.message(document: document.name, job: job.name)
+                        )
+                    )
                 }
             }
             return findings

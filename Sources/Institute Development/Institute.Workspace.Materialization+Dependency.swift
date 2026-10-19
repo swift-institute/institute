@@ -21,12 +21,14 @@ extension Institute.Workspace.Materialization {
             }
         }
 
-        let selected = Set(specification.members.map { member in
-            switch member.role {
-            case .subject(let repository): repository
-            case .control(let control): control.repository
+        let selected = Set(
+            specification.members.map { member in
+                switch member.role {
+                case .subject(let repository): repository
+                case .control(let control): control.repository
+                }
             }
-        })
+        )
         var missing = Set<Institute.Repository.Key>()
         for entry in catalog.entries {
             for dependency in entry.dependencies {

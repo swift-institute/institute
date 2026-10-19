@@ -426,8 +426,7 @@ extension Institute.Doctor.Test.Integration {
     }
 
     @Test
-    func `institute access measures inventory currency as ok when discovery matches`() async throws
-    {
+    func `institute access measures inventory currency as ok when discovery matches`() async throws {
         let fixture = try Institute.Doctor.Fixture(repositories: [
             .init(
                 name: "swift-example",
@@ -645,8 +644,7 @@ extension Institute.Doctor.Test.Integration {
     }
 
     @Test
-    func `a concurrent gather measures every selected repository, in selection order`() async throws
-    {
+    func `a concurrent gather measures every selected repository, in selection order`() async throws {
         // More repositories than any plausible fan-out bound, so the gather
         // genuinely queues and completes out of order while the population
         // it produces must not.

@@ -124,8 +124,12 @@ extension Institute.Doctor {
         let matched = Set(committedByCoordinate.keys).intersection(discoveredByCoordinate.keys)
 
         var population: [Currency] = matched.map { coordinate in
-            let committed = committedByCoordinate[coordinate]!
-            let discovered = discoveredByCoordinate[coordinate]!
+            guard
+                let committed = committedByCoordinate[coordinate],
+                let discovered = discoveredByCoordinate[coordinate]
+            else {
+                preconditionFailure("a matched coordinate is both committed and discovered")
+            }
             guard committed.layer == discovered.layer else {
                 return .init(
                     name: coordinate.name,

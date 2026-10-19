@@ -1,7 +1,8 @@
-import struct Swift.String
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// `[CI-004b]` — a per-authority sub-org `.github` repository must not
@@ -48,8 +49,10 @@ extension Institute.CI.Validation {
             }
             return [
                 Finding(
-                    repository: subject.repository, rule: rules[0],
-                    message: Self.message(organization: organization))
+                    repository: subject.repository,
+                    rule: rules[0],
+                    message: Self.message(organization: organization)
+                )
             ]
         }
 
@@ -74,7 +77,8 @@ extension Institute.CI.Validation {
         }
 
         static func message(organization: String) -> String {
-            let parent = foundationsSubOrganizations.contains(organization)
+            let parent =
+                foundationsSubOrganizations.contains(organization)
                 ? "swift-foundations" : "swift-standards"
             return """
                 .github/workflows/swift-ci.yml EXISTS at sub-org \

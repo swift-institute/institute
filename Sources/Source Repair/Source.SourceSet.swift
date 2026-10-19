@@ -1,3 +1,3 @@
 extension Source {
-  public enum SourceSet {}
+    public enum SourceSet {}
 }

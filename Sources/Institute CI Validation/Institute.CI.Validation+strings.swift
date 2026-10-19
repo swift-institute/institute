@@ -1,6 +1,7 @@
-import struct Swift.String
-public import Institute_Model
 public import Institute_CI_Model
+public import Institute_Model
+
+import struct Swift.String
 
 // Pure-Swift spellings of the string operations the validation rules
 // use, so the rules read as the predicates they publish and the target

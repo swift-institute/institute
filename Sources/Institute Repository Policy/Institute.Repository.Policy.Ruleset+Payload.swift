@@ -1,5 +1,5 @@
-public import Institute_Model
 public import Byte
+public import Institute_Model
 public import JSON
 
 // The Institute protected-main branch ruleset contracts, converged by

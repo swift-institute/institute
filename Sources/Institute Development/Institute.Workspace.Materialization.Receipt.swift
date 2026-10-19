@@ -46,7 +46,9 @@ extension Institute.Workspace.Materialization {
             let testables = try Testables(json: json["testables"])
             guard try Swift.String(json: json["testablesDigest"]) == testables.digest else {
                 throw .typeMismatch(
-                    expected: "exact materialization testables digest", got: "other")
+                    expected: "exact materialization testables digest",
+                    got: "other"
+                )
             }
             return try .init(
                 input: input,

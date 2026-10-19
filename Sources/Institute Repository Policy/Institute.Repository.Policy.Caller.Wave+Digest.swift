@@ -1,6 +1,6 @@
-public import Institute_Model
 public import Byte
 import FIPS_180_4
+public import Institute_Model
 public import JSON
 
 extension Institute.Repository.Policy.Caller.Wave {

@@ -1,6 +1,6 @@
-public import Institute_Model
 import ASCII
 public import Institute_CI_Model
+public import Institute_Model
 
 extension Institute.CI.Canon.Gitignore {
     /// The propagation half of the gitignore pair — the Swift owner of

@@ -233,10 +233,12 @@ extension Institute.Xcode.Scheme {
                 switch target.kind {
                 case .regular, .executable:
                     buildables.append(
-                        .init(reference: entry.reference, target: target.name.underlying))
+                        .init(reference: entry.reference, target: target.name.underlying)
+                    )
                 case .test:
                     testables.append(
-                        .init(reference: entry.reference, target: target.name.underlying))
+                        .init(reference: entry.reference, target: target.name.underlying)
+                    )
                 case .plugin, .binary, .system, .macro:
                     continue
                 }
@@ -255,7 +257,8 @@ extension Institute.Xcode.Scheme {
         let specified = Set(
             specification.members.compactMap {
                 Xcode_Workspace.Xcode.Workspace.Location(rawValue: $0.location)?.path
-            })
+            }
+        )
         let containers = Set(plan.buildables.map(\.reference) + plan.testables.map(\.reference))
         guard specified == containers else {
             let absent = specified.subtracting(containers).sorted().joined(separator: ", ")
@@ -286,14 +289,16 @@ extension Institute.Xcode.Scheme {
                     case .regular, .executable: target.name.underlying
                     case .test, .plugin, .binary, .system, .macro: nil
                     }
-                })
+                }
+            )
             let actualTestables = Set(
                 entry.targets.compactMap { target -> Swift.String? in
                     switch target.kind {
                     case .test: target.name.underlying
                     case .regular, .executable, .plugin, .binary, .system, .macro: nil
                     }
-                })
+                }
+            )
             let expected = exactTargets(for: control)
             guard actualBuildables == expected.buildables,
                 actualTestables == expected.testables

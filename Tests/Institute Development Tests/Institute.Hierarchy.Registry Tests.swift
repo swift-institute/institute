@@ -76,8 +76,7 @@ extension Institute.Hierarchy.Registry.Test.Integration {
     }
 
     @Test
-    func `a saved registry round-trips, written pretty and sorted with a trailing newline`() throws
-    {
+    func `a saved registry round-trips, written pretty and sorted with a trailing newline`() throws {
         let checkout = try Self.temporaryCheckout()
         defer { try? DevelopmentFixtureFiles.remove(checkout.path.description) }
 

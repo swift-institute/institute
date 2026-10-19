@@ -1,6 +1,6 @@
-public import Institute_Build_Coordinator
 public import File_System
 public import Git_Foundation
+public import Institute_Build_Coordinator
 public import Institute_Development
 public import Institute_Doctor
 public import Institute_Inventory

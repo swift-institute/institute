@@ -471,28 +471,16 @@ func `Different local source linter bytes change tool and profile identity`() th
     let policy = Institute.Source.Policy.current
     let rules = Institute.Source.Profile(policy: policy).rules(for: .institute)
     let firstProfile = policy.profile(
-        swiftFormatExecutable: "/tools/swift-format",
-        swiftFormatTool: .init("format"),
-        swiftFormatConfigurationPath: "/profile/.swift-format",
-        swiftLintExecutable: "/tools/swiftlint",
-        swiftLintTool: .init("swiftlint"),
-        swiftLintConfigurationPath: "/profile/.swiftlint.yml",
-        linterExecutable: firstSnapshot.file.description,
-        linterTool: firstSnapshot.digest,
-        linterConfigurationPath: "/profile/institute-source-linter-profile.json",
+        swiftFormat: (executable: "/tools/swift-format", tool: .init("format"), configurationPath: "/profile/.swift-format"),
+        swiftLint: (executable: "/tools/swiftlint", tool: .init("swiftlint"), configurationPath: "/profile/.swiftlint.yml"),
+        linter: (executable: firstSnapshot.file.description, tool: firstSnapshot.digest, configurationPath: "/profile/institute-source-linter-profile.json"),
         bundle: .institute,
         linterRules: rules
     )
     let secondProfile = policy.profile(
-        swiftFormatExecutable: "/tools/swift-format",
-        swiftFormatTool: .init("format"),
-        swiftFormatConfigurationPath: "/profile/.swift-format",
-        swiftLintExecutable: "/tools/swiftlint",
-        swiftLintTool: .init("swiftlint"),
-        swiftLintConfigurationPath: "/profile/.swiftlint.yml",
-        linterExecutable: secondSnapshot.file.description,
-        linterTool: secondSnapshot.digest,
-        linterConfigurationPath: "/profile/institute-source-linter-profile.json",
+        swiftFormat: (executable: "/tools/swift-format", tool: .init("format"), configurationPath: "/profile/.swift-format"),
+        swiftLint: (executable: "/tools/swiftlint", tool: .init("swiftlint"), configurationPath: "/profile/.swiftlint.yml"),
+        linter: (executable: secondSnapshot.file.description, tool: secondSnapshot.digest, configurationPath: "/profile/institute-source-linter-profile.json"),
         bundle: .institute,
         linterRules: rules
     )

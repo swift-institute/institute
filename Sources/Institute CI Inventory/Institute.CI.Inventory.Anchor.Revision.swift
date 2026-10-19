@@ -1,7 +1,7 @@
-public import Institute_Model
+import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_CI_Workflow
-import GitHub_Standard
+public import Institute_Model
 
 extension Institute.CI.Inventory.Anchor {
     /// One git object name, in its canonical 40-hex spelling.

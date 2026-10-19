@@ -1,6 +1,7 @@
-import struct Swift.String
 public import Institute_CI_Model
 public import Institute_Model
+
+import struct Swift.String
 
 // Nest.Name namespace shell.
 //

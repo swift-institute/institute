@@ -1,8 +1,9 @@
-import struct Swift.String
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
 public import Institute_CI_Workflow
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation.Drift {
     /// `[LINT-VALIDATORS-WEEKLY-DRIFT]` — every `scan-*` job in
@@ -65,12 +66,15 @@ extension Institute.CI.Validation.Drift {
                 document = try Institute.CI.Workflow.YAML.Parser.parse(text)
             } catch {
                 throw .missingSupportFile(
-                    path: "\(subject.path(Self.workflowPath)) (YAML parse failed: \(error.message))")
+                    path: "\(subject.path(Self.workflowPath)) (YAML parse failed: \(error.message))"
+                )
             }
             return try Self.gaps(in: document).map { gap in
                 Finding(
-                    repository: subject.repository, rule: rules[0],
-                    message: "\(gap.surface.rawValue): \(gap.message)")
+                    repository: subject.repository,
+                    rule: rules[0],
+                    message: "\(gap.surface.rawValue): \(gap.message)"
+                )
             }
         }
 
@@ -101,7 +105,8 @@ extension Institute.CI.Validation.Drift {
                     .first(where: { $0["name"]?.text == buildStep })?.mapping
             else {
                 throw .missingSupportFile(
-                    path: "no step named '\(buildStep)' in the '\(reportJob)' job")
+                    path: "no step named '\(buildStep)' in the '\(reportJob)' job"
+                )
             }
             let environment = step["env"]?.mapping
             let script = step["run"]?.text ?? ""
@@ -115,48 +120,69 @@ extension Institute.CI.Validation.Drift {
                 if !needs.contains(job) {
                     gaps.append(
                         Gap(
-                            job: job, surface: .needs,
-                            message: "'\(job)' is missing from the report job's needs: list"))
+                            job: job,
+                            surface: .needs,
+                            message: "'\(job)' is missing from the report job's needs: list"
+                        )
+                    )
                 }
                 if !condition.contains("needs.\(job).result") {
                     gaps.append(
                         Gap(
-                            job: job, surface: .condition,
+                            job: job,
+                            surface: .condition,
                             message: "the report job's if: condition does not reference "
-                                + "needs.\(job).result"))
+                                + "needs.\(job).result"
+                        )
+                    )
                 }
                 let declared = environment?[result]
                 if declared == nil {
                     gaps.append(
                         Gap(
-                            job: job, surface: .environment,
-                            message: "'\(buildStep)' env: block is missing \(result)"))
+                            job: job,
+                            surface: .environment,
+                            message: "'\(buildStep)' env: block is missing \(result)"
+                        )
+                    )
                 } else if !(declared?.text ?? "").contains("needs.\(job).result") {
                     gaps.append(
                         Gap(
-                            job: job, surface: .environment,
+                            job: job,
+                            surface: .environment,
                             message: "\(result) does not reference needs.\(job).result (found: "
-                                + "\(Institute.CI.Validation.Retired.value(declared ?? .null)))"))
+                                + "\(Institute.CI.Validation.Retired.value(declared ?? .null)))"
+                        )
+                    )
                 }
                 let pair = "\"\(slug):$\(result)\""
                 if !script.contains(pair) {
                     gaps.append(
                         Gap(
-                            job: job, surface: .pairList,
-                            message: "the aggregation pair list is missing \(pair)"))
+                            job: job,
+                            surface: .pairList,
+                            message: "the aggregation pair list is missing \(pair)"
+                        )
+                    )
                 }
                 let heading = "### validate-\(slug)"
                 if !heredoc.contains(heading) {
                     gaps.append(
                         Gap(
-                            job: job, surface: .section,
-                            message: "the issue-body heredoc is missing a '\(heading)' section"))
+                            job: job,
+                            surface: .section,
+                            message: "the issue-body heredoc is missing a '\(heading)' section"
+                        )
+                    )
                 } else if !heredoc.contains(result) {
                     gaps.append(
                         Gap(
-                            job: job, surface: .section,
+                            job: job,
+                            surface: .section,
                             message: "the issue-body heredoc's '\(heading)' section does not "
-                                + "reference \(result)"))
+                                + "reference \(result)"
+                        )
+                    )
                 }
             }
             return gaps

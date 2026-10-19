@@ -13,12 +13,10 @@ extension Institute.Source.Workspace.Cohort {
     ) throws(Institute.Error) -> Self {
         let specification = try Self.specification(from: workspace)
         let document: Xcode.Workspace
-        do throws(Xcode.Workspace.Error) { document = try .read(from: workspace) }
-        catch { throw .configuration("cannot read source workspace \(workspace): \(error)") }
+        do throws(Xcode.Workspace.Error) { document = try .read(from: workspace) } catch { throw .configuration("cannot read source workspace \(workspace): \(error)") }
 
         let bundle: File.Path
-        do throws(File.Path.Error) { bundle = try .init(workspace) }
-        catch { throw .configuration("invalid source workspace path \(workspace)") }
+        do throws(File.Path.Error) { bundle = try .init(workspace) } catch { throw .configuration("invalid source workspace path \(workspace)") }
         guard let container = File.Directory(bundle).parent else {
             throw .configuration("source workspace has no containing directory")
         }
@@ -142,8 +140,7 @@ extension Institute.Source.Workspace.Cohort {
         from workspace: Swift.String
     ) throws(Institute.Error) -> Institute.Workspace.Specification {
         let bundle: File.Path
-        do throws(File.Path.Error) { bundle = try .init(workspace) }
-        catch { throw .configuration("invalid source workspace path \(workspace)") }
+        do throws(File.Path.Error) { bundle = try .init(workspace) } catch { throw .configuration("invalid source workspace path \(workspace)") }
         let file = File.Directory(bundle)[directory: "xcshareddata"][
             file: "Institute.workspace.json"
         ]

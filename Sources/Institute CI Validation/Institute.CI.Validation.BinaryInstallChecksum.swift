@@ -1,9 +1,10 @@
-import struct Swift.String
-import Standard_Library_Extensions
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
 public import Institute_CI_Workflow
+public import Institute_Model
+import Standard_Library_Extensions
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// `[CI-082]` — a curl-fetched binary must be verified with
@@ -290,12 +291,12 @@ extension Institute.CI.Validation {
                 // pattern's own quirk and is kept rather than quietly
                 // widened.
                 if rest.hasPrefix("true") {
-                    let after = rest.dropFirst(4)
-                    return after.isEmpty || !Self.isWordCharacter(after.first!)
+                    guard let next = rest.dropFirst(4).first else { return true }
+                    return !Self.isWordCharacter(next)
                 }
                 if rest.hasPrefix(":") {
-                    let after = rest.dropFirst()
-                    return !after.isEmpty && Self.isWordCharacter(after.first!)
+                    guard let next = rest.dropFirst().first else { return false }
+                    return Self.isWordCharacter(next)
                 }
                 return false
             }
@@ -373,8 +374,8 @@ extension Institute.CI.Validation {
             guard let first = text.first, first.isWhitespace else { return false }
             let rest = text.drop(while: \.isWhitespace)
             guard rest.hasPrefix(token) else { return false }
-            let after = rest.dropFirst(token.count)
-            return after.isEmpty || !Self.isWordCharacter(after.first!)
+            guard let next = rest.dropFirst(token.count).first else { return true }
+            return !Self.isWordCharacter(next)
         }
 
         /// The tokens in order, each pair separated by at least one run
@@ -386,7 +387,8 @@ extension Institute.CI.Validation {
                 rest = rest[found.upperBound...]
                 let isLast = offset == tokens.count - 1
                 if isLast {
-                    return rest.isEmpty || !Self.isWordCharacter(rest.first!)
+                    guard let next = rest.first else { return true }
+                    return !Self.isWordCharacter(next)
                 }
                 guard let first = rest.first, first.isWhitespace else { return false }
                 rest = rest.drop(while: \.isWhitespace)

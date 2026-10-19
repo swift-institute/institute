@@ -125,7 +125,10 @@ extension Institute.Navigation {
                 defer { unsafe pointers.removeLast() }
                 return try unsafe pointers.withUnsafeBufferPointer {
                     buffer throws(Failure) -> Result in
-                    try unsafe body(buffer.baseAddress!)
+                    guard let base = unsafe buffer.baseAddress else {
+                        preconditionFailure("the argument vector holds at least its terminating nil")
+                    }
+                    return try unsafe body(base)
                 }
             }
             return try unsafe values[index].withCString { pointer throws(Failure) -> Result in

@@ -1,8 +1,9 @@
-import struct Swift.String
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
 public import Institute_CI_Workflow
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// Rendering that exists only because the retired Python corpus
@@ -31,7 +32,8 @@ extension Institute.CI.Validation {
         /// form when the value contains a single quote but no double
         /// quote.
         public static func quoted(_ value: String) -> String {
-            let escaped = value
+            let escaped =
+                value
                 .replacing("\\", with: "\\\\")
                 .replacing("\n", with: "\\n")
                 .replacing("\t", with: "\\t")

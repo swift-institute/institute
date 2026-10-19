@@ -1,7 +1,8 @@
-import struct Swift.String
-public import Institute_Model
-public import Institute_CI_Model
 import GitHub_Standard
+public import Institute_CI_Model
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// `[CI-117]` — a self-referential composite-action `uses:` must be
@@ -138,7 +139,9 @@ extension Institute.CI.Validation {
                 .replacing("\r\n", with: "\n")
                 .replacing("\r", with: "\n")
             var lines = normalized.split(
-                separator: "\n", omittingEmptySubsequences: false)
+                separator: "\n",
+                omittingEmptySubsequences: false
+            )
             if lines.last?.isEmpty == true { lines.removeLast() }
             return lines
         }

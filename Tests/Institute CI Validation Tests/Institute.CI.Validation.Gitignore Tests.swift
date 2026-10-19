@@ -1,8 +1,8 @@
-public import Institute_Model
-import Institute_CI_Model
-import Institute_CI_Validation
 import GitHub_Standard
 import Institute_CI_Canon
+import Institute_CI_Model
+import Institute_CI_Validation
+public import Institute_Model
 import Testing
 
 @testable import Institute_CI_Validation

@@ -112,7 +112,8 @@ extension Institute.Xcode.Test.Unit {
         #expect(input.digest != changedSource.digest)
         #expect(
             try Institute.Workspace.Materialization.Receipt(
-                jsonString: first.jsonString(sortKeys: true))
+                jsonString: first.jsonString(sortKeys: true)
+            )
                 == first
         )
     }
@@ -176,24 +177,24 @@ extension Institute.Xcode.Test.Unit {
         let specification = Institute.Workspace.Specification(
             dependency: .localInstituteClosure,
             members: [
-            .init(location: "group:.", role: .control(.application)),
-            .init(location: "group:../institute", role: .control(.institute)),
-            .init(
-                location: "group:../institute-continuous-integration",
-                role: .control(.continuousIntegration)
-            ),
-            .init(
-                location: "group:../swift-compositions/swift-linter/Runner",
-                role: .control(.linter)
-            ),
-            .init(
-                location: "group:../swift-atoms/swift-example",
-                role: .subject(
-                    try #require(
-                        Institute.Repository.Key(identity: "swift-atoms/swift-example")
+                .init(location: "group:.", role: .control(.application)),
+                .init(location: "group:../institute", role: .control(.institute)),
+                .init(
+                    location: "group:../institute-continuous-integration",
+                    role: .control(.continuousIntegration)
+                ),
+                .init(
+                    location: "group:../swift-compositions/swift-linter/Runner",
+                    role: .control(.linter)
+                ),
+                .init(
+                    location: "group:../swift-atoms/swift-example",
+                    role: .subject(
+                        try #require(
+                            Institute.Repository.Key(identity: "swift-atoms/swift-example")
+                        )
                     )
-                )
-            ),
+                ),
             ]
         )
 
@@ -304,9 +305,12 @@ extension Institute.Xcode.Test.Unit {
     @Test
     func `render terminates the workspace artifact with one line feed`() throws {
         let rendered = try Institute.Xcode.render(
-            .init(dependency: .remoteAllowed, members: [
-                .init(location: "group:.", role: .control(.application))
-            ])
+            .init(
+                dependency: .remoteAllowed,
+                members: [
+                    .init(location: "group:.", role: .control(.application))
+                ]
+            )
         )
 
         #expect(Array(rendered.utf8).last == 0x0A)
@@ -375,7 +379,8 @@ extension Institute.Xcode.Test.Unit {
         #expect(
             generic.members.map(\.role).allSatisfy { role in
                 if case .subject = role { true } else { false }
-            })
+            }
+        )
         #expect(integration.members.first?.location == "group:../institute")
         #expect(integration.members.first?.role == .control(.institute))
         #expect(integration.members[1].location == "group:.")
@@ -570,26 +575,29 @@ extension Institute.Xcode.Test.Integration {
             layer: .atoms
         )
         let root = try Institute.Root(checkout: File.Directory(validating: application))
-        let specification = Institute.Workspace.Specification(dependency: .remoteAllowed, members: [
-            .init(location: "group:.", role: .control(.application)),
-            .init(location: "group:../institute", role: .control(.institute)),
-            .init(
-                location: "group:../institute-continuous-integration",
-                role: .control(.continuousIntegration)
-            ),
-            .init(
-                location: "group:../swift-compositions/swift-linter/Runner",
-                role: .control(.linter)
-            ),
-            .init(
-                location: "group:../swift-atoms/swift-example",
-                role: .subject(
-                    try #require(
-                        Institute.Repository.Key(identity: "swift-atoms/swift-example")
+        let specification = Institute.Workspace.Specification(
+            dependency: .remoteAllowed,
+            members: [
+                .init(location: "group:.", role: .control(.application)),
+                .init(location: "group:../institute", role: .control(.institute)),
+                .init(
+                    location: "group:../institute-continuous-integration",
+                    role: .control(.continuousIntegration)
+                ),
+                .init(
+                    location: "group:../swift-compositions/swift-linter/Runner",
+                    role: .control(.linter)
+                ),
+                .init(
+                    location: "group:../swift-atoms/swift-example",
+                    role: .subject(
+                        try #require(
+                            Institute.Repository.Key(identity: "swift-atoms/swift-example")
+                        )
                     )
-                )
-            ),
-        ])
+                ),
+            ]
+        )
         try Institute.Xcode.write(specification, at: root.checkout)
         let configuration = Institute.Configuration(
             version: 1,

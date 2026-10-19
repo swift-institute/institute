@@ -1,7 +1,7 @@
-public import Institute_Model
+import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_CI_Workflow
-import GitHub_Standard
+public import Institute_Model
 
 /// The vendor-neutral contract type, aliased at file scope so the
 /// reference cannot rebind to the `Institute.CI`

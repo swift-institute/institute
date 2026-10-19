@@ -1,6 +1,5 @@
 public import Institute_Model
 
-
 extension Institute.Repository.Policy.Uniformity.Wave {
     public static func preflight<C: Client>(
         client: C,

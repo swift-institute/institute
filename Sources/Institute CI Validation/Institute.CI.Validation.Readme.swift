@@ -1,9 +1,10 @@
-import struct Swift.String
-public import Institute_Model
+import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_CI_Workflow
+public import Institute_Model
 import Standard_Library_Extensions
-import GitHub_Standard
+
+import struct Swift.String
 
 extension Institute.CI.Validation {
     /// `[README-*]` — README files conform to the readme skill family
@@ -432,7 +433,7 @@ extension Institute.CI.Validation.Readme {
         _ subject: Institute.CI.Validation.Subject
     ) -> Bool {
         let sources = subject.path("Sources")
-                guard Institute.CI.Validation.isDirectory(sources)
+        guard Institute.CI.Validation.isDirectory(sources)
         else { return false }
         var declared: Set<String> = []
         var thrown: Set<String> = []

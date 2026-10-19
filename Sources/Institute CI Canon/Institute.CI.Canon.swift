@@ -1,5 +1,5 @@
-public import Institute_Model
 public import Institute_CI_Model
+public import Institute_Model
 
 // Nest.Name namespace shell (FT1-ratification.json;
 // naming-annex-nest-name.md). `Institute.CI.Canon` owns the *documents this control

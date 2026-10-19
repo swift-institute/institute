@@ -1,5 +1,5 @@
-public import Institute_Model
 public import Institute_CI_Model
+public import Institute_Model
 
 extension Institute.CI.Canon.Gitignore {
     /// Exact generated policy for a declared nested test or benchmark package.

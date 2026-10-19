@@ -144,8 +144,7 @@ extension Institute.Inventory.Effective {
     /// duplicated rather than shared, because sharing would mean this type
     /// depending on `Merge`'s annotation-preserving machinery for a plain
     /// sort it does not need.
-    fileprivate static func sorted(_ repositories: [Institute.Repository]) -> [Institute.Repository]
-    {
+    fileprivate static func sorted(_ repositories: [Institute.Repository]) -> [Institute.Repository] {
         repositories.sorted { lhs, rhs in
             if lhs.layer.order != rhs.layer.order {
                 return lhs.layer.order < rhs.layer.order

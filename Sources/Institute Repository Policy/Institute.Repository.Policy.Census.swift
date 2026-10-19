@@ -1,6 +1,5 @@
 public import Institute_Model
 
-
 extension Institute.Repository.Policy {
     /// The canonical non-Swift executable census (FT1-frozen sixteen-field
     /// schema, censusVersion 1). Owns serialization; scanning lives in
