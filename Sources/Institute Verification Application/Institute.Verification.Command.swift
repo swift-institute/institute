@@ -334,7 +334,7 @@ extension Institute.Verification.Command {
             )
             let receipt: Institute.Verification.Receipt
             do throws(Institute.Verification.Error) {
-                receipt = try run.run()
+                receipt = try await run.run()
             } catch {
                 throw .configuration("verification seal: \(error)")
             }

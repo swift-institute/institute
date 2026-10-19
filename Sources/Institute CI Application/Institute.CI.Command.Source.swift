@@ -175,7 +175,7 @@ extension Institute.CI.Command {
             }
             let code = (Policy(rawValue: exitPolicy) ?? .advisory).code(
                 status: Source_Report.Source.Report.Status(report, expected: report.commitment),
-                errors: Policy.errors(in: report)
+                errors: report.errors
             )
             print(bytes)
             for line in Self.summary(report, exitCode: code) {
