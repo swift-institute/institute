@@ -69,19 +69,21 @@ extension Institute.Source.Application {
     public func measure(
         subject: Source_Measurement.Source.Subject,
         bundle: Institute.Source.Bundle,
+        engines: Set<Source_Measurement.Source.Engine.ID>? = nil,
         jobs: Swift.Int? = nil,
         preparation: Institute.Source.Preparation
     ) async throws(Institute.Error) -> Source_Report.Source.Report {
+        let scope: Source_Report.Source.Report.Scope = engines == nil ? .workspace : .partial
         guard preparation.binding == .package(subject.binding) else {
             return Self.unmeasuredReport(
-                scope: .workspace,
+                scope: scope,
                 reason: .init(code: "stale-subject", detail: subject.identity)
             )
         }
         return try await measure(
             entries: [(bundle: bundle, subject: subject)],
-            scope: .workspace,
-            engines: nil,
+            scope: scope,
+            engines: engines,
             jobs: jobs,
             references: [],
             preparation: preparation
@@ -97,42 +99,8 @@ extension Institute.Source.Application {
         preparation: Institute.Source.Preparation
     ) async throws(Institute.Error) -> Source_Report.Source.Report {
         let policy = Institute.Source.Policy.current
-        guard preparation.policyRevision == policy.revision else {
-            return Self.unmeasuredReport(
-                scope: scope,
-                reason: .init(code: "stale-profile", detail: preparation.policyRevision)
-            )
-        }
-        guard
-            Self.matches(
-                file: preparation.swiftFormatExecutable,
-                digest: preparation.swiftFormatTool
-            ),
-            Self.matches(
-                file: preparation.swiftLintExecutable,
-                digest: preparation.swiftLintTool
-            ),
-            Self.matches(file: preparation.linterExecutable, digest: preparation.linterTool)
-        else {
-            return Self.unmeasuredReport(
-                scope: scope,
-                reason: .init(code: "stale-tool", detail: preparation.directory)
-            )
-        }
-        guard
-            Self.matches(
-                file: "\(preparation.directory)/.swift-format",
-                digest: policy.swiftFormat.digest
-            ),
-            Self.matches(
-                file: "\(preparation.directory)/.swiftlint.yml",
-                digest: policy.swiftLint.digest
-            )
-        else {
-            return Self.unmeasuredReport(
-                scope: scope,
-                reason: .init(code: "stale-configuration", detail: ".swift-format")
-            )
+        if let reason = Self.staleness(of: preparation) {
+            return Self.unmeasuredReport(scope: scope, reason: reason)
         }
 
         let execution: Source_Execution.Source.Execution
@@ -324,6 +292,47 @@ extension Institute.Source.Application {
             artifactEvidence: configuration.evidence,
             controlEvidence: controlEvidence
         )
+    }
+
+    /// Why `preparation` can no longer back a measurement under the current
+    /// policy, or `nil` when it still can.
+    ///
+    /// The one place a preparation is judged current: measurement refuses on
+    /// it, and `institute doctor` reports it, so the two cannot disagree about
+    /// whether a checkout's source tooling is usable.
+    public static func staleness(
+        of preparation: Institute.Source.Preparation
+    ) -> Source_Measurement.Source.Reason? {
+        let policy = Institute.Source.Policy.current
+        guard preparation.policyRevision == policy.revision else {
+            return .init(code: "stale-profile", detail: preparation.policyRevision)
+        }
+        guard
+            Self.matches(
+                file: preparation.swiftFormatExecutable,
+                digest: preparation.swiftFormatTool
+            ),
+            Self.matches(
+                file: preparation.swiftLintExecutable,
+                digest: preparation.swiftLintTool
+            ),
+            Self.matches(file: preparation.linterExecutable, digest: preparation.linterTool)
+        else {
+            return .init(code: "stale-tool", detail: preparation.directory)
+        }
+        guard
+            Self.matches(
+                file: "\(preparation.directory)/.swift-format",
+                digest: policy.swiftFormat.digest
+            ),
+            Self.matches(
+                file: "\(preparation.directory)/.swiftlint.yml",
+                digest: policy.swiftLint.digest
+            )
+        else {
+            return .init(code: "stale-configuration", detail: ".swift-format")
+        }
+        return nil
     }
 
     private static func selfApplicationReasons(

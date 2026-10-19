@@ -21,7 +21,6 @@ below is the real one — every arrow points down, and there are no cycles.
 | `Institute Inventory` | The name → organization → path authority, its discovery, merge and writing |
 | `Institute Dependency` | Manifest dependency origins, ownership policy, the audit and its report |
 | `Institute Development` | Working in a checkout: sync, composition, the generated Xcode workspace, navigation, context projection, installation |
-| `Institute Lint` | Lint measurement, adjudication, the ledger, the sweep and its exit policy |
 | `Institute Pages` | The authored-page inventory: READMEs, DocC catalogues, organization profiles |
 | `Institute Doctor` | Executed checks over the checkout, and the report they produce |
 | `Institute Conversion` | The conversion instrument: cohorts, trials, seals and receipts |

@@ -2,7 +2,6 @@ public import Async_Fanout
 public import File_System
 public import Institute_Development
 public import Institute_Inventory
-public import Institute_Lint
 public import Institute_Model
 public import Institute_Pages
 public import Package_Manager

@@ -1,7 +1,6 @@
 public import Institute_Development
 public import Institute_Doctor
 public import Institute_Inventory
-public import Institute_Lint
 public import Institute_Model
 public import JSON
 
@@ -94,9 +93,8 @@ extension Institute.Verification.Operation {
 extension Institute.Verification.Operation {
     /// One operation's disposition.
     ///
-    /// Five states, not two, exactly the discipline
-    /// ``Institute/Lint/Measurement/Verdict`` and ``Institute/Coherence``
-    /// already carry: `success` and `failure` are both *measurements*, and
+    /// Five states, not two, exactly the discipline ``Institute/Coherence``
+    /// already carries: `success` and `failure` are both *measurements*, and
     /// so is `notApplicable` (there was genuinely nothing to run — no
     /// nested test package existed to test). `skipped` and `unmeasured`
     /// are the absence of one, and a receipt refuses to seal when a

@@ -8,7 +8,6 @@ import Git_Foundation
 @testable import Institute_Doctor
 @testable import Institute_Instruments
 @testable import Institute_Inventory
-@testable import Institute_Lint
 @testable import Institute_Model
 @testable import Institute_Pages
 
@@ -121,7 +120,6 @@ extension Institute.Sync {
                     ("Institute Doctor", false),
                     ("Institute Instruments", false),
                     ("Institute Inventory", false),
-                    ("Institute Lint", false),
                     ("Institute Model", false),
                     ("Institute Pages", false),
                     ("Institute Repository Policy", false),
@@ -129,7 +127,6 @@ extension Institute.Sync {
                     ("Institute Source Policy", false),
                     ("Institute Source Profile", false),
                     ("Institute Source Workspace", false),
-                    ("Institute Lint Fixture Linter", false),
                     ("Source Execution", false),
                     ("Source Linter", false),
                     ("Source Measurement", false),

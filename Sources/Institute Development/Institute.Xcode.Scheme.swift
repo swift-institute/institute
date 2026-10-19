@@ -356,7 +356,7 @@ extension Institute.Xcode.Scheme {
                     "Institute CI Inventory", "Institute CI Model", "Institute CI Validation",
                     "Institute CI Workflow", "Institute Conversion", "Institute Dependency",
                     "Institute Development", "Institute Doctor", "Institute Instruments",
-                    "Institute Inventory", "Institute Lint", "Institute Lint Fixture Linter",
+                    "Institute Inventory",
                     "Institute Model", "Institute Pages", "Institute Repository Policy",
                     "Institute Source", "Institute Source Policy", "Institute Source Profile",
                     "Institute Source Workspace", "Source Execution", "Source Linter",

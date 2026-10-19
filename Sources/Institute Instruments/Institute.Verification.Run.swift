@@ -4,8 +4,12 @@ public import Institute_Build_Coordinator
 public import Institute_Development
 public import Institute_Doctor
 public import Institute_Inventory
-public import Institute_Lint
 public import Institute_Model
+internal import Institute_Source
+internal import Institute_Source_Profile
+internal import Institute_Source_Workspace
+internal import Source_Measurement
+internal import Source_Report
 
 extension Institute.Verification {
     /// One verification run over one subject package: performs the
@@ -31,7 +35,7 @@ extension Institute.Verification {
     /// and host it is measuring on (``Environment/observe()``), and the
     /// result of every requested operation, by actually running it through
     /// ``Build/Coordinator`` (build, test, nested test packages) or
-    /// ``Institute/Lint`` (lint).
+    /// ``Institute/Source/Application`` (lint).
     ///
     /// Every real-tool interaction is injectable, exactly the
     /// ``Institute/Coherence/Run`` and ``Institute/Conversion/Seal``
@@ -173,7 +177,9 @@ extension Institute.Verification.Run {
         var nestedTests:
             @Sendable (Swift.String, Swift.Bool, Swift.Int?, [Swift.String]) ->
                 [Institute.Verification.Operation.Result]
-        var lint: @Sendable (Swift.String) -> Institute.Verification.Operation.Result
+        var lint:
+            @Sendable (Swift.String, Institute.Repository.Key, Swift.String, Institute.Layer) async ->
+                Institute.Verification.Operation.Result
         var environment: @Sendable () -> Institute.Verification.Environment
         var now: @Sendable () -> Swift.String
 
@@ -192,8 +198,9 @@ extension Institute.Verification.Run {
                 @escaping @Sendable (Swift.String, Swift.Bool, Swift.Int?, [Swift.String]) ->
                 [Institute.Verification.Operation.Result] = Institute.Verification.Run
                 .realNestedTests,
-            lint: @escaping @Sendable (Swift.String) -> Institute.Verification.Operation.Result =
-                Institute.Verification.Run.realLint,
+            lint:
+                @escaping @Sendable (Swift.String, Institute.Repository.Key, Swift.String, Institute.Layer)
+                async -> Institute.Verification.Operation.Result = Institute.Verification.Run.realLint,
             environment: @escaping @Sendable () -> Institute.Verification.Environment =
                 Institute.Verification.Environment.observe,
             now: @escaping @Sendable () -> Swift.String = Institute.Verification.Run.realNow
@@ -375,9 +382,7 @@ extension Institute.Verification.Run {
     /// tests, with F failures …`, or Swift Testing's `Test run with N
     /// tests in M suites passed/failed after T seconds …`. Returns `nil`
     /// — never a guessed count — whenever a line matches one shape's
-    /// opening words but not its exact number-bearing tokens, exactly the
-    /// discipline ``Institute/Lint/Summary/parse(_:)`` already applies to
-    /// swift-linter's own run summary.
+    /// opening words but not its exact number-bearing tokens.
     static func parseTestCounts(
         _ output: Swift.String
     ) -> Institute.Verification.Operation.TestCounts? {
@@ -504,80 +509,127 @@ extension Institute.Verification.Run {
 }
 
 extension Institute.Verification.Run {
-    /// Runs the same per-package lint gate `institute package lint`
-    /// already performs (``Institute/CLI/run()``'s `.package`/`.lint`
-    /// branch), folded into an ``Operation/Result``.
-    static func realLint(_ path: Swift.String) -> Institute.Verification.Operation.Result {
+    /// Runs the swift-linter leg of CI's source gate over the subject,
+    /// folded into an ``Operation/Result``.
+    ///
+    /// The same two steps `institute ci source` takes: prepare the
+    /// policy-pinned engines and profiles into the subject's own `.source`
+    /// directory, then measure the subject with the profile for its layer's
+    /// bundle under the strict exit policy. Only the swift-linter engine is
+    /// requested; formatting is a separate obligation.
+    static func realLint(
+        _ path: Swift.String,
+        coordinate: Institute.Repository.Key,
+        head: Swift.String,
+        layer: Institute.Layer
+    ) async -> Institute.Verification.Operation.Result {
         let started = Self.realNow()
+        let clock = ContinuousClock()
+        let begun = clock.now
         // Each stage is caught separately so the sealed reason can name
-        // *which* stage refused. The old single `catch` interpolated the
-        // error's captured message to get that detail, and the message
-        // routinely quotes this machine's filesystem — see `Refusal`.
-        let target: Institute.Lint.Target
+        // *which* stage refused. An interpolated error would quote this
+        // machine's filesystem — see `Refusal`.
+        let subject: Source_Measurement.Source.Subject
         do throws(Institute.Error) {
-            target = try Institute.Lint.Target.resolve(path)
+            subject = try Institute.Source.Workspace.subject(
+                repository: coordinate.identity,
+                revision: head,
+                root: path
+            )
         } catch {
-            return Self.refusedLint(.unresolvableTarget(error.kind), started: started)
+            return Self.refusedLint(.unresolvableSubject(error.kind), started: started)
         }
-        let lint: Institute.Lint
+        let application = Institute.Source.Application()
+        let preparation: Institute.Source.Preparation
         do throws(Institute.Error) {
-            lint = try Institute.Lint.resolve(from: target.package.description)
+            preparation = try await application.prepare(subject: subject)
         } catch {
-            return Self.refusedLint(.unresolvableConfiguration(error.kind), started: started)
+            return Self.refusedLint(.unavailablePreparation(error.kind), started: started)
         }
-        let installation: Institute.Lint.Installation
+        let report: Source_Report.Source.Report
         do throws(Institute.Error) {
-            installation = try lint.installation()
+            report = try await application.measure(
+                subject: subject,
+                bundle: Institute.Source.Profile().bundle(for: layer),
+                engines: [Self.linter],
+                preparation: preparation
+            )
         } catch {
-            return Self.refusedLint(.unavailableInstallation(error.kind), started: started)
+            return Self.refusedLint(.unavailableMeasurement(error.kind), started: started)
         }
-        let measurement = lint.measure(
-            target,
-            using: installation,
-            default: Institute.Lint.Bundle.resolve(target.package, under: lint.hierarchy),
-            fix: nil
-        )
+        let duration = clock.now - begun
+
+        let status = Source_Report.Source.Report.Status(report, expected: report.commitment)
         let outcome: Institute.Verification.Operation.Outcome
-        switch measurement.verdict {
+        switch status {
         case .clean:
             outcome = .success
 
-        case .violations(_, let failing):
-            outcome = failing ? .failure : .success
+        case .findings:
+            outcome = report.errors ? .failure : .success
 
-        case .unmeasured(let reason):
-            // The engine's own unmeasured reasons quote the package and
-            // hierarchy paths it was given (see `Institute.Lint.Run`'s
-            // no-bundle branch), so the reason is relativized first and
-            // withheld entirely if anything unsealable survives.
-            let relative = Institute.Verification.Redaction.relative(reason, to: path)
+        case .unmeasured:
+            // Source reasons quote the package and preparation paths they
+            // were given, so each is relativized first and the whole set
+            // withheld if anything unsealable survives.
+            let reasons = Self.unmeasuredReasons(in: report)
+                .map { Institute.Verification.Redaction.relative($0, to: path) }
+            let reason = reasons.isEmpty ? "the source report is incomplete" : reasons.joined(separator: "; ")
             outcome =
-                Institute.Verification.Redaction.diagnose(relative) == nil
-                ? .unmeasured(reason: relative)
+                Institute.Verification.Redaction.diagnose(reason) == nil
+                ? .unmeasured(reason: reason)
                 : .unmeasured(reason: Refusal.unsealableMeasurementReason.description)
         }
+        let code: Swift.Int32? =
+            switch status {
+            case .unmeasured: status.code
+            case .clean, .findings:
+                report.errors
+                    ? Source_Report.Source.Report.Status.findings.code
+                    : Source_Report.Source.Report.Status.clean.code
+            }
         return .init(
             operation: .lint,
             arguments: [],
             startedAt: started,
             endedAt: Self.realNow(),
-            durationSeconds: Self.seconds(measurement.duration),
-            exitCode: measurement.status,
+            durationSeconds: Self.seconds(duration),
+            exitCode: code,
             provenance: .cached,
             outcome: outcome,
-            // swift-linter reports the files it was pointed at, which on a
-            // hosted runner means an absolute path per finding — content
-            // `run()` refuses to seal. Relativizing here keeps the finding
-            // whole and makes the lint leg sealable at all; a finding that
-            // still names some *other* absolute path is left to that
-            // refusal, deliberately.
-            // Relativized centrally in `run()`, with every other leg.
-            findings: Swift.Array(measurement.findings.prefix(50))
+            // Findings name files as the engine saw them; the boundary in
+            // `run()` relativizes every leg centrally.
+            findings: Swift.Array(Self.findings(in: report).prefix(50))
         )
     }
 
+    /// The engine the lint leg requests.
+    static let linter = Source_Measurement.Source.Engine.ID("swift-linter")
+
+    /// One line per engine finding, in the compiler's diagnostic shape.
+    static func findings(in report: Source_Report.Source.Report) -> [Swift.String] {
+        report.measurements.flatMap { measurement -> [Swift.String] in
+            guard case .findings(let findings) = measurement.verdict else { return [] }
+            return findings.map { finding in
+                let location = finding.diagnostic.location
+                return "\(location.filePath ?? location.fileID):\(location.line):\(location.column): "
+                    + "\(finding.diagnostic.severity): \(finding.rule.token): \(finding.diagnostic.message)"
+            }
+        }
+    }
+
+    /// Every reason the report gives for not measuring.
+    static func unmeasuredReasons(in report: Source_Report.Source.Report) -> [Swift.String] {
+        let references = report.references.map { "\($0.code): \($0.detail)" }
+        let measurements = report.measurements.flatMap { measurement -> [Swift.String] in
+            guard case .unmeasured(let reasons) = measurement.verdict else { return [] }
+            return reasons.map { "\($0.code): \($0.detail)" }
+        }
+        return references + measurements
+    }
+
     /// One leak-safe unmeasured lint result — the shape every refusal
-    /// stage in ``realLint(_:)`` returns.
+    /// stage in ``realLint(_:coordinate:head:layer:)`` returns.
     private static func refusedLint(
         _ refusal: Refusal,
         started: Swift.String
@@ -602,7 +654,7 @@ extension Institute.Verification.Run {
     /// to have verified the subject. See ``Error`` for exactly which
     /// conditions refuse rather than seal an ``Verdict/unverified``
     /// receipt, and why the distinction matters.
-    public func run() throws(Institute.Verification.Error) -> Institute.Verification.Receipt {
+    public func run() async throws(Institute.Verification.Error) -> Institute.Verification.Receipt {
         let observedHead: Swift.String
         let isDirty: Swift.Bool
         do throws(Institute.Error) {
@@ -648,7 +700,7 @@ extension Institute.Verification.Run {
                 }
 
             case .lint:
-                results.append(tools.lint(packagePath))
+                results.append(await tools.lint(packagePath, coordinate, claimedHead, layer))
             }
         }
 

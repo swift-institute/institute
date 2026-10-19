@@ -1,7 +1,6 @@
 public import Institute_Development
 public import Institute_Doctor
 public import Institute_Inventory
-public import Institute_Lint
 public import Institute_Model
 
 extension Institute.Verification.Run {
@@ -25,17 +24,18 @@ extension Institute.Verification.Run {
     /// ``Institute/Verification/Redaction`` — the reason a reader gets is
     /// smaller than the old free text but, unlike it, actually arrives.
     public enum Refusal: Equatable, Sendable, CustomStringConvertible {
-        /// The subject's lint target could not be resolved.
-        case unresolvableTarget(Institute.Error.Kind)
-        /// The subject's rule set could not be resolved from its
-        /// `Lint.swift` or its position in the layer hierarchy.
-        case unresolvableConfiguration(Institute.Error.Kind)
-        /// No usable swift-linter installation could be established.
-        case unavailableInstallation(Institute.Error.Kind)
-        /// The linter ran and declined to measure, but its own reason
-        /// carries content this instrument will not seal. The full reason
-        /// is still printed by `institute package lint` locally; only the
-        /// receipt withholds it.
+        /// The subject could not be bound as a source subject at its
+        /// claimed head.
+        case unresolvableSubject(Institute.Error.Kind)
+        /// The policy-pinned source engines and profiles could not be
+        /// prepared for the subject.
+        case unavailablePreparation(Institute.Error.Kind)
+        /// The prepared measurement could not run.
+        case unavailableMeasurement(Institute.Error.Kind)
+        /// The measurement declined to measure, but its own reason carries
+        /// content this instrument will not seal. The full reason is still
+        /// printed by `institute source measure` locally; only the receipt
+        /// withholds it.
         case unsealableMeasurementReason
     }
 }
@@ -43,14 +43,14 @@ extension Institute.Verification.Run {
 extension Institute.Verification.Run.Refusal {
     public var description: Swift.String {
         switch self {
-        case .unresolvableTarget(let kind):
-            "the lint gate could not resolve the subject as a lint target (\(kind))"
+        case .unresolvableSubject(let kind):
+            "the lint gate could not bind the subject at its claimed head (\(kind))"
 
-        case .unresolvableConfiguration(let kind):
-            "the lint gate could not resolve the subject's rule set (\(kind))"
+        case .unavailablePreparation(let kind):
+            "the lint gate could not prepare the pinned source engines (\(kind))"
 
-        case .unavailableInstallation(let kind):
-            "the lint gate could not establish a swift-linter installation (\(kind))"
+        case .unavailableMeasurement(let kind):
+            "the lint gate could not run the source measurement (\(kind))"
 
         case .unsealableMeasurementReason:
             "the lint gate declined to measure, for a reason that cannot cross the receipt "

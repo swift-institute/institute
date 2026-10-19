@@ -23,14 +23,14 @@ extension Institute.Xcode.Scheme.Test.Unit {
                 ("Institute Inventory", false),
                 ("Institute Source Workspace", false), ("Institute Source Profile", false),
                 ("Institute Source", false), ("Institute Dependency", false),
-                ("Institute Development", false), ("Institute Lint", false),
+                ("Institute Development", false),
                 ("Institute Pages", false), ("Institute Doctor", false),
                 ("Institute Conversion", false), ("Institute Instruments", false),
                 ("Institute CI Canon", false), ("Institute CI Contract", false),
                 ("Institute CI Inventory", false), ("Institute CI Model", false),
                 ("Institute CI Validation", false), ("Institute CI Workflow", false),
                 ("Institute Repository Policy", false), ("Institute Source Policy", false),
-                ("Institute Lint Fixture Linter", false), ("Source Execution", false),
+                ("Source Execution", false),
                 ("Source Linter", false), ("Source Measurement", false),
                 ("Source Profile", false), ("Source Repair", false),
                 ("Source Report", false), ("Source Swift Format", false),
@@ -131,10 +131,10 @@ extension Institute.Xcode.Scheme.Test.Unit {
             timeout: .seconds(5)
         )
 
-        #expect(Array(plan.buildables.prefix(30)).allSatisfy { $0.reference == "../institute" })
-        #expect(Array(plan.buildables.dropFirst(30).prefix(27)).allSatisfy { $0.reference == "." })
+        #expect(Array(plan.buildables.prefix(28)).allSatisfy { $0.reference == "../institute" })
+        #expect(Array(plan.buildables.dropFirst(28).prefix(27)).allSatisfy { $0.reference == "." })
         #expect(
-            Array(plan.buildables.dropFirst(57).prefix(6)).allSatisfy { $0.reference == "../slow" }
+            Array(plan.buildables.dropFirst(55).prefix(6)).allSatisfy { $0.reference == "../slow" }
         )
         #expect(plan.buildables.last?.reference == "../fast")
         #expect(

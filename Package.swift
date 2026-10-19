@@ -82,10 +82,6 @@ let package = Package(
             targets: ["Institute Development"]
         ),
         .library(
-            name: "Institute Lint",
-            targets: ["Institute Lint"]
-        ),
-        .library(
             name: "Institute Pages",
             targets: ["Institute Pages"]
         ),
@@ -451,27 +447,6 @@ let package = Package(
             ]
         ),
         .target(
-            name: "Institute Lint",
-            dependencies: [
-                "Institute Build Coordinator",
-                "Institute Model",
-                "Institute Development",
-                "Institute Source Policy",
-                .product(name: "Async Fanout", package: "swift-async-fanout"),
-                .product(name: "Environment", package: "swift-environment"),
-                .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
-                .product(name: "File System", package: "swift-file-system"),
-                .product(name: "Git", package: "swift-git"),
-                .product(name: "JSON", package: "swift-json"),
-                .product(name: "Package Manager", package: "swift-package-manager"),
-                .product(name: "Process", package: "swift-process"),
-                .product(
-                    name: "Standard Library Extensions",
-                    package: "swift-standard-library-extensions"
-                ),
-            ]
-        ),
-        .target(
             name: "Institute Pages",
             dependencies: [
                 "Institute Model",
@@ -486,8 +461,8 @@ let package = Package(
                 "Institute Inventory",
                 "Institute Pages",
                 "Institute Development",
-                "Institute Lint",
                 "Institute Source",
+                "Source Measurement",
                 .product(name: "Async Fanout", package: "swift-async-fanout"),
                 .product(name: "Environment", package: "swift-environment"),
                 .product(name: "File System", package: "swift-file-system"),
@@ -521,8 +496,11 @@ let package = Package(
                 "Institute Inventory",
                 "Institute Development",
                 "Institute Doctor",
-                "Institute Lint",
                 "Institute Source",
+                "Institute Source Profile",
+                "Institute Source Workspace",
+                "Source Measurement",
+                "Source Report",
                 .product(name: "Command", package: "swift-arguments"),
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "Git", package: "swift-git"),
@@ -531,14 +509,9 @@ let package = Package(
                 .product(name: "SPM Standard", package: "swift-spm-standard"),
             ]
         ),
-        .executableTarget(
-            name: "Institute Lint Fixture Linter",
-            path: "Tests/Institute Lint Fixture Linter"
-        ),
         .testTarget(
             name: "Institute Tests",
             dependencies: [
-                "Institute Lint Fixture Linter",
                 "Institute Build Coordinator",
                 "Institute Model",
                 "Institute Inventory",
@@ -548,7 +521,6 @@ let package = Package(
                 "Institute Source Policy",
                 "Institute Source Profile",
                 "Institute Source Workspace",
-                "Institute Lint",
                 "Institute Pages",
                 "Institute Doctor",
                 "Institute Conversion",
