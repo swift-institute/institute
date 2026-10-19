@@ -35,7 +35,7 @@ jobs:
   currency:
     name: doctor --institute over the live organizations
     if: ${{ !github.event.repository.private }}
-    runs-on: macos-26
+    runs-on: xcode-27
     timeout-minutes: 60
     permissions:
       contents: read
@@ -52,7 +52,7 @@ jobs:
           persist-credentials: false
 
       - name: Select the required Xcode
-        run: sudo xcode-select --switch /Applications/Xcode_26.6.app
+        run: sudo xcode-select --switch /Applications/Xcode_27.1.app
 
       # The committed Selection.json is the bounded default checkout — five
       # repositories — so this materializes five clones, not the roster's 445.
