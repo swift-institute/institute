@@ -143,7 +143,7 @@ func `Institute source subject excludes descendant package ownership`() throws {
         ("Package.swift", "// swift-tools-version: 6.4\n"),
         ("Package@swift-6.4.swift", "// swift-tools-version: 6.4\n"),
         ("Sources/Owned.swift", "public enum Owned {}\n"),
-        ("Tests/Package.swift", "// swift-tools-version: 6.4\n"),
+        ("Tests/Package.swift", "// swift-tools-version: 6.4\nimport PackageDescription\nlet package = Package(name: \"testing\")\n"),
         ("Tests/Nested/Nested.swift", "public enum Nested {}\n"),
         ("TestsSibling/Owned.swift", "public enum Sibling {}\n"),
     ] {
@@ -179,6 +179,58 @@ func `Institute source subject excludes descendant package ownership`() throws {
             "Package@swift-6.4.swift",
             "Sources/Owned.swift",
             "TestsSibling/Owned.swift",
+        ]
+    )
+}
+
+@Test
+func `Institute source subject keeps a Package.swift that is not a manifest`() throws {
+    let root = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+    defer { try? MainFixtureFiles.remove(root) }
+    for directory in ["Sources/Package", "Tests/Fixtures/plain"] {
+        try MainFixtureFiles.createDirectory(MainFixtureFiles.join(root, directory))
+    }
+    for (path, contents) in [
+        ("Package.swift", "// swift-tools-version: 6.4\nimport PackageDescription\n"),
+        ("Sources/Package/Package.swift", "public enum Package {}\n"),
+        ("Sources/Package/Name.swift", "extension Package { public enum Name {} }\n"),
+        ("Tests/Fixtures/plain/Package.swift", "// swift-tools-version: 6.3\n"),
+        ("Tests/Fixtures/plain/Fixture.swift", "public enum Fixture {}\n"),
+    ] {
+        try MainFixtureFiles.write(bytes: Array(contents.utf8), to: MainFixtureFiles.join(root, path))
+    }
+    let row = Institute.Source.Workspace.Row(
+        index: 0,
+        location: .init(scheme: .group, path: "."),
+        directory: root,
+        identity: "swift-compositions/swift-example",
+        role: .subject(
+            try #require(Institute.Repository.Key(identity: "swift-compositions/swift-example"))
+        ),
+        repository: nil,
+        reason: nil
+    )
+
+    let subject = try Institute.Source.Workspace.subject(
+        for: row,
+        paths: [
+            "Package.swift",
+            "Sources/Package/Name.swift",
+            "Sources/Package/Package.swift",
+            "Tests/Fixtures/plain/Fixture.swift",
+            "Tests/Fixtures/plain/Package.swift",
+        ]
+    )
+
+    // Neither nested Package.swift is a manifest, so nothing is pruned: the same
+    // file set swift-linter measures.
+    #expect(
+        subject.paths(of: .swift) == [
+            "Package.swift",
+            "Sources/Package/Name.swift",
+            "Sources/Package/Package.swift",
+            "Tests/Fixtures/plain/Fixture.swift",
+            "Tests/Fixtures/plain/Package.swift",
         ]
     )
 }

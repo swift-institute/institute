@@ -268,6 +268,7 @@ let package = Package(
                 .product(name: "JSON", package: "swift-json"),
                 "Source Measurement",
                 .product(name: "Xcode Workspace", package: "swift-xcode"),
+                .product(name: "SPM Standard", package: "swift-spm-standard"),
             ]
         ),
         .target(

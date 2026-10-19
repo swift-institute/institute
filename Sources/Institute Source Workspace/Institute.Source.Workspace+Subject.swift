@@ -3,6 +3,7 @@ internal import FIPS_180_4
 public import File_System
 public import Git_Foundation
 public import Institute_Model
+internal import SPM_Standard
 public import Source_Measurement
 
 extension Institute.Source.Workspace {
@@ -77,7 +78,12 @@ extension Institute.Source.Workspace {
         for path in paths where path.hasSuffix(".swift") {
             guard valid(path) else { throw .configuration("invalid source artifact path \(path)") }
             sources.append(path)
-            if path != "Package.swift", path.hasSuffix("/Package.swift") {
+            // Only a real manifest makes a nested package: a production file named
+            // Package.swift (a `Package` namespace, a fixture) stays a source, as it
+            // does for SwiftPM and swift-linter.
+            if path != "Package.swift", path.hasSuffix("/Package.swift"),
+                try Package.Manifest.recognizes(bytes(of: path, under: root))
+            {
                 packages.append(Array(path.split(separator: "/").dropLast()))
             }
         }
@@ -121,6 +127,25 @@ extension Institute.Source.Workspace {
             )
         }
         return .init(identity: identity, root: rootPath, artifacts: artifacts)
+    }
+
+    private static func bytes(
+        of path: Swift.String,
+        under root: File.Directory
+    ) throws(Institute.Error) -> [Byte] {
+        let parsed: File.Path
+        do throws(File.Path.Error) { parsed = try .init(path) } catch {
+            throw .configuration("invalid source artifact path \(path)")
+        }
+        let file = File(root.path / parsed)
+        do throws(Either<File.System.Read.Full.Error, Never>) {
+            return try file.read.full { span in
+                var result: [Byte] = []
+                result.reserveCapacity(span.count)
+                for index in span.indices { result.append(span[index]) }
+                return result
+            }
+        } catch { throw .filesystem("cannot read source artifact \(file): \(error)") }
     }
 
     private static func digest(_ file: File) throws(Institute.Error) -> Source.Artifact.Digest {
