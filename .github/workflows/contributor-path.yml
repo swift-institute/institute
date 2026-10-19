@@ -38,11 +38,10 @@ jobs:
         with:
           persist-credentials: false
 
-      # Swift 6.4 has not shipped independently yet. Use the same Xcode 27
-      # preview toolchain as the universal Apple CI leg until the documented
-      # Xcode floor is revisited.
-      - name: Select the Swift 6.4-capable Xcode
-        run: sudo xcode-select --switch /Applications/Xcode_27.0.app
+      # The Xcode floor in Institute.json, which tracks the latest Xcode: the
+      # same Xcode 27.1 as the universal Apple CI leg and roster-currency.
+      - name: Select the required Xcode
+        run: sudo xcode-select --switch /Applications/Xcode_27.1.app
 
       # The command directory is exported before the bootstrap because the
       # installer refuses to publish a command the invoking shell cannot find.
