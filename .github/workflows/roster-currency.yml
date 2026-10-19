@@ -54,8 +54,8 @@ jobs:
       - name: Select the required Xcode
         run: sudo xcode-select --switch /Applications/Xcode_27.1.app
 
-      # The committed Selection.json is the bounded default checkout — five
-      # repositories — so this materializes five clones, not the roster's 445.
+      # The committed Selection.json is the default checkout cohort, a subset
+      # of the roster, so this materializes that cohort, not every roster entry.
       # `doctor`'s other checks need materialized work to measure; without
       # this they report `unmeasured` and the run's exit status stops saying
       # anything about currency.
@@ -75,9 +75,9 @@ jobs:
           document = json.load(open(path))
           document["repositories"].append({
               "name": "swift-roster-currency-control",
-              "url": "https://github.com/swift-primitives/swift-roster-currency-control.git",
-              "organization": "swift-primitives",
-              "layer": "primitives",
+              "url": "https://github.com/swift-atoms/swift-roster-currency-control.git",
+              "organization": "swift-atoms",
+              "layer": "atoms",
           })
           json.dump(document, open(path, "w"), indent=2)
           PY

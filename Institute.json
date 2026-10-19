@@ -1,1258 +1,1450 @@
 {
   "repositories": [
     {
-      "layer": "primitives",
-      "name": "swift-affine-algebra-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-affine-algebra-primitives.git"
+      "layer": "atoms",
+      "name": "swift-addition",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-addition.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-affine-geometry-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-affine-geometry-primitives.git"
+      "layer": "atoms",
+      "name": "swift-advancement",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-advancement.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-affine-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-affine-primitives.git"
+      "layer": "atoms",
+      "name": "swift-affine",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-affine.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-algebra-modular-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-algebra-modular-primitives.git"
+      "layer": "atoms",
+      "name": "swift-algebra",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-algebra.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-algebra-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-algebra-primitives.git"
+      "layer": "atoms",
+      "name": "swift-always",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-always.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-application-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-application-primitives.git"
+      "layer": "atoms",
+      "name": "swift-anamorphism",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-anamorphism.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-argument-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-argument-primitives.git"
+      "layer": "atoms",
+      "name": "swift-angle",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-angle.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-array-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-array-primitives.git"
+      "layer": "atoms",
+      "name": "swift-apomorphism",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-apomorphism.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-ascii-parser-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-ascii-parser-primitives.git"
+      "layer": "atoms",
+      "name": "swift-append",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-append.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-ascii-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-ascii-primitives.git"
+      "layer": "atoms",
+      "name": "swift-application",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-application.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-ascii-serializer-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-ascii-serializer-primitives.git"
+      "layer": "atoms",
+      "name": "swift-arc",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-arc.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-async-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-async-primitives.git"
+      "layer": "atoms",
+      "name": "swift-argument",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-argument.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-axis-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-axis-primitives.git"
+      "layer": "atoms",
+      "name": "swift-ascii",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-ascii.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-bifunctor-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-bifunctor-primitives.git"
+      "layer": "atoms",
+      "name": "swift-async",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-async.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-binary-base-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-binary-base-primitives.git"
+      "layer": "atoms",
+      "name": "swift-axis",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-axis.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-binary-coder-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-binary-coder-primitives.git"
+      "layer": "atoms",
+      "name": "swift-ball",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-ball.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-binary-cursor-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-binary-cursor-primitives.git"
+      "layer": "atoms",
+      "name": "swift-bezier",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-bezier.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-binary-formatter-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-binary-formatter-primitives.git"
+      "layer": "atoms",
+      "name": "swift-bifunctor",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-bifunctor.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-binary-leb128-parser-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-binary-leb128-parser-primitives.git"
+      "layer": "atoms",
+      "name": "swift-binary",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-binary.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-binary-leb128-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-binary-leb128-primitives.git"
+      "layer": "atoms",
+      "name": "swift-birecursive",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-birecursive.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-binary-parser-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-binary-parser-primitives.git"
+      "layer": "atoms",
+      "name": "swift-bit",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-bit.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-binary-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-binary-primitives.git"
+      "layer": "atoms",
+      "name": "swift-bit-pattern",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-bit-pattern.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-binary-serializer-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-binary-serializer-primitives.git"
+      "layer": "atoms",
+      "name": "swift-bitset",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-bitset.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-bit-algebra-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-bit-algebra-primitives.git"
+      "layer": "atoms",
+      "name": "swift-boundary",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-boundary.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-bit-finite-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-bit-finite-primitives.git"
+      "layer": "atoms",
+      "name": "swift-buffer",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-buffer.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-bit-formatter-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-bit-formatter-primitives.git"
+      "layer": "atoms",
+      "name": "swift-byte",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-byte.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-bit-index-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-bit-index-primitives.git"
+      "layer": "atoms",
+      "name": "swift-calendar",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-calendar.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-bit-pack-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-bit-pack-primitives.git"
+      "layer": "atoms",
+      "name": "swift-cardinal",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-cardinal.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-bit-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-bit-primitives.git"
+      "layer": "atoms",
+      "name": "swift-carrier",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-carrier.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-bit-vector-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-bit-vector-primitives.git"
+      "layer": "atoms",
+      "name": "swift-catamorphism",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-catamorphism.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-bitset-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-bitset-primitives.git"
+      "layer": "atoms",
+      "name": "swift-checkpoint",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-checkpoint.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-bool-algebra-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-bool-algebra-primitives.git"
+      "layer": "atoms",
+      "name": "swift-chronomorphism",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-chronomorphism.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-boundary-facet-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-boundary-facet-primitives.git"
+      "layer": "atoms",
+      "name": "swift-clock",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-clock.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-boundary-orthant-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-boundary-orthant-primitives.git"
+      "layer": "atoms",
+      "name": "swift-coder",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-coder.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-boundary-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-boundary-primitives.git"
+      "layer": "atoms",
+      "name": "swift-cofree",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-cofree.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-buffer-linear-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-buffer-linear-primitives.git"
+      "layer": "atoms",
+      "name": "swift-collection",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-collection.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-buffer-linked-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-buffer-linked-primitives.git"
+      "layer": "atoms",
+      "name": "swift-compass",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-compass.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-buffer-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-buffer-primitives.git"
+      "layer": "atoms",
+      "name": "swift-complex",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-complex.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-buffer-ring-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-buffer-ring-primitives.git"
+      "layer": "atoms",
+      "name": "swift-contramap",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-contramap.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-buffer-slab-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-buffer-slab-primitives.git"
+      "layer": "atoms",
+      "name": "swift-contravariant",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-contravariant.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-buffer-slots-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-buffer-slots-primitives.git"
+      "layer": "atoms",
+      "name": "swift-coordinate",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-coordinate.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-builder-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-builder-primitives.git"
+      "layer": "atoms",
+      "name": "swift-coproduct",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-coproduct.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-byte-collection-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-byte-collection-primitives.git"
+      "layer": "atoms",
+      "name": "swift-corecursive",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-corecursive.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-byte-formatter-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-byte-formatter-primitives.git"
+      "layer": "atoms",
+      "name": "swift-cpu",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-cpu.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-byte-parser-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-byte-parser-primitives.git"
+      "layer": "atoms",
+      "name": "swift-cursor",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-cursor.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-byte-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-byte-primitives.git"
+      "layer": "atoms",
+      "name": "swift-cyclic",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-cyclic.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-byte-serializer-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-byte-serializer-primitives.git"
+      "layer": "atoms",
+      "name": "swift-decimal",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-decimal.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-cache-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-cache-primitives.git"
+      "layer": "atoms",
+      "name": "swift-dependency",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-dependency.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-cardinal-algebra-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-cardinal-algebra-primitives.git"
+      "layer": "atoms",
+      "name": "swift-deque",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-deque.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-cardinal-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-cardinal-primitives.git"
+      "layer": "atoms",
+      "name": "swift-difference",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-difference.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-carrier-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-carrier-primitives.git"
+      "layer": "atoms",
+      "name": "swift-direction",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-direction.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-clock-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-clock-primitives.git"
+      "layer": "atoms",
+      "name": "swift-displacement",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-displacement.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-coder-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-coder-primitives.git"
+      "layer": "atoms",
+      "name": "swift-distance",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-distance.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-collection-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-collection-primitives.git"
+      "layer": "atoms",
+      "name": "swift-distribution",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-distribution.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-column-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-column-primitives.git"
+      "layer": "atoms",
+      "name": "swift-division",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-division.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-comparison-finite-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-comparison-finite-primitives.git"
+      "layer": "atoms",
+      "name": "swift-effect",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-effect.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-comparison-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-comparison-primitives.git"
+      "layer": "atoms",
+      "name": "swift-either",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-either.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-compass-cyclic-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-compass-cyclic-primitives.git"
+      "layer": "atoms",
+      "name": "swift-ellipse",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-ellipse.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-compass-facet-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-compass-facet-primitives.git"
+      "layer": "atoms",
+      "name": "swift-empty",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-empty.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-compass-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-compass-primitives.git"
+      "layer": "atoms",
+      "name": "swift-error",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-error.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-complex-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-complex-primitives.git"
+      "layer": "atoms",
+      "name": "swift-executor",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-executor.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-coproduct-derivation",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-coproduct-derivation.git"
+      "layer": "atoms",
+      "name": "swift-exponential",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-exponential.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-coproduct-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-coproduct-primitives.git"
+      "layer": "atoms",
+      "name": "swift-facet",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-facet.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-cpu-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-cpu-primitives.git"
+      "layer": "atoms",
+      "name": "swift-finite",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-finite.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-cursor-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-cursor-primitives.git"
+      "layer": "atoms",
+      "name": "swift-fixed",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-fixed.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-cyclic-index-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-cyclic-index-primitives.git"
+      "layer": "atoms",
+      "name": "swift-flatmap",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-flatmap.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-cyclic-iterator-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-cyclic-iterator-primitives.git"
+      "layer": "atoms",
+      "name": "swift-foldable",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-foldable.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-cyclic-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-cyclic-primitives.git"
+      "layer": "atoms",
+      "name": "swift-formatter",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-formatter.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-decimal-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-decimal-primitives.git"
+      "layer": "atoms",
+      "name": "swift-free",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-free.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-declaration-derivation",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-declaration-derivation.git"
+      "layer": "atoms",
+      "name": "swift-functor",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-functor.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-dependency-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-dependency-primitives.git"
+      "layer": "atoms",
+      "name": "swift-futumorphism",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-futumorphism.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-deque-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-deque-primitives.git"
+      "layer": "atoms",
+      "name": "swift-geometry",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-geometry.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-diagnostic-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-diagnostic-primitives.git"
+      "layer": "atoms",
+      "name": "swift-glob",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-glob.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-dictionary-ordered-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-dictionary-ordered-primitives.git"
+      "layer": "atoms",
+      "name": "swift-growth",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-growth.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-dictionary-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-dictionary-primitives.git"
+      "layer": "atoms",
+      "name": "swift-heap",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-heap.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-dimension-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-dimension-primitives.git"
+      "layer": "atoms",
+      "name": "swift-histomorphism",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-histomorphism.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-direction-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-direction-primitives.git"
+      "layer": "atoms",
+      "name": "swift-hylomorphism",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-hylomorphism.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-effect-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-effect-primitives.git"
+      "layer": "atoms",
+      "name": "swift-index",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-index.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-either-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-either-primitives.git"
+      "layer": "atoms",
+      "name": "swift-indexed",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-indexed.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-empty-iterator-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-empty-iterator-primitives.git"
+      "layer": "atoms",
+      "name": "swift-infinite",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-infinite.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-empty-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-empty-primitives.git"
+      "layer": "atoms",
+      "name": "swift-initialization",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-initialization.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-equation-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-equation-primitives.git"
+      "layer": "atoms",
+      "name": "swift-inset",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-inset.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-error-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-error-primitives.git"
+      "layer": "atoms",
+      "name": "swift-integer",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-integer.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-executor-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-executor-primitives.git"
+      "layer": "atoms",
+      "name": "swift-interval",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-interval.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-facet-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-facet-primitives.git"
+      "layer": "atoms",
+      "name": "swift-io",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-io.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-finite-algebra-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-finite-algebra-primitives.git"
+      "layer": "atoms",
+      "name": "swift-iterator",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-iterator.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-finite-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-finite-primitives.git"
+      "layer": "atoms",
+      "name": "swift-lazy",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-lazy.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-fixed-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-fixed-primitives.git"
+      "layer": "atoms",
+      "name": "swift-line",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-line.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-format-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-format-primitives.git"
+      "layer": "atoms",
+      "name": "swift-linear",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-linear.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-formatter-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-formatter-primitives.git"
+      "layer": "atoms",
+      "name": "swift-link",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-link.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-foundation-extensions",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-foundation-extensions.git"
+      "layer": "atoms",
+      "name": "swift-list",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-list.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-geometry-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-geometry-primitives.git"
+      "layer": "atoms",
+      "name": "swift-logic",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-logic.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-glob-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-glob-primitives.git"
+      "layer": "atoms",
+      "name": "swift-magnitude",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-magnitude.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-graph-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-graph-primitives.git"
+      "layer": "atoms",
+      "name": "swift-manifest",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-manifest.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-growth-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-growth-primitives.git"
+      "layer": "atoms",
+      "name": "swift-map",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-map.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-hash-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-hash-primitives.git"
+      "layer": "atoms",
+      "name": "swift-matrix",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-matrix.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-hash-table-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-hash-table-primitives.git"
+      "layer": "atoms",
+      "name": "swift-memory",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-memory.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-heap-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-heap-primitives.git"
+      "layer": "atoms",
+      "name": "swift-multiplication",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-multiplication.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-index-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-index-primitives.git"
+      "layer": "atoms",
+      "name": "swift-navigation",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-navigation.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-infinite-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-infinite-primitives.git"
+      "layer": "atoms",
+      "name": "swift-numeric",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-numeric.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-initialization-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-initialization-primitives.git"
+      "layer": "atoms",
+      "name": "swift-observer",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-observer.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-input-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-input-primitives.git"
+      "layer": "atoms",
+      "name": "swift-operation",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-operation.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-interval-finite-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-interval-finite-primitives.git"
+      "layer": "atoms",
+      "name": "swift-optic",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-optic.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-interval-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-interval-primitives.git"
+      "layer": "atoms",
+      "name": "swift-order",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-order.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-io-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-io-primitives.git"
+      "layer": "atoms",
+      "name": "swift-ordinal",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-ordinal.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-iterator-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-iterator-primitives.git"
+      "layer": "atoms",
+      "name": "swift-orthant",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-orthant.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-layout-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-layout-primitives.git"
+      "layer": "atoms",
+      "name": "swift-orthotope",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-orthotope.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-lexer-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-lexer-primitives.git"
+      "layer": "atoms",
+      "name": "swift-ownership",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-ownership.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-linear-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-linear-primitives.git"
+      "layer": "atoms",
+      "name": "swift-package",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-package.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-link-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-link-primitives.git"
+      "layer": "atoms",
+      "name": "swift-pair",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-pair.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-linter-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-linter-primitives.git"
+      "layer": "atoms",
+      "name": "swift-paramorphism",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-paramorphism.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-list-linked-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-list-linked-primitives.git"
+      "layer": "atoms",
+      "name": "swift-parity",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-parity.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-list-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-list-primitives.git"
+      "layer": "atoms",
+      "name": "swift-parser",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-parser.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-loader-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-loader-primitives.git"
+      "layer": "atoms",
+      "name": "swift-path",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-path.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-logic-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-logic-primitives.git"
+      "layer": "atoms",
+      "name": "swift-percent",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-percent.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-machine-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-machine-primitives.git"
+      "layer": "atoms",
+      "name": "swift-point",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-point.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-manifest-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-manifest-primitives.git"
+      "layer": "atoms",
+      "name": "swift-polarity",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-polarity.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-matrix-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-matrix-primitives.git"
+      "layer": "atoms",
+      "name": "swift-polygon",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-polygon.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-memory-aligned-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-memory-aligned-primitives.git"
+      "layer": "atoms",
+      "name": "swift-pool",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-pool.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-memory-allocation-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-memory-allocation-primitives.git"
+      "layer": "atoms",
+      "name": "swift-predecessor",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-predecessor.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-memory-cursor-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-memory-cursor-primitives.git"
+      "layer": "atoms",
+      "name": "swift-predicate",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-predicate.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-memory-foreign-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-memory-foreign-primitives.git"
+      "layer": "atoms",
+      "name": "swift-product",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-product.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-memory-heap-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-memory-heap-primitives.git"
+      "layer": "atoms",
+      "name": "swift-profunctor",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-profunctor.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-memory-inline-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-memory-inline-primitives.git"
+      "layer": "atoms",
+      "name": "swift-property",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-property.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-memory-iterator-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-memory-iterator-primitives.git"
+      "layer": "atoms",
+      "name": "swift-quantizer",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-quantizer.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-memory-lock-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-memory-lock-primitives.git"
+      "layer": "atoms",
+      "name": "swift-queue",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-queue.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-memory-map-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-memory-map-primitives.git"
+      "layer": "atoms",
+      "name": "swift-radical",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-radical.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-memory-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-memory-primitives.git"
+      "layer": "atoms",
+      "name": "swift-radix",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-radix.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-memory-sequence-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-memory-sequence-primitives.git"
+      "layer": "atoms",
+      "name": "swift-random",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-random.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-memory-shared-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-memory-shared-primitives.git"
+      "layer": "atoms",
+      "name": "swift-ratio",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-ratio.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-memory-small-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-memory-small-primitives.git"
+      "layer": "atoms",
+      "name": "swift-rational",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-rational.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-module-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-module-primitives.git"
+      "layer": "atoms",
+      "name": "swift-ray",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-ray.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-navigation-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-navigation-primitives.git"
+      "layer": "atoms",
+      "name": "swift-recursion",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-recursion.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-numeric-finite-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-numeric-finite-primitives.git"
+      "layer": "atoms",
+      "name": "swift-recursive",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-recursive.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-numeric-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-numeric-primitives.git"
+      "layer": "atoms",
+      "name": "swift-reference",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-reference.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-observation-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-observation-primitives.git"
+      "layer": "atoms",
+      "name": "swift-renderer",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-renderer.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-optic-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-optic-primitives.git"
+      "layer": "atoms",
+      "name": "swift-repetition",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-repetition.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-order-finite-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-order-finite-primitives.git"
+      "layer": "atoms",
+      "name": "swift-retreat",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-retreat.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-order-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-order-primitives.git"
+      "layer": "atoms",
+      "name": "swift-rotation",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-rotation.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-ordinal-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-ordinal-primitives.git"
+      "layer": "atoms",
+      "name": "swift-rounding",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-rounding.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-orthant-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-orthant-primitives.git"
+      "layer": "atoms",
+      "name": "swift-sample",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-sample.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-ownership-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-ownership-primitives.git"
+      "layer": "atoms",
+      "name": "swift-scale",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-scale.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-ownership-shared-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-ownership-shared-primitives.git"
+      "layer": "atoms",
+      "name": "swift-search",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-search.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-package-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-package-primitives.git"
+      "layer": "atoms",
+      "name": "swift-sector",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-sector.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-pair-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-pair-primitives.git"
+      "layer": "atoms",
+      "name": "swift-segment",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-segment.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-parity-algebra-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-parity-algebra-primitives.git"
+      "layer": "atoms",
+      "name": "swift-sequence",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-sequence.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-parity-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-parity-primitives.git"
+      "layer": "atoms",
+      "name": "swift-serializer",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-serializer.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-parser-effect-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-parser-effect-primitives.git"
+      "layer": "atoms",
+      "name": "swift-set",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-set.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-parser-machine-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-parser-machine-primitives.git"
+      "layer": "atoms",
+      "name": "swift-shear",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-shear.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-parser-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-parser-primitives.git"
+      "layer": "atoms",
+      "name": "swift-single",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-single.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-path-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-path-primitives.git"
+      "layer": "atoms",
+      "name": "swift-size",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-size.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-percent-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-percent-primitives.git"
+      "layer": "atoms",
+      "name": "swift-skip",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-skip.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-polarity-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-polarity-primitives.git"
+      "layer": "atoms",
+      "name": "swift-slab",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-slab.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-pool-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-pool-primitives.git"
+      "layer": "atoms",
+      "name": "swift-span",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-span.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-position-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-position-primitives.git"
+      "layer": "atoms",
+      "name": "swift-spatial",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-spatial.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-predicate-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-predicate-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-primitives-linter-rules",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-primitives-linter-rules.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-product-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-product-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-property-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-property-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-queue-linked-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-queue-linked-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-queue-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-queue-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-radix-formatter-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-radix-formatter-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-radix-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-radix-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-random-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-random-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-range-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-range-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-reference-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-reference-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-render-async-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-render-async-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-render-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-render-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-sample-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-sample-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-sector-cyclic-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-sector-cyclic-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-sector-orthant-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-sector-orthant-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-sector-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-sector-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-sequence-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-sequence-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-serializer-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-serializer-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-set-algebra-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-set-algebra-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-set-ordered-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-set-ordered-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-set-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-set-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-single-iterator-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-single-iterator-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-single-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-single-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-slab-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-slab-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-slot-map-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-slot-map-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-source-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-source-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-span-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-span-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-stack-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-stack-primitives.git"
-    },
-    {
-      "layer": "primitives",
+      "layer": "atoms",
       "name": "swift-standard-library-extensions",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-standard-library-extensions.git"
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-standard-library-extensions.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-storage-generational-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-storage-generational-primitives.git"
+      "layer": "atoms",
+      "name": "swift-storage",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-storage.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-storage-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-storage-primitives.git"
+      "layer": "atoms",
+      "name": "swift-store",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-store.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-storage-split-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-storage-split-primitives.git"
+      "layer": "atoms",
+      "name": "swift-string",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-string.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-store-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-store-primitives.git"
+      "layer": "atoms",
+      "name": "swift-subtraction",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-subtraction.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-string-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-string-primitives.git"
+      "layer": "atoms",
+      "name": "swift-successor",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-successor.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-structured-queries-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-structured-queries-primitives.git"
+      "layer": "atoms",
+      "name": "swift-symmetry",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-symmetry.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-symmetry-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-symmetry-primitives.git"
+      "layer": "atoms",
+      "name": "swift-system",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-system.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-system-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-system-primitives.git"
+      "layer": "atoms",
+      "name": "swift-tagged",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-tagged.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-tagged-collection-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-tagged-collection-primitives.git"
+      "layer": "atoms",
+      "name": "swift-terminal",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-terminal.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-tagged-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-tagged-primitives.git"
+      "layer": "atoms",
+      "name": "swift-text",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-text.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-tensor-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-tensor-primitives.git"
+      "layer": "atoms",
+      "name": "swift-time",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-time.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-terminal-input-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-terminal-input-primitives.git"
+      "layer": "atoms",
+      "name": "swift-tolerance",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-tolerance.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-terminal-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-terminal-primitives.git"
+      "layer": "atoms",
+      "name": "swift-translation",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-translation.git"
     },
     {
-      "layer": "primitives",
+      "layer": "atoms",
+      "name": "swift-trigonometry",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-trigonometry.git"
+    },
+    {
+      "layer": "atoms",
+      "name": "swift-vector",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-vector.git"
+    },
+    {
+      "layer": "atoms",
+      "name": "swift-version",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-version.git"
+    },
+    {
+      "layer": "atoms",
+      "name": "swift-witness",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-witness.git"
+    },
+    {
+      "layer": "atoms",
+      "name": "swift-zygomorphism",
+      "organization": "swift-atoms",
+      "url": "https://github.com/swift-atoms/swift-zygomorphism.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-algebra-modular",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-algebra-modular.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-array",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-array.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-async-barrier",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-async-barrier.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-async-bridge",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-async-bridge.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-async-broadcast",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-async-broadcast.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-async-channel",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-async-channel.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-async-fanout",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-async-fanout.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-async-semaphore",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-async-semaphore.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-async-sequence",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-async-sequence.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-async-stream",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-async-stream.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-async-waiter",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-async-waiter.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-axis-dimension",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-axis-dimension.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-benchmark",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-benchmark.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-binary-parser",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-binary-parser.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-bit-vector",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-bit-vector.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-buffer-linear",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-buffer-linear.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-buffer-linked",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-buffer-linked.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-buffer-ring",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-buffer-ring.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-buffer-slab",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-buffer-slab.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-buffer-slots",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-buffer-slots.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-builder",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-builder.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-cache",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-cache.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-calendar-gregorian",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-calendar-gregorian.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-client",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-client.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-complex-dimension",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-complex-dimension.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-copy-on-write",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-copy-on-write.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-diagnostic",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-diagnostic.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-dictionary",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-dictionary.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-dictionary-ordered",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-dictionary-ordered.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-foundation-extensions",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-foundation-extensions.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-geometry-boundary",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-geometry-boundary.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-geometry-pair",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-geometry-pair.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-graph",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-graph.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-hash-table",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-hash-table.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-interface",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-interface.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-layout",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-layout.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-lexer",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-lexer.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-lint",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-lint.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-list-linked",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-list-linked.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-loader-vocabulary",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-loader-vocabulary.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-machine",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-machine.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-memory-allocation",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-memory-allocation.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-module",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-module.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-ownership-shared",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-ownership-shared.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-parser-machine",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-parser-machine.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-primitives-linter-rules",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-primitives-linter-rules.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-queue-linked",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-queue-linked.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-range",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-range.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-set-algebra",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-set-algebra.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-set-ordered",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-set-ordered.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-slot-map",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-slot-map.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-snapshot",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-snapshot.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-source",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-source.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-stack",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-stack.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-symmetry-algebra",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-symmetry-algebra.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-symmetry-dimension",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-symmetry-dimension.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-symmetry-finite",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-symmetry-finite.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-symmetry-linear",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-symmetry-linear.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-symmetry-pair",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-symmetry-pair.git"
+    },
+    {
+      "layer": "molecules",
+      "name": "swift-tensor",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-tensor.git"
+    },
+    {
+      "layer": "molecules",
       "name": "swift-test",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-test.git"
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-test.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-text-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-text-primitives.git"
+      "layer": "molecules",
+      "name": "swift-token",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-token.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-time-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-time-primitives.git"
+      "layer": "molecules",
+      "name": "swift-tree",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-tree.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-token-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-token-primitives.git"
+      "layer": "molecules",
+      "name": "swift-tree-column",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-tree-column.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-tree-keyed-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-tree-keyed-primitives.git"
+      "layer": "molecules",
+      "name": "swift-tree-keyed",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-tree-keyed.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-tree-n-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-tree-n-primitives.git"
+      "layer": "molecules",
+      "name": "swift-tree-n",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-tree-n.git"
     },
     {
-      "layer": "primitives",
-      "name": "swift-tree-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-tree-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-vector-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-vector-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-version-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-version-primitives.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-witness-derivation",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-witness-derivation.git"
-    },
-    {
-      "layer": "primitives",
-      "name": "swift-witness-primitives",
-      "organization": "swift-primitives",
-      "url": "https://github.com/swift-primitives/swift-witness-primitives.git"
+      "layer": "molecules",
+      "name": "swift-version-carrier",
+      "organization": "swift-molecules",
+      "url": "https://github.com/swift-molecules/swift-version-carrier.git"
     },
     {
       "layer": "standards",
@@ -1304,9 +1496,21 @@
     },
     {
       "layer": "standards",
+      "name": "swift-rfc-1035-coder",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-1035-coder.git"
+    },
+    {
+      "layer": "standards",
       "name": "swift-rfc-1123",
       "organization": "swift-ietf",
       "url": "https://github.com/swift-ietf/swift-rfc-1123.git"
+    },
+    {
+      "layer": "standards",
+      "name": "swift-rfc-1123-coder",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-1123-coder.git"
     },
     {
       "layer": "standards",
@@ -1328,15 +1532,45 @@
     },
     {
       "layer": "standards",
+      "name": "swift-rfc-2045-coder",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-2045-coder.git"
+    },
+    {
+      "layer": "standards",
       "name": "swift-rfc-2046",
       "organization": "swift-ietf",
       "url": "https://github.com/swift-ietf/swift-rfc-2046.git"
     },
     {
       "layer": "standards",
+      "name": "swift-rfc-2046-coder",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-2046-coder.git"
+    },
+    {
+      "layer": "standards",
+      "name": "swift-rfc-2047",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-2047.git"
+    },
+    {
+      "layer": "standards",
       "name": "swift-rfc-2183",
       "organization": "swift-ietf",
       "url": "https://github.com/swift-ietf/swift-rfc-2183.git"
+    },
+    {
+      "layer": "standards",
+      "name": "swift-rfc-2183-coder",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-2183-coder.git"
+    },
+    {
+      "layer": "standards",
+      "name": "swift-rfc-2231",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-2231.git"
     },
     {
       "layer": "standards",
@@ -1376,9 +1610,27 @@
     },
     {
       "layer": "standards",
+      "name": "swift-rfc-3501",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-3501.git"
+    },
+    {
+      "layer": "standards",
+      "name": "swift-rfc-3501-coder",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-3501-coder.git"
+    },
+    {
+      "layer": "standards",
       "name": "swift-rfc-3986",
       "organization": "swift-ietf",
       "url": "https://github.com/swift-ietf/swift-rfc-3986.git"
+    },
+    {
+      "layer": "standards",
+      "name": "swift-rfc-3986-coder",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-3986-coder.git"
     },
     {
       "layer": "standards",
@@ -1391,6 +1643,12 @@
       "name": "swift-rfc-4007",
       "organization": "swift-ietf",
       "url": "https://github.com/swift-ietf/swift-rfc-4007.git"
+    },
+    {
+      "layer": "standards",
+      "name": "swift-rfc-4007-coder",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-4007-coder.git"
     },
     {
       "layer": "standards",
@@ -1409,6 +1667,12 @@
       "name": "swift-rfc-4291",
       "organization": "swift-ietf",
       "url": "https://github.com/swift-ietf/swift-rfc-4291.git"
+    },
+    {
+      "layer": "standards",
+      "name": "swift-rfc-4291-coder",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-4291-coder.git"
     },
     {
       "layer": "standards",
@@ -1436,6 +1700,12 @@
     },
     {
       "layer": "standards",
+      "name": "swift-rfc-5322-coder",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-5322-coder.git"
+    },
+    {
+      "layer": "standards",
       "name": "swift-rfc-5646",
       "organization": "swift-ietf",
       "url": "https://github.com/swift-ietf/swift-rfc-5646.git"
@@ -1454,9 +1724,21 @@
     },
     {
       "layer": "standards",
+      "name": "swift-rfc-5952-coder",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-5952-coder.git"
+    },
+    {
+      "layer": "standards",
       "name": "swift-rfc-6068",
       "organization": "swift-ietf",
       "url": "https://github.com/swift-ietf/swift-rfc-6068.git"
+    },
+    {
+      "layer": "standards",
+      "name": "swift-rfc-6068-coder",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-6068-coder.git"
     },
     {
       "layer": "standards",
@@ -1526,9 +1808,21 @@
     },
     {
       "layer": "standards",
+      "name": "swift-rfc-768-coder",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-768-coder.git"
+    },
+    {
+      "layer": "standards",
       "name": "swift-rfc-791",
       "organization": "swift-ietf",
       "url": "https://github.com/swift-ietf/swift-rfc-791.git"
+    },
+    {
+      "layer": "standards",
+      "name": "swift-rfc-791-coder",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-791-coder.git"
     },
     {
       "layer": "standards",
@@ -1562,9 +1856,21 @@
     },
     {
       "layer": "standards",
+      "name": "swift-rfc-9110-coder",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-9110-coder.git"
+    },
+    {
+      "layer": "standards",
       "name": "swift-rfc-9111",
       "organization": "swift-ietf",
       "url": "https://github.com/swift-ietf/swift-rfc-9111.git"
+    },
+    {
+      "layer": "standards",
+      "name": "swift-rfc-9111-coder",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-9111-coder.git"
     },
     {
       "layer": "standards",
@@ -1574,9 +1880,21 @@
     },
     {
       "layer": "standards",
+      "name": "swift-rfc-9112-coder",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-9112-coder.git"
+    },
+    {
+      "layer": "standards",
       "name": "swift-rfc-9293",
       "organization": "swift-ietf",
       "url": "https://github.com/swift-ietf/swift-rfc-9293.git"
+    },
+    {
+      "layer": "standards",
+      "name": "swift-rfc-9293-coder",
+      "organization": "swift-ietf",
+      "url": "https://github.com/swift-ietf/swift-rfc-9293-coder.git"
     },
     {
       "layer": "standards",
@@ -1664,6 +1982,12 @@
     },
     {
       "layer": "standards",
+      "name": "swift-iso-9075",
+      "organization": "swift-iso",
+      "url": "https://github.com/swift-iso/swift-iso-9075.git"
+    },
+    {
+      "layer": "standards",
       "name": "swift-iso-9899",
       "organization": "swift-iso",
       "url": "https://github.com/swift-iso/swift-iso-9899.git"
@@ -1679,6 +2003,12 @@
       "name": "swift-linux-standard",
       "organization": "swift-linux-foundation",
       "url": "https://github.com/swift-linux-foundation/swift-linux-standard.git"
+    },
+    {
+      "layer": "standards",
+      "name": "swift-model-context-protocol",
+      "organization": "swift-linux-foundation",
+      "url": "https://github.com/swift-linux-foundation/swift-model-context-protocol.git"
     },
     {
       "layer": "standards",
@@ -1754,9 +2084,9 @@
     },
     {
       "layer": "standards",
-      "name": "swift-http-standard",
+      "name": "swift-http",
       "organization": "swift-standards",
-      "url": "https://github.com/swift-standards/swift-http-standard.git"
+      "url": "https://github.com/swift-standards/swift-http.git"
     },
     {
       "layer": "standards",
@@ -1775,6 +2105,12 @@
       "name": "swift-json-feed-standard",
       "organization": "swift-standards",
       "url": "https://github.com/swift-standards/swift-json-feed-standard.git"
+    },
+    {
+      "layer": "standards",
+      "name": "swift-json-rpc-standard",
+      "organization": "swift-standards",
+      "url": "https://github.com/swift-standards/swift-json-rpc-standard.git"
     },
     {
       "layer": "standards",
@@ -1799,12 +2135,6 @@
       "name": "swift-pdf-standard",
       "organization": "swift-standards",
       "url": "https://github.com/swift-standards/swift-pdf-standard.git"
-    },
-    {
-      "layer": "standards",
-      "name": "swift-postgresql-standard",
-      "organization": "swift-standards",
-      "url": "https://github.com/swift-standards/swift-postgresql-standard.git"
     },
     {
       "layer": "standards",
@@ -1910,6 +2240,12 @@
     },
     {
       "layer": "standards",
+      "name": "swift-whatwg-encoding",
+      "organization": "swift-whatwg",
+      "url": "https://github.com/swift-whatwg/swift-whatwg-encoding.git"
+    },
+    {
+      "layer": "standards",
       "name": "swift-whatwg-html",
       "organization": "swift-whatwg",
       "url": "https://github.com/swift-whatwg/swift-whatwg-html.git"
@@ -1921,886 +2257,760 @@
       "url": "https://github.com/swift-whatwg/swift-whatwg-url.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-agent-skills",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-agent-skills.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-agent-skills.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-application",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-application.git"
-    },
-    {
-      "layer": "foundations",
-      "name": "swift-application-server",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-application-server.git"
-    },
-    {
-      "layer": "foundations",
-      "name": "swift-application-swiftui",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-application-swiftui.git"
-    },
-    {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-arguments",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-arguments.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-arguments.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-ascii",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-ascii.git"
+      "layer": "compositions",
+      "name": "swift-benchmark-clock",
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-benchmark-clock.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-async",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-async.git"
+      "layer": "compositions",
+      "name": "swift-byte-channel",
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-byte-channel.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-authentication",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-authentication.git"
-    },
-    {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-certificate-verification",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-certificate-verification.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-certificate-verification.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-clocks",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-clocks.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-clocks.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-clocks-dependencies",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-clocks-dependencies.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-clocks-dependencies.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-color",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-color.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-color.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-console",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-console.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-console.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-continuous-integration",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-continuous-integration.git"
-    },
-    {
-      "layer": "foundations",
-      "name": "swift-copy-on-write",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-copy-on-write.git"
-    },
-    {
-      "layer": "foundations",
-      "name": "swift-cpu",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-cpu.git"
-    },
-    {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-css",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-css.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-css.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-css-html-layout-render",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-css-html-layout-render.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-css-html-layout-render.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-css-html-render",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-css-html-render.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-css-html-render.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-darwin",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-darwin.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-darwin.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-decimals",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-decimals.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-decimals.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-defunctionalize",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-defunctionalize.git"
-    },
-    {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-dependencies",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-dependencies.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-dependencies.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-diagnostics",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-diagnostics.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-diagnostics.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-domain-name-system",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-domain-name-system.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-domain-name-system.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-domain-name-system-kernel",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-domain-name-system-kernel.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-domain-name-system-kernel.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-dual",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-dual.git"
-    },
-    {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-effects",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-effects.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-effects.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-email",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-email.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-email.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-email-html",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-email-html.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-email-html.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-emailaddress",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-emailaddress.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-emailaddress.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-entitlement",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-entitlement.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-entitlement.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-environment",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-environment.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-environment.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-environment-dependencies",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-environment-dependencies.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-environment-dependencies.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-epub-render",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-epub-render.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-epub-render.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-event-loop-group-dependencies",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-event-loop-group-dependencies.git"
-    },
-    {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-executors",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-executors.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-executors.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-favicon",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-favicon.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-favicon.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-file-system",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-file-system.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-file-system.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-form-coding",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-form-coding.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-form-coding.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-foundation-dependencies",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-foundation-dependencies.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-foundation-dependencies.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-git",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-git.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-git.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-github",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-github.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-github.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-github-continuous-integration",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-github-continuous-integration.git"
-    },
-    {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-github-http",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-github-http.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-github-http.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-html",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-html.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-html.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-html-chart",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-html-chart.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-html-chart.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-html-fontawesome",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-html-fontawesome.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-html-fontawesome.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-html-form-coder",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-html-form-coder.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-html-form-coder.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-html-prism",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-html-prism.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-html-prism.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-html-render",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-html-render.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-html-render.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-http-body",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-http-body.git"
+      "layer": "compositions",
+      "name": "swift-http-client",
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-http-client.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-http-cookies",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-http-cookies.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-http-cookies.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-http-host",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-http-host.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-http-host.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-http-redirect",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-http-redirect.git"
+      "layer": "compositions",
+      "name": "swift-http-router",
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-http-router.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-http-session",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-http-session.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-http-session.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-identities",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-identities.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-identities.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-identities-mailgun",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-identities-mailgun.git"
-    },
-    {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-identities-types",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-identities-types.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-identities-types.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
+      "name": "swift-imap",
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-imap.git"
+    },
+    {
+      "layer": "compositions",
       "name": "swift-institute-linter-rules",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-institute-linter-rules.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-institute-linter-rules.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-io",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-io.git"
+      "layer": "compositions",
+      "name": "swift-interface-composable-architecture",
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-interface-composable-architecture.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
+      "name": "swift-io-kernel",
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-io-kernel.git"
+    },
+    {
+      "layer": "compositions",
       "name": "swift-ip-address",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-ip-address.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-ip-address.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-json",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-json.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-json.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-json-web-token",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-json-web-token.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-json-web-token.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-kernel",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-kernel.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-kernel.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-lexer",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-lexer.git"
-    },
-    {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-linter",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-linter.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-linter.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-linter-rules",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-linter-rules.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-linter-rules.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-linux",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-linux.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-linux.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-loader",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-loader.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-loader.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-logger-dependencies",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-logger-dependencies.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-logger-dependencies.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-logger-handlers",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-logger-handlers.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-logger-handlers.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-mailgun",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-mailgun.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-mailgun.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-mailgun-http",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-mailgun-http.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-mailgun-http.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-manifests",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-manifests.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-manifests.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-markdown-html-render",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-markdown-html-render.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-markdown-html-render.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-memory",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-memory.git"
+      "layer": "compositions",
+      "name": "swift-mcp",
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-mcp.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
+      "name": "swift-memory-mapping",
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-memory-mapping.git"
+    },
+    {
+      "layer": "compositions",
       "name": "swift-multipart-form-coding",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-multipart-form-coding.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-multipart-form-coding.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-navigation",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-navigation.git"
-    },
-    {
-      "layer": "foundations",
-      "name": "swift-numerics",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-numerics.git"
-    },
-    {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-observations",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-observations.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-observations.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-package-graph",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-package-graph.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-package-graph.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-package-manager",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-package-manager.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-package-manager.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-parsers",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-parsers.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-parsers.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-password",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-password.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-password.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-paths",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-paths.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-paths.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-pdf",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-pdf.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-pdf.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-pdf-html-render",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-pdf-html-render.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-pdf-html-render.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-pdf-render",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-pdf-render.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-pdf-render.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-plist",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-plist.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-plist.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-posix",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-posix.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-posix.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
+      "name": "swift-postgresql",
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-postgresql.git"
+    },
+    {
+      "layer": "compositions",
       "name": "swift-process",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-process.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-process.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-products",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-products.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-products.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-random",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-random.git"
-    },
-    {
-      "layer": "foundations",
-      "name": "swift-records",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-records.git"
-    },
-    {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-resource-pool",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-resource-pool.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-resource-pool.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-scheduler",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-scheduler.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-scheduler.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-server",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-server.git"
-    },
-    {
-      "layer": "foundations",
-      "name": "swift-server-dependencies",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-server-dependencies.git"
-    },
-    {
-      "layer": "foundations",
-      "name": "swift-server-static",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-server-static.git"
-    },
-    {
-      "layer": "foundations",
-      "name": "swift-server-vapor",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-server-vapor.git"
-    },
-    {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-signature",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-signature.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-signature.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-sitemap",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-sitemap.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-sitemap.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-sockets",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-sockets.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-sockets.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-sockets-ip-address",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-sockets-ip-address.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-sockets-ip-address.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-source",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-source.git"
-    },
-    {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-splat",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-splat.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-splat.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-sql",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-sql.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-sql.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-sql-migrations",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-sql-migrations.git"
+      "layer": "compositions",
+      "name": "swift-sqlite",
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-sqlite.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-sql-postgres-provider",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-sql-postgres-provider.git"
-    },
-    {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-stores",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-stores.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-stores.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-strings",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-strings.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-strings.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-stripe",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-stripe.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-stripe.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-stripe-http",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-stripe-http.git"
-    },
-    {
-      "layer": "foundations",
-      "name": "swift-structured-queries-postgres",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-structured-queries-postgres.git"
-    },
-    {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-svg",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-svg.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-svg.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-svg-render",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-svg-render.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-svg-render.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-synchronizers",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-synchronizers.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-synchronizers.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-systems",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-systems.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-systems.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-tensors",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-tensors.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-tensors.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
+      "name": "swift-test-apple",
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-test-apple.git"
+    },
+    {
+      "layer": "compositions",
       "name": "swift-test-application",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-test-application.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-test-application.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
+      "name": "swift-test-benchmark",
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-test-benchmark.git"
+    },
+    {
+      "layer": "compositions",
       "name": "swift-testing-performance",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-testing-performance.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-testing-performance.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-tests",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-tests.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-tests.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-threads",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-threads.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-threads.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-throttling",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-throttling.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-throttling.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-throttling-dependencies",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-throttling-dependencies.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-throttling-dependencies.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-time-based-one-time-password",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-time-based-one-time-password.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-time-based-one-time-password.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-time-to-live",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-time-to-live.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-time-to-live.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-time-to-live-dependencies",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-time-to-live-dependencies.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-time-to-live-dependencies.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-tls",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-tls.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-tls.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-translating",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-translating.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-translating.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-translating-dependencies",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-translating-dependencies.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-translating-dependencies.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-uri",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-uri.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-uri.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-url-form-coding",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-url-form-coding.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-url-form-coding.git"
     },
     {
-      "layer": "foundations",
-      "name": "swift-url-routing",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-url-routing.git"
-    },
-    {
-      "layer": "foundations",
-      "name": "swift-url-routing-authentication",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-url-routing-authentication.git"
-    },
-    {
-      "layer": "foundations",
-      "name": "swift-url-routing-form-coding",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-url-routing-form-coding.git"
-    },
-    {
-      "layer": "foundations",
-      "name": "swift-url-routing-translating",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-url-routing-translating.git"
-    },
-    {
-      "layer": "foundations",
-      "name": "swift-url-routing-vapor",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-url-routing-vapor.git"
-    },
-    {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-urlrequest-handler",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-urlrequest-handler.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-urlrequest-handler.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-uuids",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-uuids.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-uuids.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-webpage",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-webpage.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-webpage.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-windows",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-windows.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-windows.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
+      "name": "swift-witness-context",
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-witness-context.git"
+    },
+    {
+      "layer": "compositions",
+      "name": "swift-witness-observation",
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-witness-observation.git"
+    },
+    {
+      "layer": "compositions",
       "name": "swift-witnesses",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-witnesses.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-witnesses.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-xcode",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-xcode.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-xcode.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-xml",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-xml.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-xml.git"
     },
     {
-      "layer": "foundations",
+      "layer": "compositions",
       "name": "swift-yaml",
-      "organization": "swift-foundations",
-      "url": "https://github.com/swift-foundations/swift-yaml.git"
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swift-yaml.git"
+    },
+    {
+      "layer": "compositions",
+      "name": "swiftui-extensions",
+      "organization": "swift-compositions",
+      "url": "https://github.com/swift-compositions/swiftui-extensions.git"
     }
   ],
   "scope": "proof",
