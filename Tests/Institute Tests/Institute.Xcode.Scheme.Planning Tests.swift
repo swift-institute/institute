@@ -30,6 +30,11 @@ extension Institute.Xcode.Scheme.Test.Unit {
                 ("Institute CI Inventory", false), ("Institute CI Model", false),
                 ("Institute CI Validation", false), ("Institute CI Workflow", false),
                 ("Institute Repository Policy", false), ("Institute Source Policy", false),
+                ("Institute Lint Fixture Linter", false), ("Source Execution", false),
+                ("Source Linter", false), ("Source Measurement", false),
+                ("Source Profile", false), ("Source Repair", false),
+                ("Source Report", false), ("Source Swift Format", false),
+                ("Source SwiftLint", false),
                 ("Institute Tests", true),
                 ("Institute Instruments Tests", true),
                 ("Institute Development Tests", true),
@@ -39,6 +44,7 @@ extension Institute.Xcode.Scheme.Test.Unit {
                 ("Institute CI Validation Tests", true),
                 ("Institute CI Workflow Tests", true),
                 ("Institute Source Policy Tests", true),
+                ("Institute Repository Policy Tests", true),
             ]
         )
         try Self.package(
@@ -125,10 +131,10 @@ extension Institute.Xcode.Scheme.Test.Unit {
             timeout: .seconds(5)
         )
 
-        #expect(Array(plan.buildables.prefix(21)).allSatisfy { $0.reference == "../institute" })
-        #expect(Array(plan.buildables.dropFirst(21).prefix(27)).allSatisfy { $0.reference == "." })
+        #expect(Array(plan.buildables.prefix(30)).allSatisfy { $0.reference == "../institute" })
+        #expect(Array(plan.buildables.dropFirst(30).prefix(27)).allSatisfy { $0.reference == "." })
         #expect(
-            Array(plan.buildables.dropFirst(48).prefix(6)).allSatisfy { $0.reference == "../slow" }
+            Array(plan.buildables.dropFirst(57).prefix(6)).allSatisfy { $0.reference == "../slow" }
         )
         #expect(plan.buildables.last?.reference == "../fast")
         #expect(
@@ -142,6 +148,7 @@ extension Institute.Xcode.Scheme.Test.Unit {
                 "Institute CI Validation Tests",
                 "Institute CI Workflow Tests",
                 "Institute Source Policy Tests",
+                "Institute Repository Policy Tests",
                 "Institute CI Application Tests",
                 "Institute Repository Application Tests",
                 "Institute Source Application Tests",

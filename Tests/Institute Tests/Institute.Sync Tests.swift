@@ -334,6 +334,7 @@ extension Institute.Sync.Test.Unit {
                 "Institute CI Workflow Tests",
                 "Institute Development Tests",
                 "Institute Instruments Tests",
+                "Institute Repository Policy Tests",
                 "Institute Source Policy Tests",
                 "Institute Tests",
                 "Institute CI Application Tests",

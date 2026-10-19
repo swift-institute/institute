@@ -356,17 +356,19 @@ extension Institute.Xcode.Scheme {
                     "Institute CI Inventory", "Institute CI Model", "Institute CI Validation",
                     "Institute CI Workflow", "Institute Conversion", "Institute Dependency",
                     "Institute Development", "Institute Doctor", "Institute Instruments",
-                    "Institute Inventory", "Institute Lint", "Institute Model",
-                    "Institute Pages", "Institute Repository Policy", "Institute Source",
-                    "Institute Source Policy", "Institute Source Profile",
-                    "Institute Source Workspace",
+                    "Institute Inventory", "Institute Lint", "Institute Lint Fixture Linter",
+                    "Institute Model", "Institute Pages", "Institute Repository Policy",
+                    "Institute Source", "Institute Source Policy", "Institute Source Profile",
+                    "Institute Source Workspace", "Source Execution", "Source Linter",
+                    "Source Measurement", "Source Profile", "Source Repair", "Source Report",
+                    "Source Swift Format", "Source SwiftLint",
                 ],
                 testables: [
                     "Institute CI Canon Tests", "Institute CI Inventory Tests",
                     "Institute CI Model Tests", "Institute CI Validation Tests",
                     "Institute CI Workflow Tests", "Institute Development Tests",
-                    "Institute Instruments Tests", "Institute Source Policy Tests",
-                    "Institute Tests",
+                    "Institute Instruments Tests", "Institute Repository Policy Tests",
+                    "Institute Source Policy Tests", "Institute Tests",
                 ]
             )
         case .application:
