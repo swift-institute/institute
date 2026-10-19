@@ -1,12 +1,12 @@
+import Byte
 public import Command
 public import Command_Schema
-public import Institute_Model
-import Byte
 import Console
 import Environment
 import File_System
 import Git_Foundation
 public import Institute_Instruments
+public import Institute_Model
 import JSON
 import Process
 
@@ -308,16 +308,20 @@ extension Institute.Verification.Command {
                     Institute.Verification.Operation.Kind.init(rawValue:)
                 )
 
+            // `validate()` already refused an unrecognised visibility or layer.
+            guard
+                let visibility = Institute.Verification.Visibility(rawValue: verificationVisibility),
+                let layer = Institute.Layer(rawValue: verificationLayer)
+            else {
+                preconditionFailure("validate() admits only known visibility and layer values")
+            }
             let run = Institute.Verification.Run(
                 packagePath: subjectPath,
                 claimedHead: claimedHead,
                 coordinate: coordinate,
-                // `validate()` already refused an unrecognised value.
-                visibility: Institute.Verification.Visibility(
-                    rawValue: verificationVisibility
-                )!,
+                visibility: visibility,
                 defaultBranch: defaultBranch,
-                layer: Institute.Layer(rawValue: verificationLayer)!,
+                layer: layer,
                 inventoryDigest: verificationInventoryDigest,
                 workspaceRevision: workspaceRevision,
                 policyRevision: policyRevision,

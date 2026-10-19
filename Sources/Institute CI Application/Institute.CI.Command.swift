@@ -1,7 +1,7 @@
 public import Command
 public import Command_Schema
-public import Institute_Model
 public import Institute_CI_Model
+public import Institute_Model
 
 extension Institute.CI {
     /// `institute ci` — the typed continuous-integration passthrough. The

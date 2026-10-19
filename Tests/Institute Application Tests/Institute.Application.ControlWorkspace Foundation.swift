@@ -12,6 +12,9 @@ enum ControlWorkspaceFoundation {
             root
             .appendingPathComponent("institute control.xcworkspace")
             .appendingPathComponent("contents.xcworkspacedata")
+        // A Windows checkout converts the committed LF to CRLF; compare the
+        // committed bytes, not the platform's text conversion of them.
         return try String(contentsOf: workspace, encoding: .utf8)
+            .replacingOccurrences(of: "\r\n", with: "\n")
     }
 }

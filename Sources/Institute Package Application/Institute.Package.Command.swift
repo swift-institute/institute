@@ -1,7 +1,7 @@
 public import Command
 public import Command_Schema
-public import Institute_Model
 import Institute_Build_Coordinator
+public import Institute_Model
 
 extension Institute {
     /// The single-package operation domain: one package operated through

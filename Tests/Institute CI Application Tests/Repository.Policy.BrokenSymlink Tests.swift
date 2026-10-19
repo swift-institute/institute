@@ -1,7 +1,7 @@
-public import Institute_Model
-import Institute_Repository_Policy
 import Byte
 import Institute_CI_Application
+public import Institute_Model
+import Institute_Repository_Policy
 import Testing
 
 @Suite

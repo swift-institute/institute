@@ -1,9 +1,10 @@
-public import Institute_Model
-import struct Swift.String
 import Byte
 import FIPS_180_4
 import File_System
+public import Institute_Model
 public import Institute_Repository_Policy
+
+import struct Swift.String
 
 extension Institute.Repository.Policy.Command {
     /// The application half of the census: filesystem traversal over
@@ -157,7 +158,9 @@ extension Institute.Repository.Policy.Command.Census.Generator {
         }
         let text = Swift.String(decoding: raw, as: Swift.UTF8.self)
         let fam = family(forPath: "/" + rel)
-        let owner = ownerByFamily[fam] ?? ownerByFamily["other"]!
+        guard let owner = ownerByFamily[fam] ?? ownerByFamily["other"] else {
+            preconditionFailure("ownerByFamily names an owner for \"other\"")
+        }
         let ext = rel.split(separator: ".").last.map(Swift.String.init) ?? ""
         let engine: Swift.String
         switch ext {
@@ -227,7 +230,8 @@ extension Institute.Repository.Policy.Command.Census.Generator {
             .anchorsMatchLineEndings()
         i = 0
         for match in text.matches(of: uses) {
-            let target = match.output.count > 1
+            let target =
+                match.output.count > 1
                 ? match.output[1].substring.map(Swift.String.init) ?? ""
                 : ""
             rows.append(
@@ -251,7 +255,8 @@ extension Institute.Repository.Policy.Command.Census.Generator {
         i = 0
         for match in text.matches(of: runPattern) {
             let startLine = lineNumber(at: match.range.lowerBound)
-            let indent = match.output.count > 1
+            let indent =
+                match.output.count > 1
                 ? (match.output[1].substring?.count ?? 0)
                 : 0
             let blockScalar =

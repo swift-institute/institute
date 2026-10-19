@@ -1,8 +1,9 @@
-public import Institute_Model
-public import Institute_CI_Model
-import struct Swift.String
 import Console
+public import Institute_CI_Model
 import Institute_CI_Validation
+public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Command {
     static func control(_ arguments: [Swift.String]) {

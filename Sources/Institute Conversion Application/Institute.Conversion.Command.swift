@@ -1,11 +1,11 @@
+import Byte
 public import Command
 public import Command_Schema
-public import Institute_Model
-import Byte
 import Console
 import Environment
 import File_System
 public import Institute_Conversion
+public import Institute_Model
 import JSON
 
 extension Institute.Conversion.Command {

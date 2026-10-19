@@ -1,11 +1,12 @@
-public import Institute_Model
-import struct Swift.String
 import Byte
 import GitHub_App
+public import Institute_Model
 public import Institute_Repository_Policy
 import JSON
 import RFC_3339
 import Time
+
+import struct Swift.String
 
 extension Institute.Repository.Policy.Command {
     /// `institute repository census --repo <name>=<root>=<headSha> ... --output <csv>`

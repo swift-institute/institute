@@ -1,10 +1,11 @@
-public import Institute_Model
-import struct Swift.String
-public import Institute_Repository_Policy
 public import Byte
 public import Institute_GitHub
+public import Institute_Model
+public import Institute_Repository_Policy
 import JSON
 import RFC_4648
+
+import struct Swift.String
 
 extension Institute.Repository.Policy.Command {
     /// The executing client behind both wave contracts, issuing every
@@ -16,9 +17,10 @@ extension Institute.Repository.Policy.Command {
 
         /// One raw request: method, path, body. Defaults to the `gh api`
         /// transport; tests inject a deterministic seam here.
-        public typealias Execute = @Sendable (
-            Swift.String, Swift.String, [Byte]?
-        ) async throws(Institute.GitHub.Transport.Error) -> Institute.GitHub.Transport.Response
+        public typealias Execute =
+            @Sendable (
+                Swift.String, Swift.String, [Byte]?
+            ) async throws(Institute.GitHub.Transport.Error) -> Institute.GitHub.Transport.Response
 
         let maximumAttempts: Int
         let delaySeconds: Int

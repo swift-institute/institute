@@ -1,11 +1,11 @@
 public import Command
 public import Command_Schema
-public import Institute_Model
-public import Institute_Instruments
 import Console
 import File_System
 import Git_Foundation
 import Institute_Doctor
+public import Institute_Instruments
+public import Institute_Model
 import JSON
 import Package_Manager
 import Process

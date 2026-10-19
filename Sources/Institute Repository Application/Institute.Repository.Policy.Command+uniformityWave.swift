@@ -1,7 +1,8 @@
-public import Institute_Model
-import struct Swift.String
 import Byte
+public import Institute_Model
 public import Institute_Repository_Policy
+
+import struct Swift.String
 
 extension Institute.Repository.Policy.Command {
     static func uniformityWave(_ arguments: [Swift.String]) async throws(Error) {
@@ -75,7 +76,7 @@ extension Institute.Repository.Policy.Command {
         _ values: [Swift.String: Swift.String]
     ) throws(Error) {
         let attestation = try attestation(values, operation: "uniformity-wave")
-        try encode(attestation, to: values["--output"]!)
+        try encode(attestation, to: (try value("--output", in: values)))
         print(
             "institute repository: uniformity-wave attested \(attestation.organization) "
                 + "repositories=\(attestation.repositories.count) "
@@ -181,6 +182,7 @@ extension Institute.Repository.Policy.Command {
             "--policy-digest", "--policy-source", "--attestation", "--recovery", "--receipt",
         ]
         try require(values, keys: required, operation: "uniformity-wave preflight")
+        let attestationPath = try value("--attestation", in: values)
         let attestation:
             (
                 attestation: Institute.Repository.Policy.Uniformity.Wave.Attestation,
@@ -188,13 +190,13 @@ extension Institute.Repository.Policy.Command {
             )
         do throws(Institute.Repository.Policy.Uniformity.Wave.Error) {
             attestation = try Institute.Repository.Policy.Uniformity.Wave.Attestation.read(
-                at: values["--attestation"]!
+                at: attestationPath
             )
         } catch {
             throw .wave(error)
         }
         let population: Institute.Repository.Policy.Uniformity.Wave.Population = try decode(
-            at: values["--population"]!,
+            at: (try value("--population", in: values)),
             label: "uniformity-wave population"
         )
         do throws(Institute.Repository.Policy.Uniformity.Wave.Error) {
@@ -202,7 +204,7 @@ extension Institute.Repository.Policy.Command {
         } catch {
             throw .wave(error)
         }
-        let repository = values["--repository"]!
+        let repository = (try value("--repository", in: values))
         guard let subject = population.subjects.first(where: { $0.repository == repository }),
             population.subjects.filter({ $0.repository == repository }).count == 1
         else {
@@ -230,8 +232,8 @@ extension Institute.Repository.Policy.Command {
         } catch {
             throw .wave(error)
         }
-        try encode(result.recovery, to: values["--recovery"]!)
-        try encode(result.receipt, to: values["--receipt"]!)
+        try encode(result.recovery, to: (try value("--recovery", in: values)))
+        try encode(result.receipt, to: (try value("--receipt", in: values)))
         print(
             "institute repository: uniformity-wave preflight accepted \(repository) "
                 + "recovery=\(result.receipt.recoveryDigest)"
@@ -245,10 +247,10 @@ extension Institute.Repository.Policy.Command {
         let required = ["--recovery", "--payload", "--events", "--receipt"]
         try require(values, keys: required, operation: "uniformity-wave apply")
         let recovery: Institute.Repository.Policy.Uniformity.Wave.Recovery = try decode(
-            at: values["--recovery"]!,
+            at: (try value("--recovery", in: values)),
             label: "uniformity-wave recovery"
         )
-        let payload = try bytes(at: values["--payload"]!, label: "shape policy payload")
+        let payload = try bytes(at: (try value("--payload", in: values)), label: "shape policy payload")
         let request = Institute.Repository.Policy.Uniformity.Wave.Request(
             repository: recovery.repository,
             expectedRepositoryID: recovery.repositoryID,
@@ -263,7 +265,7 @@ extension Institute.Repository.Policy.Command {
             policySource: recovery.policySource,
             commitMessage: uniformityCommitMessage
         )
-        let events = values["--events"]!
+        let events = (try value("--events", in: values))
         let receipt: Institute.Repository.Policy.Uniformity.Wave.Receipt
         do throws(Institute.Repository.Policy.Uniformity.Wave.Error) {
             receipt = try await Institute.Repository.Policy.Uniformity.Wave.run(
@@ -275,7 +277,7 @@ extension Institute.Repository.Policy.Command {
         } catch {
             throw .wave(error)
         }
-        try encode(receipt, to: values["--receipt"]!)
+        try encode(receipt, to: (try value("--receipt", in: values)))
         print(
             "institute repository: uniformity-wave \(receipt.changed ? "applied" : "converged") "
                 + "\(receipt.repository) head=\(receipt.newHead) "
@@ -291,10 +293,10 @@ extension Institute.Repository.Policy.Command {
         let required = ["--recovery", "--payload", "--output"]
         try require(values, keys: required, operation: "uniformity-wave close")
         let recovery: Institute.Repository.Policy.Uniformity.Wave.Recovery = try decode(
-            at: values["--recovery"]!,
+            at: (try value("--recovery", in: values)),
             label: "uniformity-wave recovery"
         )
-        let payload = try bytes(at: values["--payload"]!, label: "shape policy payload")
+        let payload = try bytes(at: (try value("--payload", in: values)), label: "shape policy payload")
         let closure: Institute.Repository.Policy.Uniformity.Wave.Closure
         do throws(Institute.Repository.Policy.Uniformity.Wave.Error) {
             closure = try await Institute.Repository.Policy.Uniformity.Wave.close(
@@ -305,7 +307,7 @@ extension Institute.Repository.Policy.Command {
         } catch {
             throw .wave(error)
         }
-        try encode(closure, to: values["--output"]!)
+        try encode(closure, to: (try value("--output", in: values)))
         guard closure.accepted else {
             throw .wave(
                 .verification("\(closure.repository): uniformity closure was not accepted")
@@ -324,10 +326,10 @@ extension Institute.Repository.Policy.Command {
         ]
         try require(values, keys: required, operation: "uniformity-wave recensus")
         let original: Institute.Repository.Policy.Uniformity.Wave.Population = try decode(
-            at: values["--original"]!,
+            at: (try value("--original", in: values)),
             label: "original uniformity-wave population"
         )
-        let fleetPolicy = try fleet(at: values["--fleet"]!)
+        let fleetPolicy = try fleet(at: (try value("--fleet", in: values)))
         let current: Institute.Repository.Policy.Uniformity.Wave.Population
         do throws(Institute.Repository.Policy.Uniformity.Wave.Error) {
             current = try await Institute.Repository.Policy.Uniformity.Wave.enumerate(
@@ -337,22 +339,24 @@ extension Institute.Repository.Policy.Command {
         } catch {
             throw .wave(error)
         }
-        let payload = try bytes(at: values["--payload"]!, label: "shape policy payload")
+        let payload = try bytes(at: (try value("--payload", in: values)), label: "shape policy payload")
         let receipts: [Institute.Repository.Policy.Uniformity.Wave.Receipt] =
             try decodeDirectory(
-                at: values["--receipts"]!,
+                at: (try value("--receipts", in: values)),
                 label: "uniformity-wave receipts"
             )
         let closures: [Institute.Repository.Policy.Uniformity.Wave.Closure] =
             try decodeDirectory(
-                at: values["--closures"]!,
+                at: (try value("--closures", in: values)),
                 label: "uniformity-wave closures"
             )
         let events: [Institute.Repository.Policy.Uniformity.Wave.Event] =
             try decodeLinesDirectory(
-                at: values["--events"]!,
+                at: (try value("--events", in: values)),
                 label: "uniformity-wave events"
             )
+        let policyDigest = try value("--policy-digest", in: values)
+        let policySource = try value("--policy-source", in: values)
         let recensus: Institute.Repository.Policy.Uniformity.Wave.Recensus
         do throws(Institute.Repository.Policy.Uniformity.Wave.Error) {
             recensus = try Institute.Repository.Policy.Uniformity.Wave.recensus(
@@ -363,14 +367,14 @@ extension Institute.Repository.Policy.Command {
                     receipts: receipts,
                     events: events,
                     closures: closures,
-                    policyDigest: values["--policy-digest"]!,
-                    policySource: values["--policy-source"]!
+                    policyDigest: policyDigest,
+                    policySource: policySource
                 )
             )
         } catch {
             throw .wave(error)
         }
-        try encode(recensus, to: values["--output"]!)
+        try encode(recensus, to: (try value("--output", in: values)))
         guard recensus.accepted else {
             let mismatches = recensus.observations.filter { !$0.matches }.map(\.repository)
             throw .wave(
@@ -418,11 +422,11 @@ extension Institute.Repository.Policy.Command {
         population: Institute.Repository.Policy.Uniformity.Wave.Commitment,
         values: [Swift.String: Swift.String]
     ) throws(Error) -> Institute.Repository.Policy.Uniformity.Wave.Request {
-        guard let integrationID = Int64(values["--integration-id"]!), integrationID > 0 else {
+        guard let integrationID = Int64((try value("--integration-id", in: values))), integrationID > 0 else {
             throw configuration("uniformity-wave --integration-id must be a positive integer")
         }
-        let policyDigest = values["--policy-digest"]!
-        let policySource = values["--policy-source"]!
+        let policyDigest = (try value("--policy-digest", in: values))
+        let policySource = (try value("--policy-source", in: values))
         guard policyDigest.count == 64, policySource.count == 40 else {
             throw configuration("uniformity-wave policy digest or source is not exact")
         }
@@ -432,8 +436,8 @@ extension Institute.Repository.Policy.Command {
             expectedHead: subject.head,
             expectedManifest: subject.manifest,
             expectedShape: subject.shape,
-            payload: try bytes(at: values["--payload"]!, label: "shape policy payload"),
-            canonicalRuleset: try canonicalRuleset(at: values["--policy"]!),
+            payload: try bytes(at: (try value("--payload", in: values)), label: "shape policy payload"),
+            canonicalRuleset: try canonicalRuleset(at: (try value("--policy", in: values))),
             integrationID: integrationID,
             population: population,
             policyDigest: policyDigest,

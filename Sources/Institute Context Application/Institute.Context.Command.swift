@@ -1,9 +1,9 @@
 public import Command
 public import Command_Schema
-public import Institute_Model
 import Environment
 import File_System
 public import Institute_Development
+public import Institute_Model
 import Process
 
 extension Institute.Context.Command {

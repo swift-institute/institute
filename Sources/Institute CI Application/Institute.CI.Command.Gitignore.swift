@@ -1,7 +1,7 @@
-public import Institute_Model
-public import Institute_CI_Model
 public import Institute_CI_Canon
+public import Institute_CI_Model
 public import Institute_CI_Validation
+public import Institute_Model
 
 extension Institute.CI.Command {
     /// The portable process seam for complete Gitignore policy rendering and

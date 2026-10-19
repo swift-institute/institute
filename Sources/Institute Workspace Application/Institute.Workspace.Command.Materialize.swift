@@ -1,7 +1,7 @@
 public import Command
 public import Command_Schema
-public import Institute_Model
 import Institute_Development
+public import Institute_Model
 
 extension Institute.Workspace.Command {
     /// `institute workspace materialize` — regenerate the fleet workspace

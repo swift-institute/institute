@@ -1,5 +1,5 @@
-public import Institute_Model
 public import Institute_CI_Model
+public import Institute_Model
 public import Source_Report
 
 extension Institute.CI.Command.Source {

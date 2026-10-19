@@ -193,8 +193,7 @@ struct `Institute Architecture Tests` {
         // MARK: Exemption control
 
         @Test
-        func `accepts only a derived-model exemption with owner, reason, scope and expiry`() throws
-        {
+        func `accepts only a derived-model exemption with owner, reason, scope and expiry`() throws {
             let inverted = [
                 Institute.Architecture.Edge(
                     source: owner("swift-atoms", "swift-byte-primitives"),

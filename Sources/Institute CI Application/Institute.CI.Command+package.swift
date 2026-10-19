@@ -1,8 +1,9 @@
-public import Institute_Model
 public import Institute_CI_Model
-import struct Swift.String
+public import Institute_Model
 import Institute_Repository_Policy
 import Package_Manager
+
+import struct Swift.String
 
 extension Institute.CI.Command {
     static func package(_ arguments: [Swift.String]) {

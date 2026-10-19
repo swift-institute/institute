@@ -1,9 +1,9 @@
 public import Command
 public import Command_Schema
-public import Institute_Model
 import Environment
 import File_System
 public import Institute_Instruments
+public import Institute_Model
 import Process
 
 /// File-scope alias: inside `Institute.Coherence`, the bare name

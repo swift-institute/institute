@@ -1,8 +1,9 @@
-public import Institute_Model
-import struct Swift.String
 import Byte
+public import Institute_Model
 public import Institute_Repository_Policy
 import JSON
+
+import struct Swift.String
 
 extension Institute.Repository.Policy.Command {
     /// `institute repository ruleset --policy <json> [--class package|control-plane]

@@ -1,9 +1,9 @@
 public import Command
 public import Command_Schema
-public import Institute_Model
 import Console
 import GitHub_App
 public import Institute_GitHub
+public import Institute_Model
 import Paths
 
 extension Institute.GitHub.Command {

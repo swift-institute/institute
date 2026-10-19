@@ -1,12 +1,12 @@
 public import Command
 public import Command_Schema
-public import Institute_Model
 import Environment
 import File_System
 import Git_Foundation
 public import Institute_Dependency
 import Institute_GitHub
 import Institute_Inventory
+public import Institute_Model
 import Process
 
 extension Institute.Dependency {

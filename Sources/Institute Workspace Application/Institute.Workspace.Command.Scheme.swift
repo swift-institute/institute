@@ -1,8 +1,8 @@
 public import Command
 public import Command_Schema
 import File_System
-public import Institute_Model
 import Institute_Development
+public import Institute_Model
 import Xcode_Workspace
 
 extension Institute.Workspace.Command {

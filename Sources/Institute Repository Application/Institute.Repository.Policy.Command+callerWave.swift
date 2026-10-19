@@ -1,12 +1,13 @@
-public import Institute_Model
-import struct Swift.String
 import Byte
 import Calendar_Gregorian
 import Environment
 import GitHub_App
+public import Institute_Model
 public import Institute_Repository_Policy
 import RFC_3339
 import Time
+
+import struct Swift.String
 
 extension Institute.Repository.Policy.Command {
     static func callerWave(_ arguments: [Swift.String]) async throws(Error) {
@@ -77,24 +78,24 @@ extension Institute.Repository.Policy.Command {
             "--repositories", "--permissions", "--run-id", "--output",
         ]
         try require(values, keys: required, operation: "\(operation) attest")
-        guard let installationID = Int64(values["--installation-id"]!), installationID > 0 else {
+        guard let installationID = Int64((try value("--installation-id", in: values))), installationID > 0 else {
             throw configuration("\(operation) --installation-id must be a positive integer")
         }
-        guard let runID = Int64(values["--run-id"]!), runID > 0 else {
+        guard let runID = Int64((try value("--run-id", in: values))), runID > 0 else {
             throw configuration("\(operation) --run-id must be a positive integer")
         }
-        let organization = values["--organization"]!
-        let appClientID = values["--app-client-id"]!
-        let appSlug = values["--app-slug"]!
+        let organization = (try value("--organization", in: values))
+        let appClientID = (try value("--app-client-id", in: values))
+        let appSlug = (try value("--app-slug", in: values))
         guard !organization.isEmpty, !appClientID.isEmpty, !appSlug.isEmpty else {
             throw configuration("\(operation) attest identity values must be nonempty")
         }
-        let repositories = values["--repositories"]!.split(separator: ",").map(Swift.String.init)
+        let repositories = (try value("--repositories", in: values)).split(separator: ",").map(Swift.String.init)
         guard !repositories.isEmpty else {
             throw configuration("\(operation) attest --repositories must be nonempty")
         }
         var permissions: [Swift.String: Swift.String] = [:]
-        for entry in values["--permissions"]!.split(separator: ",") {
+        for entry in (try value("--permissions", in: values)).split(separator: ",") {
             let pair = entry.split(separator: "=", omittingEmptySubsequences: false)
             guard pair.count == 2, !pair[0].isEmpty, !pair[1].isEmpty,
                 permissions.updateValue(
@@ -126,7 +127,7 @@ extension Institute.Repository.Policy.Command {
         _ values: [Swift.String: Swift.String]
     ) throws(Error) {
         let attestation = try attestation(values, operation: "caller-wave")
-        try encode(attestation, to: values["--output"]!)
+        try encode(attestation, to: (try value("--output", in: values)))
         print(
             "institute repository: caller-wave attested \(attestation.organization) "
                 + "repositories=\(attestation.repositories.count) "
@@ -227,6 +228,7 @@ extension Institute.Repository.Policy.Command {
             "--policy-digest", "--policy-source", "--attestation", "--recovery", "--receipt",
         ]
         try require(values, keys: required, operation: "caller-wave preflight")
+        let attestationPath = try value("--attestation", in: values)
         let attestation:
             (
                 attestation: Institute.Repository.Policy.Caller.Wave.Attestation,
@@ -234,13 +236,13 @@ extension Institute.Repository.Policy.Command {
             )
         do throws(Institute.Repository.Policy.Caller.Wave.Error) {
             attestation = try Institute.Repository.Policy.Caller.Wave.Attestation.read(
-                at: values["--attestation"]!
+                at: attestationPath
             )
         } catch {
             throw .wave(error)
         }
         let population: Institute.Repository.Policy.Caller.Wave.Population = try decode(
-            at: values["--population"]!,
+            at: (try value("--population", in: values)),
             label: "caller-wave population"
         )
         do throws(Institute.Repository.Policy.Caller.Wave.Error) {
@@ -248,7 +250,7 @@ extension Institute.Repository.Policy.Command {
         } catch {
             throw .wave(error)
         }
-        let repository = values["--repository"]!
+        let repository = (try value("--repository", in: values))
         guard let subject = population.subjects.first(where: { $0.repository == repository }),
             population.subjects.filter({ $0.repository == repository }).count == 1
         else {
@@ -276,8 +278,8 @@ extension Institute.Repository.Policy.Command {
         } catch {
             throw .wave(error)
         }
-        try encode(result.recovery, to: values["--recovery"]!)
-        try encode(result.receipt, to: values["--receipt"]!)
+        try encode(result.recovery, to: (try value("--recovery", in: values)))
+        try encode(result.receipt, to: (try value("--receipt", in: values)))
         print(
             "institute repository: caller-wave preflight accepted \(repository) "
                 + "recovery=\(result.receipt.recoveryDigest)"
@@ -291,10 +293,10 @@ extension Institute.Repository.Policy.Command {
         let required = ["--recovery", "--caller", "--events", "--receipt"]
         try require(values, keys: required, operation: "caller-wave apply")
         let recovery: Institute.Repository.Policy.Caller.Wave.Recovery = try decode(
-            at: values["--recovery"]!,
+            at: (try value("--recovery", in: values)),
             label: "caller-wave recovery"
         )
-        let caller = try bytes(at: values["--caller"]!, label: "terminal caller")
+        let caller = try bytes(at: (try value("--caller", in: values)), label: "terminal caller")
         let request = Institute.Repository.Policy.Caller.Wave.Request(
             repository: recovery.repository,
             expectedRepositoryID: recovery.repositoryID,
@@ -309,7 +311,7 @@ extension Institute.Repository.Policy.Command {
             policySource: recovery.policySource,
             commitMessage: terminalCallerCommitMessage
         )
-        let events = values["--events"]!
+        let events = (try value("--events", in: values))
         let receipt: Institute.Repository.Policy.Caller.Wave.Receipt
         do throws(Institute.Repository.Policy.Caller.Wave.Error) {
             receipt = try await Institute.Repository.Policy.Caller.Wave.run(
@@ -321,7 +323,7 @@ extension Institute.Repository.Policy.Command {
         } catch {
             throw .wave(error)
         }
-        try encode(receipt, to: values["--receipt"]!)
+        try encode(receipt, to: (try value("--receipt", in: values)))
         print(
             "institute repository: caller-wave \(receipt.changed ? "applied" : "converged") "
                 + "\(receipt.repository) head=\(receipt.newHead) blob=\(receipt.newBlob) "
@@ -336,10 +338,10 @@ extension Institute.Repository.Policy.Command {
         let required = ["--recovery", "--caller", "--output"]
         try require(values, keys: required, operation: "caller-wave close")
         let recovery: Institute.Repository.Policy.Caller.Wave.Recovery = try decode(
-            at: values["--recovery"]!,
+            at: (try value("--recovery", in: values)),
             label: "caller-wave recovery"
         )
-        let caller = try bytes(at: values["--caller"]!, label: "terminal caller")
+        let caller = try bytes(at: (try value("--caller", in: values)), label: "terminal caller")
         let closure: Institute.Repository.Policy.Caller.Wave.Closure
         do throws(Institute.Repository.Policy.Caller.Wave.Error) {
             closure = try await Institute.Repository.Policy.Caller.Wave.close(
@@ -350,7 +352,7 @@ extension Institute.Repository.Policy.Command {
         } catch {
             throw .wave(error)
         }
-        try encode(closure, to: values["--output"]!)
+        try encode(closure, to: (try value("--output", in: values)))
         guard closure.accepted else {
             throw .wave(.verification("\(closure.repository): terminal closure was not accepted"))
         }
@@ -367,10 +369,10 @@ extension Institute.Repository.Policy.Command {
         ]
         try require(values, keys: required, operation: "caller-wave recensus")
         let original: Institute.Repository.Policy.Caller.Wave.Population = try decode(
-            at: values["--original"]!,
+            at: (try value("--original", in: values)),
             label: "original caller-wave population"
         )
-        let fleetPolicy = try fleet(at: values["--fleet"]!)
+        let fleetPolicy = try fleet(at: (try value("--fleet", in: values)))
         let current: Institute.Repository.Policy.Caller.Wave.Population
         do throws(Institute.Repository.Policy.Caller.Wave.Error) {
             current = try await Institute.Repository.Policy.Caller.Wave.enumerate(
@@ -380,19 +382,21 @@ extension Institute.Repository.Policy.Command {
         } catch {
             throw .wave(error)
         }
-        let caller = try bytes(at: values["--caller"]!, label: "terminal caller")
+        let caller = try bytes(at: (try value("--caller", in: values)), label: "terminal caller")
         let receipts: [Institute.Repository.Policy.Caller.Wave.Receipt] = try decodeDirectory(
-            at: values["--receipts"]!,
+            at: (try value("--receipts", in: values)),
             label: "caller-wave receipts"
         )
         let closures: [Institute.Repository.Policy.Caller.Wave.Closure] = try decodeDirectory(
-            at: values["--closures"]!,
+            at: (try value("--closures", in: values)),
             label: "caller-wave closures"
         )
         let events: [Institute.Repository.Policy.Caller.Wave.Event] = try decodeLinesDirectory(
-            at: values["--events"]!,
+            at: (try value("--events", in: values)),
             label: "caller-wave events"
         )
+        let policyDigest = try value("--policy-digest", in: values)
+        let policySource = try value("--policy-source", in: values)
         let recensus: Institute.Repository.Policy.Caller.Wave.Recensus
         do throws(Institute.Repository.Policy.Caller.Wave.Error) {
             recensus = try Institute.Repository.Policy.Caller.Wave.recensus(
@@ -403,14 +407,14 @@ extension Institute.Repository.Policy.Command {
                     receipts: receipts,
                     events: events,
                     closures: closures,
-                    policyDigest: values["--policy-digest"]!,
-                    policySource: values["--policy-source"]!
+                    policyDigest: policyDigest,
+                    policySource: policySource
                 )
             )
         } catch {
             throw .wave(error)
         }
-        try encode(recensus, to: values["--output"]!)
+        try encode(recensus, to: (try value("--output", in: values)))
         guard recensus.accepted else {
             let mismatches = recensus.observations.filter { !$0.matches }.map(\.repository)
             throw .wave(
@@ -458,11 +462,11 @@ extension Institute.Repository.Policy.Command {
         population: Institute.Repository.Policy.Caller.Wave.Commitment,
         values: [Swift.String: Swift.String]
     ) throws(Error) -> Institute.Repository.Policy.Caller.Wave.Request {
-        guard let integrationID = Int64(values["--integration-id"]!), integrationID > 0 else {
+        guard let integrationID = Int64((try value("--integration-id", in: values))), integrationID > 0 else {
             throw configuration("caller-wave --integration-id must be a positive integer")
         }
-        let policyDigest = values["--policy-digest"]!
-        let policySource = values["--policy-source"]!
+        let policyDigest = (try value("--policy-digest", in: values))
+        let policySource = (try value("--policy-source", in: values))
         guard policyDigest.count == 64, policySource.count == 40 else {
             throw configuration("caller-wave policy digest or source is not exact")
         }
@@ -472,8 +476,8 @@ extension Institute.Repository.Policy.Command {
             expectedHead: subject.head,
             expectedManifest: subject.manifest,
             expectedBlob: subject.caller.blob,
-            caller: try bytes(at: values["--caller"]!, label: "terminal caller"),
-            canonicalRuleset: try canonicalRuleset(at: values["--policy"]!),
+            caller: try bytes(at: (try value("--caller", in: values)), label: "terminal caller"),
+            canonicalRuleset: try canonicalRuleset(at: (try value("--policy", in: values))),
             integrationID: integrationID,
             population: population,
             policyDigest: policyDigest,

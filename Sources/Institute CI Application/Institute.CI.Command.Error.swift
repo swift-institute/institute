@@ -1,6 +1,6 @@
-public import Institute_Model
 public import Institute_CI_Model
 public import Institute_CI_Validation
+public import Institute_Model
 
 extension Institute.CI.Command {
     /// Every way the CI command family refuses, preserving the refusing

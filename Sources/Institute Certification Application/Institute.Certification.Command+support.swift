@@ -1,8 +1,8 @@
-public import Institute_Model
-public import Institute_Instruments
 import Byte
 import Environment
 import File_System
+public import Institute_Instruments
+public import Institute_Model
 import JSON
 
 extension Institute.Certification.Command {

@@ -1,9 +1,9 @@
 public import Command
 public import Command_Schema
-public import Institute_Model
 import Environment
 import File_System
 public import Institute_Inventory
+public import Institute_Model
 
 extension Institute.Inventory.Command {
     /// Resolves the Institute root from the working directory.

@@ -1,8 +1,8 @@
-public import Institute_Model
-import Institute_Repository_Policy
 import Byte
 import Foundation
+public import Institute_Model
 import Institute_Repository_Application
+import Institute_Repository_Policy
 
 actor UniformityWaveMockClient: Institute.Repository.Policy.Uniformity.Wave.Client {
     var remainingRequests = 5_000

@@ -1,8 +1,8 @@
-public import Institute_Model
-import Institute_Repository_Policy
 import Byte
 import Foundation
+public import Institute_Model
 import Institute_Repository_Application
+import Institute_Repository_Policy
 
 actor CallerWaveMockClient: Institute.Repository.Policy.Caller.Wave.Client {
     var remainingRequests = 5_000

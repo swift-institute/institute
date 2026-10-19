@@ -1,8 +1,8 @@
 public import Command
 public import Command_Schema
-public import Institute_Model
-public import Institute_Build_Coordinator
 import Environment
+public import Institute_Build_Coordinator
+public import Institute_Model
 import Process
 
 extension Institute.Package.Command {

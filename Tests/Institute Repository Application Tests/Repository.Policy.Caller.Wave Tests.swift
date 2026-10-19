@@ -1,8 +1,8 @@
-public import Institute_Model
-import Institute_Repository_Policy
 import Byte
-import Institute_Repository_Application
 import Institute_GitHub
+public import Institute_Model
+import Institute_Repository_Application
+import Institute_Repository_Policy
 import Testing
 
 @Suite
@@ -829,7 +829,11 @@ struct `Repository Policy Caller Wave Tests` {
             maximumAttempts: 2,
             delaySeconds: 0,
             execute: {
-                (_, path, _) async throws(Institute.GitHub.Transport.Error)
+                (
+                    _,
+                    path,
+                    _
+                ) async throws(Institute.GitHub.Transport.Error)
                     -> Institute.GitHub.Transport.Response in
                 if await counter.next() == 1 {
                     throw Institute.GitHub.Transport.Error.spawn("injected transport failure")

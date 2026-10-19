@@ -1,7 +1,7 @@
-public import Institute_Model
-import Institute_Repository_Policy
 import Byte
+public import Institute_Model
 import Institute_Repository_Application
+import Institute_Repository_Policy
 import JSON
 import Testing
 

@@ -1,21 +1,21 @@
 import Command
+import Institute_Build_Coordinator
 import Institute_Certification_Application
 import Institute_Coherence_Application
 import Institute_Composition_Application
 import Institute_Context_Application
 import Institute_Conversion_Application
+import Institute_Dependency
 import Institute_Dependency_Application
+import Institute_Development
 import Institute_Doctor_Application
 import Institute_GitHub_Application
 import Institute_Inventory_Application
+import Institute_Model
 import Institute_Navigation_Application
 import Institute_Package_Application
 import Institute_Verification_Application
 import Institute_Workspace_Application
-import Institute_Build_Coordinator
-import Institute_Dependency
-import Institute_Model
-import Institute_Development
 import Testing
 
 @testable import Institute_Application

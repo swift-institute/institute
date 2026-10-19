@@ -1,8 +1,8 @@
 import Command
 import Institute_Certification_Application
 import Institute_Instruments
-import Institute_Workspace_Application
 import Institute_Model
+import Institute_Workspace_Application
 import Testing
 
 @testable import Institute_Application

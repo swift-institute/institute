@@ -1,9 +1,10 @@
-public import Institute_Model
-public import Institute_CI_Model
-import struct Swift.String
 import Institute_CI_Contract
+public import Institute_CI_Model
+public import Institute_Model
 import JSON
 import Process
+
+import struct Swift.String
 
 extension Institute.CI.Command {
     /// Complete GitHub event-diff retrieval for package-work planning.

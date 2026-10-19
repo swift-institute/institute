@@ -1,8 +1,8 @@
-public import Institute_Model
-import Institute_Repository_Policy
 import Byte
-import Package_Manager
+public import Institute_Model
 import Institute_Repository_Application
+import Institute_Repository_Policy
+import Package_Manager
 import Testing
 
 @Suite

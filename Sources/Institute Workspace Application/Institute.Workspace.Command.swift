@@ -1,6 +1,6 @@
-public import Institute_Model
 import Environment
 import File_System
+public import Institute_Model
 
 extension Institute.Workspace.Command {
     /// Resolves the Institute root from the working directory.

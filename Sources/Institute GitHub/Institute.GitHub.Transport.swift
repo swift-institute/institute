@@ -1,8 +1,9 @@
-public import Institute_Model
-import struct Swift.String
 public import Byte
 import File_System
+public import Institute_Model
 import Process
+
+import struct Swift.String
 
 extension Institute.GitHub {
     /// The Process transport for authenticated GitHub REST operations,

@@ -1,7 +1,7 @@
-public import Institute_Model
-import Institute_Repository_Policy
 import Byte
+public import Institute_Model
 import Institute_Repository_Application
+import Institute_Repository_Policy
 import Testing
 
 /// `Parse` is defined as `Render`'s inverse, so the test is the identity

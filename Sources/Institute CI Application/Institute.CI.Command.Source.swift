@@ -1,14 +1,14 @@
 public import Command
 public import Command_Schema
-public import Institute_Model
+import Console
 public import Institute_CI_Model
+public import Institute_Model
 public import Institute_Source
 import Institute_Source_Policy
 public import Institute_Source_Workspace
 public import JSON
-public import Source_Report
-import Console
 import Process
+public import Source_Report
 
 extension Institute.CI.Command {
     public struct Source: Sendable, Command_Schema.Command.`Protocol` {

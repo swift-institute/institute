@@ -1,8 +1,9 @@
-public import Institute_Model
-import struct Swift.String
 import Console
+public import Institute_Model
 public import Institute_Repository_Policy
 import Process
+
+import struct Swift.String
 
 extension Institute.Repository.Policy.Command {
     public static func execute(_ arguments: [Swift.String]) async {
@@ -52,6 +53,16 @@ extension Institute.Repository.Policy.Command {
 
     static func configuration(_ message: Swift.String) -> Error {
         .configuration(message)
+    }
+
+    /// The value of a key ``require(_:keys:operation:)`` already
+    /// established, or a configuration error naming it.
+    static func value(
+        _ key: Swift.String,
+        in values: [Swift.String: Swift.String]
+    ) throws(Error) -> Swift.String {
+        guard let value = values[key] else { throw configuration("\(key) is required") }
+        return value
     }
 
     static func require(

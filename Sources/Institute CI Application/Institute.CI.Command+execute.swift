@@ -1,12 +1,13 @@
-public import Institute_Model
-public import Institute_CI_Model
-import struct Swift.String
 import Byte
 import Console
 import File_System
+public import Institute_CI_Model
 import Institute_CI_Validation
+public import Institute_Model
 import JSON
 import Process
+
+import struct Swift.String
 
 extension Institute.CI.Command {
     public static func execute(_ arguments: [Swift.String]) async {

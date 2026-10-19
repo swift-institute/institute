@@ -1,11 +1,11 @@
 public import Command
 public import Command_Schema
-public import Institute_Model
 import Console
 import Institute_Doctor
+public import Institute_Inventory
+public import Institute_Model
 import Institute_Pages
 import Process
-public import Institute_Inventory
 
 extension Institute.Inventory.Command {
     /// `institute inventory pages` — enumerate Pages posture over the

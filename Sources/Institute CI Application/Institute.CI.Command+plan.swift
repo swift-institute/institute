@@ -1,10 +1,11 @@
-public import Institute_Model
-import struct Swift.String
 import Console
 import Institute_CI_Contract
 public import Institute_CI_Model
+public import Institute_Model
 import Institute_Repository_Policy
 import JSON
+
+import struct Swift.String
 
 extension Institute.CI.Command {
     // MARK: - plan
@@ -93,7 +94,8 @@ extension Institute.CI.Command {
                     ?? value("--platform-support", in: rest),
                 lintBundle: configuration?.lintBundle
                     ?? value("--lint-bundle", in: rest),
-                packageContentChanged: PackageDiff
+                packageContentChanged:
+                    PackageDiff
                     .packageContentChanged(
                         event: event,
                         eventPath: value("--event-path", in: rest),
@@ -112,7 +114,8 @@ extension Institute.CI.Command {
             "gating": plan.gating.map(\.id).joined(separator: ",").json,
             "package-content-changed": plan.packageContentChanged.json,
             "linux-image": linuxImage.json,
-            "lint-bundle": (configuration?.lintBundle
+            "lint-bundle":
+                (configuration?.lintBundle
                 ?? value("--lint-bundle", in: rest)).json,
             "embedded-target": (configuration?.embeddedTarget ?? "").json,
             // `leg=reason` records; empty when nothing was descheduled.

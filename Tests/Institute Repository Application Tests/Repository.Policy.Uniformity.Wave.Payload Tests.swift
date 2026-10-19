@@ -1,6 +1,6 @@
+import Byte
 public import Institute_Model
 import Institute_Repository_Policy
-import Byte
 import Testing
 
 @testable import Institute_Repository_Application

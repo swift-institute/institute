@@ -1,7 +1,7 @@
-public import Institute_Model
-public import Institute_CI_Model
-public import Institute_Repository_Policy
 import File_System
+public import Institute_CI_Model
+public import Institute_Model
+public import Institute_Repository_Policy
 
 extension Institute.Repository.Policy.BrokenSymlink {
     /// Broken symbolic links beneath `root`, in repository-relative order.

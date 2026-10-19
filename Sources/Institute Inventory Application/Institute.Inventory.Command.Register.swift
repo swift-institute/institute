@@ -1,7 +1,7 @@
 public import Command
 public import Command_Schema
-public import Institute_Model
 public import Institute_Inventory
+public import Institute_Model
 
 extension Institute.Inventory.Command {
     /// `institute inventory` — the read-only register and peer report.
