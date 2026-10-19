@@ -25,20 +25,14 @@ extension Institute.CI.Validation {
 
         /// The eleven L2 authority sub-orgs, which route through the
         /// `swift-standards` layer wrapper.
-        public static let standardsSubOrganizations: Set<String> = [
+        /// The organizations nested under the swift-standards layer root:
+        /// the specification authorities and vendors `fleet.json` places at L3.
+        public static let subOrganizations: Set<String> = [
             "swift-ietf", "swift-iso", "swift-w3c", "swift-whatwg", "swift-ecma",
             "swift-incits", "swift-ieee", "swift-iec", "swift-arm-ltd",
-            "swift-intel", "swift-riscv",
+            "swift-intel", "swift-riscv", "swift-linux-foundation", "swift-microsoft",
+            "swift-bipm",
         ]
-
-        /// The two L3 sub-orgs, which route through `swift-foundations`.
-        public static let foundationsSubOrganizations: Set<String> = [
-            "swift-linux-foundation", "swift-microsoft",
-        ]
-
-        public static var subOrganizations: Set<String> {
-            standardsSubOrganizations.union(foundationsSubOrganizations)
-        }
 
         public func findings(in subject: Subject) throws(EnvironmentDefect) -> [Finding] {
             guard let organization = try Self.subOrganization(of: subject) else {
@@ -77,20 +71,16 @@ extension Institute.CI.Validation {
         }
 
         static func message(organization: String) -> String {
-            let parent =
-                foundationsSubOrganizations.contains(organization)
-                ? "swift-foundations" : "swift-standards"
-            return """
-                .github/workflows/swift-ci.yml EXISTS at sub-org \
-                `\(organization)/.github` — per [CI-004b] sub-org wrappers MUST NOT \
-                be created today (GitHub Actions `workflow_call` 4-level chain limit \
-                would break the universal's advisory linter sub-dispatches). Route \
-                this sub-org's consumers through the parent layer wrapper \
-                `\(parent)/.github/.github/workflows/swift-ci.yml@main` instead. \
-                Per-authority concerns belong in the universal `swift-ci.yml` as \
-                advisory jobs filtered by repo-name pattern, not as a per-authority \
-                wrapper.
-                """
+            """
+            .github/workflows/swift-ci.yml EXISTS at sub-org \
+            `\(organization)/.github` — per [CI-004b] sub-org wrappers MUST NOT \
+            be created (GitHub Actions `workflow_call` 4-level chain limit would \
+            break the universal's advisory linter sub-dispatches). This sub-org's \
+            packages call `swift-institute/.github/.github/workflows/swift-ci.yml@main` \
+            directly, like every package. Per-authority concerns belong in the \
+            universal `swift-ci.yml` as advisory jobs filtered by repo-name pattern, \
+            not as a per-authority wrapper.
+            """
         }
     }
 }

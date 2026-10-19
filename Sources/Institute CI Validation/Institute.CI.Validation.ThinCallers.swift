@@ -45,8 +45,8 @@ extension Institute.CI.Validation {
     /// parseability — the diagnostic-precedence proof below — where
     /// failing closed is correct.
     ///
-    /// It also does not consume `Repository.Policy.Caller.Parse`, and
-    /// that is not an oversight. `Parse` is `Render`'s inverse and fails
+    /// It also never consumed the caller parser (retired with the migration
+    /// forms), and that was not an oversight. The parser was `Render`'s inverse and fails
     /// closed on anything the renderer cannot emit; this validator's
     /// subjects are arbitrary repository workflows, most of which are
     /// exactly the non-canonical shapes `Parse` refuses. Routing them
