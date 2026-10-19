@@ -161,7 +161,8 @@ private func measure(findingsPerFile: Swift.Int) async throws -> (Source.Measure
 @Test
 func `a negative control that trips its rule as declared is clean evidence, and its finding is not a Quality finding`() async throws {
     let (measurement, runs) = try await measure(findingsPerFile: 1)
-    #expect(runs == [["/repo/Sources/Owned.swift"], ["/repo/\(compound)"]])
+    // One run over the whole tree, as swift-linter requires; the split is on the result.
+    #expect(runs == [["/repo/Sources/Owned.swift", "/repo/\(compound)"]])
     #expect(measurement.files == ["/repo/Sources/Owned.swift"])
     guard case .clean = measurement.verdict else {
         Issue.record("governed source must not carry the control's finding")

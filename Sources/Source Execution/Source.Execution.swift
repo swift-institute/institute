@@ -17,10 +17,9 @@ extension Source {
             engines selected: Set<Engine.ID>? = nil
         ) async -> [Measurement] {
             var measurements: [Measurement] = []
-            let governed = subject.governed
             for engine in profile.engines {
                 if let selected, !selected.contains(engine.id) { continue }
-                let artifacts = governed.artifacts.filter { engine.artifactKinds.contains($0.kind) }
+                let artifacts = subject.governed.artifacts.filter { engine.artifactKinds.contains($0.kind) }
                 guard let driver = drivers[engine.id] else {
                     measurements.append(
                         .init(
@@ -39,63 +38,69 @@ extension Source {
                     )
                     continue
                 }
-                let measurement = await driver.measure(governed, engine)
-                let controls = await self.controls(of: subject, engine: engine, driver: driver)
-                measurements.append(
-                    .init(
-                        engine: measurement.engine,
-                        subject: subject,
-                        activeRules: measurement.activeRules,
-                        applicableRules: measurement.applicableRules,
-                        files: measurement.files,
-                        observations: measurement.observations,
-                        suppressions: measurement.suppressions,
-                        repairs: measurement.repairs,
-                        controls: measurement.controls + controls,
-                        verdict: measurement.verdict
-                    )
-                )
+                measurements.append(Self.split(await driver.measure(subject, engine), of: subject, engine: engine))
             }
             return measurements.sorted { $0.engine.token < $1.engine.token }
         }
 
-        /// Measures each control artifact whose predicate `engine` owns on its
-        /// own, and compares the predicate's findings in it with the declared
-        /// expectation. The artifact's other findings are not evidence of
-        /// anything and are dropped; it is not governed source.
-        private func controls(
+        /// Separates an engine's measurement of the whole subject into the
+        /// governed measurement and the evidence of the control artifacts.
+        ///
+        /// Engines measure the subject as one tree — swift-linter enumerates
+        /// the package itself and refuses a partial file set — so controls are
+        /// split out of the result rather than out of the input. Everything
+        /// reported in a control artifact leaves the governed measurement; the
+        /// control's predicate findings there, if this engine owns the
+        /// predicate, are compared with the declared expectation. Its other
+        /// findings are evidence of nothing and are dropped.
+        private static func split(
+            _ measurement: Measurement,
             of subject: Subject,
-            engine: Profile.Engine,
-            driver: Engine.Driver
-        ) async -> [Rule.Control.Evidence] {
-            let declared = subject.artifacts.compactMap {
-                artifact -> (artifact: Artifact, control: Artifact.Purpose.Control)? in
-                guard case .control(let control) = artifact.purpose,
-                    control.predicate.engine == engine.id,
-                    engine.artifactKinds.contains(artifact.kind)
-                else { return nil }
-                return (artifact, control)
-            }
-            guard !declared.isEmpty else { return [] }
-            let probe = await driver.measure(
-                Subject(identity: subject.identity, root: subject.root, artifacts: declared.map(\.artifact)),
-                engine
-            )
+            engine: Profile.Engine
+        ) -> Measurement {
             let prefix = subject.root.hasSuffix("/") ? subject.root : subject.root + "/"
-            return declared.map { declaration in
-                let control = declaration.control
-                let expected: Swift.Int
-                switch control.expectation {
-                case .clean: expected = 0
-                case .findings(let count): expected = count
+            let declared = subject.artifacts.compactMap {
+                artifact -> (path: Swift.String, control: Artifact.Purpose.Control)? in
+                guard case .control(let control) = artifact.purpose else { return nil }
+                return (prefix + artifact.path, control)
+            }
+            guard !declared.isEmpty else { return measurement }
+            let controlFiles = Swift.Set(declared.map(\.path))
+            let governed = { (file: Swift.String?) in !controlFiles.contains(file ?? "") }
+
+            let observations = measurement.observations.filter { governed($0.file) }
+            let applicableRules =
+                measurement.observations.isEmpty
+                ? measurement.applicableRules
+                : measurement.applicableRules.filter { rule in
+                    observations.contains { $0.rule == rule && $0.applicable }
                 }
-                let findings: [Finding]
-                switch probe.verdict {
-                case .clean:
-                    findings = []
-                case .findings(let reported):
-                    findings = reported
-                case .unmeasured(let reasons):
+            let verdict: Measurement.Verdict
+            let reported: [Finding]?
+            switch measurement.verdict {
+            case .findings(let findings):
+                reported = findings
+                let kept = findings.filter { governed($0.diagnostic.location.filePath) }
+                verdict = kept.isEmpty ? .clean : .findings(kept)
+            case .clean:
+                reported = []
+                verdict = .clean
+            case .unmeasured, .notRequested:
+                reported = nil
+                verdict = measurement.verdict
+            }
+
+            let evidence: [Rule.Control.Evidence] = declared.filter {
+                $0.control.predicate.engine == engine.id
+            }.map { declaration in
+                let control = declaration.control
+                guard let reported else {
+                    let reasons: [Reason]
+                    if case .unmeasured(let unmeasured) = measurement.verdict {
+                        reasons = unmeasured
+                    } else {
+                        reasons = [.init(code: "control-not-requested", detail: control.identity)]
+                    }
                     return .init(
                         identity: control.identity,
                         rule: control.predicate,
@@ -103,18 +108,14 @@ extension Source {
                         actualFindings: 0,
                         verdict: .unmeasured(reasons)
                     )
-                case .notRequested:
-                    return .init(
-                        identity: control.identity,
-                        rule: control.predicate,
-                        expectation: control.expectation,
-                        actualFindings: 0,
-                        verdict: .unmeasured([.init(code: "control-not-requested", detail: control.identity)])
-                    )
                 }
-                let actual = findings.count {
-                    $0.rule == control.predicate
-                        && $0.diagnostic.location.filePath == prefix + declaration.artifact.path
+                let expected: Swift.Int
+                switch control.expectation {
+                case .clean: expected = 0
+                case .findings(let count): expected = count
+                }
+                let actual = reported.count {
+                    $0.rule == control.predicate && $0.diagnostic.location.filePath == declaration.path
                 }
                 return .init(
                     identity: control.identity,
@@ -131,6 +132,19 @@ extension Source {
                         ])
                 )
             }
+
+            return .init(
+                engine: measurement.engine,
+                subject: measurement.subject,
+                activeRules: measurement.activeRules,
+                applicableRules: applicableRules,
+                files: measurement.files.filter { governed($0) },
+                observations: observations,
+                suppressions: measurement.suppressions.filter { governed($0.diagnostic.location.filePath) },
+                repairs: measurement.repairs.filter { governed($0.file) },
+                controls: measurement.controls + evidence,
+                verdict: verdict
+            )
         }
 
         public func plan(
@@ -151,8 +165,13 @@ extension Source {
                     planned.append(measurement)
                     continue
                 }
-                let proposal = await driver.repair(subject.governed, engine)
-                var repairs: [Repair.Evidence] = proposal.edits.map { edit in
+                let proposal = await driver.repair(subject, engine)
+                let governedPaths = Swift.Set(subject.governed.artifacts.map(\.path))
+                var repairs: [Repair.Evidence] = proposal.edits.filter { edit in
+                    let prefix = subject.root.hasSuffix("/") ? subject.root : subject.root + "/"
+                    return !edit.path.hasPrefix(prefix)
+                        || governedPaths.contains(Swift.String(edit.path.dropFirst(prefix.count)))
+                }.map { edit in
                     let disposition: Repair.Evidence.Disposition
                     if subject.artifacts.contains(where: {
                         let prefix = subject.root.hasSuffix("/") ? subject.root : subject.root + "/"
