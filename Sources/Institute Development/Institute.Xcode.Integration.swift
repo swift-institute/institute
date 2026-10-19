@@ -79,4 +79,23 @@ extension Institute.Workspace.Control {
             "group:../swift-compositions/swift-linter/Runner"
         }
     }
+
+    /// The checkout that carries ``location``, as path components under the
+    /// hierarchy root, or `nil` for the application checkout itself.
+    ///
+    /// `sync` materializes it when absent: the integration workspace names
+    /// every control unconditionally, so a fresh hierarchy without them
+    /// cannot be acquired.
+    var checkout: [Swift.String]? {
+        switch self {
+        case .application:
+            nil
+        case .institute:
+            ["institute"]
+        case .continuousIntegration:
+            ["institute-continuous-integration"]
+        case .linter:
+            ["swift-compositions", "swift-linter"]
+        }
+    }
 }

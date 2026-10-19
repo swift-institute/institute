@@ -8,15 +8,28 @@ extension Institute {
         public let root: Institute.Root
         public let selection: Institute.Selection.Resolved
         public let client: Git.Client
+        /// Where an absent self-hosting control is cloned from, by control.
+        /// A control not named here clones from its canonical repository.
+        let origins: [Institute.Workspace.Control: Swift.String]
 
         public init(
             root: Institute.Root,
             selection: Institute.Selection.Resolved,
             client: Git.Client = .init()
         ) {
+            self.init(root: root, selection: selection, client: client, origins: [:])
+        }
+
+        init(
+            root: Institute.Root,
+            selection: Institute.Selection.Resolved,
+            client: Git.Client,
+            origins: [Institute.Workspace.Control: Swift.String]
+        ) {
             self.root = root
             self.selection = selection
             self.client = client
+            self.origins = origins
         }
     }
 }
@@ -28,6 +41,7 @@ extension Institute.Sync {
             inspections.append(try inspect(repository, dry: dry))
         }
         let specification = try Institute.Xcode.integration(selection.repositories)
+        let controls = try controls(of: specification)
         let workspace = Institute.Xcode.current(specification, at: root.checkout)
 
         print(selection.origin)
@@ -37,6 +51,9 @@ extension Institute.Sync {
                 "  \(Institute.Layout.reference(for: inspection.repository)): \(inspection.action.text)"
             )
         }
+        for control in controls {
+            print("  \(control.reference) (\(control.control.rawValue) control): \(control.action.text)")
+        }
         print("  \(Institute.Xcode.bundleName): \(workspace ? "current" : "generate")")
         // The scheme's contents are the selected packages' target names, so
         // it cannot be planned here: a repository this run is about to clone
@@ -44,7 +61,10 @@ extension Institute.Sync {
         // materialization instead, and reported there.
         print("  \(Institute.Xcode.Scheme.name).xcscheme: after materialization")
 
-        guard !inspections.contains(where: { $0.action.fatal }) else {
+        guard
+            !inspections.contains(where: { $0.action.fatal }),
+            !controls.contains(where: { $0.action.fatal })
+        else {
             throw .repository("sync stopped before mutation because the plan contains conflicts")
         }
         guard !dry else {
@@ -60,14 +80,12 @@ extension Institute.Sync {
                     for: inspection.repository,
                     at: root.hierarchy
                 )
-                try root.preflight(parent, under: root.hierarchy)
-                do throws(File.System.Create.Directory.Error) {
-                    try create(parent)
-                } catch {
-                    throw .filesystem("cannot create \(parent): \(error)")
-                }
-                try root.preflight(parent, under: root.hierarchy)
-                try clone(inspection.repository, to: path)
+                try materialize(
+                    inspection.repository.name,
+                    from: inspection.repository.url,
+                    in: parent,
+                    to: path
+                )
 
             case .update(let remote):
                 try root.preflight(path, under: root.hierarchy)
@@ -79,6 +97,18 @@ extension Institute.Sync {
             case .fail:
                 throw .repository("unreachable conflicting plan")
             }
+        }
+
+        for control in controls where control.action == .clone {
+            guard let parent = control.directory.parent else {
+                throw .configuration("control checkout has no parent: \(control.directory)")
+            }
+            try materialize(
+                control.control.repository.name.underlying,
+                from: control.url,
+                in: parent,
+                to: control.directory
+            )
         }
 
         let receipt = try await Institute.Workspace.Materialization(
@@ -98,6 +128,91 @@ extension Institute.Sync {
         _ directory: File.Directory
     ) throws(File.System.Create.Directory.Error) {
         try directory.create.recursive()
+    }
+
+    private func materialize(
+        _ name: Swift.String,
+        from url: Swift.String,
+        in parent: File.Directory,
+        to path: File.Directory
+    ) throws(Institute.Error) {
+        try root.preflight(parent, under: root.hierarchy)
+        do throws(File.System.Create.Directory.Error) {
+            try create(parent)
+        } catch {
+            throw .filesystem("cannot create \(parent): \(error)")
+        }
+        try root.preflight(parent, under: root.hierarchy)
+        try clone(name, from: url, to: path)
+    }
+
+    /// The materialization plan for the specification's self-hosting
+    /// controls — every control except the application checkout itself and
+    /// any whose checkout is already a selected repository's layout path,
+    /// which the repository plan materializes.
+    ///
+    /// ## Why this exists
+    ///
+    /// The integration workspace names `../institute` and the linter runner
+    /// unconditionally, but only inventory repositories were ever cloned. On
+    /// a contributor's machine the controls happened to sit beside the
+    /// application; on a clean runner they did not, and `sync` planned every
+    /// clone and then failed acquisition with "workspace member has no
+    /// Package.swift: group:../institute" (roster-currency 39225008406,
+    /// contributor-path 39225006632).
+    private func controls(
+        of specification: Institute.Workspace.Specification
+    ) throws(Institute.Error) -> [Control] {
+        var selected = Set<Swift.String>()
+        for repository in selection.repositories {
+            selected.insert(try root.materialization(for: repository).description)
+        }
+
+        var result = [Control]()
+        for member in specification.members {
+            guard
+                case .control(let control) = member.role,
+                let components = control.checkout
+            else { continue }
+            var directory = root.hierarchy
+            for component in components {
+                do throws(File.Path.Component.Error) {
+                    directory = directory[directory: try File.Path.Component(component)]
+                } catch {
+                    throw .configuration("invalid control checkout component \(component): \(error)")
+                }
+            }
+            try root.preflight(directory, under: root.hierarchy)
+            guard !selected.contains(directory.description) else { continue }
+
+            let url = origins[control] ?? control.repository.url
+            result.append(
+                .init(
+                    control: control,
+                    reference: components.joined(separator: "/"),
+                    directory: directory,
+                    url: url,
+                    action: try inspect(control: directory, url: url)
+                )
+            )
+        }
+        return result
+    }
+
+    private func inspect(
+        control directory: File.Directory,
+        url: Swift.String
+    ) throws(Institute.Error) -> Institute.Action {
+        guard !File(directory.path).stat.exists else {
+            return .skip("present; a control checkout is the contributor's own")
+        }
+        let main = try reference("refs/heads/main")
+        do throws(Git.Client.Error) {
+            _ = try client.probe(url, ref: main)
+        } catch {
+            return .fail("canonical origin/main is unavailable")
+        }
+        return .clone
     }
 
     /// A checkout of `repository` sitting somewhere in the hierarchy other
@@ -441,7 +556,8 @@ extension Institute.Sync {
     }
 
     private func clone(
-        _ repository: Institute.Repository,
+        _ name: Swift.String,
+        from url: Swift.String,
         to path: File.Directory
     ) throws(Institute.Error) {
         try root.preflight(path, under: root.hierarchy)
@@ -449,18 +565,18 @@ extension Institute.Sync {
         do throws(File.Path.Temporary.Error) {
             temporaryPath = try File.Path.Temporary.sibling(
                 of: path.path,
-                prefix: ".workspace-\(repository.name)-",
+                prefix: ".workspace-\(name)-",
                 suffix: ".clone"
             )
         } catch {
-            throw .filesystem("cannot create a staging path for \(repository.name): \(error)")
+            throw .filesystem("cannot create a staging path for \(name): \(error)")
         }
         let temporary = File.Directory(temporaryPath)
         try root.preflight(temporary, under: root.hierarchy)
 
         do throws(Institute.Error) {
             try execute { () throws(Git.Client.Error) in
-                try client.clone(repository.url, to: temporary.description)
+                try client.clone(url, to: temporary.description)
             }
         } catch {
             // Cleanup discard is deliberate — the clone error below is the
@@ -481,7 +597,7 @@ extension Institute.Sync {
             do throws(File.System.Delete.Error) {
                 try temporary.delete.recursive()
             } catch {}
-            throw .filesystem("cannot install \(repository.name): \(error)")
+            throw .filesystem("cannot install \(name): \(error)")
         }
 
         try root.preflight(path, under: root.hierarchy)

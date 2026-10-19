@@ -225,6 +225,44 @@ extension Institute.Sync.Fixture {
         try command(["push", "--force", remote.path, "main"], at: replacement)
     }
 
+    /// Makes the hierarchy look like a clean runner's: each self-hosting
+    /// control checkout the integration workspace names beside the
+    /// application becomes a bare remote and is removed, leaving only the
+    /// application and the selected subject on disk. Returns the remotes as
+    /// sync control origins.
+    func detachControls() throws -> [Institute.Workspace.Control: Swift.String] {
+        var origins = [Institute.Workspace.Control: Swift.String]()
+        let controls: [(Institute.Workspace.Control, Swift.String)] = [
+            (.institute, "institute"),
+            (.linter, "swift-compositions/swift-linter"),
+        ]
+        for (control, relative) in controls {
+            let checkout = base.appending(path: relative)
+            let remote = base.appending(path: "\(control.rawValue)-control.git")
+            try client.initialize(at: checkout.path, bare: false)
+            try command(["config", "user.email", "workspace@swift.institute"], at: checkout)
+            try command(["config", "user.name", "Institute Tests"], at: checkout)
+            try command(["branch", "-M", "main"], at: checkout)
+            try commit("control", contents: "control\n", at: checkout)
+            try client.clone(checkout.path, branch: "main", bare: true, to: remote.path)
+            try FileManager.default.removeItem(at: checkout)
+            origins[control] = remote.path
+        }
+        return origins
+    }
+
+    func application(
+        origins: [Institute.Workspace.Control: Swift.String]
+    ) throws -> Institute.Sync {
+        let sync = try application()
+        return Institute.Sync(
+            root: sync.root,
+            selection: sync.selection,
+            client: client,
+            origins: origins
+        )
+    }
+
     func application() throws -> Institute.Sync {
         let directory = try File.Directory(validating: root.path)
         let repository = Institute.Repository(

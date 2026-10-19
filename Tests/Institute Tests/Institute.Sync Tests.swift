@@ -250,6 +250,69 @@ extension Institute.Sync.Test.Integration {
     }
 }
 
+extension Institute.Sync.Test.Integration {
+    /// The clean-checkout acceptance: no control checkout beside the
+    /// application, as on a fresh runner. Before sync materialized controls,
+    /// this planned every clone and then failed acquisition with
+    /// "workspace member has no Package.swift: group:../institute".
+    @Test
+    func `A clean hierarchy clones the absent self-hosting controls before acquisition`()
+        async throws
+    {
+        let fixture = try Institute.Sync.Fixture()
+        defer { fixture.remove() }
+        let origins = try fixture.detachControls()
+        #expect(!MainFixtureFiles.exists(MainFixtureFiles.join(fixture.basePath, "institute")))
+
+        try await fixture.application(origins: origins).run(dry: false)
+
+        #expect(MainFixtureFiles.exists(MainFixtureFiles.join(fixture.basePath, "institute/.git")))
+        #expect(MainFixtureFiles.exists(MainFixtureFiles.join(fixture.basePath, "institute/Package.swift")))
+        #expect(
+            MainFixtureFiles.exists(
+                MainFixtureFiles.join(fixture.basePath, "swift-compositions/swift-linter/Runner/Package.swift")
+            )
+        )
+        let root = try File.Directory(validating: fixture.rootPath)
+        let workspace = try #require(Institute.Xcode.contents(at: root))
+        #expect(workspace.contains("group:../institute"))
+        #expect(workspace.contains("group:../swift-compositions/swift-linter/Runner"))
+        #expect(try fixture.residue().isEmpty)
+    }
+
+    @Test
+    func `A dry run plans absent controls without cloning them`() async throws {
+        let fixture = try Institute.Sync.Fixture()
+        defer { fixture.remove() }
+        let origins = try fixture.detachControls()
+
+        try await fixture.application(origins: origins).run(dry: true)
+
+        #expect(!MainFixtureFiles.exists(MainFixtureFiles.join(fixture.basePath, "institute")))
+        #expect(!MainFixtureFiles.exists(MainFixtureFiles.join(fixture.basePath, "swift-compositions/swift-linter")))
+    }
+
+    @Test
+    func `An unreachable control origin stops sync before mutation`() async throws {
+        let fixture = try Institute.Sync.Fixture()
+        defer { fixture.remove() }
+        var origins = try fixture.detachControls()
+        origins[.institute] = MainFixtureFiles.join(fixture.basePath, "absent.git")
+        try fixture.push("second", contents: "second\n")
+        let before = try fixture.state()
+
+        await #expect(throws: Institute.Error.self) {
+            try await fixture.application(origins: origins).run(dry: false)
+        }
+
+        #expect(try fixture.state().head == before.head)
+        #expect(!MainFixtureFiles.exists(MainFixtureFiles.join(fixture.basePath, "swift-compositions/swift-linter")))
+        #expect(
+            !MainFixtureFiles.exists(MainFixtureFiles.join(fixture.rootPath, "institute interim.xcworkspace"))
+        )
+    }
+}
+
 extension Institute.Sync.Test.Unit {
     @Test
     func `fixture self-hosting controls expose their test targets to scheme planning`()
