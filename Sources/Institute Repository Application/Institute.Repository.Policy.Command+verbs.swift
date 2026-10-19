@@ -71,149 +71,17 @@ extension Institute.Repository.Policy.Command {
         )
     }
 
-    /// `institute repository parse-caller --caller <ci.yml> --repository
-    /// <owner/name>`
-    ///
-    /// The inverse of `render-caller`, and the Swift owner of the retired
-    /// `generate-caller.py parse` mode (F16 C3).
-    ///
-    /// Prints the recovered spec as JSON in the shape the retired mode
-    /// emitted — `layer`, `same_org`, and one snake-cased field per
-    /// approved typed input, `null` where the caller supplies none — so a
-    /// consumer reading the old payload reads this one. A caller carrying
-    /// something the renderer does not model exits non-zero naming it,
-    /// rather than reporting a spec that would silently erase it.
-    static func parseCaller(_ arguments: [Swift.String]) throws(Error) {
-        var caller: Swift.String?
-        var repository: Swift.String?
-        var iterator = arguments.makeIterator()
-        while let argument = iterator.next() {
-            switch argument {
-            case "--caller": caller = iterator.next()
-            case "--repository": repository = iterator.next()
-
-            default:
-                throw configuration("unknown parse-caller argument \(argument)")
-            }
-        }
-        guard let caller, let repository else {
-            throw configuration(
-                "parse-caller requires --caller <ci.yml> and --repository <owner/name>"
-            )
-        }
-        let text = try text(at: caller, label: "caller")
-        let spec: Institute.Repository.Policy.Caller
-        do throws(Institute.Repository.Policy.Caller.Error) {
-            spec = try Institute.Repository.Policy.Caller.Parse.caller(
-                text,
-                repository: repository
-            )
-        } catch {
-            throw .caller(error)
-        }
-
-        var payload: [Swift.String: JSON] = [
-            "layer": spec.layer.rawValue.json,
-            "same_org": (spec.sameOrganization ? "true" : "false").json,
-        ]
-        for key in Institute.Repository.Policy.Caller.approvedTypedInputs {
-            let value = spec.inputs.first { $0.key == key }?.value
-            payload[key.replacing("-", with: "_")] = value.json
-        }
-        print(
-            JSON.object(payload.map { ($0.key, $0.value) })
-                .serialize(pretty: true, sortKeys: true)
-        )
-    }
-
     /// `institute repository render-caller [--form terminal]`
     ///
-    /// The superseded `current` and `direct` forms still accept their former
-    /// repository, layer, input, and private-closure arguments until their
-    /// final migration consumer is deleted.
-    ///
-    /// Prints the deterministic host projection to stdout (F3; #366).
+    /// Prints the terminal caller, the bytes every package carries (F3;
+    /// #366). The `current` and `direct` migration forms, and
+    /// `parse-caller` that read them back, were retired once the caller wave
+    /// had converged the fleet onto the terminal form.
     static func renderCaller(_ arguments: [Swift.String]) throws(Error) {
-        var repository: Swift.String?
-        var layer: Institute.Repository.Policy.Caller.Layer?
-        var inputs: [(key: Swift.String, value: Swift.String)] = []
-        var form = "terminal"
-        var privateClosure = false
-        var iterator = arguments.makeIterator()
-        while let argument = iterator.next() {
-            switch argument {
-            case "--repository": repository = iterator.next()
-
-            case "--layer":
-                guard let raw = iterator.next(),
-                    let value = Institute.Repository.Policy.Caller.Layer(rawValue: raw)
-                else {
-                    throw configuration("--layer must be primitives|standards|institute")
-                }
-                layer = value
-
-            case "--input":
-                guard let raw = iterator.next(),
-                    let separator = raw.firstIndex(of: "=")
-                else {
-                    throw configuration("--input needs <key>=<value>")
-                }
-                let key = Swift.String(raw[..<separator])
-                guard Institute.Repository.Policy.Caller.approvedTypedInputs.contains(key)
-                else {
-                    throw configuration("unapproved input key \(key)")
-                }
-                inputs.append(
-                    (key: key, value: Swift.String(raw[raw.index(after: separator)...]))
-                )
-
-            case "--form":
-                guard let value = iterator.next() else {
-                    throw configuration("--form requires a value")
-                }
-                form = value
-
-            case "--private-dependency-closure": privateClosure = true
-
-            default:
-                throw configuration("unknown render-caller argument \(argument)")
-            }
+        guard arguments.isEmpty || arguments == ["--form", "terminal"] else {
+            throw configuration("render-caller takes no arguments but --form terminal")
         }
-        if form == "terminal" {
-            print(Institute.Repository.Policy.Caller.Render.terminal, terminator: "")
-            return
-        }
-        guard let repository, let layer else {
-            throw configuration(
-                "render-caller --form \(form) requires --repository and --layer"
-            )
-        }
-        let caller: Institute.Repository.Policy.Caller
-        do throws(Institute.Repository.Policy.Caller.Error) {
-            caller = try Institute.Repository.Policy.Caller(
-                repository: repository,
-                layer: layer,
-                inputs: inputs
-            )
-        } catch {
-            throw .caller(error)
-        }
-        switch form {
-        case "current":
-            print(Institute.Repository.Policy.Caller.Render.current(caller), terminator: "")
-
-        case "direct":
-            print(
-                Institute.Repository.Policy.Caller.Render.direct(
-                    caller,
-                    privateDependencyClosure: privateClosure
-                ),
-                terminator: ""
-            )
-
-        default:
-            throw configuration("--form must be current|direct|terminal")
-        }
+        print(Institute.Repository.Policy.Caller.Render.terminal, terminator: "")
     }
 
     /// `institute repository draft-metadata --repository <owner/name>

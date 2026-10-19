@@ -20,9 +20,6 @@ extension Institute.Repository.Policy.Command {
             case "render-caller":
                 try renderCaller(rest)
 
-            case "parse-caller":
-                try parseCaller(rest)
-
             case "draft-metadata":
                 try draftMetadata(rest)
 
@@ -41,7 +38,7 @@ extension Institute.Repository.Policy.Command {
             default:
                 throw Error.configuration(
                     "institute repository requires census, capability-records, "
-                        + "render-caller, parse-caller, draft-metadata, ruleset, "
+                        + "render-caller, draft-metadata, ruleset, "
                         + "ruleset-convergence, caller-wave, or uniformity-wave"
                 )
             }
