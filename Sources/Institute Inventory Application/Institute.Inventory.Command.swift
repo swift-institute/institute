@@ -45,7 +45,7 @@ extension Institute.Inventory {
                     ).default
                     Command_Schema.Command.Subcommand.Case(
                         "regenerate",
-                        help: .init(abstract: "Regenerate the inventory (no transport here)."),
+                        help: .init(abstract: "Rediscover the organizations and rewrite Institute.json."),
                         initial: { .init() },
                         map: Self.regenerate
                     )

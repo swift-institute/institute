@@ -44,20 +44,20 @@ private let today = Institute.Architecture.Exemption.Expiry.fixture("2026-08-07"
 /// The bounded positive fixture: derived owner, layer and generated
 /// projection agree.
 private let positive: [Institute.Architecture.Fact] = [
-    fact("swift-primitives", "swift-byte-primitives", layer: .primitives),
+    fact("swift-atoms", "swift-byte-primitives", layer: .atoms),
     fact("swift-standards", "swift-spm-standard", layer: .standards),
-    fact("swift-foundations", "swift-console", layer: .foundations),
+    fact("swift-compositions", "swift-console", layer: .compositions),
 ]
 
 private let positiveEdges: [Institute.Architecture.Edge] = [
     .init(
-        source: owner("swift-foundations", "swift-console"),
-        destination: owner("swift-primitives", "swift-byte-primitives"),
+        source: owner("swift-compositions", "swift-console"),
+        destination: owner("swift-atoms", "swift-byte-primitives"),
         kind: .runtime
     ),
     .init(
         source: owner("swift-standards", "swift-spm-standard"),
-        destination: owner("swift-primitives", "swift-byte-primitives"),
+        destination: owner("swift-atoms", "swift-byte-primitives"),
         kind: .target
     ),
 ]
@@ -91,13 +91,13 @@ struct `Institute Architecture Tests` {
                         "swift-standards",
                         "swift-bytes-standard",
                         layer: .standards,
-                        concept: "swift-primitives/swift-byte-primitives"
+                        concept: "swift-atoms/swift-byte-primitives"
                     ),
                     fact(
-                        "swift-primitives",
+                        "swift-atoms",
                         "swift-byte-primitives-2",
-                        layer: .primitives,
-                        concept: "swift-primitives/swift-byte-primitives"
+                        layer: .atoms,
+                        concept: "swift-atoms/swift-byte-primitives"
                     ),
                 ]
             let graph = Institute.Architecture.Graph(facts: duplicated, edges: [])
@@ -119,8 +119,8 @@ struct `Institute Architecture Tests` {
             let inverted =
                 positiveEdges + [
                     .init(
-                        source: owner("swift-primitives", "swift-byte-primitives"),
-                        destination: owner("swift-foundations", "swift-console"),
+                        source: owner("swift-atoms", "swift-byte-primitives"),
+                        destination: owner("swift-compositions", "swift-console"),
                         kind: .runtime
                     )
                 ]
@@ -142,8 +142,8 @@ struct `Institute Architecture Tests` {
         func `finds a derived contradiction for an unknown edge endpoint`() {
             let dangling = [
                 Institute.Architecture.Edge(
-                    source: owner("swift-foundations", "swift-console"),
-                    destination: owner("swift-primitives", "swift-never-derived"),
+                    source: owner("swift-compositions", "swift-console"),
+                    destination: owner("swift-atoms", "swift-never-derived"),
                     kind: .runtime
                 )
             ]
@@ -171,7 +171,7 @@ struct `Institute Architecture Tests` {
             `does not treat a similarly named target as the same concept without a matching concept identifier`()
         {
             let similar = [
-                fact("swift-primitives", "swift-json-primitives", layer: .primitives),
+                fact("swift-atoms", "swift-json-primitives", layer: .atoms),
                 fact("swift-standards", "swift-json-standard", layer: .standards),
             ]
             let graph = Institute.Architecture.Graph(facts: similar, edges: [])
@@ -197,15 +197,15 @@ struct `Institute Architecture Tests` {
         {
             let inverted = [
                 Institute.Architecture.Edge(
-                    source: owner("swift-primitives", "swift-byte-primitives"),
-                    destination: owner("swift-foundations", "swift-console"),
+                    source: owner("swift-atoms", "swift-byte-primitives"),
+                    destination: owner("swift-compositions", "swift-console"),
                     kind: .runtime
                 )
             ]
             let graph = Institute.Architecture.Graph(facts: positive, edges: inverted)
 
             let exemption = try Institute.Architecture.Exemption(
-                owner: owner("swift-primitives", "swift-byte-primitives"),
+                owner: owner("swift-atoms", "swift-byte-primitives"),
                 reason: "bounded migration window ruled in the accepted programme",
                 scope: .forbiddenEdge,
                 expiry: .init(rawValue: "2027-01-01")
@@ -217,7 +217,7 @@ struct `Institute Architecture Tests` {
 
             // An expired exemption excuses nothing.
             let expired = try Institute.Architecture.Exemption(
-                owner: owner("swift-primitives", "swift-byte-primitives"),
+                owner: owner("swift-atoms", "swift-byte-primitives"),
                 reason: "bounded migration window ruled in the accepted programme",
                 scope: .forbiddenEdge,
                 expiry: .init(rawValue: "2026-01-01")
@@ -229,7 +229,7 @@ struct `Institute Architecture Tests` {
             // A missing reason cannot be constructed at all.
             #expect(throws: Institute.Architecture.Exemption.Error.self) {
                 try Institute.Architecture.Exemption(
-                    owner: owner("swift-primitives", "swift-byte-primitives"),
+                    owner: owner("swift-atoms", "swift-byte-primitives"),
                     reason: "",
                     scope: .forbiddenEdge,
                     expiry: .init(rawValue: "2027-01-01")
@@ -248,9 +248,9 @@ struct `Institute Architecture Tests` {
         @Test
         func `classifies a package with zero public APIs`() {
             let closed = fact(
-                "swift-primitives",
+                "swift-atoms",
                 "swift-internal-only",
-                layer: .primitives,
+                layer: .atoms,
                 products: []
             )
             #expect(closed.classification == .internalOnly)
@@ -261,7 +261,7 @@ struct `Institute Architecture Tests` {
         func `classifies a migration epoch with zero consumers as terminal`() {
             let terminal = Institute.Architecture.Epoch(
                 identifier: .init(rawValue: "epoch-1"),
-                owner: owner("swift-primitives", "swift-byte-primitives"),
+                owner: owner("swift-atoms", "swift-byte-primitives"),
                 consumers: []
             )
             #expect(Institute.Architecture.Migration.classify(terminal) == .terminal)
@@ -271,8 +271,8 @@ struct `Institute Architecture Tests` {
 
             let active = Institute.Architecture.Epoch(
                 identifier: .init(rawValue: "epoch-2"),
-                owner: owner("swift-primitives", "swift-byte-primitives"),
-                consumers: [owner("swift-foundations", "swift-console")]
+                owner: owner("swift-atoms", "swift-byte-primitives"),
+                consumers: [owner("swift-compositions", "swift-console")]
             )
             #expect(
                 Institute.Architecture.Migration.classify(active) == .active(consumers: 1)

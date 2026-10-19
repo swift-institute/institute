@@ -115,7 +115,7 @@ extension Institute.Verification.Command {
                 Command_Schema.Command.Option(
                     \.verificationLayer,
                     name: .long(.literal("layer")),
-                    placeholder: "primitives|standards|foundations|components|applications",
+                    placeholder: "atoms|molecules|standards|compositions",
                     help: .init(
                         abstract: "The subject's inventory layer."
                     )
@@ -227,8 +227,8 @@ extension Institute.Verification.Command {
             guard Institute.Layer(rawValue: verificationLayer) != nil else {
                 throw .validationFailed(
                     reason:
-                        "verification seal requires --layer primitives, standards, foundations, "
-                        + "components, or applications."
+                        "verification seal requires --layer atoms, molecules, standards, "
+                        + "or compositions."
                 )
             }
             guard !inventoryDigest.isEmpty else {

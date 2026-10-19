@@ -8,16 +8,16 @@ import Testing
 
 private let inventory = Institute.Architecture.Facts.Inventory(rows: [
     .init(
-        organization: "swift-primitives",
+        organization: "swift-atoms",
         name: "swift-byte-primitives",
-        layer: .primitives,
-        url: "https://github.com/swift-primitives/swift-byte-primitives.git"
+        layer: .atoms,
+        url: "https://github.com/swift-atoms/swift-byte-primitives.git"
     ),
     .init(
-        organization: "swift-foundations",
+        organization: "swift-compositions",
         name: "swift-console",
-        layer: .foundations,
-        url: "https://github.com/swift-foundations/swift-console.git"
+        layer: .compositions,
+        url: "https://github.com/swift-compositions/swift-console.git"
     ),
 ])
 
@@ -32,7 +32,7 @@ private let manifest = Institute.Architecture.Facts.Manifest.scan(
             ),
         ],
         dependencies: [
-            .package(url: "https://github.com/swift-primitives/swift-byte-primitives.git", branch: "main"),
+            .package(url: "https://github.com/swift-atoms/swift-byte-primitives.git", branch: "main"),
         ],
         targets: [
             .target(
@@ -57,14 +57,14 @@ struct `Institute Architecture Facts Tests` {
             #expect(manifest.targets == ["Console"])
             #expect(
                 manifest.dependencyURLs
-                    == ["https://github.com/swift-primitives/swift-byte-primitives.git"]
+                    == ["https://github.com/swift-atoms/swift-byte-primitives.git"]
             )
         }
 
         @Test
         func `derives facts, provenance edges and runtime edges`() {
             let consoleOwner = Institute.Architecture.Owner(
-                organization: "swift-foundations",
+                organization: "swift-compositions",
                 name: "swift-console"
             )
             let derived = Institute.Architecture.Facts.derive(
@@ -83,7 +83,7 @@ struct `Institute Architecture Facts Tests` {
                     .init(
                         source: consoleOwner,
                         destination: .init(
-                            organization: "swift-primitives",
+                            organization: "swift-atoms",
                             name: "swift-byte-primitives"
                         ),
                         kind: .runtime
@@ -100,7 +100,7 @@ struct `Institute Architecture Facts Tests` {
                     .init(
                         source: consoleOwner,
                         destination: .init(
-                            organization: "swift-primitives",
+                            organization: "swift-atoms",
                             name: "swift-byte-primitives"
                         ),
                         kind: .runtime
@@ -124,7 +124,7 @@ struct `Institute Architecture Facts Tests` {
         @Test
         func `records an empty measured manifest as an internal-only fact`() {
             let owner = Institute.Architecture.Owner(
-                organization: "swift-primitives",
+                organization: "swift-atoms",
                 name: "swift-byte-primitives"
             )
             let derived = Institute.Architecture.Facts.derive(
@@ -175,7 +175,7 @@ struct `Institute Architecture Facts Tests` {
         @Test
         func `derivation is deterministic across repeated runs`() {
             let consoleOwner = Institute.Architecture.Owner(
-                organization: "swift-foundations",
+                organization: "swift-compositions",
                 name: "swift-console"
             )
             let first = Institute.Architecture.Facts.derive(

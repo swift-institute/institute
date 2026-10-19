@@ -54,7 +54,7 @@ extension Institute.Architecture.Facts.Inventory.Row {
     let layerName = try Swift.String(json: layer)
     guard let parsed = Institute.Architecture.Layer(name: layerName) else {
       throw .typeMismatch(
-        expected: "primitives, standards, or foundations",
+        expected: "atoms, molecules, standards, or compositions",
         got: layerName
       )
     }
