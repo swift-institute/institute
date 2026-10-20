@@ -50,28 +50,6 @@ enum MainFixtureFiles {
         try FileManager.default.removeItem(atPath: path)
     }
 
-    /// The build products directory holding this test bundle and the
-    /// executables the test targets depend on.
-    static var productsDirectory: Swift.String {
-        let bundle = Bundle(for: ProductsAnchor.self).bundleURL
-        #if os(macOS)
-            return bundle.deletingLastPathComponent().path
-        #else
-            return bundle.path
-        #endif
-    }
-
-    private final class ProductsAnchor {}
-
-    /// The compiled fixture linter built from `Institute Lint Fixture Linter`.
-    static var fixtureLinter: Swift.String {
-        #if os(Windows)
-            join(productsDirectory, "Institute Lint Fixture Linter.exe")
-        #else
-            join(productsDirectory, "Institute Lint Fixture Linter")
-        #endif
-    }
-
     static func exists(_ path: Swift.String) -> Swift.Bool {
         FileManager.default.fileExists(atPath: path)
     }
@@ -84,10 +62,6 @@ enum MainFixtureFiles {
 
     static func contents(ofDirectory path: Swift.String) throws -> [Swift.String] {
         try FileManager.default.contentsOfDirectory(atPath: path)
-    }
-
-    static func copy(_ source: Swift.String, to destination: Swift.String) throws {
-        try FileManager.default.copyItem(atPath: source, toPath: destination)
     }
 
     static func move(_ source: Swift.String, to destination: Swift.String) throws {

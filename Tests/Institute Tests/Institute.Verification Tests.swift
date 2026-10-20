@@ -7,7 +7,6 @@ import Testing
 @testable import Institute_Doctor
 @testable import Institute_Instruments
 @testable import Institute_Inventory
-@testable import Institute_Lint
 @testable import Institute_Model
 @testable import Institute_Pages
 
@@ -95,7 +94,7 @@ extension Institute.Verification.Test {
                 },
                 test: { _, _, _, _ in testResult ?? Institute.Verification.Test.operation(.test) },
                 nestedTests: { _, _, _, _ in [] },
-                lint: { _ in Institute.Verification.Test.operation(.lint) },
+                lint: { _, _, _, _ in Institute.Verification.Test.operation(.lint) },
                 environment: { Institute.Verification.Test.environment(swift: environmentSwift) },
                 now: { "2026-08-04T00:00:00Z" }
             )
@@ -105,8 +104,8 @@ extension Institute.Verification.Test {
 
 extension Institute.Verification.Test.Unit {
     @Test
-    func `A run whose subject matches its claim and whose operations succeed is verified`() throws {
-        let receipt = try Institute.Verification.Test.run().run()
+    func `A run whose subject matches its claim and whose operations succeed is verified`() async throws {
+        let receipt = try await Institute.Verification.Test.run().run()
         #expect(receipt.verdict == .verified)
         #expect(receipt.operations.count == 2)
         // An explicit closure, not `\.satisfied` — the Swift Testing
@@ -119,16 +118,16 @@ extension Institute.Verification.Test.Unit {
     }
 
     @Test
-    func `Two runs over the same semantic input produce identical canonical JSON`() throws {
-        let first = try Institute.Verification.Test.run().run()
-        let second = try Institute.Verification.Test.run().run()
+    func `Two runs over the same semantic input produce identical canonical JSON`() async throws {
+        let first = try await Institute.Verification.Test.run().run()
+        let second = try await Institute.Verification.Test.run().run()
         #expect(first.canonical == second.canonical)
     }
 
     @Test
-    func `Changing the claimed subject head changes the canonical digest`() throws {
-        let first = try Institute.Verification.Test.run().run()
-        let second = try Institute.Verification.Test.run(
+    func `Changing the claimed subject head changes the canonical digest`() async throws {
+        let first = try await Institute.Verification.Test.run().run()
+        let second = try await Institute.Verification.Test.run(
             claimedHead: "3333333333333333333333333333333333333333",
             observedHead: "3333333333333333333333333333333333333333"
         ).run()
@@ -136,33 +135,33 @@ extension Institute.Verification.Test.Unit {
     }
 
     @Test
-    func `Changing one operation result changes the canonical digest`() throws {
-        let first = try Institute.Verification.Test.run().run()
-        let second = try Institute.Verification.Test.run(
+    func `Changing one operation result changes the canonical digest`() async throws {
+        let first = try await Institute.Verification.Test.run().run()
+        let second = try await Institute.Verification.Test.run(
             buildResult: Institute.Verification.Test.operation(.build, outcome: .failure)
         ).run()
         #expect(first.canonical != second.canonical)
     }
 
     @Test
-    func `Changing the observed toolchain changes the canonical digest`() throws {
-        let first = try Institute.Verification.Test.run().run()
-        let second = try Institute.Verification.Test.run(environmentSwift: "6.5").run()
+    func `Changing the observed toolchain changes the canonical digest`() async throws {
+        let first = try await Institute.Verification.Test.run().run()
+        let second = try await Institute.Verification.Test.run(environmentSwift: "6.5").run()
         #expect(first.canonical != second.canonical)
     }
 
     @Test
-    func `Changing the inventory digest changes the canonical digest`() throws {
-        let first = try Institute.Verification.Test.run().run()
-        let second = try Institute.Verification.Test.run(
+    func `Changing the inventory digest changes the canonical digest`() async throws {
+        let first = try await Institute.Verification.Test.run().run()
+        let second = try await Institute.Verification.Test.run(
             inventoryDigest: .measured(Swift.String(repeating: "b", count: 64))
         ).run()
         #expect(first.canonical != second.canonical)
     }
 
     @Test
-    func `A build failure seals as an unverified receipt rather than refusing`() throws {
-        let receipt = try Institute.Verification.Test.run(
+    func `A build failure seals as an unverified receipt rather than refusing`() async throws {
+        let receipt = try await Institute.Verification.Test.run(
             buildResult: Institute.Verification.Test.operation(.build, outcome: .failure)
         ).run()
         #expect(receipt.verdict.fails)
@@ -171,17 +170,17 @@ extension Institute.Verification.Test.Unit {
 
 extension Institute.Verification.Test.`Edge Case` {
     @Test
-    func `Zero requested operations refuses to seal`() {
-        #expect(throws: Institute.Verification.Error.noOperationExecuted) {
-            try Institute.Verification.Test.run(requestedOperations: [], requiredOperations: [])
+    func `Zero requested operations refuses to seal`() async {
+        await #expect(throws: Institute.Verification.Error.noOperationExecuted) {
+            try await Institute.Verification.Test.run(requestedOperations: [], requiredOperations: [])
                 .run()
         }
     }
 
     @Test
-    func `A required operation that was never requested refuses to seal`() {
-        #expect(throws: Institute.Verification.Error.requiredOperationMissing(.lint)) {
-            try Institute.Verification.Test.run(
+    func `A required operation that was never requested refuses to seal`() async {
+        await #expect(throws: Institute.Verification.Error.requiredOperationMissing(.lint)) {
+            try await Institute.Verification.Test.run(
                 requestedOperations: [.build],
                 requiredOperations: [.build, .lint]
             ).run()
@@ -189,11 +188,11 @@ extension Institute.Verification.Test.`Edge Case` {
     }
 
     @Test
-    func `A required operation that came back unmeasured refuses to seal`() {
-        #expect(
+    func `A required operation that came back unmeasured refuses to seal`() async {
+        await #expect(
             throws: Institute.Verification.Error.requiredOperationNotExecuted(.build)
         ) {
-            try Institute.Verification.Test.run(
+            try await Institute.Verification.Test.run(
                 buildResult: Institute.Verification.Test.operation(
                     .build,
                     outcome: .unmeasured(reason: "synthetic")
@@ -203,14 +202,14 @@ extension Institute.Verification.Test.`Edge Case` {
     }
 
     @Test
-    func `A claimed head that does not match the observed head refuses to seal`() {
-        #expect(
+    func `A claimed head that does not match the observed head refuses to seal`() async {
+        await #expect(
             throws: Institute.Verification.Error.headMismatch(
                 claimed: Institute.Verification.Test.head,
                 observed: "4444444444444444444444444444444444444444"
             )
         ) {
-            try Institute.Verification.Test.run(
+            try await Institute.Verification.Test.run(
                 observedHead: "4444444444444444444444444444444444444444"
             )
             .run()
@@ -218,16 +217,16 @@ extension Institute.Verification.Test.`Edge Case` {
     }
 
     @Test
-    func `A dirty subject checkout refuses to seal`() {
-        #expect(throws: Institute.Verification.Error.dirtySubject("/tmp/subject")) {
-            try Institute.Verification.Test.run(isDirty: true).run()
+    func `A dirty subject checkout refuses to seal`() async {
+        await #expect(throws: Institute.Verification.Error.dirtySubject("/tmp/subject")) {
+            try await Institute.Verification.Test.run(isDirty: true).run()
         }
     }
 
     @Test
-    func `A secret-shaped diagnostic refuses to seal`() {
-        #expect(throws: (Institute.Verification.Error).self) {
-            try Institute.Verification.Test.run(
+    func `A secret-shaped diagnostic refuses to seal`() async {
+        await #expect(throws: (Institute.Verification.Error).self) {
+            try await Institute.Verification.Test.run(
                 buildResult: Institute.Verification.Test.operation(
                     .build,
                     outcome: .failure,
@@ -238,7 +237,7 @@ extension Institute.Verification.Test.`Edge Case` {
     }
 
     @Test
-    func `An absolute machine path in a finding refuses to seal`() {
+    func `An absolute machine path in a finding refuses to seal`() async {
         let run = Institute.Verification.Run(
             packagePath: "/tmp/subject",
             claimedHead: Institute.Verification.Test.head,
@@ -257,7 +256,7 @@ extension Institute.Verification.Test.`Edge Case` {
                 build: { _, _, _, _ in Institute.Verification.Test.operation(.build) },
                 test: { _, _, _, _ in Institute.Verification.Test.operation(.test) },
                 nestedTests: { _, _, _, _ in [] },
-                lint: { _ in
+                lint: { _, _, _, _ in
                     Institute.Verification.Test.operation(
                         .lint,
                         findings: [
@@ -269,8 +268,8 @@ extension Institute.Verification.Test.`Edge Case` {
                 now: { "2026-08-04T00:00:00Z" }
             )
         )
-        #expect(throws: (Institute.Verification.Error).self) {
-            try run.run()
+        await #expect(throws: (Institute.Verification.Error).self) {
+            try await run.run()
         }
     }
 }
@@ -438,9 +437,9 @@ extension Institute.Verification.Test.Redaction {
     @Test
     func `Every lint refusal reason is sealable`() {
         let refusals: [Institute.Verification.Run.Refusal] = [
-            .unresolvableTarget(.filesystem),
-            .unresolvableConfiguration(.configuration),
-            .unavailableInstallation(.process),
+            .unresolvableSubject(.filesystem),
+            .unavailablePreparation(.configuration),
+            .unavailableMeasurement(.process),
             .unsealableMeasurementReason,
         ]
         for refusal in refusals {

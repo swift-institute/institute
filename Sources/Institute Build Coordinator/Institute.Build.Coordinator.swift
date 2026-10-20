@@ -23,7 +23,6 @@ extension Institute.Build {
         ///
         /// Read from the machine rather than fixed, so a coordinated build
         /// neither under-uses a large host nor oversubscribes a small one.
-        /// Same derivation as ``Institute/Lint/Sweep/processors``.
         public static var processors: Swift.Int {
             Swift.Int(Kernel.Thread.Count(System.processorCount))
         }

@@ -4,12 +4,16 @@ public import Institute_Source_Profile
 public import Institute_Source_Workspace
 
 extension Institute.Source.Profile {
-    public func bundle(for repository: Institute.Repository) -> Institute.Source.Bundle {
-        switch repository.layer {
+    public func bundle(for layer: Institute.Layer) -> Institute.Source.Bundle {
+        switch layer {
         case .atoms, .molecules: .primitives
         case .standards: .standards
         case .compositions: .institute
         }
+    }
+
+    public func bundle(for repository: Institute.Repository) -> Institute.Source.Bundle {
+        bundle(for: repository.layer)
     }
 
     public func bundle(

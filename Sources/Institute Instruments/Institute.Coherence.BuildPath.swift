@@ -2,7 +2,6 @@ public import Command
 internal import Institute_Development
 internal import Institute_Doctor
 internal import Institute_Inventory
-internal import Institute_Lint
 public import Institute_Model
 
 extension Institute.Coherence {

@@ -1,7 +1,6 @@
 public import Institute_Development
 public import Institute_Doctor
 public import Institute_Inventory
-public import Institute_Lint
 public import Institute_Model
 public import JSON
 

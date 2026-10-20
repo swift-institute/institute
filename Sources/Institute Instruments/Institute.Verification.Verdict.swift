@@ -1,7 +1,6 @@
 public import Institute_Development
 public import Institute_Doctor
 public import Institute_Inventory
-public import Institute_Lint
 public import Institute_Model
 public import JSON
 
@@ -52,8 +51,7 @@ extension Institute.Verification {
 extension Institute.Verification.Verdict {
     /// Whether this verdict alone should fail a caller reading the receipt
     /// as a pass/fail gate — the same "one boolean a CI leg can switch on"
-    /// convenience ``Institute/Lint/Measurement/Verdict/fails`` and
-    /// ``Institute/Coherence/Verdict`` already provide.
+    /// convenience ``Institute/Coherence/Verdict`` already provides.
     public var fails: Swift.Bool {
         switch self {
         case .verified: false

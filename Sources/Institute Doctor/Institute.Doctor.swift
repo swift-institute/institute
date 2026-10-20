@@ -4,7 +4,6 @@ public import File_System
 public import Git_Foundation
 public import Institute_Development
 public import Institute_Inventory
-public import Institute_Lint
 public import Institute_Model
 public import Institute_Pages
 public import Package_Manager
@@ -101,7 +100,7 @@ extension Institute.Doctor {
             record(await pins(checkouts)),
             record(await manifest(checkouts)),
             record(await uniqueness(checkouts)),
-            record(linter()),
+            record(preparation()),
             record(await peerCheckout()),
         ]
         switch access {

@@ -2,7 +2,6 @@ public import Async_Fanout
 public import File_System
 public import Institute_Development
 public import Institute_Inventory
-public import Institute_Lint
 public import Institute_Model
 public import Institute_Pages
 internal import Standard_Library_Extensions
@@ -42,8 +41,7 @@ extension Institute.Doctor {
     /// Scoped to caches this checkout can actually find: the checkout
     /// root and every materialized repository's own directory, since
     /// `swift-linter` caches per invocation directory rather than in one
-    /// fixed location (`institute lint`'s sweep runs it once per package
-    /// root). A repository that was never linted locally has no cache
+    /// fixed location. A repository that was never linted locally has no cache
     /// and contributes nothing — that is the ordinary case, not a gap.
     public static let lintConfigCurrency = Check<ConfigCache>(
         name: "lint-config-currency",

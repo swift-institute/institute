@@ -4,7 +4,6 @@ public import Institute_Build_Coordinator
 public import Institute_Development
 public import Institute_Doctor
 public import Institute_Inventory
-public import Institute_Lint
 public import Institute_Model
 
 extension Institute.Coherence {

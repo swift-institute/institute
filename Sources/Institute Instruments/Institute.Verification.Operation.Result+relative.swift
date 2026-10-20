@@ -1,7 +1,6 @@
 internal import Institute_Development
 internal import Institute_Doctor
 internal import Institute_Inventory
-internal import Institute_Lint
 internal import Institute_Model
 
 extension Institute.Verification.Operation.Result {
