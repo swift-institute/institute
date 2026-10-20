@@ -64,6 +64,7 @@ extension Institute.Xcode.Scheme.Test.Unit {
                 ("Institute Inventory Application", false),
                 ("Institute Navigation Application", false),
                 ("Institute Package Application", false),
+                ("Institute Planner Application", false),
                 ("Institute Repository Application", false),
                 ("Institute Source Application", false),
                 ("Institute Verification Application", false),
@@ -79,6 +80,7 @@ extension Institute.Xcode.Scheme.Test.Unit {
                 ("Institute GitHub", false),
                 ("Institute CI Application Tests", true),
                 ("Institute Repository Application Tests", true),
+                ("Institute Planner Application Tests", true),
                 ("Institute Source Application Tests", true),
                 ("Institute Application Tests", true),
                 ("Institute Architecture Tests", true),
@@ -132,9 +134,9 @@ extension Institute.Xcode.Scheme.Test.Unit {
         )
 
         #expect(Array(plan.buildables.prefix(28)).allSatisfy { $0.reference == "../institute" })
-        #expect(Array(plan.buildables.dropFirst(28).prefix(27)).allSatisfy { $0.reference == "." })
+        #expect(Array(plan.buildables.dropFirst(28).prefix(28)).allSatisfy { $0.reference == "." })
         #expect(
-            Array(plan.buildables.dropFirst(55).prefix(6)).allSatisfy { $0.reference == "../slow" }
+            Array(plan.buildables.dropFirst(56).prefix(6)).allSatisfy { $0.reference == "../slow" }
         )
         #expect(plan.buildables.last?.reference == "../fast")
         #expect(
@@ -151,6 +153,7 @@ extension Institute.Xcode.Scheme.Test.Unit {
                 "Institute Repository Policy Tests",
                 "Institute CI Application Tests",
                 "Institute Repository Application Tests",
+                "Institute Planner Application Tests",
                 "Institute Source Application Tests",
                 "Institute Application Tests",
                 "Institute Architecture Tests",

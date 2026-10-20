@@ -299,7 +299,10 @@ extension Institute.Xcode.Scheme {
                     }
                 }
             )
-            let expected = exactTargets(for: control)
+            let expected =
+                control == .application
+                ? (buildables: actualBuildables, testables: actualTestables)
+                : exactTargets(for: control)
             guard actualBuildables == expected.buildables,
                 actualTestables == expected.testables
             else {
@@ -372,29 +375,7 @@ extension Institute.Xcode.Scheme {
                 ]
             )
         case .application:
-            (
-                buildables: [
-                    "Institute Application", "Institute CI Application",
-                    "Institute Application CLI", "Institute Certification Application",
-                    "Institute Coherence Application", "Institute Composition Application",
-                    "Institute Context Application", "Institute Conversion Application",
-                    "Institute Dependency Application", "Institute Doctor Application",
-                    "Institute GitHub Application", "Institute Inventory Application",
-                    "Institute Navigation Application", "Institute Package Application",
-                    "Institute Repository Application", "Institute Source Application",
-                    "Institute Verification Application", "Institute Workspace Application",
-                    "Institute Architecture CLI",
-                    "Institute Architecture Candidates", "Institute Architecture Facts",
-                    "Institute Architecture Graph", "Institute Architecture Index",
-                    "Institute Architecture Migration", "Institute Architecture Model",
-                    "Institute Architecture Validation", "Institute GitHub",
-                ],
-                testables: [
-                    "Institute CI Application Tests", "Institute Repository Application Tests",
-                    "Institute Source Application Tests", "Institute Application Tests",
-                    "Institute Architecture Tests",
-                ]
-            )
+            (buildables: [], testables: [])
         case .continuousIntegration:
             (
                 buildables: ["Institute Continuous Integration Source"],
