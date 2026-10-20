@@ -581,12 +581,12 @@ extension Institute.Verification.Run {
                 : .unmeasured(reason: Refusal.unsealableMeasurementReason.description)
         }
         let code: Swift.Int32? =
-            switch status {
-            case .unmeasured: status.code
-            case .clean, .findings:
-                report.errors
-                    ? Source_Report.Source.Report.Status.findings.code
-                    : Source_Report.Source.Report.Status.clean.code
+            if status == .unmeasured {
+                status.code
+            } else if report.errors {
+                Source_Report.Source.Report.Status.findings.code
+            } else {
+                Source_Report.Source.Report.Status.clean.code
             }
         return .init(
             operation: .lint,
