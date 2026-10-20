@@ -229,7 +229,7 @@ func `CI source exit policy classifies complete real reports per evidence channe
     for (report, expected, strict) in cases {
         _ = try Source.Report.Complete(report, expected: report.commitment)
         let status = Source.Report.Status(report, expected: report.commitment)
-        let errors = Policy.errors(in: report)
+        let errors = report.errors
 
         #expect(status == expected)
         #expect(errors == (strict == 1))
@@ -251,9 +251,9 @@ func `CI source exit policy keeps an incomplete real report at two under both po
         _ = try Source.Report.Complete(report, expected: report.commitment)
     }
     #expect(status == .unmeasured)
-    #expect(Policy.errors(in: report))
-    #expect(Policy.advisory.code(status: status, errors: Policy.errors(in: report)) == 2)
-    #expect(Policy.strict.code(status: status, errors: Policy.errors(in: report)) == 2)
+    #expect(report.errors)
+    #expect(Policy.advisory.code(status: status, errors: report.errors) == 2)
+    #expect(Policy.strict.code(status: status, errors: report.errors) == 2)
 }
 
 @Test
