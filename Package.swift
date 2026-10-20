@@ -77,6 +77,10 @@ let package = Package(
             targets: ["Institute Package Application"]
         ),
         .library(
+            name: "Institute Planner Application",
+            targets: ["Institute Planner Application"]
+        ),
+        .library(
             name: "Institute Verification Application",
             targets: ["Institute Verification Application"]
         ),
@@ -225,7 +229,9 @@ let package = Package(
                 .product(name: "Institute Dependency", package: "institute"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "File System", package: "swift-file-system"),
+                .product(name: "JSON", package: "swift-json"),
                 .product(name: "Process", package: "swift-process"),
+                .product(name: "RFC 4648", package: "swift-rfc-4648"),
             ]
         ),
         .target(
@@ -391,6 +397,25 @@ let package = Package(
             ]
         ),
         .target(
+            name: "Institute Planner Application",
+            dependencies: [
+                "Institute GitHub",
+                .product(name: "Byte", package: "swift-byte"),
+                .product(name: "Command", package: "swift-arguments"),
+                .product(name: "Command Schema", package: "swift-arguments"),
+                .product(name: "Console", package: "swift-console"),
+                .product(name: "Environment", package: "swift-environment"),
+                .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
+                .product(name: "File System", package: "swift-file-system"),
+                .product(name: "Git", package: "swift-git"),
+                .product(name: "Institute Model", package: "institute"),
+                .product(name: "Institute Repository Policy", package: "institute"),
+                .product(name: "Institute Source", package: "institute"),
+                .product(name: "JSON", package: "swift-json"),
+                .product(name: "Process", package: "swift-process"),
+            ]
+        ),
+        .target(
             name: "Institute Coherence Application",
             dependencies: [
                 .product(name: "Command", package: "swift-arguments"),
@@ -477,6 +502,7 @@ let package = Package(
                 "Institute Inventory Application",
                 "Institute Navigation Application",
                 "Institute Package Application",
+                "Institute Planner Application",
                 "Institute Verification Application",
                 "Institute Workspace Application",
                 "Institute Repository Application",
@@ -554,6 +580,19 @@ let package = Package(
                 .product(name: "JSON", package: "swift-json"),
             ],
             path: "Tests/Institute Application Tests"
+        ),
+        .testTarget(
+            name: "Institute Planner Application Tests",
+            dependencies: [
+                "Institute Planner Application",
+                .product(name: "Byte", package: "swift-byte"),
+                .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
+                .product(name: "File System", package: "swift-file-system"),
+                .product(name: "Git", package: "swift-git"),
+                .product(name: "Institute Model", package: "institute"),
+                .product(name: "Institute Source", package: "institute"),
+                .product(name: "JSON", package: "swift-json"),
+            ]
         ),
         .testTarget(
             name: "Institute CI Application Tests",

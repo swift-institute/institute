@@ -23,6 +23,7 @@ public import Institute_Inventory_Application
 public import Institute_Model
 public import Institute_Navigation_Application
 public import Institute_Package_Application
+public import Institute_Planner_Application
 public import Institute_Repository_Application
 public import Institute_Repository_Policy
 public import Institute_Source_Application
@@ -52,6 +53,7 @@ extension Institute.Application {
         case verification(Institute.Verification.Command)
         case certification(Institute.Certification.Command)
         case ci(Institute.CI.Command)
+        case planner(Institute.Planner.Command)
         case repository(Institute.Repository.Policy.Command)
         case architecture(Institute.Architecture.CLI.Command)
         case source(Institute.Source.Command)
@@ -181,6 +183,12 @@ extension Institute.Application {
                         map: Self.ci
                     )
                     Command_Schema.Command.Subcommand.Case(
+                        "planner",
+                        help: .init(abstract: "Canary and adopt a published CI planner."),
+                        initial: { .canary(.init()) },
+                        map: Self.planner
+                    )
+                    Command_Schema.Command.Subcommand.Case(
                         "repository",
                         help: .init(abstract: "Operate the repository-policy families."),
                         initial: { .init() },
@@ -255,6 +263,9 @@ extension Institute.Application {
             case .ci(var command):
                 try await command.run()
                 self = .ci(command)
+            case .planner(var command):
+                try await command.run()
+                self = .planner(command)
             case .repository(var command):
                 try await command.run()
                 self = .repository(command)
