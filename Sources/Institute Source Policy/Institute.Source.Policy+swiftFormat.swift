@@ -10,7 +10,7 @@ extension Institute.Source.Policy {
         ("FileScopedDeclarationPrivacy", true),
         ("FullyIndirectEnum", true),
         ("GroupNumericLiterals", true),
-        ("IdentifiersMustBeASCII", true),
+        ("IdentifiersMustBeASCII", false),
         ("NeverForceUnwrap", true),
         ("NeverUseForceTry", true),
         ("NeverUseImplicitlyUnwrappedOptionals", true),
