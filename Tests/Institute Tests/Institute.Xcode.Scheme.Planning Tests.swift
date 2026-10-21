@@ -133,9 +133,9 @@ extension Institute.Xcode.Scheme.Test.Unit {
         )
 
         #expect(Array(plan.buildables.prefix(28)).allSatisfy { $0.reference == "../institute" })
-        #expect(Array(plan.buildables.dropFirst(28).prefix(28)).allSatisfy { $0.reference == "." })
+        #expect(Array(plan.buildables.dropFirst(28).prefix(27)).allSatisfy { $0.reference == "." })
         #expect(
-            Array(plan.buildables.dropFirst(56).prefix(6)).allSatisfy { $0.reference == "../slow" }
+            Array(plan.buildables.dropFirst(55).prefix(6)).allSatisfy { $0.reference == "../slow" }
         )
         #expect(plan.buildables.last?.reference == "../fast")
         #expect(
