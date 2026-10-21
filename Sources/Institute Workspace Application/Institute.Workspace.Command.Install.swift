@@ -29,7 +29,7 @@ extension Institute.Workspace.Command {
             do throws(Institute.Planner.Error) {
                 executable = try Institute.Planner.Pinned.executable(
                     consumer: .published,
-                    release: .github,
+                    release: .published,
                     platform: .macos
                 )
             } catch {
