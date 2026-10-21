@@ -21,7 +21,6 @@ public import Institute_Instruments
 public import Institute_Inventory
 public import Institute_Inventory_Application
 public import Institute_Model
-public import Institute_Navigation_Application
 public import Institute_Package_Application
 public import Institute_Planner_Application
 public import Institute_Repository_Application
@@ -45,7 +44,6 @@ extension Institute.Application {
         case dependencies(Institute.Dependency.Command)
         case composition(Institute.Composition.Command)
         case context(Institute.Context.Command)
-        case navigation(Institute.Navigation.Command)
         case package(Institute.Package.Command)
         case coherence(Institute.Coherence.Command)
         case conversion(Institute.Conversion.Command)
@@ -133,12 +131,6 @@ extension Institute.Application {
                         help: .init(abstract: "Install, verify, and read agent context."),
                         initial: { .install(.init()) },
                         map: Self.context
-                    )
-                    Command_Schema.Command.Subcommand.Case(
-                        "navigation",
-                        help: .init(abstract: "Install, verify, and serve code navigation."),
-                        initial: { .install(.init()) },
-                        map: Self.navigation
                     )
                     Command_Schema.Command.Subcommand.Case(
                         "package",
@@ -239,9 +231,6 @@ extension Institute.Application {
             case .context(var command):
                 try await command.run()
                 self = .context(command)
-            case .navigation(var command):
-                try await command.run()
-                self = .navigation(command)
             case .package(var command):
                 try await command.run()
                 self = .package(command)

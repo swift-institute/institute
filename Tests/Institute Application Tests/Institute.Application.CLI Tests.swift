@@ -12,7 +12,6 @@ import Institute_Doctor_Application
 import Institute_GitHub_Application
 import Institute_Inventory_Application
 import Institute_Model
-import Institute_Navigation_Application
 import Institute_Package_Application
 import Institute_Verification_Application
 import Institute_Workspace_Application
@@ -277,33 +276,6 @@ extension Institute.Application.CLI.Test.Unit {
         #expect(packet.includedComments.count == 1)
     }
 
-    @Test(arguments: ["install", "check", "serve"])
-    func `navigation parses its operation`(argument: Swift.String) throws {
-        let argv: [Swift.String] =
-            argument == "serve"
-            ? ["navigation", argument]
-            : ["navigation", argument, "--workspace-path", "/tmp/Institute"]
-        let command = try parse(argv)
-
-        guard case .navigation(let navigation) = command else {
-            Issue.record("expected navigation, got \(command)")
-            return
-        }
-        switch (argument, navigation) {
-        case ("install", .install(let install)):
-            #expect(install.workspacePath == "/tmp/Institute")
-
-        case ("check", .check(let check)):
-            #expect(check.workspacePath == "/tmp/Institute")
-
-        case ("serve", .serve):
-            break
-
-        default:
-            Issue.record("navigation \(argument) parsed as \(navigation)")
-        }
-    }
-
     @Test(arguments: ["build", "test"])
     func `package parses its coordinated operations`(argument: Swift.String) throws {
         let command = try parse(["package", argument, "--package-path", "/tmp/example"])
@@ -473,20 +445,6 @@ extension Institute.Application.CLI.Test.`Edge Case` {
     func `context rejects a package operation`() {
         #expect(throws: Command.Error.self) {
             _ = try parse(["context", "build"])
-        }
-    }
-
-    @Test
-    func `navigation requires an operation`() {
-        #expect(throws: Command.Error.self) {
-            _ = try parse(["navigation"])
-        }
-    }
-
-    @Test
-    func `navigation rejects a package operation`() {
-        #expect(throws: Command.Error.self) {
-            _ = try parse(["navigation", "build"])
         }
     }
 

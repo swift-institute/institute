@@ -18,8 +18,6 @@ swift run institute build            # build the whole selection, one xcodebuild
 swift run institute doctor           # report checkout facts
 swift run institute doctor --institute  # + roster currency (needs gh)
 .build/debug/institute package test --package-path . --fresh
-.build/debug/institute navigation install
-.build/debug/institute navigation check
 .build/debug/institute source prepare --workspace-path <workspace.xcworkspace>
 .build/debug/institute source measure --workspace-path <workspace.xcworkspace>
 .build/debug/institute source repair plan --workspace-path <workspace.xcworkspace> --output-path <plan.json>
@@ -174,10 +172,6 @@ authenticated `gh` never changes what a plain `doctor` does.
   path in durable configuration. The source profile and preparation receipt bind the exact
   executable, tool digest, configuration, and environment; a measurement run is offline.
   Do not add a flag that softens the rule set, severities, or fail-closed interpretation.
-- **cclsp is developer tooling, not an inventory package.** Install and verify it through
-  `institute navigation`; never add it to `Institute.json`, resolve it from a personal fork,
-  or put a fixed machine checkout path in durable configuration. `navigation serve` owns the
-  Xcode/`TOOLCHAINS` boundary. The merged cross-package index remainder is institute-application#25.
 - **The generated Xcode workspace uses relative references only.** Never emit an absolute path
   into `institute.xcworkspace` or into `Institute.json` — the package root is the checkout
   itself and is emitted as `group:.`, while materialized packages use

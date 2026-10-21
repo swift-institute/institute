@@ -69,10 +69,6 @@ let package = Package(
             targets: ["Institute Inventory Application"]
         ),
         .library(
-            name: "Institute Navigation Application",
-            targets: ["Institute Navigation Application"]
-        ),
-        .library(
             name: "Institute Package Application",
             targets: ["Institute Package Application"]
         ),
@@ -375,17 +371,6 @@ let package = Package(
             ]
         ),
         .target(
-            name: "Institute Navigation Application",
-            dependencies: [
-                .product(name: "Command", package: "swift-arguments"),
-                .product(name: "Command Schema", package: "swift-arguments"),
-                .product(name: "Institute Model", package: "institute"),
-                .product(name: "Institute Development", package: "institute"),
-                .product(name: "Environment", package: "swift-environment"),
-                .product(name: "File System", package: "swift-file-system"),
-            ]
-        ),
-        .target(
             name: "Institute Package Application",
             dependencies: [
                 .product(name: "Command", package: "swift-arguments"),
@@ -500,7 +485,6 @@ let package = Package(
                 "Institute Doctor Application",
                 "Institute GitHub Application",
                 "Institute Inventory Application",
-                "Institute Navigation Application",
                 "Institute Package Application",
                 "Institute Planner Application",
                 "Institute Verification Application",
@@ -569,7 +553,6 @@ let package = Package(
                 "Institute Doctor Application",
                 "Institute GitHub Application",
                 "Institute Inventory Application",
-                "Institute Navigation Application",
                 "Institute Package Application",
                 "Institute Verification Application",
                 "Institute Workspace Application",

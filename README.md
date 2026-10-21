@@ -21,7 +21,6 @@ and local-source composition for cross-package work (`institute compose` / `rest
 | `verify` | Report which source a dependency actually compiled from, read from resolved state. |
 | `context install\|check` | Install or verify the checkout-root agent entry point and canonical skill projections. |
 | `context packet` | Render a bounded, read-only current-state packet for one GitHub Issue; ordinary history stays cold unless a comment URL is named explicitly. |
-| `navigation install\|check` | Install or verify the pinned cclsp/SourceKit-LSP integration for this checkout. |
 | `package <action>` | Run SwiftPM build, test, resolution, and administration through the Swift coordinator. |
 | `source prepare` | Materialize and verify the exact offline source engines and profiles. |
 | `source measure` | Measure a typed workspace source cohort without building or testing. |
@@ -158,8 +157,6 @@ passes.
 already keep one. If you keep more than one Swift toolchain installed,
 [TOOLCHAINS.md](https://github.com/swift-institute/Research/blob/main/institute-application-historical/TOOLCHAINS.md) covers how to select one explicitly and how to determine which
 one actually produced a result — machine-local configuration, not committed state.
-
-The optional navigation setup additionally requires Node 18 or newer and Bun.
 
 **Clone into a directory named `swift-institute`.** The layout is load-bearing, not cosmetic:
 the materialized organization roots are placed beside this checkout, and the canonical skill
@@ -301,50 +298,9 @@ and from which roots, and **fails rather than reporting success when it
 resolves no root at all** — an install that projected nothing is not an
 install, and used to print the same line as one that worked.
 
-### Install code navigation
+### Code navigation
 
-Institute owns the reproducible integration boundary between
-[cclsp](https://github.com/swift-institute/cclsp) and Xcode's SourceKit-LSP:
-
-```sh
-institute navigation install
-institute navigation check
-```
-
-`install` clones the public `sourcekit-lsp-adapter` line at the exact revision
-compiled into Institute, installs dependencies from cclsp's frozen Bun
-lockfile, builds its Node executable, and writes two generated files beneath
-the physical organization hierarchy:
-
-- `.workspace/navigation/cclsp.json` — one SourceKit-LSP server for the
-  Institute Application and each currently materialized `Institute.json`
-  repository;
-- `.workspace/navigation/mcp-server.json` — the command, arguments, and
-  environment an MCP client registers.
-
-The command prints the descriptor path. Client applications own their own
-registration format, so Institute does not rewrite a user's global client
-configuration. The descriptor is the canonical value to translate into that
-format.
-
-SourceKit-LSP is launched through the generated `institute navigation serve`
-invocation. That typed boundary removes `TOOLCHAINS`, resolves
-`sourcekit-lsp` through `xcrun`, and refuses a binary outside the Xcode selected
-by `xcode-select`. cclsp remains a distinct third-party TypeScript tool: it is
-not a Swift package, is not listed in `Institute.json`, and is never resolved
-from a personal fork or a fixed machine path.
-
-The current generated configuration is deliberately per-package. A single
-deduplicated Institute-wide index requires a larger IndexStore merge and
-stabilizing acceptance probe; that exact Full-Swift remainder is tracked in
-[issue #25](https://github.com/swift-institute/institute-application/issues/25). Institute
-does not claim that per-package navigation is equivalent to cross-package
-index coverage.
-
-Any earlier ad hoc merged-index pipeline and any prebuilt index bundle are
-retired, unsupported, and not prerequisites for navigation. A clean machine
-installs from the public cclsp revision and generates its own configuration
-through the Institute commands above; it does not copy old index artifacts.
+Agents use Claude Code's swift-lsp plugin, which indexes one package at a time. Institute no longer installs or serves a navigation integration.
 
 ### Source measurement and repair
 
