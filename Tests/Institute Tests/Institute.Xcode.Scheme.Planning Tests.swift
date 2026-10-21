@@ -62,7 +62,6 @@ extension Institute.Xcode.Scheme.Test.Unit {
                 ("Institute Doctor Application", false),
                 ("Institute GitHub Application", false),
                 ("Institute Inventory Application", false),
-                ("Institute Navigation Application", false),
                 ("Institute Package Application", false),
                 ("Institute Planner Application", false),
                 ("Institute Repository Application", false),
