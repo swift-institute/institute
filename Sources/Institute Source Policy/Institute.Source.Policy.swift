@@ -118,6 +118,7 @@ extension Institute.Source {
             self.bundles = Bundle.allCases
             self.externallyStandardizedTargets = [.init("CSS")]
             let linterID = Source_Profile.Source.Engine.ID("swift-linter")
+            let swiftFormatID = Source_Profile.Source.Engine.ID("swift-format")
             self.negativeControls = [
                 .init(
                     repository: "swift-institute/institute",
@@ -133,6 +134,36 @@ extension Institute.Source {
                     repository: "swift-compositions/swift-linter",
                     path: "Tests/Fixtures/runner-controls/error/Sources/Naming Core/ImplBinding.swift",
                     rule: .init(engine: linterID, token: "variable named impl")
+                ),
+                .init(
+                    repository: "swift-atoms/swift-segment",
+                    path: "Tests/Temporal Typechecking/InvalidClockCoordinateInstant.swift",
+                    rule: .init(engine: swiftFormatID, token: "format"),
+                    findings: 1
+                ),
+                .init(
+                    repository: "swift-atoms/swift-segment",
+                    path: "Tests/Temporal Typechecking/InvalidGenericCoordinateInstant.swift",
+                    rule: .init(engine: swiftFormatID, token: "format"),
+                    findings: 1
+                ),
+                .init(
+                    repository: "swift-atoms/swift-segment",
+                    path: "Tests/Temporal Typechecking/InvalidMixedDomainAffine.swift",
+                    rule: .init(engine: swiftFormatID, token: "format"),
+                    findings: 2
+                ),
+                .init(
+                    repository: "swift-atoms/swift-segment",
+                    path: "Tests/Temporal Typechecking/InvalidTemporalCoordinateInstant.swift",
+                    rule: .init(engine: swiftFormatID, token: "format"),
+                    findings: 1
+                ),
+                .init(
+                    repository: "swift-atoms/swift-segment",
+                    path: "Tests/Temporal Typechecking/InvalidTimeInstantProtocol.swift",
+                    rule: .init(engine: swiftFormatID, token: "format"),
+                    findings: 1
                 ),
             ]
             self.commitment = .init(
