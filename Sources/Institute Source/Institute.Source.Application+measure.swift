@@ -197,6 +197,15 @@ extension Institute.Source.Application {
                 }
             }
             let measured = await execution.measure(subject, profile: profile, engines: engines)
+                .map { measurement in
+                    measurement.demotingFindings { finding in
+                        policy.reportsAsWarning(
+                            identifier: finding.diagnostic.identifier,
+                            path: finding.diagnostic.location.filePath ?? finding.diagnostic.location.fileID,
+                            root: subject.root
+                        )
+                    }
+                }
             let current: Source_Measurement.Source.Subject
             do throws(Institute.Error) {
                 current = try Institute.Source.Workspace.subject(
