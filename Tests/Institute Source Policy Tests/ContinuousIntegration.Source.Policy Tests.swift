@@ -206,8 +206,8 @@ extension `Institute source policy` {
             (.standards, 122, "1792673e3453fa926688807127816aa8561e16702c5a1805332405cf93787681"),
         ]
         let engine = policy.engines.first { $0.id.token == "swift-linter" }
-        #expect(engine?.revision == "53e591fd18d0066b7c5cf633a4ed6b0b86e52886")
-        #expect(engine?.executable.digest == .init("8d06030fc1b5c2ed0a1dc7e4859fdb1fa9502fad137e13e3ebca8000a7ad7021"))
+        #expect(engine?.revision == "2c3133cecf5a8e24dc23a2654687f214911dbd79")
+        #expect(engine?.executable.digest == .init("76bc0e9b74beb050acc56310781ccfe2de232545e0fa3772eb35521493890dda"))
         for (bundle, count, digest) in expected {
             let rules = policy.linterRules(for: bundle)
             #expect(rules.count == count)
