@@ -28,10 +28,11 @@ extension Institute.Planner.Contract.Test {
         init() {
             rows = fixture.publish(Institute.Planner.Fixture.candidate, run: "200")
             pin = "# comment\n\(Institute.Planner.Fixture.candidate)\n"
-            ledger = [
-                "# rows",
-                "\(Institute.Planner.Contract.Test.old) linux-x86_64 \(String(repeating: "c", count: 64)) \(String(repeating: "d", count: 64))",
-            ] + rows
+            ledger =
+                [
+                    "# rows",
+                    "\(Institute.Planner.Contract.Test.old) linux-x86_64 \(String(repeating: "c", count: 64)) \(String(repeating: "d", count: 64))",
+                ] + rows
         }
 
         func row(_ platform: Institute.Planner.Platform) -> String {

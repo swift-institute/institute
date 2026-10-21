@@ -1,6 +1,6 @@
+import Byte
 public import Command
 public import Command_Schema
-import Byte
 import Console
 import File_System
 public import Institute_Model

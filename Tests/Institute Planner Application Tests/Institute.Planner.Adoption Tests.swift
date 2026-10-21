@@ -1,7 +1,7 @@
 import Byte
+import FIPS_180_4
 import File_System
 import Git_Foundation
-import FIPS_180_4
 import Institute_Model
 import JSON
 import Testing
@@ -175,7 +175,8 @@ extension Institute.Planner.Adoption.Test.`Edge Case` {
             return
         }
         object = object.map { member in
-            member.key == "repositories" ? (member.key, [comparison].json)
+            member.key == "repositories"
+                ? (member.key, [comparison].json)
                 : member.key == "verdict" ? (member.key, "adoptable".json) : member
         }
         evidence = .object(object)

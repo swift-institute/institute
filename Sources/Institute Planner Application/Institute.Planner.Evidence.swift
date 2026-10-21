@@ -109,9 +109,11 @@ extension Institute.Planner.Evidence: JSON.Serializable {
         guard try Swift.Int(json: json["schema"]) == schema else {
             throw .typeMismatch(expected: "planner evidence schema \(schema)", got: "other schema")
         }
-        guard let verdict = Institute.Planner.Canary.Verdict(
-            rawValue: try Swift.String(json: json["verdict"])
-        ) else {
+        guard
+            let verdict = Institute.Planner.Canary.Verdict(
+                rawValue: try Swift.String(json: json["verdict"])
+            )
+        else {
             throw .typeMismatch(expected: "adoptable, differs or refused", got: "other verdict")
         }
         let repositories = try [Institute.Planner.Canary.Comparison](json: json["repositories"])

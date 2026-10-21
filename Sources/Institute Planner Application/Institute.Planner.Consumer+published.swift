@@ -1,3 +1,4 @@
+import Byte
 public import Institute_Model
 import Process
 
@@ -30,7 +31,7 @@ extension Institute.Planner.Consumer {
                 let message = Swift.String(decoding: output.stderr ?? [], as: Swift.UTF8.self)
                 throw .transport("cannot read \(address): \(message)")
             }
-            return output.stdout ?? []
+            return (output.stdout ?? []).map(Byte.init(_:))
         }
     }
 }

@@ -116,8 +116,9 @@ extension Institute.Planner.Canary.Comparison: JSON.Serializable {
             current: try .init(json: json["current"]),
             candidate: try .init(json: json["candidate"])
         )
-        guard try [Institute.Planner.Canary.Difference](json: json["differences"])
-            == comparison.differences
+        guard
+            try [Institute.Planner.Canary.Difference](json: json["differences"])
+                == comparison.differences
         else {
             throw .typeMismatch(
                 expected: "differences derived from the recorded outcomes",
