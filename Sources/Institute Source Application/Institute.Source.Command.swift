@@ -1,6 +1,7 @@
 public import Command
 public import Command_Schema
 public import Institute_Model
+import Institute_Planner_Application
 public import Institute_Source
 
 extension Institute.Source {
@@ -39,6 +40,7 @@ extension Institute.Source {
         }
 
         public mutating func run() async throws(Institute.Error) {
+            try Institute.Planner.Freshness.enforce()
             switch self {
             case .prepare(var command):
                 try await command.run()

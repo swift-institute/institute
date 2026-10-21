@@ -3,6 +3,7 @@ public import Command_Schema
 import Console
 public import Institute_CI_Model
 public import Institute_Model
+import Institute_Planner_Application
 public import Institute_Source
 import Institute_Source_Policy
 public import Institute_Source_Workspace
@@ -202,6 +203,7 @@ extension Institute.CI.Command {
             terminate(64)
         }
         do throws(Institute.Error) {
+            try Institute.Planner.Freshness.enforce()
             try await command.run()
         } catch {
             Console.Output.error("institute ci source: \(error)\n")

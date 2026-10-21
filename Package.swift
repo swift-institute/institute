@@ -233,6 +233,7 @@ let package = Package(
         .target(
             name: "Institute CI Application",
             dependencies: [
+                "Institute Planner Application",
                 .product(name: "Command", package: "swift-arguments"),
                 .product(name: "Command Schema", package: "swift-arguments"),
                 .product(name: "Institute CI Canon", package: "institute"),
@@ -282,6 +283,7 @@ let package = Package(
         .target(
             name: "Institute Source Application",
             dependencies: [
+                "Institute Planner Application",
                 .product(name: "Institute Model", package: "institute"),
                 .product(name: "Institute Source", package: "institute"),
                 .product(name: "Institute Source Workspace", package: "institute"),
@@ -296,6 +298,7 @@ let package = Package(
         .target(
             name: "Institute Workspace Application",
             dependencies: [
+                "Institute Planner Application",
                 .product(name: "Command", package: "swift-arguments"),
                 .product(name: "Command Schema", package: "swift-arguments"),
                 .product(name: "Institute Model", package: "institute"),
@@ -393,6 +396,7 @@ let package = Package(
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "Git", package: "swift-git"),
+                .product(name: "Institute Development", package: "institute"),
                 .product(name: "Institute Model", package: "institute"),
                 .product(name: "Institute Repository Policy", package: "institute"),
                 .product(name: "Institute Source", package: "institute"),
