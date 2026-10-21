@@ -4,7 +4,7 @@ internal import Source_Profile
 extension Institute.Source.Policy {
     internal static let swiftFormatRules: [(Swift.String, Swift.Bool)] = [
         ("AlwaysUseLowerCamelCase", false),
-        ("AmbiguousTrailingClosureOverload", true),
+        ("AmbiguousTrailingClosureOverload", false),
         ("DoNotUseSemicolons", true),
         ("DontRepeatTypeInStaticProperties", true),
         ("FileScopedDeclarationPrivacy", true),
@@ -24,7 +24,7 @@ extension Institute.Source.Policy {
         ("NoVoidReturnOnFunctionSignature", true),
         ("OneCasePerLine", true),
         ("OneVariableDeclarationPerLine", true),
-        ("OnlyOneTrailingClosureArgument", true),
+        ("OnlyOneTrailingClosureArgument", false),
         ("OrderedImports", true),
         ("ReturnVoidInsteadOfEmptyTuple", true),
         ("UseEarlyExits", true),
