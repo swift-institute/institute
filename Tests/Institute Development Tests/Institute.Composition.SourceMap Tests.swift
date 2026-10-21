@@ -69,7 +69,7 @@ extension Institute.Composition.SourceMap.Test {
         ) throws {
             let directory = try Institute.Layout.directory(for: repository, at: root)
             try DevelopmentFixtureFiles.createDirectory(directory.path.description)
-            DevelopmentFixtureFiles.createFile(
+            try DevelopmentFixtureFiles.createFile(
                 directory[file: "Package.swift"].path.description,
                 contents: Array("// fixture manifest\n".utf8)
             )
@@ -238,7 +238,7 @@ extension Institute.Composition.SourceMap.Test {
 
         let bDirectory = try Institute.Layout.directory(for: b, at: secondRoot)
         try DevelopmentFixtureFiles.createDirectory(bDirectory.path.description)
-        DevelopmentFixtureFiles.createFile(
+        try DevelopmentFixtureFiles.createFile(
             bDirectory[file: "Package.swift"].path.description,
             contents: Array("// fixture manifest\n".utf8)
         )

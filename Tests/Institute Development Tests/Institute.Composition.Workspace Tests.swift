@@ -159,7 +159,7 @@ extension Institute.Composition.Workspace.Test.Integration {
         let first = workspace.executionLocation(fresh: true)
         try DevelopmentFixtureFiles.createDirectory(first.path.description)
         let marker = first.path.description + "/marker"
-        DevelopmentFixtureFiles.createFile(marker, contents: Array("state".utf8))
+        try DevelopmentFixtureFiles.createFile(marker, contents: Array("state".utf8))
 
         let second = workspace.executionLocation(fresh: true)
         #expect(second != first)

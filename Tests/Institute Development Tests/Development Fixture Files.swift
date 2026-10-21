@@ -57,9 +57,12 @@ enum DevelopmentFixtureFiles {
         FileManager.default.fileExists(atPath: path)
     }
 
-    @discardableResult
-    static func createFile(_ path: Swift.String, contents: [Swift.UInt8]) -> Swift.Bool {
-        FileManager.default.createFile(atPath: path, contents: Data(contents))
+    /// Writes the file in place and throws on failure. `FileManager.createFile`
+    /// writes atomically (temporary file, then rename) and reports failure only
+    /// as a discarded `false`; on Windows the rename can lose a race with a
+    /// scanner holding the temporary file, leaving a fixture silently absent.
+    static func createFile(_ path: Swift.String, contents: [Swift.UInt8]) throws {
+        try Data(contents).write(to: URL(fileURLWithPath: path))
     }
 
     static func copy(_ source: Swift.String, to destination: Swift.String) throws {
