@@ -8,10 +8,12 @@ private import Process
 extension Institute {
     /// The account-local installation of the Institute command.
     ///
-    /// The executable is copied out of SwiftPM's generated build state so a
-    /// later package clean cannot break the command. A relative symbolic link
-    /// in `.local/bin` exposes that copy without recording the account's
-    /// absolute path.
+    /// The executable is a published, already verified binary, copied out of
+    /// its staging file into the account's managed directory so no later
+    /// build or clean can change the command. A relative symbolic link in
+    /// `.local/bin` exposes that copy without recording the account's
+    /// absolute path. Beside the executable an identity record states what
+    /// was installed.
     public struct Installation: Sendable {
         public let source: File
         public let home: File.Directory
@@ -20,11 +22,11 @@ extension Institute {
 
         private let environmentPath: Swift.String
 
-        /// Resolves the running executable and the invoking account's home.
+        /// Resolves the invoking account's home and installs from `source`.
         ///
-        /// - Throws: ``Institute/Error`` when `HOME`, `PATH`, or the running
-        ///   executable cannot be resolved.
-        public init() throws(Institute.Error) {
+        /// - Throws: ``Institute/Error`` when `HOME`, `PATH`, or `source`
+        ///   cannot be resolved.
+        public init(installing source: File) throws(Institute.Error) {
             guard let value = Environment.read("HOME"), !value.isEmpty else {
                 throw .configuration(
                     "HOME is not available, so the account-local command cannot be installed"
@@ -44,7 +46,7 @@ extension Institute {
             }
 
             try self.init(
-                source: Self.runningExecutable(searching: environmentPath),
+                source: source,
                 home: home,
                 environmentPath: environmentPath
             )
@@ -73,12 +75,13 @@ extension Institute {
 }
 
 extension Institute.Installation {
-    /// Installs or refreshes the account-local Institute command.
+    /// Installs or refreshes the account-local Institute command, and records
+    /// `identity` as what was installed.
     ///
     /// A prior installation is replaced only when its receipt and launcher
     /// prove that this installer owns it. Existing unmanaged files, directories,
     /// and symbolic links are rejected before any mutation.
-    public func install() throws(Institute.Error) {
+    public func install(recording identity: Swift.String) throws(Institute.Error) {
         guard commandDirectoryIsOnPath else {
             throw .configuration(
                 """
@@ -117,6 +120,7 @@ extension Institute.Installation {
         }
 
         try placeExecutable()
+        try record(identity)
 
         if try metadata(at: command.path) == nil {
             try Institute.Materialization.install(
@@ -170,6 +174,11 @@ extension Institute.Installation {
 
     private var receipt: File {
         root[file: "INSTALLATION"]
+    }
+
+    /// States what was installed: written on every install, replaced whole.
+    internal var identity: File {
+        root[file: "INSTALLED"]
     }
 
     private var directories: [File.Directory] {
@@ -339,6 +348,14 @@ extension Institute.Installation {
 }
 
 extension Institute.Installation {
+    private func record(_ text: Swift.String) throws(Institute.Error) {
+        do throws(File.System.Write.Atomic.Error) {
+            try identity.write.atomic(text)
+        } catch {
+            throw .filesystem("cannot record the installed identity \(identity): \(error)")
+        }
+    }
+
     private func placeExecutable() throws(Institute.Error) {
         let stagingPath: File.Path
         do throws(File.Path.Temporary.Error) {
@@ -379,9 +396,14 @@ extension Institute.Installation {
         }
     }
 
-    private static func runningExecutable(
-        searching environmentPath: Swift.String
-    ) throws(Institute.Error) -> File {
+    /// The executable this process was launched from.
+    ///
+    /// - Throws: ``Institute/Error`` when `PATH` or the executable cannot be
+    ///   resolved.
+    public static func running() throws(Institute.Error) -> File {
+        guard let environmentPath = Environment.read("PATH") else {
+            throw .configuration("PATH is not available, so the running executable cannot be found")
+        }
         guard let argument = CommandLine.arguments.first, !argument.isEmpty else {
             throw .configuration("the running Institute executable has no command path")
         }

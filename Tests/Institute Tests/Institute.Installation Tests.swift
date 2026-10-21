@@ -97,7 +97,7 @@ extension Institute.Installation.Test.Unit {
         defer { fixture.remove() }
         let installation = try fixture.installation
 
-        try installation.install()
+        try installation.install(recording: "fixture identity")
 
         #expect(
             try fixture.contents(of: installation.executable)
@@ -118,14 +118,27 @@ extension Institute.Installation.Test.Unit {
     }
 
     @Test
+    func `install records the identity it installed`() throws {
+        let fixture = try Institute.Installation.Test.Fixture()
+        defer { fixture.remove() }
+        let installation = try fixture.installation
+
+        try installation.install(recording: "planner one")
+        #expect(try fixture.contents(of: installation.identity) == "planner one")
+
+        try installation.install(recording: "planner two")
+        #expect(try fixture.contents(of: installation.identity) == "planner two")
+    }
+
+    @Test
     func `install refreshes an installation carrying its receipt`() throws {
         let fixture = try Institute.Installation.Test.Fixture()
         defer { fixture.remove() }
         let installation = try fixture.installation
-        try installation.install()
+        try installation.install(recording: "fixture identity")
         try fixture.source.write.atomic("coordinator-version-two")
 
-        try installation.install()
+        try installation.install(recording: "fixture identity")
 
         #expect(
             try fixture.contents(of: installation.executable)
@@ -152,7 +165,7 @@ extension Institute.Installation.Test.Unit {
                 .joined(separator: Institute.Installation.Test.Fixture.pathSeparator)
         )
 
-        try installation.install()
+        try installation.install(recording: "fixture identity")
 
         #expect(
             try File.System.Canonical.resolve(installation.command.path)
@@ -172,7 +185,7 @@ extension Institute.Installation.Test.`Edge Case` {
         let installation = try fixture.installation
 
         #expect(throws: Institute.Error.self) {
-            try installation.install()
+            try installation.install(recording: "fixture identity")
         }
         #expect(try fixture.contents(of: fixture.command) == "user-command")
         #expect(!fixture.root.stat.exists)
@@ -192,7 +205,7 @@ extension Institute.Installation.Test.`Edge Case` {
         let installation = try fixture.installation
 
         #expect(throws: Institute.Error.self) {
-            try installation.install()
+            try installation.install(recording: "fixture identity")
         }
         #expect(
             try File.System.Canonical.resolve(fixture.command.path)
@@ -210,7 +223,7 @@ extension Institute.Installation.Test.`Edge Case` {
         let installation = try fixture.installation
 
         #expect(throws: Institute.Error.self) {
-            try installation.install()
+            try installation.install(recording: "fixture identity")
         }
         #expect(fixture.root[file: "local-state"].stat.isFile)
         #expect(!fixture.command.stat.exists)
@@ -223,7 +236,7 @@ extension Institute.Installation.Test.`Edge Case` {
         let installation = try fixture.installation
 
         #expect(throws: Institute.Error.self) {
-            try installation.install()
+            try installation.install(recording: "fixture identity")
         }
         #expect(!fixture.root.stat.exists)
         #expect(!fixture.command.stat.exists)
