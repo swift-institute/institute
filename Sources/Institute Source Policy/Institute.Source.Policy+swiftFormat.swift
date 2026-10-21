@@ -29,7 +29,7 @@ extension Institute.Source.Policy {
         ("ReturnVoidInsteadOfEmptyTuple", true),
         ("UseEarlyExits", true),
         ("UseLetInEveryBoundCaseVariable", true),
-        ("UseShorthandTypeNames", true),
+        ("UseShorthandTypeNames", false),
         ("UseSingleLinePropertyGetter", true),
         ("UseSynthesizedInitializer", false),
         ("UseTripleSlashForDocumentationComments", true),
@@ -52,7 +52,6 @@ extension Institute.Source.Policy {
         "OrderedImports",
         "ReturnVoidInsteadOfEmptyTuple",
         "UseLetInEveryBoundCaseVariable",
-        "UseShorthandTypeNames",
         "UseSingleLinePropertyGetter",
     ]
 
