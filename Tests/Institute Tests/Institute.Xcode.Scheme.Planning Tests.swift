@@ -85,6 +85,7 @@ extension Institute.Xcode.Scheme.Test.Unit {
                 ("Institute Architecture Tests", true),
             ]
         )
+        try MainFixtureFiles.checkout(application)
         try Self.package(
             at: slow,
             name: "slow",
@@ -175,7 +176,7 @@ extension Institute.Xcode.Scheme.Test.Unit {
             let executable = MainFixtureFiles.join(base, "hang")
             let script = "#!/bin/sh\nsleep 5\n"
         #endif
-        try MainFixtureFiles.createDirectory(application)
+        try MainFixtureFiles.checkout(application)
         try Self.package(at: hung, name: "hung", targets: [("Hung", false)])
         try MainFixtureFiles.write(bytes: Array(script.utf8), to: executable)
         try MainFixtureFiles.setPermissions(executable, posix: 0o755)

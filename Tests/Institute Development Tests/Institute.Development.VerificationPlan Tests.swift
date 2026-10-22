@@ -37,7 +37,7 @@ extension Institute.Development.VerificationPlan.Test {
                 DevelopmentFixtureFiles.uniqueName()
             )
             let checkout = DevelopmentFixtureFiles.join(temporary, "Institute")
-            try DevelopmentFixtureFiles.createDirectory(checkout)
+            try DevelopmentFixtureFiles.checkout(checkout)
             let workspaceRoot = try Institute.Root(
                 checkout: File.Directory(validating: checkout)
             )

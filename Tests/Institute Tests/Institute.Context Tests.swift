@@ -64,6 +64,7 @@ extension Institute.Context.Test {
 
         try home.create.recursive()
         try templates.create.recursive()
+        try checkout[file: "Institute.json"].write.atomic("")
         try templates[file: "AGENTS.md"].write.atomic(
             "\(Self.marker)\n# Fixture\n"
         )

@@ -538,7 +538,7 @@ extension Institute.Inventory.Test.Unit {
 extension Institute.Inventory.Test.Unit {
     private static func scratchRoot() throws -> (Institute.Root, Swift.String) {
         let location = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
-        try MainFixtureFiles.createDirectory(location)
+        try MainFixtureFiles.checkout(location)
         let directory = try File.Directory(validating: location)
         return (try Institute.Root(checkout: directory), location)
     }

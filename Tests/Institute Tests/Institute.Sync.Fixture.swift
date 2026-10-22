@@ -49,6 +49,10 @@ extension Institute.Sync {
             client = .init()
 
             try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+            try FileManager.default.createDirectory(
+                at: root.appending(path: "Context"),
+                withIntermediateDirectories: true
+            )
             let configuration = Institute.Configuration(
                 version: 1,
                 scope: "swift-institute",

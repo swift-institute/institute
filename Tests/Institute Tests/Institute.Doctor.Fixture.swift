@@ -33,7 +33,7 @@ extension Institute.Doctor {
             let temporary =
                 FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
             let checkout = temporary.appending(path: "Institute")
-            try FileManager.default.createDirectory(at: checkout, withIntermediateDirectories: true)
+            try MainFixtureFiles.checkout(checkout.path)
             let workspaceRoot = try Institute.Root(
                 checkout: File.Directory(validating: checkout.path)
             )

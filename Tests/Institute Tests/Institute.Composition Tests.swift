@@ -32,7 +32,7 @@ extension Institute.Composition.Test {
             let temporary =
                 MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
             let checkout = MainFixtureFiles.join(temporary, "Institute")
-            try MainFixtureFiles.createDirectory(checkout)
+            try MainFixtureFiles.checkout(checkout)
             let workspaceRoot = try Institute.Root(
                 checkout: File.Directory(validating: checkout)
             )

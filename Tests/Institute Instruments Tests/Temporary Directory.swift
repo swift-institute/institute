@@ -15,4 +15,13 @@ enum TemporaryDirectory {
         }
         return root.path
     }
+
+    static func checkout(_ path: Swift.String) throws {
+        let checkout = URL(fileURLWithPath: path, isDirectory: true)
+        try FileManager.default.createDirectory(
+            at: checkout.appendingPathComponent("Context"),
+            withIntermediateDirectories: true
+        )
+        try Data().write(to: checkout.appendingPathComponent("Institute.json"))
+    }
 }

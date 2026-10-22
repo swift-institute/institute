@@ -39,6 +39,7 @@ extension Institute.Certification.Test.Derivation {
         heads: [Swift.String: Swift.String]
     ) throws -> Institute.Certification.Derivation {
         let temporary = try TemporaryDirectory.make(prefix: "certification-derivation")
+        try TemporaryDirectory.checkout(temporary)
         return try .init(
             root: Institute.Root(checkout: File.Directory(validating: temporary)),
             configuration: .init(

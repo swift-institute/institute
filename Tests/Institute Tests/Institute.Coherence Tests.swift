@@ -296,7 +296,7 @@ extension Institute.Coherence.Test.Unit {
         #else
             let checkout = temporary + "/C:/Institute"
         #endif
-        try MainFixtureFiles.createDirectory(checkout)
+        try MainFixtureFiles.checkout(checkout)
         let root = try Institute.Root(checkout: File.Directory(validating: checkout))
         let repositories = Institute.Coherence.Test.repositories()
         let culprit = repositories[1]

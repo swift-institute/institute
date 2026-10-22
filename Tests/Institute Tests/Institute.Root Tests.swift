@@ -21,11 +21,11 @@ extension Institute.Root {
 
 extension Institute.Root.Test.Unit {
     @Test
-    func `a physical checkout owns a sibling materialization hierarchy`() throws {
+    func `a checkout directory resolves by its identity`() throws {
         let base = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
         let checkout = MainFixtureFiles.join(base, "X/Institute")
         defer { try? MainFixtureFiles.remove(base) }
-        try MainFixtureFiles.createDirectory(checkout)
+        try MainFixtureFiles.checkout(checkout)
 
         let root = try Institute.Root(checkout: File.Directory(validating: checkout))
         let canonical = try File.System.Canonical.resolve(File.Path(checkout))
@@ -40,7 +40,7 @@ extension Institute.Root.Test.Unit {
         let physical = MainFixtureFiles.join(base, "physical/X/Institute")
         let alias = MainFixtureFiles.join(base, "alias-workspace")
         defer { try? MainFixtureFiles.remove(base) }
-        try MainFixtureFiles.createDirectory(physical)
+        try MainFixtureFiles.checkout(physical)
         try MainFixtureFiles.createSymbolicLink(alias, toURLOf: physical)
 
         let root = try Institute.Root(checkout: File.Directory(validating: alias))
@@ -53,15 +53,46 @@ extension Institute.Root.Test.Unit {
                 != File.Directory(try File.System.Canonical.resolve(File.Path(base)))
         )
     }
+
+    @Test
+    func `a nested directory resolves its containing checkout`() throws {
+        let base = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+        let checkout = MainFixtureFiles.join(base, "X/Institute")
+        let nested = MainFixtureFiles.join(checkout, "Sources/Feature")
+        defer { try? MainFixtureFiles.remove(base) }
+        try MainFixtureFiles.checkout(checkout)
+        try MainFixtureFiles.createDirectory(nested)
+
+        let root = try Institute.Root(checkout: File.Directory(validating: nested))
+        let canonical = try File.System.Canonical.resolve(File.Path(checkout))
+
+        #expect(root.checkout.path == canonical)
+        #expect(root.hierarchy == File.Directory(canonical).parent)
+    }
 }
 
 extension Institute.Root.Test.`Edge Case` {
+    @Test
+    func `a directory outside an Institute checkout fails at root resolution`() throws {
+        let outside = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
+        defer { try? MainFixtureFiles.remove(outside) }
+        try MainFixtureFiles.createDirectory(outside)
+        let canonical = try File.System.Canonical.resolve(File.Path(outside))
+
+        do throws(Institute.Error) {
+            _ = try Institute.Root(checkout: File.Directory(validating: outside))
+            Issue.record("expected root resolution to fail")
+        } catch {
+            #expect(error.description == "not inside an Institute checkout: \(canonical)")
+        }
+    }
+
     @Test
     func `a missing materialization hierarchy is admitted for later creation`() throws {
         let base = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
         let checkout = MainFixtureFiles.join(base, "Institute")
         defer { try? MainFixtureFiles.remove(base) }
-        try MainFixtureFiles.createDirectory(checkout)
+        try MainFixtureFiles.checkout(checkout)
         let root = try Institute.Root(checkout: File.Directory(validating: checkout))
         let target = root.hierarchy[directory: "swift-standards"][directory: "swift-ietf"]
 
@@ -73,7 +104,7 @@ extension Institute.Root.Test.`Edge Case` {
         let base = MainFixtureFiles.temporaryPath(MainFixtureFiles.uniqueName())
         let checkout = MainFixtureFiles.join(base, "Institute")
         defer { try? MainFixtureFiles.remove(base) }
-        try MainFixtureFiles.createDirectory(checkout)
+        try MainFixtureFiles.checkout(checkout)
         _ = MainFixtureFiles.createFile(MainFixtureFiles.join(base, "swift-compositions"), contents: Array("collision".utf8))
         let root = try Institute.Root(checkout: File.Directory(validating: checkout))
         let target = root.hierarchy[directory: "swift-compositions"][directory: "swift-example"]
@@ -89,7 +120,7 @@ extension Institute.Root.Test.`Edge Case` {
         let checkout = MainFixtureFiles.join(base, "Institute")
         let outside = MainFixtureFiles.join(base, "outside")
         defer { try? MainFixtureFiles.remove(base) }
-        try MainFixtureFiles.createDirectory(checkout)
+        try MainFixtureFiles.checkout(checkout)
         try MainFixtureFiles.createDirectory(outside)
         try MainFixtureFiles.createSymbolicLink(MainFixtureFiles.join(base, "swift-compositions"), toURLOf: outside)
         let root = try Institute.Root(checkout: File.Directory(validating: checkout))

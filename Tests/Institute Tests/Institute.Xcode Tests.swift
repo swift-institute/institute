@@ -567,6 +567,7 @@ extension Institute.Xcode.Test.Integration {
                 to: MainFixtureFiles.join(directory, "Package.swift")
             )
         }
+        try MainFixtureFiles.checkout(application)
         let repository = Institute.Repository(
             name: "swift-example",
             url: "https://github.com/swift-atoms/swift-example.git",

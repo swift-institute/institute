@@ -54,6 +54,7 @@ extension Institute.Certification.Test.Execution {
             prefix: "certification-execution",
             creating: ["swift-institute/institute", "swift-atoms/swift-color"]
         )
+        try TemporaryDirectory.checkout(temporary + "/swift-institute/institute")
         return try .init(
             root: Institute.Root(
                 checkout: File.Directory(validating: temporary + "/swift-institute/institute")

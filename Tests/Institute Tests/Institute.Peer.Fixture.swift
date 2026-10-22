@@ -33,7 +33,7 @@ extension Institute.Peer {
                 base
                 .appending(path: "institute")
                 .appending(path: "Institute")
-            try FileManager.default.createDirectory(at: checkout, withIntermediateDirectories: true)
+            try MainFixtureFiles.checkout(checkout.path)
             root = try Institute.Root(
                 checkout: File.Directory(validating: checkout.path)
             )

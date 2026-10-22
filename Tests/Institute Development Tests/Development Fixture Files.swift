@@ -49,6 +49,12 @@ enum DevelopmentFixtureFiles {
         try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true)
     }
 
+    static func checkout(_ path: Swift.String) throws {
+        try createDirectory(path)
+        try write("", to: join(path, "Institute.json"))
+        try createDirectory(join(path, "Context"))
+    }
+
     static func remove(_ path: Swift.String) throws {
         try FileManager.default.removeItem(atPath: path)
     }

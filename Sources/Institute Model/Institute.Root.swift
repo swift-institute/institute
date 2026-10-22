@@ -11,7 +11,8 @@ extension Institute {
         public let checkout: File.Directory
         public let hierarchy: File.Directory
 
-        /// Resolves `checkout` physically and derives its hierarchy parent.
+        /// Resolves the starting directory physically, discovers the containing
+        /// checkout by its inventory and context roots, and derives its hierarchy parent.
         ///
         /// No initializer accepts the two roots independently: their
         /// parent-child relationship is the invariant this value carries.
@@ -33,9 +34,19 @@ extension Institute {
                 throw .configuration("workspace checkout is not a directory: \(path)")
             }
 
-            let physical = File.Directory(path)
+            let starting = File.Directory(path)
+            var physical = starting
+            while !physical[file: "Institute.json"].stat.isFile
+                || !physical[directory: "Context"].stat.isDirectory
+            {
+                guard let parent = physical.parent else {
+                    throw .configuration("not inside an Institute checkout: \(starting)")
+                }
+                physical = parent
+            }
+
             guard let hierarchy = physical.parent else {
-                throw .configuration("workspace checkout has no hierarchy parent: \(physical)")
+                throw .configuration("Institute checkout has no hierarchy parent: \(physical)")
             }
 
             self.checkout = physical
