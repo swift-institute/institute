@@ -18,8 +18,8 @@ extension Institute.Planner {
         case absent(revision: Swift.String, platform: Swift.String)
         /// A winning row is not carried verbatim by any published PIN asset.
         case unpublished(Swift.String)
-        /// The running binary is not the planner the consumer pins.
-        case stale(running: Swift.String, pinned: Swift.String, revision: Swift.String, platform: Swift.String)
+        /// The running binary is not published at or after the pinned revision.
+        case stale(running: Swift.String, revision: Swift.String, platform: Swift.String)
         /// Canary evidence does not admit adoption.
         case evidence(Swift.String)
         /// The GitHub transport failed.
@@ -39,10 +39,10 @@ extension Institute.Planner {
                 "pinned revision \(revision) has no planner row for \(platform)"
             case .unpublished(let row):
                 "planner row was not published by any PIN asset: '\(row)'"
-            case .stale(let running, let pinned, let revision, let platform):
+            case .stale(let running, let revision, let platform):
                 """
-                this institute binary (sha256 \(running)) is not the published planner \
-                pinned for revision \(revision) on \(platform) (sha256 \(pinned)); \
+                this institute binary (sha256 \(running)) is not a published planner \
+                at or after revision \(revision) on \(platform); \
                 run `institute install` to install the pinned planner
                 """
             case .evidence(let message): message

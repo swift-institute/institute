@@ -67,6 +67,19 @@ extension Institute.Planner.Release {
         return published
     }
 
+    /// Every published PIN row for `platform`, with each publication's
+    /// revision, platform cardinality and checksum record validated.
+    public func published(
+        _ platform: Institute.Planner.Platform
+    ) throws(Institute.Planner.Error) -> [Institute.Planner.Row] {
+        var rows: [Institute.Planner.Row] = []
+        for asset in try publications() {
+            guard case .pin(let revision, let run) = asset else { continue }
+            rows.append(try publication(revision: revision, run: run).row(for: platform))
+        }
+        return rows
+    }
+
     /// The bytes of the asset named `name`, refused unless they hash to
     /// `digest`.
     public func verified(

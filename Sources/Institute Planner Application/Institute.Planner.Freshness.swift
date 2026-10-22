@@ -4,32 +4,36 @@ import Institute_Development
 public import Institute_Model
 
 extension Institute.Planner {
-    /// Whether the running binary is the planner the consumer pins.
+    /// Whether the running binary is a published planner at or after the
+    /// revision the consumer pins.
     ///
     /// A binary cannot carry the revision it was built from, so it is
-    /// identified by its own digest: it is current when that digest is the
-    /// one the consumer's winning row names for the pinned revision on this
-    /// platform. Anything else is stale, and so is a binary that cannot be
-    /// compared at all.
+    /// identified by its own digest. It is current when a published PIN row
+    /// for this platform names that digest and its source revision is the
+    /// pinned revision or a descendant of it on the publisher's main branch.
+    /// Anything else is stale, and so is a binary that cannot be compared.
     public enum Freshness {}
 }
 
 extension Institute.Planner.Freshness {
-    /// Refuses unless `running` is the digest `consumer` pins for `platform`.
+    /// Refuses unless `running` is published for `platform` at or after the
+    /// revision `consumer` pins.
     public static func verify(
         running: FIPS_180_4.Digest,
         platform: Institute.Planner.Platform,
-        consumer: Institute.Planner.Consumer
+        consumer: Institute.Planner.Consumer,
+        release: Institute.Planner.Release,
+        history: Institute.Planner.History
     ) throws(Institute.Planner.Error) {
-        let row = try consumer.current(platform)
-        guard row.binary == running else {
-            throw .stale(
-                running: running.hex,
-                pinned: row.binary.hex,
-                revision: row.revision.description,
-                platform: platform.rawValue
-            )
+        let pinned = try consumer.current(platform)
+        for row in try release.published(platform) where row.binary == running {
+            if try history.contains(row.revision, atOrAfter: pinned.revision) { return }
         }
+        throw .stale(
+            running: running.hex,
+            revision: pinned.revision.description,
+            platform: platform.rawValue
+        )
     }
 
     /// Refuses unless this process is the planner the live consumer pins for
@@ -44,7 +48,9 @@ extension Institute.Planner.Freshness {
             try verify(
                 running: Institute.Planner.digest(of: bytes),
                 platform: platform,
-                consumer: .published
+                consumer: .published,
+                release: .published,
+                history: .published
             )
         } catch {
             throw .configuration("institute refuses to run: \(error)")
