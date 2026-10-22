@@ -47,7 +47,6 @@ struct `Institute repository policy fleet` {
         #expect(try fleet.configuration(for: "swift-atoms/swift-ratio").embedded == .package)
         for (repository, target) in [
             "swift-atoms/swift-fixed": "Fixed Standard Library Integration",
-            "swift-atoms/swift-geometry": "Geometry",
             "swift-atoms/swift-io": "IO",
             "swift-atoms/swift-iterator": "Iterator",
             "swift-atoms/swift-pool": "Pool Bounded",
@@ -70,6 +69,10 @@ struct `Institute repository policy fleet` {
         let fleet = try Self.fleet(Self.document())
         for repository in [
             "swift-molecules/swift-foundation-extensions",
+            "swift-atoms/swift-argument",
+            "swift-atoms/swift-geometry",
+            "swift-atoms/swift-linear",
+            "swift-atoms/swift-spatial",
             "swift-atoms/swift-anamorphism",
             "swift-atoms/swift-apomorphism",
             "swift-atoms/swift-catamorphism",
@@ -79,6 +82,7 @@ struct `Institute repository policy fleet` {
             "swift-atoms/swift-hylomorphism",
             "swift-atoms/swift-paramorphism",
             "swift-atoms/swift-zygomorphism",
+            "swift-molecules/swift-test",
         ] {
             #expect(try fleet.configuration(for: repository).embedded == .absent)
         }
