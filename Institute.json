@@ -1922,6 +1922,12 @@
     },
     {
       "layer": "standards",
+      "name": "swift-iso-13616",
+      "organization": "swift-iso",
+      "url": "https://github.com/swift-iso/swift-iso-13616.git"
+    },
+    {
+      "layer": "standards",
       "name": "swift-iso-14496-22",
       "organization": "swift-iso",
       "url": "https://github.com/swift-iso/swift-iso-14496-22.git"
@@ -1955,6 +1961,12 @@
       "name": "swift-iso-639",
       "organization": "swift-iso",
       "url": "https://github.com/swift-iso/swift-iso-639.git"
+    },
+    {
+      "layer": "standards",
+      "name": "swift-iso-7064",
+      "organization": "swift-iso",
+      "url": "https://github.com/swift-iso/swift-iso-7064.git"
     },
     {
       "layer": "standards",
@@ -2132,6 +2144,12 @@
     },
     {
       "layer": "standards",
+      "name": "swift-netherlands-standard",
+      "organization": "swift-standards",
+      "url": "https://github.com/swift-standards/swift-netherlands-standard.git"
+    },
+    {
+      "layer": "standards",
       "name": "swift-pdf-standard",
       "organization": "swift-standards",
       "url": "https://github.com/swift-standards/swift-pdf-standard.git"
@@ -2183,6 +2201,12 @@
       "name": "swift-uri-standard",
       "organization": "swift-standards",
       "url": "https://github.com/swift-standards/swift-uri-standard.git"
+    },
+    {
+      "layer": "standards",
+      "name": "swift-vat-standard",
+      "organization": "swift-standards",
+      "url": "https://github.com/swift-standards/swift-vat-standard.git"
     },
     {
       "layer": "standards",
@@ -2285,12 +2309,6 @@
       "name": "swift-certificate-verification",
       "organization": "swift-compositions",
       "url": "https://github.com/swift-compositions/swift-certificate-verification.git"
-    },
-    {
-      "layer": "compositions",
-      "name": "swift-clocks",
-      "organization": "swift-compositions",
-      "url": "https://github.com/swift-compositions/swift-clocks.git"
     },
     {
       "layer": "compositions",
