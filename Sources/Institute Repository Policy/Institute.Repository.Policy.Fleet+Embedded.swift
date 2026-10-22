@@ -1,5 +1,5 @@
 import Institute_CI_Model
-public import Institute_Model
+import Institute_Model
 
 extension Institute.Repository.Policy.Fleet {
     /// The identity-mapped descendants of the Embedded population formerly
