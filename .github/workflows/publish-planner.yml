@@ -163,13 +163,20 @@ jobs:
               --target "$REVISION"
           fi
           existing="$(gh release view ci-binaries -R "$REPOSITORY" --json assets --jq '.assets[].name')"
+          verify="$(mktemp -d)"
+          upload=()
           for asset in ./*; do
-            if grep -qxF -- "${asset#./}" <<< "$existing"; then
-              echo "::error::asset ${asset#./} already exists; published assets are never replaced"
-              exit 1
+            name="${asset#./}"
+            if grep -qxF -- "$name" <<< "$existing"; then
+              gh release download ci-binaries -R "$REPOSITORY" --pattern "$name" --dir "$verify"
+              cmp --silent "$asset" "$verify/$name" \
+                || { echo "::error::published asset $name differs; assets are never replaced"; exit 1; }
+              echo "Reusing identical published asset $name."
+            else
+              upload+=("$asset")
             fi
           done
-          gh release upload ci-binaries -R "$REPOSITORY" ./*
+          [ "${#upload[@]}" -eq 0 ] || gh release upload ci-binaries -R "$REPOSITORY" "${upload[@]}"
           {
             echo "### Planner $REVISION"
             echo
