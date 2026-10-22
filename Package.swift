@@ -463,6 +463,7 @@ let package = Package(
                 "Institute Development",
                 "Institute Source",
                 "Source Measurement",
+                .product(name: "Byte", package: "swift-byte"),
                 .product(name: "Async Fanout", package: "swift-async-fanout"),
                 .product(name: "Environment", package: "swift-environment"),
                 .product(name: "File System", package: "swift-file-system"),
@@ -470,6 +471,7 @@ let package = Package(
                 .product(name: "JSON", package: "swift-json"),
                 .product(name: "Package Manager", package: "swift-package-manager"),
                 .product(name: "Process", package: "swift-process"),
+                .product(name: "SPM Standard", package: "swift-spm-standard"),
                 .product(name: "Tagged", package: "swift-tagged"),
                 .product(
                     name: "Standard Library Extensions",

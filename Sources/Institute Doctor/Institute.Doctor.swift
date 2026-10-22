@@ -100,6 +100,8 @@ extension Institute.Doctor {
             record(await pins(checkouts)),
             record(await manifest(checkouts)),
             record(await uniqueness(checkouts)),
+            record(workspace(checkouts)),
+            record(dependency(checkouts)),
             record(preparation()),
             record(await peerCheckout()),
         ]
