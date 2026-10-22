@@ -165,6 +165,42 @@ extension Institute.Source {
                     rule: .init(engine: swiftFormatID, token: "format"),
                     findings: 1
                 ),
+                .init(
+                    repository: "swift-atoms/swift-cursor",
+                    path: "Tests/Cursor Tests/Fixtures/Double Consume Output.swift",
+                    rule: .init(engine: swiftFormatID, token: "format"),
+                    findings: 1
+                ),
+                .init(
+                    repository: "swift-atoms/swift-cursor",
+                    path: "Tests/Cursor Tests/Fixtures/Escape Borrowed Output.swift",
+                    rule: .init(engine: swiftFormatID, token: "format"),
+                    findings: 1
+                ),
+                .init(
+                    repository: "swift-atoms/swift-cursor",
+                    path: "Tests/Cursor Tests/Fixtures/Mutate Backing With Live Output.swift",
+                    rule: .init(engine: swiftFormatID, token: "format"),
+                    findings: 1
+                ),
+                .init(
+                    repository: "swift-atoms/swift-cursor",
+                    path: "Tests/Cursor Tests/Fixtures/Mutate Cursor With Live Output.swift",
+                    rule: .init(engine: swiftFormatID, token: "format"),
+                    findings: 1
+                ),
+                .init(
+                    repository: "swift-atoms/swift-cursor",
+                    path: "Tests/Cursor Tests/Fixtures/Valid Borrowed Replay.swift",
+                    rule: .init(engine: swiftFormatID, token: "format"),
+                    findings: 2
+                ),
+                .init(
+                    repository: "swift-atoms/swift-cursor",
+                    path: "Tests/Cursor Tests/Fixtures/Valid Owned Replay.swift",
+                    rule: .init(engine: swiftFormatID, token: "format"),
+                    findings: 2
+                ),
             ]
             self.commitment = .init(
                 repositories: [
