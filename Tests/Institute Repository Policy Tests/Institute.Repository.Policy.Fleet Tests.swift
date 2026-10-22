@@ -40,6 +40,58 @@ struct `Institute repository policy fleet` {
     }
 
     @Test
+    func `embedded selection is mapped by repository identity`() throws {
+        let fleet = try Self.fleet(Self.document())
+
+        #expect(try fleet.configuration(for: "swift-atoms/swift-ratio").embedded == .package)
+        for (repository, target) in [
+            "swift-atoms/swift-fixed": "Fixed Standard Library Integration",
+            "swift-atoms/swift-geometry": "Geometry",
+            "swift-atoms/swift-io": "IO",
+            "swift-atoms/swift-iterator": "Iterator",
+            "swift-atoms/swift-pool": "Pool Bounded",
+            "swift-atoms/swift-renderer": "Renderer",
+            "swift-atoms/swift-sample": "Sample",
+            "swift-atoms/swift-system": "System Standard Library Integration",
+            "swift-atoms/swift-time": "Time",
+            "swift-molecules/swift-builder": "Builder Standard Library Integration",
+            "swift-molecules/swift-range": "Range Standard Library Integration",
+            "swift-molecules/swift-stack": "Stack Standard Library Integration",
+            "swift-molecules/swift-token": "Token Standard Library Integration",
+            "swift-molecules/swift-tree": "Tree Standard Library Integration",
+        ] {
+            #expect(try fleet.configuration(for: repository).embedded == .target(target))
+        }
+    }
+
+    @Test
+    func `hosted only identities are not admitted to embedded`() throws {
+        let fleet = try Self.fleet(Self.document())
+        for repository in [
+            "swift-molecules/swift-foundation-extensions",
+            "swift-atoms/swift-anamorphism",
+            "swift-atoms/swift-apomorphism",
+            "swift-atoms/swift-catamorphism",
+            "swift-atoms/swift-chronomorphism",
+            "swift-atoms/swift-futumorphism",
+            "swift-atoms/swift-histomorphism",
+            "swift-atoms/swift-hylomorphism",
+            "swift-atoms/swift-paramorphism",
+            "swift-atoms/swift-zygomorphism",
+        ] {
+            #expect(try fleet.configuration(for: repository).embedded == .absent)
+        }
+    }
+
+    @Test
+    func `organization membership does not admit a new identity`() throws {
+        let fleet = try Self.fleet(Self.document())
+        #expect(try fleet.configuration(for: "swift-atoms/swift-new").embedded == .absent)
+        #expect(try fleet.configuration(for: "swift-molecules/swift-new").embedded == .absent)
+        #expect(try fleet.configuration(for: "swift-molecules/swift-pool").embedded == .absent)
+    }
+
+    @Test
     func `an unknown layer is rejected`() throws {
         let fleet = try Self.fleet(Self.document(compositions: "L5"))
         #expect(throws: Institute.Repository.Policy.Fleet.Error.invalidLayer("L5")) {

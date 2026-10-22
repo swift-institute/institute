@@ -147,17 +147,47 @@ struct ContinuousIntegrationPlanTests {
     }
 
     @Test
-    func primitivesBundleAppendsAdvisoryLegsInBothTiers() throws {
+    func admittedPackageAppendsEmbeddedInBothTiers() throws {
         for tier in ["build", "full"] {
             let plan = try Institute.CI.Plan(
                 forcedTier: tier,
                 ref: "refs/heads/x",
                 event: "push",
-                lintBundle: "primitives"
+                lintBundle: "primitives",
+                embedded: .package
             )
             #expect(plan.legs.map(\.id).contains("embedded"), Comment(rawValue: tier))
             #expect(!plan.gating.map(\.id).contains("embedded"), Comment(rawValue: tier))
         }
+    }
+
+    @Test
+    func embeddedSelectionHasThreeDistinctPlanningStates() throws {
+        let absent = try Institute.CI.Plan(
+            ref: "refs/heads/x",
+            event: "push",
+            lintBundle: "primitives"
+        )
+        let package = try Institute.CI.Plan(
+            ref: "refs/heads/x",
+            event: "push",
+            lintBundle: "primitives",
+            embedded: .package
+        )
+        let target = try Institute.CI.Plan(
+            ref: "refs/heads/x",
+            event: "push",
+            lintBundle: "primitives",
+            embedded: .target("Iterator")
+        )
+
+        #expect(!absent.legs.map(\.id).contains("embedded"))
+        #expect(package.legs.map(\.id).contains("embedded"))
+        #expect(target.legs.map(\.id).contains("embedded"))
+        #expect(absent.embedded == .absent)
+        #expect(package.embedded == .package)
+        #expect(target.embedded == .target("Iterator"))
+        #expect(target.embedded.target == "Iterator")
     }
 
     @Test
@@ -181,7 +211,8 @@ struct ContinuousIntegrationPlanTests {
             let plan = try Institute.CI.Plan(
                 ref: ref,
                 event: event,
-                lintBundle: "primitives"
+                lintBundle: "primitives",
+                embedded: .package
             )
             #expect(plan.tier != .exhaustive, Comment(rawValue: "\(ref)/\(event)"))
             let ids = Set(plan.legs.map(\.id))
@@ -201,13 +232,15 @@ struct ContinuousIntegrationPlanTests {
                 forcedTier: "exhaustive",
                 ref: "refs/heads/x",
                 event: "push",
-                lintBundle: "primitives"
+                lintBundle: "primitives",
+                embedded: .package
             ),
             try Institute.CI.Plan(
                 ref: "refs/heads/x",
                 headMessage: "wip [ci exhaustive]",
                 event: "push",
-                lintBundle: "primitives"
+                lintBundle: "primitives",
+                embedded: .package
             ),
         ] {
             #expect(plan.tier == .exhaustive)
@@ -233,14 +266,15 @@ struct ContinuousIntegrationPlanTests {
     }
 
     @Test
-    func embeddedStaysOnEveryTierForPrimitives() throws {
+    func embeddedStaysOnEveryTierForAdmittedPackages() throws {
         // The L1 freestanding invariant is not a cost knob.
         for tier in ["build", "full", "exhaustive"] {
             let plan = try Institute.CI.Plan(
                 forcedTier: tier,
                 ref: "refs/heads/x",
                 event: "push",
-                lintBundle: "primitives"
+                lintBundle: "primitives",
+                embedded: .package
             )
             #expect(plan.legs.map(\.id).contains("embedded"), Comment(rawValue: tier))
         }
@@ -252,6 +286,7 @@ struct ContinuousIntegrationPlanTests {
             ref: "refs/heads/main",
             event: "push",
             lintBundle: "primitives",
+            embedded: .package,
             packageContentChanged: false
         )
         #expect(!plan.packageContentChanged)

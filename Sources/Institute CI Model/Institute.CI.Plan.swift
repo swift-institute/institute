@@ -52,6 +52,7 @@ extension Institute.CI {
         }
 
         public let tier: Tier
+        public let embedded: Embedded
         public let legs: [Leg]
         public let descheduled: [Descheduled]
         public let packageContentChanged: Bool
@@ -73,10 +74,10 @@ extension Institute.CI {
             "linux-nightly", "apple-simulator-build",
         ]
 
-        /// The L1 embedded invariant, scheduled on every tier for the
-        /// primitives bundle: a package that cannot build freestanding is
-        /// not a primitive, and that is a property worth failing fast on.
-        static let primitivesAdvisoryLegs = ["embedded"]
+        /// The Embedded invariant, scheduled on every tier for an explicitly
+        /// admitted package. Admission is an identity decision supplied by
+        /// repository policy, never inferred from a lint bundle or layer.
+        static let embeddedAdvisoryLegs = ["embedded"]
 
         /// The primitives cross-compile legs, exhaustive-only for the same
         /// reason as ``exhaustiveTierLegs``: each installs an SDK.
@@ -90,6 +91,9 @@ extension Institute.CI {
         /// message (empty on PR events); `event` = the event name;
         /// `platformSupport` = the comma-separated family list;
         /// `lintBundle` = primitives|standards|institute.
+        /// - Parameter embedded: the explicitly selected Embedded package
+        ///   closure. Only admitted package and target selections schedule the
+        ///   advisory leg.
         /// - Parameter packageContentChanged: false when the event diff
         ///   selected no package build work. Build legs are then dropped
         ///   and the no-gating-build-leg guard stands down, because
@@ -107,6 +111,7 @@ extension Institute.CI {
             event: String,
             platformSupport: String = "",
             lintBundle: String,
+            embedded: Embedded = .absent,
             packageContentChanged: Bool = true,
             deschedule: [String: String] = [:]
         ) throws(Error) {
@@ -141,6 +146,7 @@ extension Institute.CI {
             if ref == "refs/heads/main", tier != .exhaustive { tier = .full }
             let selected = tier ?? .build
             self.tier = selected
+            self.embedded = embedded
             // An explicit dispatch is a deliberate request to verify, so it
             // never inherits a no-work classification from the event diff.
             let packageContentChanged = packageContentChanged || event == "workflow_dispatch"
@@ -167,8 +173,10 @@ extension Institute.CI {
             case .exhaustive:
                 legIds = Self.fullTierLegs + Self.exhaustiveTierLegs
             }
+            if embedded.admitted {
+                legIds += Self.embeddedAdvisoryLegs
+            }
             if lintBundle == "primitives" {
-                legIds += Self.primitivesAdvisoryLegs
                 if selected == .exhaustive { legIds += Self.primitivesExhaustiveLegs }
             }
             if !packageContentChanged {

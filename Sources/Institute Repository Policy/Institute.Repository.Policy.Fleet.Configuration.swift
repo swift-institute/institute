@@ -1,3 +1,4 @@
+import Institute_CI_Model
 public import Institute_Model
 
 extension Institute.Repository.Policy.Fleet {
@@ -6,16 +7,16 @@ extension Institute.Repository.Policy.Fleet {
     public struct Configuration: Swift.Sendable, Swift.Equatable {
         public let lintBundle: Swift.String
         public let platforms: Swift.String
-        public let embeddedTarget: Swift.String
+        public let embedded: Institute.CI.Plan.Embedded
 
         public init(
             lintBundle: Swift.String,
             platforms: Swift.String,
-            embeddedTarget: Swift.String
+            embedded: Institute.CI.Plan.Embedded
         ) {
             self.lintBundle = lintBundle
             self.platforms = platforms
-            self.embeddedTarget = embeddedTarget
+            self.embedded = embedded
         }
     }
 }

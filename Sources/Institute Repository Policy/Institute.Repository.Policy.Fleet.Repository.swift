@@ -6,6 +6,5 @@ extension Institute.Repository.Policy.Fleet {
     public struct Repository: Swift.Decodable, Swift.Sendable, Swift.Equatable {
         public let name: Swift.String
         public let platforms: Swift.String?
-        public let embeddedTarget: Swift.String?
     }
 }

@@ -341,6 +341,7 @@ let package = Package(
         .target(
             name: "Institute Repository Policy",
             dependencies: [
+                "Institute CI Model",
                 "Institute Model",
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),

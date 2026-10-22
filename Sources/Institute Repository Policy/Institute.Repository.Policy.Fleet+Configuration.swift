@@ -1,3 +1,4 @@
+import Institute_CI_Model
 public import Institute_Model
 
 extension Institute.Repository.Policy.Fleet {
@@ -23,7 +24,7 @@ extension Institute.Repository.Policy.Fleet {
         return Configuration(
             lintBundle: lintBundle,
             platforms: authored?.platforms ?? "",
-            embeddedTarget: authored?.embeddedTarget ?? ""
+            embedded: Self.embedded(for: repository)
         )
     }
 
