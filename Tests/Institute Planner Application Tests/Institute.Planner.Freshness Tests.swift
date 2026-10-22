@@ -46,10 +46,8 @@ extension Institute.Planner.Freshness.Test {
                     release: fixture.release,
                     history: .init { revision, pinned in
                         pinned.description == Institute.Planner.Fixture.current
-                            && (
-                                revision.description == Institute.Planner.Fixture.current
-                                    || revision.description == Institute.Planner.Fixture.candidate
-                            )
+                            && (revision.description == Institute.Planner.Fixture.current
+                                || revision.description == Institute.Planner.Fixture.candidate)
                     }
                 )
                 return nil
