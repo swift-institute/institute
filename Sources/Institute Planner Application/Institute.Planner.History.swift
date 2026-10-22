@@ -4,10 +4,11 @@ extension Institute.Planner {
     /// The publisher's main-branch commit graph. The closure is the network
     /// boundary; tests bind it to a known graph.
     public struct History: Sendable {
-        public typealias Contains = @Sendable (
-            Institute.Planner.Revision,
-            Institute.Planner.Revision
-        ) throws(Institute.Planner.Error) -> Swift.Bool
+        public typealias Contains =
+            @Sendable (
+                Institute.Planner.Revision,
+                Institute.Planner.Revision
+            ) throws(Institute.Planner.Error) -> Swift.Bool
 
         public let check: Contains
 

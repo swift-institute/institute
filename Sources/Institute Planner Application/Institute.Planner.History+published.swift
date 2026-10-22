@@ -6,8 +6,8 @@ extension Institute.Planner.History {
     /// public compare endpoint without a credential.
     public static var published: Self {
         .init { revision, pinned throws(Institute.Planner.Error) in
-            try follows(revision, pinned)
-                && followsMain(revision)
+            guard try follows(revision, pinned) else { return false }
+            return try followsMain(revision)
         }
     }
 
