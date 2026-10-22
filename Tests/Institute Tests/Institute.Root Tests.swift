@@ -74,7 +74,10 @@ extension Institute.Root.Test.`Edge Case` {
         let checkout = MainFixtureFiles.join(base, "Institute")
         defer { try? MainFixtureFiles.remove(base) }
         try MainFixtureFiles.createDirectory(checkout)
-        _ = MainFixtureFiles.createFile(MainFixtureFiles.join(base, "swift-compositions"), contents: Array("collision".utf8))
+        try MainFixtureFiles.write(
+            bytes: Array("collision".utf8),
+            to: MainFixtureFiles.join(base, "swift-compositions")
+        )
         let root = try Institute.Root(checkout: File.Directory(validating: checkout))
         let target = root.hierarchy[directory: "swift-compositions"][directory: "swift-example"]
 
