@@ -578,6 +578,7 @@ let package = Package(
         .testTarget(
             name: "Institute Repository Policy Tests",
             dependencies: [
+                "Institute CI Model",
                 "Institute Repository Policy",
                 "Institute Model",
                 .product(name: "JSON", package: "swift-json"),

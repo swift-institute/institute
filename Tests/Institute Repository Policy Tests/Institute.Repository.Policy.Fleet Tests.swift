@@ -1,3 +1,4 @@
+import Institute_CI_Model
 import Institute_Model
 import Institute_Repository_Policy
 import JSON
