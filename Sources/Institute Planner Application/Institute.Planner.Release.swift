@@ -110,8 +110,15 @@ extension Institute.Planner.Release {
     ) throws(Institute.Planner.Error) -> Institute.Planner.Executable {
         let row = publication.row(for: platform)
         let binary = try verified(
-            .binary(platform, row.binary), digest: row.binary, in: publication)
-        _ = try verified(.graph(platform, row.graph), digest: row.graph, in: publication)
+            .binary(platform, row.binary),
+            digest: row.binary,
+            in: publication
+        )
+        _ = try verified(
+            .graph(platform, row.graph),
+            digest: row.graph,
+            in: publication
+        )
         let toolchain = Institute.Planner.Asset.toolchain(platform, row.binary).name
         guard let recorded = publication.checksums[toolchain] else {
             throw .missing("checksum for \(toolchain)")

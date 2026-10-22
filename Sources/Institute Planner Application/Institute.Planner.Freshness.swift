@@ -44,7 +44,8 @@ extension Institute.Planner.Freshness {
     public static func enforce() throws(Institute.Error) {
         guard let platform = Institute.Planner.Platform.host else {
             throw .configuration(
-                "no planner is published for this platform, so this binary cannot be verified")
+                "no planner is published for this platform, so this binary cannot be verified"
+            )
         }
         let executable = try Institute.Installation.running()
         do throws(Institute.Planner.Error) {
