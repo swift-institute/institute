@@ -10,6 +10,7 @@ extension Institute.Planner {
         case binary(Platform, FIPS_180_4.Digest)
         case graph(Platform, FIPS_180_4.Digest)
         case toolchain(Platform, FIPS_180_4.Digest)
+        case ancestry(Revision, run: Swift.String)
         case pin(Revision, run: Swift.String)
         case sums(Revision, run: Swift.String)
     }
@@ -22,6 +23,7 @@ extension Institute.Planner.Asset {
         case .graph(let platform, let digest): "Package.resolved-\(platform.rawValue)-\(digest.hex)"
         case .toolchain(let platform, let digest):
             "TOOLCHAIN-\(platform.rawValue)-\(digest.hex).txt"
+        case .ancestry(let revision, let run): "ANCESTORS-\(revision)-\(run)"
         case .pin(let revision, let run): "PIN-\(revision)-\(run)"
         case .sums(let revision, let run): "SHA256SUMS-\(revision)-\(run)"
         }
@@ -38,6 +40,7 @@ extension Institute.Planner.Asset {
             return nil
         }
         switch fields[0] {
+        case "ANCESTORS": self = .ancestry(revision, run: Swift.String(fields[2]))
         case "PIN": self = .pin(revision, run: Swift.String(fields[2]))
         case "SHA256SUMS": self = .sums(revision, run: Swift.String(fields[2]))
         default: return nil

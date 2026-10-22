@@ -11,6 +11,7 @@ extension Institute.Planner {
         /// The PIN asset's rows in published order.
         public let rows: [Row]
         public let checksums: [Swift.String: FIPS_180_4.Digest]
+        public let ancestors: Swift.Set<Revision>?
         let linux: Row
         let macos: Row
 
@@ -18,7 +19,8 @@ extension Institute.Planner {
             revision: Revision,
             run: Swift.String,
             pin: Swift.String,
-            sums: Swift.String
+            sums: Swift.String,
+            ancestry: Swift.String? = nil
         ) throws(Institute.Planner.Error) {
             let rows = try Row.rows(in: pin)
             for row in rows where row.revision != revision {
@@ -41,6 +43,20 @@ extension Institute.Planner {
             self.run = run
             self.rows = rows
             self.checksums = try Checksum.checksums(in: sums)
+            if let ancestry {
+                let ancestors = try Swift.Set(
+                    ancestry.split(separator: "\n").map(Revision.init)
+                )
+                guard ancestors.contains(revision) else {
+                    throw .malformed(
+                        line: "ANCESTORS-\(revision)-\(run)",
+                        reason: "does not contain its published revision"
+                    )
+                }
+                self.ancestors = ancestors
+            } else {
+                self.ancestors = nil
+            }
             self.linux = try only(.linux)
             self.macos = try only(.macos)
         }

@@ -41,7 +41,12 @@ extension Institute.Planner {
 
         /// Publishes `revision` as run `run`, returning the PIN lines.
         @discardableResult
-        mutating func publish(_ revision: String, run: String, salt: String = "") -> [String] {
+        mutating func publish(
+            _ revision: String,
+            run: String,
+            salt: String = "",
+            ancestors: [String] = []
+        ) -> [String] {
             var rows: [String] = []
             var sums = ""
             for platform in Institute.Planner.Platform.allCases {
@@ -58,6 +63,11 @@ extension Institute.Planner {
                 sums += "\(Self.hex(toolchain))  TOOLCHAIN-\(platform.rawValue)-\(b).txt\n"
                 rows.append("\(revision) \(platform.rawValue) \(b) \(g)")
             }
+            let ancestryName = "ANCESTORS-\(revision)-\(run)"
+            let ancestry = [revision] + ancestors
+            let ancestryBytes = [Byte](utf8: ancestry.joined(separator: "\n") + "\n")
+            assets[ancestryName] = ancestryBytes
+            sums += "\(Self.hex(ancestryBytes))  \(ancestryName)\n"
             assets["PIN-\(revision)-\(run)"] = [Byte](utf8: rows.joined(separator: "\n") + "\n")
             assets["SHA256SUMS-\(revision)-\(run)"] = [Byte](utf8: sums)
             return rows

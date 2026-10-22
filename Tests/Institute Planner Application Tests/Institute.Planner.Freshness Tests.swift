@@ -26,7 +26,11 @@ extension Institute.Planner.Freshness.Test {
         init() {
             older = fixture.publish(String(repeating: "c", count: 40), run: "100")
             pinned = fixture.publish(Institute.Planner.Fixture.current, run: "200")
-            newer = fixture.publish(Institute.Planner.Fixture.candidate, run: "300")
+            newer = fixture.publish(
+                Institute.Planner.Fixture.candidate,
+                run: "300",
+                ancestors: [Institute.Planner.Fixture.current]
+            )
             fixture.adopt(Institute.Planner.Fixture.current, rows: pinned)
         }
 
@@ -43,12 +47,7 @@ extension Institute.Planner.Freshness.Test {
                     running: FIPS_180_4.SHA256.digest(running),
                     platform: .macos,
                     consumer: fixture.consumer,
-                    release: fixture.release,
-                    history: .init { revision, pinned in
-                        pinned.description == Institute.Planner.Fixture.current
-                            && (revision.description == Institute.Planner.Fixture.current
-                                || revision.description == Institute.Planner.Fixture.candidate)
-                    }
+                    release: fixture.release
                 )
                 return nil
             } catch {
@@ -73,7 +72,7 @@ extension Institute.Planner.Freshness.Test.Unit {
 extension Institute.Planner.Freshness.Test.`Edge Case` {
     /// The control that makes the refusal fire: the binary of an older
     /// published revision, against a pin that has moved on.
-    @Test func `a binary built for another revision than the pin is refused`() {
+    @Test func `an older published binary is refused`() {
         let scenario = Institute.Planner.Freshness.Test.Scenario()
         let refusal = scenario.refusal(running: scenario.binary(scenario.older))
         guard case .stale(_, let revision, let platform)? = refusal else {
@@ -82,6 +81,15 @@ extension Institute.Planner.Freshness.Test.`Edge Case` {
         }
         #expect(revision == Institute.Planner.Fixture.current)
         #expect(platform == "macos-arm64")
+        #expect(refusal?.description.contains("`institute install`") == true)
+    }
+
+    @Test func `a newer publication without main ancestry is refused`() {
+        var scenario = Institute.Planner.Freshness.Test.Scenario()
+        scenario.fixture.assets[
+            "ANCESTORS-\(Institute.Planner.Fixture.candidate)-300"
+        ] = nil
+        let refusal = scenario.refusal(running: scenario.binary(scenario.newer))
         #expect(refusal?.description.contains("`institute install`") == true)
     }
 

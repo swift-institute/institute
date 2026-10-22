@@ -50,6 +50,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.revision }}
+          fetch-depth: 0
           persist-credentials: false
       - name: Install Swift
         if: runner.os != 'macOS'
@@ -64,6 +65,7 @@ jobs:
         run: |
           set -euo pipefail
           [ "$(git rev-parse HEAD)" = "$REVISION" ] || { echo "::error::checked out $(git rev-parse HEAD), not $REVISION"; exit 1; }
+          git merge-base --is-ancestor "$REVISION" origin/main || { echo "::error::revision is not on main"; exit 1; }
           swift package resolve
           if command -v apt-get >/dev/null 2>&1; then
             shopt -s nullglob
@@ -131,6 +133,11 @@ jobs:
       - uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
         with:
           egress-policy: audit
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.revision }}
+          fetch-depth: 0
+          persist-credentials: false
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: planner-*
@@ -147,7 +154,8 @@ jobs:
           cd out
           cat PIN-* > "PIN-$REVISION-$GITHUB_RUN_ID"
           rm PIN-linux-x86_64 PIN-macos-arm64
-          sha256sum institute-* Package.resolved-* TOOLCHAIN-* > "SHA256SUMS-$REVISION-$GITHUB_RUN_ID"
+          git -C "$GITHUB_WORKSPACE" rev-list "$REVISION" > "ANCESTORS-$REVISION-$GITHUB_RUN_ID"
+          sha256sum institute-* Package.resolved-* TOOLCHAIN-* ANCESTORS-* > "SHA256SUMS-$REVISION-$GITHUB_RUN_ID"
           cat "SHA256SUMS-$REVISION-$GITHUB_RUN_ID"
           if ! gh release view ci-binaries -R "$REPOSITORY" >/dev/null 2>&1; then
             gh release create ci-binaries -R "$REPOSITORY" --title ci-binaries \
