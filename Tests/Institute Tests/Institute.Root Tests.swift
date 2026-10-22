@@ -78,9 +78,10 @@ extension Institute.Root.Test.`Edge Case` {
         defer { try? MainFixtureFiles.remove(outside) }
         try MainFixtureFiles.createDirectory(outside)
         let canonical = try File.System.Canonical.resolve(File.Path(outside))
+        let starting = try File.Directory(validating: outside)
 
         do throws(Institute.Error) {
-            _ = try Institute.Root(checkout: File.Directory(validating: outside))
+            _ = try Institute.Root(checkout: starting)
             Issue.record("expected root resolution to fail")
         } catch {
             #expect(error.description == "not inside an Institute checkout: \(canonical)")
