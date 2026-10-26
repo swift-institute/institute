@@ -4,6 +4,7 @@
 *~
 .DS_Store
 
+Package.resolved
 Thumbs.db
 
 # Top-level entries (opt-in only)
