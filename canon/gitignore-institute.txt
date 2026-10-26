@@ -41,16 +41,12 @@ Thumbs.db
 !/Policy/
 !/Tools/
 !/Application/
-!/Context/
 !/profile/
 !/brand/
 !/workflow-templates/
 !/Workspace.json
 !/metadata.yaml
 !/metadata-schema.json
-!/Institute.json
-!/Peers.json
-!/Selection.json
 
 # The control workspace ships exactly one document: its membership file.
 # Xcode writes per-user and shared state (xcuserdata/, xcshareddata/)

@@ -116,10 +116,6 @@ extension Institute.CI.Validation {
                     Probe("Tools/tool/Package.swift"),
                     Probe("profile/README.md"),
                     Probe("RULINGS.md"),
-                    Probe("Institute.json"),
-                    Probe("Peers.json"),
-                    Probe("Selection.json"),
-                    Probe("Context/AGENTS.md"),
                     Probe("institute control.xcworkspace/contents.xcworkspacedata"),
                 ]
 

@@ -25,48 +25,6 @@ extension Institute.Source.Application {
     }
 
     public func measure(
-        cohort: Institute.Source.Workspace.Cohort,
-        selected: [Institute.Source.Workspace.Row]? = nil,
-        engines: Set<Source_Measurement.Source.Engine.ID>? = nil,
-        jobs: Swift.Int? = nil,
-        references: [Source_Measurement.Source.Reason] = [],
-        preparation: Institute.Source.Preparation
-    ) async throws(Institute.Error) -> Source_Report.Source.Report {
-        let rows = selected ?? cohort.measurable
-        let scope: Source_Report.Source.Report.Scope =
-            selected == nil && engines == nil ? .workspace : .partial
-        let expectedBinding = Institute.Source.Preparation.Binding.workspace(
-            digest: try Self.digest(file: cohort.workspace + "/contents.xcworkspacedata").hex
-        )
-        guard preparation.binding == expectedBinding else {
-            return Self.unmeasuredReport(
-                scope: scope,
-                reason: .init(code: "stale-subject", detail: cohort.workspace)
-            )
-        }
-        let owner = Institute.Source.Profile(policy: .current)
-        var entries: [(bundle: Institute.Source.Bundle, subject: Source_Measurement.Source.Subject)] = []
-        for row in rows {
-            entries.append(
-                (
-                    bundle: try owner.bundle(for: row),
-                    subject: try Institute.Source.Workspace.subject(for: row)
-                )
-            )
-        }
-        return try await measure(
-            entries: entries,
-            scope: scope,
-            engines: engines,
-            jobs: jobs,
-            references: cohort.reasons
-                + Self.selfApplicationReasons(cohort: cohort, policy: .current)
-                + references,
-            preparation: preparation
-        )
-    }
-
-    public func measure(
         subject: Source_Measurement.Source.Subject,
         bundle: Institute.Source.Bundle,
         engines: Set<Source_Measurement.Source.Engine.ID>? = nil,
@@ -307,8 +265,7 @@ extension Institute.Source.Application {
     /// policy, or `nil` when it still can.
     ///
     /// The one place a preparation is judged current: measurement refuses on
-    /// it, and `institute doctor` reports it, so the two cannot disagree about
-    /// whether a checkout's source tooling is usable.
+    /// it before running any engine.
     public static func staleness(
         of preparation: Institute.Source.Preparation
     ) -> Source_Measurement.Source.Reason? {
@@ -342,40 +299,6 @@ extension Institute.Source.Application {
             return .init(code: "stale-configuration", detail: ".swift-format")
         }
         return nil
-    }
-
-    private static func selfApplicationReasons(
-        cohort: Institute.Source.Workspace.Cohort,
-        policy: Institute.Source.Policy
-    ) -> [Source_Measurement.Source.Reason] {
-        let admitted = Swift.Set(cohort.admitted.map(\.identity))
-        let controls = Swift.Set(
-            cohort.controls.compactMap { row -> Swift.String? in
-                guard case .control(let control) = row.role else { return nil }
-                return control.rawValue
-            }
-        )
-        var reasons: [Source_Measurement.Source.Reason] = []
-        for identity in policy.commitment.repositories where !admitted.contains(identity) {
-            reasons.append(.init(code: "self-application-repository", detail: identity))
-        }
-        for control in policy.commitment.controls where !controls.contains(control) {
-            reasons.append(.init(code: "self-application-control", detail: control))
-        }
-        let declaredRules = admitted.filter {
-            $0.split(separator: "/").last?.hasSuffix(
-                policy.commitment.rule.suffix
-            ) == true
-        }
-        if declaredRules.isEmpty {
-            reasons.append(
-                .init(
-                    code: "self-application-rule-family",
-                    detail: policy.commitment.rule.suffix
-                )
-            )
-        }
-        return reasons
     }
 
     private static func unmeasuredReport(

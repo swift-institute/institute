@@ -16,7 +16,7 @@ import Testing
 func `Institute source preparation round trips its parse receipt`() throws {
     let preparation = Institute.Source.Preparation(
         policyRevision: "source-enforcement-v3",
-        binding: .workspace(digest: "workspace-digest"),
+        binding: .package(.init(identity: "swift-atoms/swift-example@revision", digest: "subject-digest")),
         swiftFormatExecutable: "/tools/swift-format",
         swiftFormatTool: .init("format-tool"),
         swiftLintExecutable: "/tools/swiftlint",
@@ -86,7 +86,7 @@ func `Institute source preparation binds one exact package subject`() throws {
 func `Institute source preparation rejects receipts without a parse verdict`() throws {
     let preparation = Institute.Source.Preparation(
         policyRevision: "source-enforcement-v3",
-        binding: .workspace(digest: "workspace-digest"),
+        binding: .package(.init(identity: "swift-atoms/swift-example@revision", digest: "subject-digest")),
         swiftFormatExecutable: "/tools/swift-format",
         swiftFormatTool: .init("format-tool"),
         swiftLintExecutable: "/tools/swiftlint",
@@ -284,7 +284,7 @@ func `Xcode source acquisition succeeds across build changes and records the obs
     #expect(observed == build)
     let preparation = Institute.Source.Preparation(
         policyRevision: "source-enforcement-v3",
-        binding: .workspace(digest: "workspace-digest"),
+        binding: .package(.init(identity: "swift-atoms/swift-example@revision", digest: "subject-digest")),
         swiftFormatExecutable: tool.description,
         swiftFormatTool: digest,
         swiftLintExecutable: "/tools/swiftlint",
@@ -360,7 +360,7 @@ func `Local source linter snapshot is content addressed and omits its input path
     )
     let preparation = Institute.Source.Preparation(
         policyRevision: "source-enforcement-v3",
-        binding: .workspace(digest: "workspace-digest"),
+        binding: .package(.init(identity: "swift-atoms/swift-example@revision", digest: "subject-digest")),
         swiftFormatExecutable: "/tools/swift-format",
         swiftFormatTool: .init("format-tool"),
         swiftLintExecutable: "/tools/swiftlint",
@@ -501,18 +501,21 @@ func `Source measurement refuses a tampered local linter snapshot`() async throw
     try MainFixtureFiles.write(bytes: Array("swiftlint".utf8), to: swiftLint)
     try MainFixtureFiles.write(bytes: Array("linter".utf8), to: linter)
     defer { try? MainFixtureFiles.remove(root) }
-    let workspace = MainFixtureFiles.join(root, "workspace")
-    try MainFixtureFiles.createDirectory(workspace)
-    let workspaceFile = MainFixtureFiles.join(workspace, "contents.xcworkspacedata")
+    let package = MainFixtureFiles.join(root, "package")
+    try MainFixtureFiles.createDirectory(package)
     try MainFixtureFiles.write(
-        bytes: Array("<Workspace version=\"1.0\"></Workspace>\n".utf8),
-        to: workspaceFile
+        bytes: Array("// swift-tools-version: 6.4\n".utf8),
+        to: MainFixtureFiles.join(package, "Package.swift")
     )
-    let workspaceDigest = try Institute.Source.Application.digest(file: workspaceFile).hex
+    let subject = try Institute.Source.Workspace.subject(
+        identity: "swift-atoms/swift-example",
+        root: package,
+        paths: ["Package.swift"]
+    )
 
     let preparation = Institute.Source.Preparation(
         policyRevision: Institute.Source.Policy.current.revision,
-        binding: .workspace(digest: workspaceDigest),
+        binding: .package(subject.binding),
         swiftFormatExecutable: format,
         swiftFormatTool: try Institute.Source.Application.digest(file: format),
         swiftLintExecutable: swiftLint,
@@ -530,16 +533,9 @@ func `Source measurement refuses a tampered local linter snapshot`() async throw
         verifiedProfiles: []
     )
     try MainFixtureFiles.write(bytes: Array("tampered".utf8), to: linter)
-    let cohort = Institute.Source.Workspace.Cohort(
-        workspace: workspace,
-        references: 0,
-        groupReferences: 0,
-        containerReferences: 0,
-        rows: [],
-        reasons: []
-    )
     let report = try await Institute.Source.Application().measure(
-        cohort: cohort,
+        subject: subject,
+        bundle: .primitives,
         preparation: preparation
     )
 

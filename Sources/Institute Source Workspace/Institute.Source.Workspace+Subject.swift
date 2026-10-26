@@ -32,13 +32,6 @@ extension Institute.Source.Workspace {
     }
 
     public static func subject(
-        for row: Row,
-        using git: Git.Client = .init()
-    ) throws(Institute.Error) -> Source.Subject {
-        try subject(identity: row.identity, root: row.directory, using: git)
-    }
-
-    public static func subject(
         identity: Swift.String,
         root: Swift.String,
         using git: Git.Client = .init()
@@ -48,13 +41,6 @@ extension Institute.Source.Workspace {
             throw .filesystem("cannot enumerate Git paths for \(identity): \(error)")
         }
         return try subject(identity: identity, root: root, paths: paths)
-    }
-
-    public static func subject(
-        for row: Row,
-        paths: [Swift.String]
-    ) throws(Institute.Error) -> Source.Subject {
-        try subject(identity: row.identity, root: row.directory, paths: paths)
     }
 
     public static func subject(
@@ -148,16 +134,10 @@ extension Institute.Source.Workspace {
         return .init(identity: identity, root: rootPath, artifacts: artifacts)
     }
 
-    /// The `owner/name` a subject identity measures: a workspace subject
-    /// is named by its repository, a workspace control by its role, and a
-    /// CI subject by `repository@revision`.
+    /// The `owner/name` a subject identity measures: a CI subject is named
+    /// `repository@revision`.
     private static func repository(of identity: Swift.String) -> Swift.String {
-        if identity.hasPrefix("control:"),
-            let control = Institute.Workspace.Control(rawValue: Swift.String(identity.dropFirst(8)))
-        {
-            return control.repository.identity
-        }
-        return Swift.String(identity.prefix { $0 != "@" })
+        Swift.String(identity.prefix { $0 != "@" })
     }
 
     private static func bytes(

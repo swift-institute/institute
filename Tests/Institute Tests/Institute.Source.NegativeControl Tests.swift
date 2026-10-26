@@ -47,18 +47,6 @@ func `declared negative controls leave governed source and become controls of th
 }
 
 @Test
-func `workspace control identities resolve to their repository's negative controls`() throws {
-    let root = try fixtureRoot([compound, dotted])
-    defer { try? MainFixtureFiles.remove(root) }
-    let subject = try Institute.Source.Workspace.subject(
-        identity: "control:institute",
-        root: root,
-        paths: ["Package.swift", "Sources/Owned.swift", compound, dotted]
-    )
-    #expect(subject.governed.paths(of: .swift) == ["Package.swift", "Sources/Owned.swift"])
-}
-
-@Test
 func `a declared negative control that is no longer a source artifact is a configuration error`() throws {
     let root = try fixtureRoot([compound])
     defer { try? MainFixtureFiles.remove(root) }

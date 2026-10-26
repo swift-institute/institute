@@ -1,36 +1,32 @@
 # institute
 
-The Institute domain model: what is true about an Institute checkout, its
-inventory, its dependencies, its pages and its instruments — as a library, with
-no command surface of its own.
+The Institute domain model behind the central CI: workflow and repository policy, the CI
+contract and validation, Institute lint over one package, and the installation of the pinned
+planner — as a library, with no command surface of its own.
 
 This package is the domain half of a split. The other half,
 [swift-institute/institute-application](https://github.com/swift-institute/institute-application),
-owns *operating* an Institute: the `institute` executable, its command surface,
-and the composition that binds the two. Domain semantics live here; the act of
-running them lives there.
+owns the `institute` executable, its command surface, and the composition that binds the two.
+Domain semantics live here; the act of running them lives there.
 
 ## Targets
 
-Each target owns one area and has its own change schedule. The dependency order
-below is the real one — every arrow points down, and there are no cycles.
+Each target owns one area and has its own change schedule. Every arrow points down, and there
+are no cycles.
 
 | Target | Owns |
 |---|---|
-| `Institute Model` | The checkout's vocabulary: root, layout, layer, repository, selection, peers, configuration, errors, receipts, inspections |
-| `Institute Inventory` | The name → organization → path authority, its discovery, merge and writing |
-| `Institute Dependency` | Manifest dependency origins, ownership policy, the audit and its report |
-| `Institute Development` | Working in a checkout: sync, composition, the generated Xcode workspace, context projection, installation |
-| `Institute Pages` | The authored-page inventory: READMEs, DocC catalogues, organization profiles |
-| `Institute Doctor` | Executed checks over the checkout, and the report they produce |
-| `Institute Conversion` | The conversion instrument: cohorts, trials, seals and receipts |
-| `Institute Instruments` | Ecosystem coherence and verification runs over the whole selection |
-| `Build Coordinator` | Machine-lock-serialized SwiftPM and `xcodebuild` invocation with fresh-scratch evidence builds |
-
-`Build Coordinator` is carried here because `Institute Development` and
-`Institute Instruments` both build through it. It is a general mechanism with no
-Institute vocabulary in it and is due to extract to its own package; it sits here
-until it does.
+| `Institute Model` | The `Institute` namespace and its error, and the processor-count default for bounded fan-out |
+| `Institute Installation` | Installing a verified planner binary into the account and the link-materialization contract it uses |
+| `Institute CI Model` | The CI vocabulary: subjects, events, platforms, plans, verdicts |
+| `Institute CI Canon` | The canonical documents every repository carries, such as the `.gitignore` classes |
+| `Institute CI Contract` | The planner contract: what a plan and an aggregate must say |
+| `Institute CI Workflow` | The GitHub Actions workflow vocabulary |
+| `Institute CI Inventory` | What a checked-out repository contains, as CI reads it |
+| `Institute CI Validation` | The validation rules `ci -- package validate` applies |
+| `Institute Repository Policy` | Rulesets, caller workflows and fleet policy across the organizations |
+| `Institute Source Policy`, `Institute Source Profile`, `Institute Source Workspace`, `Institute Source` | Institute lint: the pinned engines and profiles, the package subject, and one measurement |
+| `Source Measurement`, `Source Profile`, `Source Report`, `Source Execution`, `Source Repair`, `Source Linter`, `Source Swift Format`, `Source SwiftLint` | The engine-neutral source measurement the Institute lint is built on |
 
 ## Using it
 

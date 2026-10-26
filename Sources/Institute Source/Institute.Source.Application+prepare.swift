@@ -14,23 +14,6 @@ extension Institute.Source.Application {
     }
 
     public func prepare(
-        workspace: Swift.String,
-        xcodeApplication: Swift.String? = nil,
-        swiftLint swiftLintSelection: Executable = .published,
-        linter linterSelection: Executable = .published
-    ) async throws(Institute.Error) -> Institute.Source.Preparation {
-        try await prepare(
-            directory: Self.artifactDirectory(workspace: workspace),
-            binding: .workspace(
-                digest: try Self.digest(file: workspace + "/contents.xcworkspacedata").hex
-            ),
-            xcodeApplication: xcodeApplication,
-            swiftLint: swiftLintSelection,
-            linter: linterSelection
-        )
-    }
-
-    public func prepare(
         subject: Source_Repair.Source.Subject,
         xcodeApplication: Swift.String? = nil,
         swiftLint swiftLintSelection: Executable = .published,
@@ -206,21 +189,6 @@ extension Institute.Source.Application {
             throw .configuration("source policy must declare exactly one macos-arm64 \(token) engine")
         }
         return engine
-    }
-
-    public static func artifactDirectory(
-        workspace: Swift.String
-    ) throws(Institute.Error)
-        -> File.Directory
-    {
-        let path: File.Path
-        do throws(File.Path.Error) { path = try .init(workspace) } catch {
-            throw .configuration("invalid source workspace path \(workspace)")
-        }
-        guard let parent = File.Directory(path).parent else {
-            throw .configuration("source workspace has no containing directory")
-        }
-        return parent[directory: ".source"]
     }
 
     public static func artifactDirectory(
