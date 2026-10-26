@@ -1,4 +1,5 @@
 import Byte
+import Calendar_Gregorian
 import GitHub_App
 public import Institute_Model
 public import Institute_Repository_Policy
@@ -135,8 +136,9 @@ extension Institute.Repository.Policy.Command {
 
     /// Today in UTC, `YYYY-MM-DD` — the header stamp the retired script
     /// took from `date -u +%Y-%m-%d`. Overridable by `--date` so a test
-    /// (and a re-run of the same wave) renders the same bytes.
+    /// (and a re-run of the same draft) renders the same bytes.
     private static var today: Swift.String {
-        Swift.String(issuedAt.prefix(10))
+        let now = Gregorian.DateTime(Time.Instant(secondsSinceUnixEpoch: GitHub.App.Clock.now()))
+        return Swift.String(now.rfc3339.format(offset: .utc, precision: 0).prefix(10))
     }
 }

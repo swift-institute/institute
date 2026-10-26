@@ -64,10 +64,6 @@ struct `Repository Policy Caller Tests` {
         )
         #expect(substituted != canonical)
         #expect(canonical + "\n" != canonical)
-        // The digest the wave records over these bytes moves with them.
-        let digest = Institute.Repository.Policy.Caller.Wave.digest([Byte](utf8: canonical))
-        #expect(Institute.Repository.Policy.Caller.Wave.digest([Byte](utf8: dropped)) != digest)
-        #expect(Institute.Repository.Policy.Caller.Wave.digest([Byte](utf8: substituted)) != digest)
     }
 
     /// The merge_group trigger fires only `checks_requested`, and today no

@@ -101,13 +101,10 @@ let package = Package(
         .target(
             name: "Institute Repository Application",
             dependencies: [
-                "Institute GitHub",
                 .product(name: "Command", package: "swift-arguments"),
                 .product(name: "Command Schema", package: "swift-arguments"),
                 .product(name: "Console", package: "swift-console"),
-                .product(name: "Environment", package: "swift-environment"),
                 .product(name: "Kernel", package: "swift-kernel"),
-                .product(name: "RFC 4648", package: "swift-rfc-4648"),
                 .product(name: "RFC 3339", package: "swift-rfc-3339"),
                 .product(name: "Time", package: "swift-time"),
                 .product(name: "Byte", package: "swift-byte"),
@@ -217,7 +214,6 @@ let package = Package(
             name: "Institute Repository Application Tests",
             dependencies: [
                 "Institute Repository Application",
-                "Institute GitHub",
                 .product(name: "Institute Model", package: "institute"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "JSON", package: "swift-json"),
