@@ -21,6 +21,7 @@ Thumbs.db
 !/Scripts/
 !/.github/
 !/Package.swift
+!/Hosts/
 !/Package@swift-*.swift
 !/Lint.swift
 !/Lint/
