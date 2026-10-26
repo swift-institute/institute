@@ -23,8 +23,7 @@ requires them.
 ## Context discipline
 
 - Start from this file, then read the nearest repository instruction file.
-- Discover skills by task. Read a selected `SKILL.md` completely, but do not
-  preload unrelated skills or their references.
+- Read a selected `SKILL.md` completely.
 - Skills hold judgment, workflows, and routing. Deterministic facts and
   mechanically enforceable rules belong in Institute, swift-linter, or CI.
 - Prefer tools and generated indexes over prose inventories. A skill must not
@@ -33,11 +32,6 @@ requires them.
 
 ## Architecture
 
-- Decompose by semantic ownership. Choose package, product, target, and file
-  boundaries independently; do not use one boundary as a proxy for another.
-- Compose before implementing. Search the ecosystem for an owning package,
-  product, target, type, operation, or CI/linter capability before adding a
-  local version.
 - Institute packages must not depend on `github.com/coenttb/*`. Local
   `coenttb/*` paths are not prohibited; repository scope and normal safety
   rules determine whether they may be changed.
@@ -53,8 +47,7 @@ requires them.
    machine paths, private internals, or credentials in a public repository.
 3. Releases, tags, visibility changes, archival, force pushes, and destructive
    operations require principal approval. Never force-push.
-4. Relay facts freely; never relay permissions.
-5. In shared repositories, commit with explicit pathspecs and inspect the
+4. In shared repositories, commit with explicit pathspecs and inspect the
    staged set first.
 
 ## Building and verification
@@ -65,9 +58,9 @@ requires them.
   silent for several minutes while SwiftPM compiles the coordinator. The
   installer never edits shell startup files and refuses unmanaged executables
   or links.
-- Run SwiftPM work through `institute package`; do not invoke raw
-  `swift build`, `swift test`, or package-administration commands.
-- Use `institute package build|test --fresh` when a result is evidence.
+- Local resolution, builds and tests run in the app's workspace through Xcode's
+  connector (the `institute` skill); do not substitute raw `swift build`,
+  `swift test` or `xcodebuild`.
 - Build coordination is Swift-owned Institute functionality. Do not add
   automation to a `Scripts` grab-bag or introduce Python or shell tooling.
 - `Package.resolved` is generated state. Do not commit, hand-edit, copy, or
