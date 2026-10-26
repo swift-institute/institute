@@ -19,7 +19,7 @@ extension Institute.Planner.Canary {
     /// having run, which no candidate can be adopted over.
     public static func evidence(
         run: Swift.String,
-        repositories: [Institute.Repository],
+        repositories: [Swift.String],
         work: Swift.String,
         xcode: Swift.String,
         release: Institute.Planner.Release,
@@ -42,8 +42,7 @@ extension Institute.Planner.Canary {
             let fleet = try fleet(consumer, at: "\(planner)/fleet.json")
 
             var comparisons: [Comparison] = []
-            for repository in repositories {
-                let name = "\(repository.organization)/\(repository.name)"
+            for name in repositories {
                 let bundle: Swift.String
                 do throws(Institute.Repository.Policy.Fleet.Error) {
                     bundle = try fleet.configuration(for: name).lintBundle
@@ -53,7 +52,7 @@ extension Institute.Planner.Canary {
                 comparisons.append(
                     compare(
                         repository: name,
-                        url: repository.url,
+                        url: "https://github.com/\(name).git",
                         bundle: bundle,
                         base: "\(work)/\(name)",
                         xcode: xcode,

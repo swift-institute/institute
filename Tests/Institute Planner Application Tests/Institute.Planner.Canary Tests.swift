@@ -28,12 +28,7 @@ extension Institute.Planner.Canary.Test {
     static let fleet = """
         {"schemaVersion": 1, "organizations": [{"name": "swift-atoms", "layer": "L1", "status": "active"}]}
         """
-    static let repository = Institute.Repository(
-        name: "swift-addition",
-        url: "https://github.com/swift-atoms/swift-addition.git",
-        organization: "swift-atoms",
-        layer: .atoms
-    )
+    static let repository = "swift-atoms/swift-addition"
 
     /// A runner whose clones are empty directories at `revision` and whose
     /// planners answer by binary name.

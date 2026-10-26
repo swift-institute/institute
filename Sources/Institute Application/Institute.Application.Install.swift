@@ -1,10 +1,10 @@
 public import Command
 public import Command_Schema
-import Institute_Development
+import Institute_Installation
 public import Institute_Model
 import Institute_Planner_Application
 
-extension Institute.Workspace.Command {
+extension Institute.Application {
     /// `institute install` — install the published, digest-verified planner
     /// that swift-institute/.github pins for this platform, and record what
     /// was installed. It never builds.

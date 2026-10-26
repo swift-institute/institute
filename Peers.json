@@ -1,9 +1,0 @@
-{
-  "peers": [
-    {
-      "inventory": ".github/inventory.json",
-      "name": "rule-institute"
-    }
-  ],
-  "version": 1
-}

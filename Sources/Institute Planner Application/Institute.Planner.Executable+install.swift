@@ -1,6 +1,6 @@
 import FIPS_180_4
 import File_System
-public import Institute_Development
+public import Institute_Installation
 public import Institute_Model
 
 extension Institute.Planner.Executable {

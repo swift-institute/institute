@@ -29,92 +29,12 @@ let package = Package(
             targets: ["Institute Repository Application"]
         ),
         .library(
-            name: "Institute Source Application",
-            targets: ["Institute Source Application"]
-        ),
-        .library(
-            name: "Institute Certification Application",
-            targets: ["Institute Certification Application"]
-        ),
-        .library(
-            name: "Institute Coherence Application",
-            targets: ["Institute Coherence Application"]
-        ),
-        .library(
-            name: "Institute Composition Application",
-            targets: ["Institute Composition Application"]
-        ),
-        .library(
-            name: "Institute Context Application",
-            targets: ["Institute Context Application"]
-        ),
-        .library(
-            name: "Institute Conversion Application",
-            targets: ["Institute Conversion Application"]
-        ),
-        .library(
-            name: "Institute Dependency Application",
-            targets: ["Institute Dependency Application"]
-        ),
-        .library(
-            name: "Institute Doctor Application",
-            targets: ["Institute Doctor Application"]
-        ),
-        .library(
             name: "Institute GitHub Application",
             targets: ["Institute GitHub Application"]
         ),
         .library(
-            name: "Institute Inventory Application",
-            targets: ["Institute Inventory Application"]
-        ),
-        .library(
-            name: "Institute Package Application",
-            targets: ["Institute Package Application"]
-        ),
-        .library(
             name: "Institute Planner Application",
             targets: ["Institute Planner Application"]
-        ),
-        .library(
-            name: "Institute Verification Application",
-            targets: ["Institute Verification Application"]
-        ),
-        .library(
-            name: "Institute Workspace Application",
-            targets: ["Institute Workspace Application"]
-        ),
-        .library(
-            name: "Institute Architecture Model",
-            targets: ["Institute Architecture Model"]
-        ),
-        .library(
-            name: "Institute Architecture Facts",
-            targets: ["Institute Architecture Facts"]
-        ),
-        .library(
-            name: "Institute Architecture Graph",
-            targets: ["Institute Architecture Graph"]
-        ),
-        .library(
-            name: "Institute Architecture Index",
-            targets: ["Institute Architecture Index"]
-        ),
-        .library(
-            name: "Institute Architecture Validation",
-            targets: ["Institute Architecture Validation"]
-        ),
-        .library(
-            name: "Institute Architecture Candidates",
-            targets: ["Institute Architecture Candidates"]
-        ),
-        .library(
-            name: "Institute Architecture Migration",
-            targets: ["Institute Architecture Migration"]
-        ),
-        .library(
-            name: "Institute Architecture CLI",
-            targets: ["Institute Architecture CLI"]
         ),
         .executable(
             name: "institute",
@@ -140,89 +60,12 @@ let package = Package(
         .package(url: "https://github.com/swift-compositions/swift-process.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-byte.git", branch: "main"),
         .package(url: "https://github.com/swift-standards/swift-fips-180-4.git", branch: "main"),
-        .package(url: "https://github.com/swift-standards/swift-spm-standard.git", branch: "main"),
     ],
     targets: [
-        .target(
-            name: "Institute Architecture Model",
-            dependencies: [
-                .product(name: "Institute Model", package: "institute")
-            ]
-        ),
-        .target(
-            name: "Institute Architecture Facts",
-            dependencies: [
-                "Institute Architecture Model",
-                "Institute Architecture Graph",
-                .product(name: "File System", package: "swift-file-system"),
-                .product(name: "Institute Model", package: "institute"),
-                .product(name: "JSON", package: "swift-json"),
-            ]
-        ),
-        .target(
-            name: "Institute Architecture Graph",
-            dependencies: [
-                "Institute Architecture Model",
-                .product(name: "Institute Model", package: "institute"),
-            ]
-        ),
-        .target(
-            name: "Institute Architecture Index",
-            dependencies: [
-                "Institute Architecture Model",
-                "Institute Architecture Graph",
-                "Institute Architecture Facts",
-                "Institute Architecture Validation",
-                .product(name: "Institute Model", package: "institute"),
-            ]
-        ),
-        .target(
-            name: "Institute Architecture Validation",
-            dependencies: [
-                "Institute Architecture Model",
-                "Institute Architecture Graph",
-                "Institute Architecture Facts",
-                .product(name: "Institute Model", package: "institute"),
-            ]
-        ),
-        .target(
-            name: "Institute Architecture Candidates",
-            dependencies: [
-                "Institute Architecture Model",
-                .product(name: "Institute Model", package: "institute"),
-            ]
-        ),
-        .target(
-            name: "Institute Architecture Migration",
-            dependencies: [
-                "Institute Architecture Model",
-                .product(name: "Institute Model", package: "institute"),
-            ]
-        ),
-        .target(
-            name: "Institute Architecture CLI",
-            dependencies: [
-                "Institute Architecture Model",
-                "Institute Architecture Facts",
-                "Institute Architecture Graph",
-                "Institute Architecture Index",
-                "Institute Architecture Validation",
-                "Institute Architecture Candidates",
-                "Institute Architecture Migration",
-                .product(name: "Command", package: "swift-arguments"),
-                .product(name: "Command Schema", package: "swift-arguments"),
-                .product(name: "Environment", package: "swift-environment"),
-                .product(name: "File System", package: "swift-file-system"),
-                .product(name: "Institute Model", package: "institute"),
-                .product(name: "Kernel", package: "swift-kernel"),
-                .product(name: "Process", package: "swift-process"),
-            ]
-        ),
         .target(
             name: "Institute GitHub",
             dependencies: [
                 .product(name: "Institute Model", package: "institute"),
-                .product(name: "Institute Dependency", package: "institute"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "JSON", package: "swift-json"),
@@ -281,110 +124,6 @@ let package = Package(
             ]
         ),
         .target(
-            name: "Institute Source Application",
-            dependencies: [
-                "Institute Planner Application",
-                .product(name: "Institute Model", package: "institute"),
-                .product(name: "Institute Source", package: "institute"),
-                .product(name: "Institute Source Workspace", package: "institute"),
-                .product(name: "Command", package: "swift-arguments"),
-                .product(name: "Command Schema", package: "swift-arguments"),
-                .product(name: "Environment", package: "swift-environment"),
-                .product(name: "File System", package: "swift-file-system"),
-                .product(name: "JSON", package: "swift-json"),
-                .product(name: "Process", package: "swift-process"),
-            ]
-        ),
-        .target(
-            name: "Institute Workspace Application",
-            dependencies: [
-                "Institute Planner Application",
-                .product(name: "Command", package: "swift-arguments"),
-                .product(name: "Command Schema", package: "swift-arguments"),
-                .product(name: "Institute Model", package: "institute"),
-                .product(name: "Institute Development", package: "institute"),
-                .product(name: "Environment", package: "swift-environment"),
-                .product(name: "File System", package: "swift-file-system"),
-                .product(name: "Process", package: "swift-process"),
-            ]
-        ),
-        .target(
-            name: "Institute Doctor Application",
-            dependencies: [
-                .product(name: "Command", package: "swift-arguments"),
-                .product(name: "Command Schema", package: "swift-arguments"),
-                .product(name: "Institute Model", package: "institute"),
-                .product(name: "Institute Doctor", package: "institute"),
-                .product(name: "Environment", package: "swift-environment"),
-                .product(name: "File System", package: "swift-file-system"),
-                .product(name: "Process", package: "swift-process"),
-            ]
-        ),
-        .target(
-            name: "Institute Inventory Application",
-            dependencies: [
-                .product(name: "Command", package: "swift-arguments"),
-                .product(name: "Command Schema", package: "swift-arguments"),
-                .product(name: "Institute Model", package: "institute"),
-                .product(name: "Institute Doctor", package: "institute"),
-                .product(name: "Institute Inventory", package: "institute"),
-                .product(name: "Institute Pages", package: "institute"),
-                .product(name: "Console", package: "swift-console"),
-                .product(name: "Environment", package: "swift-environment"),
-                .product(name: "File System", package: "swift-file-system"),
-                .product(name: "Process", package: "swift-process"),
-            ]
-        ),
-        .target(
-            name: "Institute Dependency Application",
-            dependencies: [
-                "Institute GitHub",
-                .product(name: "Command", package: "swift-arguments"),
-                .product(name: "Command Schema", package: "swift-arguments"),
-                .product(name: "Institute Model", package: "institute"),
-                .product(name: "Institute Dependency", package: "institute"),
-                .product(name: "Institute Inventory", package: "institute"),
-                .product(name: "Environment", package: "swift-environment"),
-                .product(name: "File System", package: "swift-file-system"),
-                .product(name: "Git", package: "swift-git"),
-                .product(name: "Process", package: "swift-process"),
-            ]
-        ),
-        .target(
-            name: "Institute Composition Application",
-            dependencies: [
-                .product(name: "Command", package: "swift-arguments"),
-                .product(name: "Command Schema", package: "swift-arguments"),
-                .product(name: "Institute Model", package: "institute"),
-                .product(name: "Institute Development", package: "institute"),
-                .product(name: "Environment", package: "swift-environment"),
-                .product(name: "File System", package: "swift-file-system"),
-            ]
-        ),
-        .target(
-            name: "Institute Context Application",
-            dependencies: [
-                .product(name: "Command", package: "swift-arguments"),
-                .product(name: "Command Schema", package: "swift-arguments"),
-                .product(name: "Institute Model", package: "institute"),
-                .product(name: "Institute Development", package: "institute"),
-                .product(name: "Environment", package: "swift-environment"),
-                .product(name: "File System", package: "swift-file-system"),
-                .product(name: "Process", package: "swift-process"),
-            ]
-        ),
-        .target(
-            name: "Institute Package Application",
-            dependencies: [
-                .product(name: "Command", package: "swift-arguments"),
-                .product(name: "Command Schema", package: "swift-arguments"),
-                .product(name: "Institute Model", package: "institute"),
-                .product(name: "Institute Build Coordinator", package: "institute"),
-                .product(name: "Environment", package: "swift-environment"),
-                .product(name: "Process", package: "swift-process"),
-            ]
-        ),
-        .target(
             name: "Institute Planner Application",
             dependencies: [
                 "Institute GitHub",
@@ -396,38 +135,12 @@ let package = Package(
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "Git", package: "swift-git"),
-                .product(name: "Institute Development", package: "institute"),
+                .product(name: "Institute Installation", package: "institute"),
                 .product(name: "Institute Model", package: "institute"),
                 .product(name: "Institute Repository Policy", package: "institute"),
                 .product(name: "Institute Source", package: "institute"),
                 .product(name: "JSON", package: "swift-json"),
                 .product(name: "Process", package: "swift-process"),
-            ]
-        ),
-        .target(
-            name: "Institute Coherence Application",
-            dependencies: [
-                .product(name: "Command", package: "swift-arguments"),
-                .product(name: "Command Schema", package: "swift-arguments"),
-                .product(name: "Institute Model", package: "institute"),
-                .product(name: "Institute Instruments", package: "institute"),
-                .product(name: "Environment", package: "swift-environment"),
-                .product(name: "File System", package: "swift-file-system"),
-                .product(name: "Process", package: "swift-process"),
-            ]
-        ),
-        .target(
-            name: "Institute Conversion Application",
-            dependencies: [
-                .product(name: "Command", package: "swift-arguments"),
-                .product(name: "Command Schema", package: "swift-arguments"),
-                .product(name: "Institute Model", package: "institute"),
-                .product(name: "Institute Conversion", package: "institute"),
-                .product(name: "Byte", package: "swift-byte"),
-                .product(name: "Console", package: "swift-console"),
-                .product(name: "Environment", package: "swift-environment"),
-                .product(name: "File System", package: "swift-file-system"),
-                .product(name: "JSON", package: "swift-json"),
             ]
         ),
         .target(
@@ -443,70 +156,17 @@ let package = Package(
             ]
         ),
         .target(
-            name: "Institute Verification Application",
-            dependencies: [
-                .product(name: "Command", package: "swift-arguments"),
-                .product(name: "Command Schema", package: "swift-arguments"),
-                .product(name: "Institute Model", package: "institute"),
-                .product(name: "Institute Instruments", package: "institute"),
-                .product(name: "Byte", package: "swift-byte"),
-                .product(name: "Console", package: "swift-console"),
-                .product(name: "Environment", package: "swift-environment"),
-                .product(name: "File System", package: "swift-file-system"),
-                .product(name: "Git", package: "swift-git"),
-                .product(name: "JSON", package: "swift-json"),
-                .product(name: "Process", package: "swift-process"),
-            ]
-        ),
-        .target(
-            name: "Institute Certification Application",
-            dependencies: [
-                .product(name: "Command", package: "swift-arguments"),
-                .product(name: "Command Schema", package: "swift-arguments"),
-                .product(name: "Institute Model", package: "institute"),
-                .product(name: "Institute Instruments", package: "institute"),
-                .product(name: "Institute Doctor", package: "institute"),
-                .product(name: "Byte", package: "swift-byte"),
-                .product(name: "Console", package: "swift-console"),
-                .product(name: "Environment", package: "swift-environment"),
-                .product(name: "File System", package: "swift-file-system"),
-                .product(name: "Git", package: "swift-git"),
-                .product(name: "JSON", package: "swift-json"),
-                .product(name: "Package Manager", package: "swift-package-manager"),
-                .product(name: "Process", package: "swift-process"),
-            ]
-        ),
-        .target(
             name: "Institute Application",
             dependencies: [
                 "Institute CI Application",
-                "Institute Certification Application",
-                "Institute Coherence Application",
-                "Institute Composition Application",
-                "Institute Context Application",
-                "Institute Conversion Application",
-                "Institute Dependency Application",
-                "Institute Doctor Application",
-                "Institute GitHub Application",
-                "Institute Inventory Application",
-                "Institute Package Application",
-                "Institute Planner Application",
-                "Institute Verification Application",
-                "Institute Workspace Application",
-                "Institute Repository Application",
-                "Institute Source Application",
-                "Institute Architecture CLI",
-                "Institute Architecture Model",
                 "Institute GitHub",
+                "Institute GitHub Application",
+                "Institute Planner Application",
+                "Institute Repository Application",
                 .product(name: "Command", package: "swift-arguments"),
-                .product(name: "Command Schema", package: "swift-arguments"),
                 .product(name: "Institute CI Model", package: "institute"),
-                .product(name: "Institute Conversion", package: "institute"),
-                .product(name: "Institute Dependency", package: "institute"),
-                .product(name: "Institute Development", package: "institute"),
-                .product(name: "Institute Doctor", package: "institute"),
-                .product(name: "Institute Instruments", package: "institute"),
-                .product(name: "Institute Inventory", package: "institute"),
+                .product(name: "Command Schema", package: "swift-arguments"),
+                .product(name: "Institute Installation", package: "institute"),
                 .product(name: "Institute Model", package: "institute"),
                 .product(name: "Institute Repository Policy", package: "institute"),
             ],
@@ -516,55 +176,17 @@ let package = Package(
             name: "Institute Application CLI",
             dependencies: [
                 "Institute Application",
-                "Institute Workspace Application",
                 .product(name: "Institute Model", package: "institute"),
                 .product(name: "Command", package: "swift-arguments"),
-            ]
-        ),
-        .testTarget(
-            name: "Institute Architecture Tests",
-            dependencies: [
-                "Institute Architecture Model",
-                "Institute Architecture Facts",
-                "Institute Architecture Graph",
-                "Institute Architecture Index",
-                "Institute Architecture Validation",
-                "Institute Architecture Candidates",
-                "Institute Architecture Migration",
-                "Institute Architecture CLI",
-                .product(name: "Institute Model", package: "institute"),
-            ],
-            path: "Tests/Institute Architecture Tests"
-        ),
-        .testTarget(
-            name: "Institute Source Application Tests",
-            dependencies: [
-                "Institute Source Application",
-                .product(name: "Institute Model", package: "institute"),
-                .product(name: "Institute Source", package: "institute"),
             ]
         ),
         .testTarget(
             name: "Institute Application Tests",
             dependencies: [
                 "Institute Application",
-                "Institute Certification Application",
-                "Institute Coherence Application",
-                "Institute Composition Application",
-                "Institute Context Application",
-                "Institute Conversion Application",
-                "Institute Dependency Application",
-                "Institute Doctor Application",
                 "Institute GitHub Application",
-                "Institute Inventory Application",
-                "Institute Package Application",
-                "Institute Verification Application",
-                "Institute Workspace Application",
-                .product(name: "Institute Build Coordinator", package: "institute"),
                 .product(name: "Institute Model", package: "institute"),
-                .product(name: "Institute Instruments", package: "institute"),
                 .product(name: "Command", package: "swift-arguments"),
-                .product(name: "JSON", package: "swift-json"),
             ],
             path: "Tests/Institute Application Tests"
         ),

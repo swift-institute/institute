@@ -75,26 +75,19 @@ extension Institute.Planner.Command {
             guard Set(repositories).count == repositories.count else {
                 throw .validationFailed(reason: "duplicate --repository")
             }
+            for repository in repositories {
+                let parts = repository.split(separator: "/", omittingEmptySubsequences: false)
+                guard parts.count == 2, parts.allSatisfy({ !$0.isEmpty }) else {
+                    throw .validationFailed(reason: "--repository must be owner/name, got \(repository)")
+                }
+            }
             guard workPath.isEmpty || workPath.hasPrefix("/") else {
                 throw .validationFailed(reason: "--work-path must be absolute")
             }
         }
 
         public mutating func run() async throws(Institute.Error) {
-            let configuration = try Institute.Configuration.load(
-                at: Institute.Planner.Command.root().checkout
-            )
-            var selected: [Institute.Repository] = []
-            for name in repositories.isEmpty ? Institute.Planner.Canary.repositories : repositories {
-                guard
-                    let repository = configuration.repositories.first(where: {
-                        "\($0.organization)/\($0.name)" == name
-                    })
-                else {
-                    throw .configuration("planner canary: \(name) is not in Institute.json")
-                }
-                selected.append(repository)
-            }
+            let selected = repositories.isEmpty ? Institute.Planner.Canary.repositories : repositories
             let work = try workPath.isEmpty ? Self.temporary() : workPath
             let workDirectory = try Self.path(work)
             guard !File(workDirectory).stat.exists else {

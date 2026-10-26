@@ -1,7 +1,6 @@
 import Command
 import Institute_GitHub_Application
 import Institute_Model
-import Institute_Workspace_Application
 import Testing
 
 @testable import Institute_Application
@@ -10,7 +9,7 @@ import Testing
 private func parse(
     _ argv: [Swift.String]
 ) throws -> Institute.Application.CLI {
-    try Command.parse(Institute.Application.CLI.self, from: argv, initial: .sync(.init()))
+    try Command.parse(Institute.Application.CLI.self, from: argv, initial: .install(.init()))
 }
 
 @Suite
