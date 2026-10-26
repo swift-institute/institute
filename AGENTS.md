@@ -15,9 +15,10 @@ the `institute` scheme builds the executable and runs no tests.
   `.institute-ci-pin`. Never edit the pin or `.institute-ci-planner` by hand.
 - **`github token` mints a credential, so it prints one thing and logs nothing.** The token is
   the whole of stdout, so `GH_TOKEN=$(institute github token --org X)` captures a credential
-  and nothing else; whether it was minted or served from cache goes to stderr. The App identity
-  and private key live under `~/.config/swift-institute-bot/` and are never compiled in, and no
-  diagnostic names the resolved key path. Tokens are cached mode-600 per organization *and per
+  and nothing else; whether it was minted or served from cache goes to stderr. The App's private key
+  and identity live in the login keychain (service = the bot's name, `--app`, default
+  `swift-institute-bot`; account = the App id), are never compiled in or written to a file, and
+  no diagnostic names the resolved key. Tokens are cached mode-600 per organization *and per
   permission set*, so a token narrowed to `contents=read` is never handed back for a request
   for the full grant. Preserve both properties in any change.
 - **A source verdict of "clean" always means something was measured.** swift-linter exits zero

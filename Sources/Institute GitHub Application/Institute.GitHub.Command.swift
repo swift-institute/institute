@@ -15,17 +15,20 @@ extension Institute.GitHub.Command {
     /// --org X)` usable in a lane standing inside a package.
     public struct Token: Sendable, Command_Schema.Command.`Protocol` {
         public var organization: Swift.String
+        public var application: Swift.String
         public var permissions: [Swift.String]
         public var applicationIdentity: Swift.String
         public var keyPath: Swift.String
 
         public init(
             organization: Swift.String = "",
+            application: Swift.String = "swift-institute-bot",
             permissions: [Swift.String] = [],
             applicationIdentity: Swift.String = "",
             keyPath: Swift.String = ""
         ) {
             self.organization = organization
+            self.application = application
             self.permissions = permissions
             self.applicationIdentity = applicationIdentity
             self.keyPath = keyPath
@@ -46,6 +49,16 @@ extension Institute.GitHub.Command {
                             "GitHub organization whose installation token is minted."
                     )
                 )
+                Command_Schema.Command.Option(
+                    \.application,
+                    name: .long(.literal("app")),
+                    placeholder: "bot",
+                    help: .init(
+                        abstract:
+                            "GitHub App to mint as: the login-keychain item of that service holds its "
+                            + "key and identity; defaults to swift-institute-bot."
+                    )
+                )
                 Command_Schema.Command.Option<Self, Swift.String>.Many(
                     \.permissions,
                     name: .long(.literal("permission")),
@@ -63,7 +76,7 @@ extension Institute.GitHub.Command {
                     help: .init(
                         abstract:
                             "GitHub App identity to mint as; defaults to GITHUB_APP_ID, then "
-                            + "the identity file in the configuration directory."
+                            + "the keychain item's account."
                     )
                 )
                 Command_Schema.Command.Option(
@@ -72,8 +85,8 @@ extension Institute.GitHub.Command {
                     placeholder: "path",
                     help: .init(
                         abstract:
-                            "Signing key to use; defaults to GITHUB_APP_PRIVATE_KEY_PATH, then "
-                            + "the sole .pem in the configuration directory."
+                            "Signing key file to use; defaults to GITHUB_APP_PRIVATE_KEY_PATH, then "
+                            + "the login-keychain item named by --app."
                     )
                 )
             }
@@ -83,19 +96,27 @@ extension Institute.GitHub.Command {
             guard !organization.isEmpty else {
                 throw .validationFailed(reason: "github token requires --org.")
             }
+            guard !application.isEmpty else {
+                throw .validationFailed(reason: "github token requires a non-empty --app.")
+            }
         }
 
         public mutating func run() async throws(Institute.Error) {
+            let name: Paths.Path.Component
+            do throws(Paths.Path.Component.Error) {
+                name = try .init(application)
+            } catch {
+                throw .configuration("github token: --app \(application) is not a usable name")
+            }
             let app: GitHub_App.GitHub.App
             let result: (token: GitHub_App.GitHub.App.Token, cached: Swift.Bool)
             do throws(GitHub_App.GitHub.App.Error) {
                 app = try .resolve(
                     identity: applicationIdentity.isEmpty ? nil : applicationIdentity,
                     keyPath: keyPath.isEmpty ? nil : keyPath,
-                    // The sole Institute-specific residue of the extracted
-                    // mechanism: the name of the directory under ~/.config
-                    // where this operator keeps the bot's credentials.
-                    configurationDirectoryName: "swift-institute-bot"
+                    // The bot's name: the login-keychain service holding its
+                    // key and identity, and its token cache under ~/.config.
+                    name: name
                 )
                 result = try app.token(
                     organization: organization,
