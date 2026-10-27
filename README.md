@@ -11,7 +11,7 @@ the executable and its command surface.
 | `ci -- package validate\|plan\|aggregate` | The verbs the central `swift-ci.yml` runs: validate a subject repository, plan its job matrix, aggregate the verdict. |
 | `ci -- source` | Institute lint over one checked-out package at an exact revision. CI's `Quality · source` job is the evidence; a local run is guidance. |
 | `planner canary\|adopt` | Judge a `publish-planner` run against the current planner on the canary repositories, and commit an adoptable pin to the consumer checkout. |
-| `repository …` | Repository policy across the organizations: rulesets, caller workflows, and the `.gitignore` canon. |
+| `repository …` | Repository policy across the organizations: caller workflows and the `.gitignore` canon. |
 | `github token` | Mint a GitHub App installation token for one organization, optionally narrowed. |
 
 ## How CI uses it

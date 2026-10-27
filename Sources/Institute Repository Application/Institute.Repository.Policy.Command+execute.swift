@@ -23,17 +23,10 @@ extension Institute.Repository.Policy.Command {
             case "draft-metadata":
                 try draftMetadata(rest)
 
-            case "ruleset":
-                try ruleset(RulesetArguments(rest))
-
-            case "ruleset-convergence":
-                try rulesetConvergence(RulesetConvergenceArguments(rest))
-
             default:
                 throw Error.configuration(
                     "institute repository requires census, capability-records, "
-                        + "render-caller, draft-metadata, ruleset, "
-                        + "or ruleset-convergence"
+                        + "render-caller, or draft-metadata"
                 )
             }
         } catch {

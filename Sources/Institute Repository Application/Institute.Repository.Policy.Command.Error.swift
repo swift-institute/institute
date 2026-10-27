@@ -7,7 +7,6 @@ extension Institute.Repository.Policy.Command {
     /// domain refused and exits non-zero.
     public enum Error: Swift.Error, CustomStringConvertible {
         case configuration(String)
-        case ruleset(Institute.Repository.Policy.Ruleset.Error)
         case census(Institute.Repository.Policy.Command.Census.Generator.Error)
         case metadata(Institute.Repository.Policy.Metadata.Error)
         case io(String)
@@ -15,7 +14,6 @@ extension Institute.Repository.Policy.Command {
         public var description: String {
             switch self {
             case .configuration(let message): return message
-            case .ruleset(let error): return error.description
             case .census(let error): return "\(error)"
             case .metadata(let error): return "\(error)"
             case .io(let message): return message
