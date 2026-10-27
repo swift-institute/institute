@@ -19,7 +19,7 @@ struct `Institute source policy` {
         #expect(policy.swiftFormatRepair.path == ".swift-format-repair")
         #expect(!policy.swiftLint.contents.isEmpty)
         #expect(policy.swiftLint.path == ".swiftlint.yml")
-        #expect(policy.swiftLintRules.count == 117)
+        #expect(policy.swiftLintRules.count == 116)
         #expect(policy.swiftLintRules.contains { $0.token == "typed_throws_required" })
         #expect(!policy.swiftLintRules.contains { $0.token == "custom_rules" })
         #expect(policy.bundles == [.primitives, .standards, .institute])
