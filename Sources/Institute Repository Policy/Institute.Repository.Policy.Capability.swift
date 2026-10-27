@@ -48,7 +48,7 @@ extension Institute.Repository.Policy {
             ),
             Capability(
                 id: "D-03",
-                concept: "repository, routing row, workflow/action and ruleset projection policy",
+                concept: "repository, routing row and workflow/action projection policy",
                 domainOwner: "Institute.Repository.Policy",
                 target: "Repository Policy",
                 namespace: "Institute.Repository.Policy.*",

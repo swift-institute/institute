@@ -24,7 +24,7 @@ are no cycles.
 | `Institute CI Workflow` | The GitHub Actions workflow vocabulary |
 | `Institute CI Inventory` | What a checked-out repository contains, as CI reads it |
 | `Institute CI Validation` | The validation rules `ci -- package validate` applies |
-| `Institute Repository Policy` | Rulesets, caller workflows and fleet policy across the organizations |
+| `Institute Repository Policy` | Caller workflows and fleet policy across the organizations |
 | `Institute Source Policy`, `Institute Source Profile`, `Institute Source Workspace`, `Institute Source` | Institute lint: the pinned engines and profiles, the package subject, and one measurement |
 | `Source Measurement`, `Source Profile`, `Source Report`, `Source Execution`, `Source Repair`, `Source Linter`, `Source Swift Format`, `Source SwiftLint` | The engine-neutral source measurement the Institute lint is built on |
 
