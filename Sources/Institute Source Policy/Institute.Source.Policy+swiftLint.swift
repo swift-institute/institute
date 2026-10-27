@@ -105,6 +105,8 @@ disabled_rules:
   # parent_config depth, so this single Tier 1 entry kills the false-positive
   # class fleet-wide for every repo in the parent_config chain.
   - prefer_self_in_static_references
+  # function_parameter_count: removed from the profile (Coen, 2026-10-27).
+  - function_parameter_count
 
 opt_in_rules:
   - explicit_init
@@ -154,10 +156,6 @@ excluded:
   # DocC tutorial code samples are didactic fixtures, not API surface;
   # excluded ecosystem-wide ([Phase 1.5] 2026-05-05).
   - "**/*.docc/Resources"
-
-function_parameter_count:
-  warning: 6
-  error: 8
 
 # inclusive_language (swift-institute/.github#268, principal ruling
 # recommendation (a), 2026-08-04; corrected per review 4850697512): `

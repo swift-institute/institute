@@ -35,7 +35,6 @@ extension Institute.Source.Policy {
         "flatmap_over_map_reduce",
         "force_cast",
         "force_try",
-        "function_parameter_count",
         "generic_type_name",
         "implicit_getter",
         "inclusive_language",
