@@ -38,7 +38,7 @@ extension Institute.Source {
             self.swiftLint = .init(
                 path: ".swiftlint.yml",
                 contents: Self.swiftLintConfiguration,
-                schema: "swiftlint:0.65.0"
+                schema: "swiftlint:0.65.1"
             )
             let swiftLintID = Source_Profile.Source.Engine.ID("swiftlint")
             self.swiftLintRules = Self.swiftLintRuleTokens.map {
@@ -71,20 +71,20 @@ extension Institute.Source {
                 .init(
                     id: swiftLintID,
                     platform: .macOSARM64,
-                    version: "0.65.0",
-                    revision: "0.65.0",
+                    version: "0.65.1",
+                    revision: "0.65.1",
                     toolchain: "portable SwiftLint release",
-                    schema: "swiftlint-json:0.65.0",
+                    schema: "swiftlint-json:0.65.1",
                     executable: .init(
                         name: "swiftlint",
                         digest: .init(
-                            "06bdd57b59087dde8680ba6a62452defd71babd0513023f19ddfc6773708ba34"
+                            "52112ece2dfa99c2442a1367f9a365d43784714cf224c3675bf8bc2f18ebd7c8"
                         ),
                         origin: .releaseArchive(
-                            base: "https://github.com/realm/SwiftLint/releases/download/0.65.0",
+                            base: "https://github.com/realm/SwiftLint/releases/download/0.65.1",
                             archive: "portable_swiftlint.zip",
                             digest: .init(
-                                "d6cb0aa7a2f5f1ef306fc9e37bcb54dc9a26facc8f7784ac0c3dd3eccf5c6ba6"
+                                "c1e429b0599cf1b516f369a2d9ec04eaf0e436f3c12b637df8851fa52ff694d0"
                             ),
                             member: "swiftlint"
                         )

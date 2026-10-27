@@ -1,7 +1,7 @@
 public import Institute_Model
 
 extension Institute.Source.Policy {
-    /// The exact SwiftLint 0.65.0 predicates enabled by
+    /// The exact SwiftLint 0.65.1 predicates enabled by
     /// ``swiftLintConfiguration``. Configured custom predicates use their
     /// emitted identifiers rather than SwiftLint's aggregate catalog row.
     internal static let swiftLintRuleTokens: [Swift.String] = [
