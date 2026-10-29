@@ -74,7 +74,7 @@ let package = Package(
         .package(url: "https://github.com/swift-atoms/swift-ascii.git", branch: "main"),
         .package(url: "https://github.com/swift-molecules/swift-async-fanout.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-environment.git", branch: "main"),
-        .package(url: "https://github.com/swift-compositions/swift-file-system.git", branch: "main"),
+        .package(url: "https://github.com/swift-compositions/swift-file-system.git", branch: "main", traits: ["Threads"]),
         .package(url: "https://github.com/swift-compositions/swift-git.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-json.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-kernel.git", branch: "main"),
