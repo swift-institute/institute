@@ -4,8 +4,8 @@ public import Source_Profile
 extension Institute.Source.Policy {
     public func linterRules(for bundle: Institute.Source.Bundle) -> [Source_Profile.Source.Rule.ID] {
         guard let engine = engines.first(where: { $0.id.token == "swift-linter" }),
-            engine.revision == "2c3133cecf5a8e24dc23a2654687f214911dbd79",
-            engine.executable.digest == .init("76bc0e9b74beb050acc56310781ccfe2de232545e0fa3772eb35521493890dda")
+            engine.revision == "c21431f03759cc83a3fc16d9dc8400bf34fa03f7",
+            engine.executable.digest == .init("ea30dccb456d562b5a16c90dbbcbbe577481e028ef550bf325d4ac9bc4cd700a")
         else { return [] }
         let tokens: [Swift.String]
         switch bundle {
@@ -23,6 +23,7 @@ extension Institute.Source.Policy {
         "architecture import boundary",
         "architecture namespace shape",
         "ascii identifier",
+        "associated type shadows namespace",
         "bare string dependency",
         "binary serializable rawvalue uint8",
         "binary serializable uint8 witness",
@@ -41,6 +42,7 @@ extension Institute.Source.Policy {
         "compound platform namespace root",
         "compound suite name",
         "configuration before content",
+        "conflicting dependency url",
         "convention c representability",
         "count minus one",
         "counter loop iteration",
@@ -65,8 +67,11 @@ extension Institute.Source.Policy {
         "inlinable internal access",
         "int public parameter",
         "intermediate binding then return",
+        "libc import in composition",
         "lifecycle order",
         "lifecycle typealias review",
+        "literal conformance shadows validating init",
+        "macro expansion short name",
         "malformed suppression directive",
         "manifest naming grammar",
         "minimal type body",
@@ -114,6 +119,8 @@ extension Institute.Source.Policy {
         "test function naming",
         "test target naming",
         "throwing wrapper init",
+        "top level type owner",
+        "trait consistency",
         "try optional",
         "type name capital",
         "type transform placement",
@@ -127,17 +134,20 @@ extension Institute.Source.Policy {
         "unchecked sendable noncopyable",
         "unchecked sendable revalidation anchor",
         "unchecked try outside tests",
+        "undeclared module import",
         "unification typealias",
         "unknown default",
         "unlabeled lifecycle closure",
         "unsafe assignment granularity",
         "unsafe storage visibility",
+        "untraited partial dependency",
         "untyped throws",
         "upward layer edge",
         "usable from inline internal import",
         "variable named impl",
         "wrapper backing exposed",
         "xctest import",
+        "xcuitest reference",
         "zero or one literal",
     ]
 
