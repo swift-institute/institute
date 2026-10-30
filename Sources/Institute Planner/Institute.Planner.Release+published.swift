@@ -14,15 +14,10 @@ extension Institute.Planner.Release {
                 let bytes = try Institute.Planner.Curl.get(
                     "https://github.com/\(repository)/releases/expanded_assets/\(tag)"
                 )
-                let listing = Swift.String(decoding: bytes, as: Swift.UTF8.self)
-                let marker = "/\(repository)/releases/download/\(tag)/"
-                let names = listing.components(separatedBy: marker).dropFirst().compactMap { tail in
-                    tail.split(separator: "\"", maxSplits: 1).first.map(Swift.String.init)
-                }
-                guard !names.isEmpty else {
-                    throw .malformed(line: "release \(tag)", reason: "no asset links")
-                }
-                return Swift.Set(names).sorted()
+                return try assets(
+                    listing: Swift.String(decoding: bytes, as: Swift.UTF8.self),
+                    tag: tag
+                )
             },
             fetch: { name throws(Institute.Planner.Error) in
                 guard !name.isEmpty, !name.contains(where: { $0 == "/" || $0 == "?" || $0 == "#" })
@@ -34,5 +29,27 @@ extension Institute.Planner.Release {
                 )
             }
         )
+    }
+}
+
+extension Institute.Planner.Release {
+    /// The asset names a release's expanded-assets page links to.
+    ///
+    /// Links are matched on `/releases/download/<tag>/` alone, never on the
+    /// repository path before it: GitHub serves a renamed repository's page
+    /// under its new name, so a planner that matched the name it was built
+    /// with would find no assets and refuse to run.
+    static func assets(
+        listing: Swift.String,
+        tag: Swift.String
+    ) throws(Institute.Planner.Error) -> [Swift.String] {
+        let marker = "/releases/download/\(tag)/"
+        let names = listing.components(separatedBy: marker).dropFirst().compactMap { tail in
+            tail.split(separator: "\"", maxSplits: 1).first.map(Swift.String.init)
+        }
+        guard !names.isEmpty else {
+            throw .malformed(line: "release \(tag)", reason: "no asset links")
+        }
+        return Swift.Set(names).sorted()
     }
 }

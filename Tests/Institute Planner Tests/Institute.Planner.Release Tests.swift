@@ -159,3 +159,28 @@ extension Institute.Planner.Release.Test.`Edge Case` {
         #expect(refusal == .unpublished(typed))
     }
 }
+
+extension Institute.Planner.Release.Test.`Edge Case` {
+    @Test func `a renamed publisher's listing still names its assets`() throws {
+        let listing = """
+            <a href="/swift-institute/institute/releases/download/ci-binaries/PIN-abc-1">PIN</a>
+            <a href="/swift-institute/institute/releases/download/ci-binaries/institute-macos-arm64-def">bin</a>
+            <a href="/swift-institute/institute/releases/download/ci-binaries/PIN-abc-1">again</a>
+            """
+        let names = try Institute.Planner.Release.assets(
+            listing: listing,
+            tag: "ci-binaries"
+        )
+        #expect(names == ["PIN-abc-1", "institute-macos-arm64-def"])
+    }
+
+    @Test func `a listing without release links is refused`() {
+        let refusal = Institute.Planner.Release.Test.refusal { () throws(Institute.Planner.Error) in
+            _ = try Institute.Planner.Release.assets(
+                listing: "<a href=\"/swift-institute/institute/releases/tag/ci-binaries\">tag</a>",
+                tag: "ci-binaries"
+            )
+        }
+        #expect(refusal == .malformed(line: "release ci-binaries", reason: "no asset links"))
+    }
+}
