@@ -13,6 +13,7 @@ installation of the pinned planner.
 | `planner canary\|adopt` | Judge a `publish-planner` run against the current planner on the canary repositories, and commit an adoptable pin to the consumer checkout. |
 | `repository …` | Repository policy across the organizations: caller workflows and the `.gitignore` canon. |
 | `github token` | Mint a GitHub App installation token for one organization, optionally narrowed. |
+| `organizations` | Print `Institute.Organization`, the one roster of the Institute's organizations, as a JSON array, optionally for one `--layer`. Workflows that fan out over the organizations read their matrix from it. |
 | `version tag` | Tag each package's `main` head that passed CI with its next development version (`0.0.N` from `0.0.100`); `--backfill` tags only repositories not yet on the line, `--dry-run` writes nothing. `swift-institute/.github`'s `version-tags.yml` runs it. |
 
 ## Targets
@@ -62,9 +63,8 @@ are one artifact.
 
 ## Where facts come from
 
-- **Organizations and layers:** `swift-institute/.github`'s
-  [`fleet.json`](https://github.com/swift-institute/.github/blob/main/.github/policy/fleet.json)
-  and the GitHub organizations themselves. There is no second roster.
+- **Organizations and layers:** `Institute.Organization`, printed by `institute organizations`.
+  There is no second roster.
 - **Local development:** each app owns its Xcode workspace and builds through Xcode. This
   command neither clones, builds, nor composes packages.
 
