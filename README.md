@@ -13,6 +13,7 @@ installation of the pinned planner.
 | `planner canary\|adopt` | Judge a `publish-planner` run against the current planner on the canary repositories, and commit an adoptable pin to the consumer checkout. |
 | `repository …` | Repository policy across the organizations: caller workflows and the `.gitignore` canon. |
 | `github token` | Mint a GitHub App installation token for one organization, optionally narrowed. |
+| `version tag` | Tag each package's `main` head that passed CI with its next development version (`0.0.N` from `0.0.100`); `--backfill` tags only repositories not yet on the line, `--dry-run` writes nothing. `swift-institute/.github`'s `version-tags.yml` runs it. |
 
 ## Targets
 
@@ -24,6 +25,7 @@ never parse arguments or write to the console; `Institute Command` does nothing 
 | `Institute CLI` | The `institute` executable: `main.swift` only |
 | `Institute Command` | The argument grammar and console output of every verb |
 | `Institute Planner` | The published planner: pins, releases, evidence, the canary and adoption |
+| `Institute Version` | Development version tags: the version line, the CI gate a commit must pass, and the sweep that tags each `main` head |
 | `Institute GitHub` | The GitHub transport the planner reads releases and contents through |
 | `Institute Model` | The `Institute` namespace and its error, and the processor-count default for bounded fan-out |
 | `Institute Installation` | Installing a verified planner binary into the account and the link-materialization contract it uses |
