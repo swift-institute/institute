@@ -23,16 +23,14 @@ extension Institute.CI.Validation {
 
         public init() {}
 
-        /// The eleven L2 authority sub-orgs, which route through the
-        /// `swift-standards` layer wrapper.
         /// The organizations nested under the swift-standards layer root:
-        /// the specification authorities and vendors `fleet.json` places at L3.
-        public static let subOrganizations: Set<String> = [
-            "swift-ietf", "swift-iso", "swift-w3c", "swift-whatwg", "swift-ecma",
-            "swift-incits", "swift-ieee", "swift-iec", "swift-arm-ltd",
-            "swift-intel", "swift-riscv", "swift-linux-foundation", "swift-microsoft",
-            "swift-bipm",
-        ]
+        /// every standards-layer `Institute.Organization` other than
+        /// swift-standards itself, the specification authorities and vendors.
+        public static let subOrganizations: Set<String> = Set(
+            Institute.Organization.allCases
+                .filter { $0.layer == .standards && $0 != .`swift-standards` }
+                .map(\.rawValue)
+        )
 
         public func findings(in subject: Subject) throws(EnvironmentDefect) -> [Finding] {
             guard let organization = try Self.subOrganization(of: subject) else {

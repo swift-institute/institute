@@ -22,20 +22,44 @@ extension Institute.Version.Command {
 
 extension Institute.Version.Command.Test.Unit {
     @Test
-    func `version organizations selects the roster verb`() throws {
-        guard case .version(.organizations) = try parse(["version", "organizations"]) else {
-            Issue.record("expected version organizations")
+    func `organizations parses its layer`() throws {
+        guard case .organizations(let command) = try parse(["organizations", "--layer", "standards"]) else {
+            Issue.record("expected organizations")
             return
         }
+        #expect(command.layer == "standards")
     }
 
     @Test
-    func `the workflow matrix is Institute.Organization, every case in order`() throws {
-        let json = try JSON.parse([Byte](utf8: Institute.Version.Command.Organizations.matrix))
-        let names = try #require(json.array).compactMap { Swift.String($0 as JSON?) }
+    func `the organizations matrix is Institute.Organization, every case in order`() throws {
+        let names = try Self.names(Institute.Application.Organizations.matrix(layer: nil))
         #expect(names == Institute.Organization.allCases.map(\.rawValue))
         #expect(names.count == 19)
         #expect(names.contains("swift-bipm"))
+    }
+
+    @Test
+    func `a layer narrows the matrix to that layer`() throws {
+        #expect(try Self.names(Institute.Application.Organizations.matrix(layer: .atoms)) == ["swift-atoms"])
+        let standards = try Self.names(Institute.Application.Organizations.matrix(layer: .standards))
+        #expect(standards.count == 15)
+        #expect(standards.contains("swift-standards"))
+        #expect(standards.contains("swift-bipm"))
+        #expect(!standards.contains("swift-compositions"))
+    }
+
+    @Test
+    func `every layer has a name that reads back`() {
+        for layer in Institute.Organization.Layer.allCases {
+            let name = Institute.Application.Organizations.name(layer)
+            #expect(Institute.Application.Organizations.layer(named: name) == layer)
+        }
+        #expect(Institute.Application.Organizations.layer(named: "primitives") == nil)
+    }
+
+    static func names(_ matrix: Swift.String) throws -> [Swift.String] {
+        let json = try JSON.parse([Byte](utf8: matrix))
+        return try #require(json.array).compactMap { Swift.String($0 as JSON?) }
     }
 
     @Test

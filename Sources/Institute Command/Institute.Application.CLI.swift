@@ -19,6 +19,7 @@ extension Institute.Application {
         case repository(Institute.Repository.Policy.Command)
         case github(Institute.GitHub.Command)
         case version(Institute.Version.Command)
+        case organizations(Institute.Application.Organizations)
 
         public static var configuration: Command_Schema.Command.Configuration {
             .init(
@@ -66,6 +67,12 @@ extension Institute.Application {
                         initial: { .tag(.init()) },
                         map: Self.version
                     )
+                    Command_Schema.Command.Subcommand.Case(
+                        "organizations",
+                        help: .init(abstract: "Print the Institute's organizations as one JSON array."),
+                        initial: { .init() },
+                        map: Self.organizations
+                    )
                 }
             }
         }
@@ -90,6 +97,9 @@ extension Institute.Application {
             case .version(var command):
                 try await command.run()
                 self = .version(command)
+            case .organizations(var command):
+                try await command.run()
+                self = .organizations(command)
             }
         }
     }

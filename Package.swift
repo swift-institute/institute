@@ -352,6 +352,7 @@ let package = Package(
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
                 "Institute CI Inventory",
                 "Institute CI Validation",
+                "Institute Model",
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "Process", package: "swift-process"),
             ],

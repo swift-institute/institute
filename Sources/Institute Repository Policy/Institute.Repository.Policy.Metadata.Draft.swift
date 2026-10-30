@@ -209,16 +209,11 @@ extension Institute.Repository.Policy.Metadata.Draft {
     /// pre-reorganization vocabulary: `swift-atoms` and `swift-molecules`
     /// repositories carry `primitives`, as they did in `swift-primitives`.
     static func layer(of owner: String) -> String {
-        switch owner {
-        case "swift-atoms", "swift-molecules": "primitives"
-        case "swift-standards": "standards"
-        case "swift-compositions": "foundations"
-
-        case "swift-ietf", "swift-iso", "swift-ieee", "swift-iec", "swift-w3c", "swift-whatwg",
-            "swift-ecma", "swift-incits":
-            "standards"
-
-        default: ""
+        switch Institute.Organization(rawValue: owner)?.layer {
+        case .atoms, .molecules: "primitives"
+        case .standards: "standards"
+        case .compositions: "foundations"
+        case .control, nil: ""
         }
     }
 

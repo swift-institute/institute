@@ -38,44 +38,18 @@ extension Institute.CI.Validation {
         public let rules: [Rule] = [Self.rule, Self.baselineRule]
         public let retiredScript: String? = ".github/scripts/validate-branch-pins.py"
 
-        /// The organization manifest to read. `nil` locates it by walking
-        /// up from the subject, which is what every in-repository
-        /// invocation wants; a sweep over a foreign checkout names it.
-        public let organizationsFile: String?
-
-        /// A caller-supplied organization set. This is the compiled-control
-        /// path: the Institute policy owner can provide its typed set directly
-        /// without recreating the retired YAML transport beside the subject.
-        public let organizations: Organizations?
+        /// The organizations whose dependencies the rule judges.
+        public let organizations: Organizations
 
         /// The burn-down ledger. `nil` is an empty ledger.
         public let baselineFile: String?
 
-        public init(organizationsFile: String? = nil, baselineFile: String? = nil) {
-            self.organizationsFile = organizationsFile
-            self.organizations = nil
-            self.baselineFile = baselineFile
-        }
-
-        public init(organizations: Organizations, baselineFile: String? = nil) {
-            self.organizationsFile = nil
+        public init(organizations: Organizations = .institute, baselineFile: String? = nil) {
             self.organizations = organizations
             self.baselineFile = baselineFile
         }
 
         public func findings(in subject: Subject) throws(EnvironmentDefect) -> [Finding] {
-            let organizations: Organizations
-            if let supplied = self.organizations {
-                organizations = supplied
-            } else {
-                let manifestPath =
-                    organizationsFile
-                    ?? Organizations.locateManifest(startingAt: subject.root)
-                guard let manifestPath else {
-                    throw .missingSupportFile(path: Organizations.manifestPath)
-                }
-                organizations = try Organizations.read(at: manifestPath)
-            }
             let baseline = try Baseline.read(at: baselineFile)
 
             var findings: [Finding] = []
