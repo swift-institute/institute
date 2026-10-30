@@ -103,7 +103,8 @@ jobs:
           cp .build/release/institute-linter-runner "out/institute-linter-runner-$PLATFORM-$runner"
           cp Package.resolved "out/Package.resolved-$PLATFORM-$graph"
           swift --version > "out/TOOLCHAIN-$PLATFORM-$binary.txt" 2>&1
-          echo "$REVISION $PLATFORM $binary $graph $runner" > "out/PIN-$PLATFORM"
+          echo "$REVISION $PLATFORM $binary $graph" > "out/PIN-$PLATFORM"
+          echo "$REVISION $PLATFORM $runner" > "out/RUNNER-$PLATFORM"
       - name: Smoke-launch
         shell: bash
         env:
@@ -167,8 +168,10 @@ jobs:
           cd out
           cat PIN-* > "PIN-$REVISION-$GITHUB_RUN_ID"
           rm PIN-linux-x86_64 PIN-macos-arm64
+          cat RUNNER-* > "RUNNER-$REVISION-$GITHUB_RUN_ID"
+          rm RUNNER-linux-x86_64 RUNNER-macos-arm64
           git -C "$GITHUB_WORKSPACE" rev-list "$REVISION" > "ANCESTORS-$REVISION-$GITHUB_RUN_ID"
-          sha256sum institute-* Package.resolved-* TOOLCHAIN-* ANCESTORS-* > "SHA256SUMS-$REVISION-$GITHUB_RUN_ID"
+          sha256sum institute-* Package.resolved-* TOOLCHAIN-* ANCESTORS-* RUNNER-* > "SHA256SUMS-$REVISION-$GITHUB_RUN_ID"
           cat "SHA256SUMS-$REVISION-$GITHUB_RUN_ID"
           if ! gh release view ci-binaries -R "$REPOSITORY" >/dev/null 2>&1; then
             gh release create ci-binaries -R "$REPOSITORY" --title ci-binaries \
@@ -197,5 +200,11 @@ jobs:
             echo
             echo '```'
             cat "PIN-$REVISION-$GITHUB_RUN_ID"
+            echo '```'
+            echo
+            echo "Linter runner digests for Institute.Source.Policy:"
+            echo
+            echo '```'
+            cat "RUNNER-$REVISION-$GITHUB_RUN_ID"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
