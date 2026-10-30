@@ -80,7 +80,7 @@ extension Institute.Planner.Canary {
     ) -> Comparison {
         let subject = "\(base)/subject"
         var revision = ""
-        func measure(_ binary: Swift.String, bundle: Swift.String?) throws(Institute.Planner.Error) -> Outcome {
+        func measure(_ binary: Swift.String) throws(Institute.Planner.Error) -> Outcome {
             let pinned = try Institute.Planner.Revision(revision)
             return Outcome(
                 try runner.execute(
@@ -89,7 +89,6 @@ extension Institute.Planner.Canary {
                         repository: repository,
                         revision: pinned,
                         root: subject,
-                        bundle: bundle,
                         xcode: xcode
                     )
                 )
@@ -98,13 +97,13 @@ extension Institute.Planner.Canary {
         do throws(Institute.Planner.Error) {
             try Institute.Planner.directory(Institute.Planner.path(base))
             revision = try runner.clone(url, subject).description
-            let current = try measure(binaries.current, bundle: bundle)
+            let current = try measure(binaries.current)
             try move(subject, to: "\(base)/current")
             let again = try runner.clone("file://\(base)/current", subject)
             guard again.description == revision else {
                 throw .local("\(repository): the second clone is at \(again), not \(revision)")
             }
-            let candidate = try measure(binaries.candidate, bundle: nil)
+            let candidate = try measure(binaries.candidate)
             try move(subject, to: "\(base)/candidate")
             return .init(
                 repository: repository,

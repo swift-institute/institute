@@ -97,17 +97,17 @@ extension Institute.Source {
                     id: .init("swift-linter"),
                     platform: .macOSARM64,
                     version: "ci-binaries",
-                    revision: "c21431f03759cc83a3fc16d9dc8400bf34fa03f7",
-                    toolchain: "Xcode 27.1;Build version 27A9275;",
+                    revision: "d07013a24699be6a8f9d7cbeed381f3489e25e30",
+                    toolchain: "Apple Swift 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)",
                     schema: "swift-linter-structured:2",
                     executable: .init(
-                        name: "swift-linter-macos-arm64-c21431f03759cc83a3fc16d9dc8400bf34fa03f7",
+                        name: "institute-linter-runner-macos-arm64-8e1d01f5577b89f6057b8ad25e88181a2c443f2430e380d6ce5acb3eb9996510",
                         digest: .init(
-                            "ea30dccb456d562b5a16c90dbbcbbe577481e028ef550bf325d4ac9bc4cd700a"
+                            "8e1d01f5577b89f6057b8ad25e88181a2c443f2430e380d6ce5acb3eb9996510"
                         ),
                         origin: .release(
                             base:
-                                "https://github.com/swift-compositions/swift-linter/releases/download/ci-binaries"
+                                "https://github.com/swift-institute/institute/releases/download/ci-binaries"
                         )
                     ),
                     manifest: nil,

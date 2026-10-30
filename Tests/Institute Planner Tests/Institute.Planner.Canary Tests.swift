@@ -94,7 +94,7 @@ extension Institute.Planner.Canary.Test.Integration {
         #expect(
             calls.all == [
                 "clone https://github.com/swift-atoms/swift-addition.git \(subject)",
-                "run \(work)/planner/institute-current ci -- source --exit-policy strict --repository swift-atoms/swift-addition --revision \(Institute.Planner.Canary.Test.revision) --root \(subject) --bundle primitives --xcode-application /Applications/Xcode.app",
+                "run \(work)/planner/institute-current ci -- source --exit-policy strict --repository swift-atoms/swift-addition --revision \(Institute.Planner.Canary.Test.revision) --root \(subject) --xcode-application /Applications/Xcode.app",
                 "clone file://\(work)/swift-atoms/swift-addition/current \(subject)",
                 "run \(work)/planner/institute-candidate ci -- source --exit-policy strict --repository swift-atoms/swift-addition --revision \(Institute.Planner.Canary.Test.revision) --root \(subject) --xcode-application /Applications/Xcode.app",
             ]
