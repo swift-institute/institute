@@ -18,6 +18,8 @@ struct `Repository Policy BranchPin Tests` {
         #expect(Institute.Repository.Coordinate("swift-atoms") == nil)
         #expect(Institute.Organization.lintBundle(forRepository: "swift-ietf/swift-rfc-3986") == "standards")
         #expect(Institute.Organization.lintBundle(forRepository: "coenttb/kees") == "institute")
+        #expect(Institute.Organization.`swift-ietf`.implementsExternalSpecification == true)
+        #expect(Institute.Organization.`swift-atoms`.implementsExternalSpecification == nil)
     }
 
     @Test

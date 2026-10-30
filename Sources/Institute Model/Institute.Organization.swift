@@ -60,3 +60,12 @@ extension Institute.Organization {
         Institute.Repository.Coordinate(repository)?.organization.lintBundle ?? "institute"
     }
 }
+
+extension Institute.Organization {
+    public var implementsExternalSpecification: Swift.Bool? {
+        switch layer {
+        case .standards: true
+        case .atoms, .molecules, .compositions, .control: nil
+        }
+    }
+}
