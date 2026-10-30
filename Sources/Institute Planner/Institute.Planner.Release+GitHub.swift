@@ -4,7 +4,7 @@ import Institute_GitHub
 public import Institute_Model
 
 extension Institute.Planner.Release {
-    /// The live `ci-binaries` release of institute-application, read and
+    /// The live `ci-binaries` release of swift-institute/institute, read and
     /// downloaded through `gh`.
     public static var github: Self {
         .init(

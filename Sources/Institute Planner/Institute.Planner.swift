@@ -2,7 +2,7 @@ public import Institute_Model
 
 extension Institute {
     /// The fleet CI planner's release chain: a `publish-planner` run puts
-    /// digest-named planner assets on institute-application's
+    /// digest-named planner assets on swift-institute/institute's
     /// `ci-binaries` release; swift-institute/.github adopts one by
     /// appending its PIN lines to `.institute-ci-planner` and pinning its
     /// revision in `.institute-ci-pin`.
@@ -20,7 +20,7 @@ extension Institute {
 
 extension Institute.Planner {
     /// The repository whose `ci-binaries` release carries the planner.
-    public static let publisher = "swift-institute/institute-application"
+    public static let publisher = "swift-institute/institute"
 
     /// The release every planner asset is published on.
     public static let tag = "ci-binaries"

@@ -3,7 +3,7 @@ import Foundation
 public import Institute_Model
 
 extension Institute.Planner.Release {
-    /// The live `ci-binaries` release of institute-application, read from
+    /// The live `ci-binaries` release of swift-institute/institute, read from
     /// GitHub's public endpoints without any credential: the release's public
     /// expanded-assets page, and each asset through its download address.
     public static var published: Self {

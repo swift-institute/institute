@@ -1,7 +1,7 @@
 public import Institute_Model
 
 extension Institute.Planner {
-    /// An exact institute-application commit as the contract spells it:
+    /// An exact swift-institute/institute commit as the contract spells it:
     /// 40 lowercase hexadecimal characters. Narrower than a git object id,
     /// which also admits uppercase and SHA-256 object names.
     public struct Revision: Hashable, Sendable, CustomStringConvertible {

@@ -67,7 +67,7 @@ extension Institute.Planner.Adoption {
         self.message = """
             Adopt planner \(publication.revision) from publish run \(run)
 
-            Pin swift-institute/institute-application \(publication.revision) and append
+            Pin swift-institute/institute \(publication.revision) and append
             the rows publish-planner run \(run) published to .institute-ci-planner.
 
             Canary verdict \(evidence.verdict.rawValue), candidate against current \
