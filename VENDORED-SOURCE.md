@@ -51,11 +51,10 @@ The remaining changes are in `Package.swift`:
 ## Not copied
 
 - The upstream `Source` target (`Source.Loader`, `Source.Cache`, `Source.Error` and
-  a re-export of the live `Source`). Nothing in the eight targets, this package or
-  swift-institute/institute-application references `Loader`, `Cache` or `Error`;
-  copying it would add a second module named `Source`.
-- `Source Test Support` and the upstream tests. Neither this package nor
-  institute-application uses them.
+  a re-export of the live `Source`). Nothing in the eight targets or the rest of this
+  package references `Loader`, `Cache` or `Error`; copying it would add a second
+  module named `Source`.
+- `Source Test Support` and the upstream tests. This package does not use them.
 
 This copy makes no compatibility claim for the archived package's public API
 beyond these eight modules.
