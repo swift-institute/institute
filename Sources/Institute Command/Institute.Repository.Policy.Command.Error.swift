@@ -7,7 +7,7 @@ extension Institute.Repository.Policy.Command {
     /// domain refused and exits non-zero.
     public enum Error: Swift.Error, CustomStringConvertible {
         case configuration(String)
-        case census(Institute.Repository.Policy.Command.Census.Generator.Error)
+        case census(Institute.Repository.Policy.Census.Generator.Error)
         case metadata(Institute.Repository.Policy.Metadata.Error)
         case io(String)
 

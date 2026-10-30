@@ -2,18 +2,10 @@ import Byte
 import FIPS_180_4
 import File_System
 public import Institute_Model
-public import Institute_Repository_Policy
 
 import struct Swift.String
 
-extension Institute.Repository.Policy.Command {
-    /// The application half of the census: filesystem traversal over
-    /// checked-out trees. The census document itself — rows, fields, CSV,
-    /// normalization — stays with `Institute.Repository.Policy.Census`.
-    public enum Census {}
-}
-
-extension Institute.Repository.Policy.Command.Census {
+extension Institute.Repository.Policy.Census {
     /// Regenerates the census from checked-out trees at frozen heads.
     ///
     /// Semantics mirror the FT1 generator coordinate-for-coordinate;
@@ -51,7 +43,7 @@ extension Institute.Repository.Policy.Command.Census {
     }
 }
 
-extension Institute.Repository.Policy.Command.Census.Generator {
+extension Institute.Repository.Policy.Census.Generator {
     typealias Row = Institute.Repository.Policy.Census.Row
     typealias Kind = Institute.Repository.Policy.Census.Kind
 
@@ -97,30 +89,17 @@ extension Institute.Repository.Policy.Command.Census.Generator {
 
     // MARK: traversal
 
-    static func names(at path: Swift.String) -> [Swift.String]? {
-        guard let filePath = try? File.Path(path) else { return nil }
-        guard let entries = try? File.Directory.Contents.list(at: .init(filePath)) else {
-            return nil
-        }
-        return entries.map { Swift.String(lossy: $0.name) }
-    }
-
-    static func isDirectory(at path: Swift.String) -> Bool {
-        guard let filePath = try? File.Path(path) else { return false }
-        return File(filePath).stat.isDirectory
-    }
-
     static func walk(root: Swift.String, under directory: Swift.String) -> [Swift.String] {
         var results: [Swift.String] = []
         var stack = [directory]
         while let dir = stack.popLast() {
             // An unlistable directory contributes no coordinates; absence
             // of the whole `.github` tree is the common, legitimate case.
-            guard let entries = names(at: dir) else { continue }
+            guard let entries = Institute.Repository.Policy.names(at: dir) else { continue }
             for entry in entries.sorted() {
                 if entry == ".git" { continue }
                 let full = dir + "/" + entry
-                if isDirectory(at: full) {
+                if Institute.Repository.Policy.isDirectory(at: full) {
                     stack.append(full)
                 } else if entry.hasSuffix(".yml") || entry.hasSuffix(".yaml")
                     || entry.hasSuffix(".py") || entry.hasSuffix(".sh")

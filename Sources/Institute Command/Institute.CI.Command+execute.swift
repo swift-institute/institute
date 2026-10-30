@@ -164,9 +164,4 @@ extension Institute.CI.Command {
         }
         return entries.map { Swift.String(lossy: $0.name) }
     }
-
-    static func isDirectory(atPath path: Swift.String) -> Swift.Bool {
-        guard let filePath = try? File.Path(path) else { return false }
-        return File(filePath).stat.isDirectory
-    }
 }

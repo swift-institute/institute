@@ -16,7 +16,7 @@ extension Institute.Repository.Policy.Command {
     /// (F1; swift-institute/.github#363). Deterministic sorted traversal;
     /// parity with the FT1 artifact is order-normalized.
     static func census(_ arguments: [Swift.String]) throws(Error) {
-        var repos: [Census.Generator.Repo] = []
+        var repos: [Institute.Repository.Policy.Census.Generator.Repo] = []
         var output: Swift.String?
         var iterator = arguments.makeIterator()
         while let argument = iterator.next() {
@@ -42,8 +42,8 @@ extension Institute.Repository.Policy.Command {
             throw configuration("census requires --repo … and --output")
         }
         let census: Institute.Repository.Policy.Census
-        do throws(Census.Generator.Error) {
-            census = try Census.Generator(repos: repos).run()
+        do throws(Institute.Repository.Policy.Census.Generator.Error) {
+            census = try Institute.Repository.Policy.Census.Generator(repos: repos).run()
         } catch {
             throw .census(error)
         }

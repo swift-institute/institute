@@ -198,6 +198,9 @@ let package = Package(
                 "Institute Model",
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
+                .product(name: "File System", package: "swift-file-system"),
+                .product(name: "JSON", package: "swift-json"),
+                .product(name: "Process", package: "swift-process"),
             ]
         ),
         .target(

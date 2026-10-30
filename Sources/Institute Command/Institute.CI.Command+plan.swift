@@ -95,7 +95,7 @@ extension Institute.CI.Command {
                 lintBundle: configuration?.lintBundle
                     ?? value("--lint-bundle", in: rest),
                 packageContentChanged:
-                    PackageDiff
+                    Institute.CI.Package.Diff
                     .packageContentChanged(
                         event: event,
                         eventPath: value("--event-path", in: rest),

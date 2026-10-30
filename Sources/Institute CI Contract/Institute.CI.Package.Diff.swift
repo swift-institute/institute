@@ -1,4 +1,5 @@
-import Institute_CI_Contract
+import Byte
+import File_System
 public import Institute_CI_Model
 public import Institute_Model
 import JSON
@@ -6,11 +7,11 @@ import Process
 
 import struct Swift.String
 
-extension Institute.CI.Command {
+extension Institute.CI.Package {
     /// Complete GitHub event-diff retrieval for package-work planning.
     /// Workflow wiring passes coordinates only; pagination and classification
-    /// live in the Swift CI owner.
-    public enum PackageDiff {
+    /// live here, beside the `Content` classifier they feed.
+    public enum Diff {
         enum Error: Swift.Error { case event, comparison, response }
 
         /// GitHub's pull-files endpoint stops after this many records. An
@@ -45,7 +46,7 @@ extension Institute.CI.Command {
         ) -> Bool {
             guard event == "pull_request" || event == "push" else { return true }
             do throws(Error) {
-                let changes: [Institute.CI.Package.Content.Change]
+                let changes: [Content.Change]
                 if event == "pull_request" {
                     guard let number = Swift.Int(payload["number"] ?? .null), number > 0,
                         let pullRequest = payload["pull_request"]?.dictionary,
@@ -69,7 +70,7 @@ extension Institute.CI.Command {
                         response: response
                     )
                 }
-                return Institute.CI.Package.Content(
+                return Content(
                     declaredRoots: packageRoots(in: workspace)
                 )
                 .changed(changes)
@@ -77,7 +78,7 @@ extension Institute.CI.Command {
         }
 
         static func eventPayload(at path: Swift.String) throws(Error) -> [Swift.String: JSON] {
-            guard let text = Institute.CI.Command.text(atPath: path) else { throw .event }
+            guard let text = text(atPath: path) else { throw .event }
             let value: JSON
             do throws(JSON.Error) {
                 value = try JSON.parse(text)
@@ -93,7 +94,7 @@ extension Institute.CI.Command {
             before: Swift.String,
             after: Swift.String,
             response: (Swift.String) throws(Error) -> JSON
-        ) throws(Error) -> [Institute.CI.Package.Content.Change] {
+        ) throws(Error) -> [Content.Change] {
             let pages = try objects(
                 at: "repos/\(repository)/compare/\(before)...\(after)?per_page=100",
                 response: response
@@ -118,7 +119,7 @@ extension Institute.CI.Command {
             guard commits.count == expected, Set(commits).count == expected else {
                 throw .comparison
             }
-            var changes: [Institute.CI.Package.Content.Change] = []
+            var changes: [Content.Change] = []
             for commit in commits {
                 changes += try files(
                     at: "repos/\(repository)/commits/\(commit)?per_page=100",
@@ -136,7 +137,7 @@ extension Institute.CI.Command {
             at endpoint: Swift.String,
             expected: Int,
             response: (Swift.String) throws(Error) -> JSON
-        ) throws(Error) -> [Institute.CI.Package.Content.Change] {
+        ) throws(Error) -> [Content.Change] {
             let changes = try files(at: endpoint, response: response)
             guard changes.count == expected,
                 Set(changes).count == expected,
@@ -148,8 +149,8 @@ extension Institute.CI.Command {
         static func files(
             at endpoint: Swift.String,
             response: (Swift.String) throws(Error) -> JSON
-        ) throws(Error) -> [Institute.CI.Package.Content.Change] {
-            var changes: [Institute.CI.Package.Content.Change] = []
+        ) throws(Error) -> [Content.Change] {
+            var changes: [Content.Change] = []
             for page in try pages(from: response(endpoint)) {
                 let records: [JSON]
                 if page.isObject {
@@ -234,7 +235,7 @@ extension Institute.CI.Command {
             relative prefix: Swift.String,
             into roots: inout [Swift.String]
         ) {
-            guard let entries = Institute.CI.Command.names(atPath: directory)?.sorted()
+            guard let entries = names(atPath: directory)?.sorted()
             else { return }
             for name in entries {
                 if prefix.isEmpty, [".git", ".build", ".swiftpm"].contains(name) {
@@ -242,7 +243,7 @@ extension Institute.CI.Command {
                 }
                 let child = "\(directory)/\(name)"
                 let relative = prefix.isEmpty ? name : "\(prefix)/\(name)"
-                if Institute.CI.Command.isDirectory(atPath: child) {
+                if isDirectory(atPath: child) {
                     if [".git", ".build", ".swiftpm"].contains(name) { continue }
                     walk(child, relative: relative, into: &roots)
                 } else if name == "Package.swift" {
@@ -253,6 +254,40 @@ extension Institute.CI.Command {
 
         static func isZero(_ revision: Swift.String) -> Bool {
             revision.count == 40 && revision.allSatisfy { $0 == "0" }
+        }
+
+        // MARK: filesystem
+
+        /// The UTF-8 text of the file at `path`, or `nil` when unreadable.
+        static func text(atPath path: Swift.String) -> Swift.String? {
+            guard let filePath = try? File.Path(path) else { return nil }
+            do throws(Either<File.System.Read.Full.Error, Never>) {
+                return try File(filePath).read.full { view in
+                    var storage = [Byte]()
+                    storage.reserveCapacity(view.count)
+                    for index in view.indices {
+                        storage.append(view[index])
+                    }
+                    return Swift.String(decoding: storage, as: Swift.UTF8.self)
+                }
+            } catch {
+                return nil
+            }
+        }
+
+        /// The entry names of the directory at `path`, or `nil` when the
+        /// path is invalid, missing, or not a directory.
+        static func names(atPath path: Swift.String) -> [Swift.String]? {
+            guard let filePath = try? File.Path(path) else { return nil }
+            guard let entries = try? File.Directory.Contents.list(at: .init(filePath)) else {
+                return nil
+            }
+            return entries.map { Swift.String(lossy: $0.name) }
+        }
+
+        static func isDirectory(atPath path: Swift.String) -> Swift.Bool {
+            guard let filePath = try? File.Path(path) else { return false }
+            return File(filePath).stat.isDirectory
         }
     }
 }

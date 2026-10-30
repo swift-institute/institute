@@ -1,6 +1,4 @@
-import Byte
 public import Institute_Model
-import Institute_Command
 import Institute_Repository_Policy
 import JSON
 import Testing
@@ -36,7 +34,7 @@ struct `Repository Policy Census Tests` {
                     run: gh api /rate_limit
             """
         try CensusFoundation.write(yaml, toPath: workflows + "/demo.yml")
-        let census = try Institute.Repository.Policy.Command.Census.Generator(
+        let census = try Institute.Repository.Policy.Census.Generator(
             repos: [
                 .init(name: "fixture/repo", root: root, headSha: String(repeating: "a", count: 40))
             ]
