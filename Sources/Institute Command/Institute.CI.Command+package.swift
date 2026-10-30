@@ -1,5 +1,5 @@
-public import Institute_CI_Model
-public import Institute_Model
+import Institute_CI_Model
+import Institute_Model
 import Institute_Repository_Policy
 import Package_Manager
 
@@ -40,10 +40,15 @@ extension Institute.CI.Command {
             refuse("package validate requires fleet policy schemaVersion 1")
         }
 
-        let dependencies = dependencyFacts(root: root)
+        let manifest: Institute.Repository.Policy.Manifest
+        do throws(Institute.Repository.Policy.Manifest.Error) {
+            manifest = try Institute.Repository.Policy.Manifest.read(at: root)
+        } catch {
+            refuse("package validate could not read root")
+        }
         var refused = false
         for finding in Institute.Repository.Policy.BranchPin.findings(
-            in: dependencies,
+            in: manifest.dependencies,
             organizations: fleet.activeOrganizationNames
         ) {
             refused = true
@@ -53,16 +58,14 @@ extension Institute.CI.Command {
             )
         }
 
-        if repository.split(separator: "/").last != "swift-html-prism" {
-            for finding in identityFindings(root: root) {
-                switch finding.disposition {
-                case .fatal:
-                    refused = true
-                    print("\(repository)\tIDENTITY-CONFLICT\t\(identityMessage(finding))")
+        for finding in manifest.identityFindings(repository: repository) {
+            switch finding.disposition {
+            case .fatal:
+                refused = true
+                print("\(repository)\tIDENTITY-CONFLICT\t\(identityMessage(finding))")
 
-                case .stalePin:
-                    print("\(repository)\tIDENTITY-CONFLICT-STALE-PIN\t\(identityMessage(finding))")
-                }
+            case .stalePin:
+                print("\(repository)\tIDENTITY-CONFLICT-STALE-PIN\t\(identityMessage(finding))")
             }
         }
 
@@ -88,50 +91,6 @@ extension Institute.CI.Command {
         }
 
         if refused { terminate(1) }
-    }
-
-    private static func dependencyFacts(
-        root: Swift.String
-    ) -> [Package.Manifest.Dependency.SourceControl] {
-        rootManifestNames(root: root).flatMap {
-            name -> [Package.Manifest.Dependency.SourceControl] in
-            guard let source = text(atPath: root + "/" + name) else {
-                return []
-            }
-            return Package.Manifest.Dependency.SourceControl.all(
-                in: source,
-                document: name
-            )
-        }
-    }
-
-    private static func identityFindings(
-        root: Swift.String
-    ) -> [Package.Manifest.Identity.Conflict.Finding] {
-        var entries: [Package.Manifest.Identity.Conflict.Entry] = []
-        for name in rootManifestNames(root: root) {
-            guard let source = text(atPath: root + "/" + name) else {
-                continue
-            }
-            entries += Package.Manifest.Identity.Conflict.entries(
-                in: source,
-                document: name
-            )
-        }
-
-        if let resolved = text(atPath: root + "/Package.resolved") {
-            entries += Package.Manifest.Identity.Conflict.entries(
-                inResolved: resolved
-            )
-        }
-        return Package.Manifest.Identity.Conflict.findings(in: entries)
-    }
-
-    private static func rootManifestNames(root: Swift.String) -> [Swift.String] {
-        guard let names = names(atPath: root) else {
-            refuse("package validate could not read root")
-        }
-        return names.filter(Package.Manifest.Identity.Conflict.isRootManifest).sorted()
     }
 
     private static func identityMessage(

@@ -154,14 +154,4 @@ extension Institute.CI.Command {
     static func text(atPath path: Swift.String) -> Swift.String? {
         contents(atPath: path).map { Swift.String(decoding: $0, as: Swift.UTF8.self) }
     }
-
-    /// The entry names of the directory at `path`, or `nil` when the
-    /// path is invalid, missing, or not a directory.
-    static func names(atPath path: Swift.String) -> [Swift.String]? {
-        guard let filePath = try? File.Path(path) else { return nil }
-        guard let entries = try? File.Directory.Contents.list(at: .init(filePath)) else {
-            return nil
-        }
-        return entries.map { Swift.String(lossy: $0.name) }
-    }
 }

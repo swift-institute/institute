@@ -1,3 +1,4 @@
+import Byte
 import File_System
 import Institute_Model
 
@@ -8,6 +9,24 @@ import struct Swift.String
 // `nil`/`false`: each scan decides whether a missing directory is a
 // refusal or simply contributes nothing.
 extension Institute.Repository.Policy {
+    /// The UTF-8 text of the file at `path`, or `nil` when the path is
+    /// invalid, missing, or unreadable.
+    static func text(at path: Swift.String) -> Swift.String? {
+        guard let filePath = try? File.Path(path) else { return nil }
+        do throws(Either<File.System.Read.Full.Error, Never>) {
+            return try File(filePath).read.full { view in
+                var storage = [Byte]()
+                storage.reserveCapacity(view.count)
+                for index in view.indices {
+                    storage.append(view[index])
+                }
+                return Swift.String(decoding: storage, as: Swift.UTF8.self)
+            }
+        } catch {
+            return nil
+        }
+    }
+
     /// The entry names of the directory at `path`, or `nil` when the
     /// path is invalid, missing, or not a directory.
     static func names(at path: Swift.String) -> [Swift.String]? {
