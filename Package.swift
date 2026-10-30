@@ -369,6 +369,23 @@ let package = Package(
             ]
         ),
         .target(
+            name: "Institute Version",
+            dependencies: [
+                "Institute GitHub",
+                "Institute Model",
+                .product(name: "Byte", package: "swift-byte"),
+                .product(name: "JSON", package: "swift-json"),
+            ]
+        ),
+        .testTarget(
+            name: "Institute Version Tests",
+            dependencies: [
+                "Institute Model",
+                "Institute Repository Policy",
+                "Institute Version",
+            ]
+        ),
+        .target(
             name: "Institute Planner",
             dependencies: [
                 "Institute GitHub",
@@ -399,6 +416,7 @@ let package = Package(
                 "Institute Source",
                 "Institute Source Policy",
                 "Institute Source Workspace",
+                "Institute Version",
                 "Source Report",
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "Calendar Gregorian", package: "swift-calendar-gregorian"),

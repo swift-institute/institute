@@ -5,6 +5,7 @@ public import Institute_GitHub
 public import Institute_Model
 public import Institute_Planner
 public import Institute_Repository_Policy
+public import Institute_Version
 
 extension Institute.Application {
     /// The Institute command router: one typed subcommand per family
@@ -17,6 +18,7 @@ extension Institute.Application {
         case planner(Institute.Planner.Command)
         case repository(Institute.Repository.Policy.Command)
         case github(Institute.GitHub.Command)
+        case version(Institute.Version.Command)
 
         public static var configuration: Command_Schema.Command.Configuration {
             .init(
@@ -58,6 +60,12 @@ extension Institute.Application {
                         initial: { .token(.init()) },
                         map: Self.github
                     )
+                    Command_Schema.Command.Subcommand.Case(
+                        "version",
+                        help: .init(abstract: "Tag the Institute's packages with development versions."),
+                        initial: { .tag(.init()) },
+                        map: Self.version
+                    )
                 }
             }
         }
@@ -79,6 +87,9 @@ extension Institute.Application {
             case .github(var command):
                 try await command.run()
                 self = .github(command)
+            case .version(var command):
+                try await command.run()
+                self = .version(command)
             }
         }
     }
