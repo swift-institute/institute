@@ -278,6 +278,7 @@ extension Institute.Source {
             linter linterInstallation: (executable: Swift.String, tool: Source_Profile.Source.Profile.Digest, configurationPath: Swift.String),
             bundle: Bundle,
             linterRules: [Source_Profile.Source.Rule.ID],
+            repository: Institute.Repository.Coordinate? = nil,
             repair: Swift.Bool = false
         ) -> Source_Profile.Source.Profile {
             let (swiftFormatExecutable, swiftFormatTool, swiftFormatConfigurationPath) = formatInstallation
@@ -314,7 +315,10 @@ extension Institute.Source {
                         tool: linterTool,
                         configuration: linter(bundle: bundle, rules: linterRules).digest,
                         configurationPath: linterConfigurationPath,
-                        environment: ["SWIFT_LINTER_BUNDLE": bundle.token],
+                        environment: ["SWIFT_LINTER_BUNDLE": bundle.token].merging(
+                            repository.map { [Institute.Repository.Coordinate.variable: $0.description] } ?? [:],
+                            uniquingKeysWith: { bundle, _ in bundle }
+                        ),
                         artifactKinds: [.swift],
                         rules: linterRules
                     ),

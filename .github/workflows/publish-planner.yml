@@ -1,6 +1,8 @@
 name: publish-planner
 
-# Builds the `institute` planner at one exact revision of this repository with
+# Builds the `institute` planner and the `institute-linter-runner` (the
+# swift-linter engine with the Institute rule packs) at one exact revision of
+# this repository with
 # Swift 6.4 (the version the institute-ci action installs) and
 # publishes it on the `ci-binaries` release under names that carry each
 # file's own digest, so an asset is never replaced and a revision can be
@@ -91,14 +93,17 @@ jobs:
             fi
           fi
           swift build -c release --product institute
+          swift build -c release --product institute-linter-runner
           sha() { (sha256sum "$1" 2>/dev/null || shasum -a 256 "$1") | cut -d' ' -f1; }
           mkdir -p out
           binary="$(sha .build/release/institute)"
           graph="$(sha Package.resolved)"
           cp .build/release/institute "out/institute-$PLATFORM-$binary"
+          runner="$(sha .build/release/institute-linter-runner)"
+          cp .build/release/institute-linter-runner "out/institute-linter-runner-$PLATFORM-$runner"
           cp Package.resolved "out/Package.resolved-$PLATFORM-$graph"
           swift --version > "out/TOOLCHAIN-$PLATFORM-$binary.txt" 2>&1
-          echo "$REVISION $PLATFORM $binary $graph" > "out/PIN-$PLATFORM"
+          echo "$REVISION $PLATFORM $binary $graph $runner" > "out/PIN-$PLATFORM"
       - name: Smoke-launch
         shell: bash
         env:
@@ -106,15 +111,23 @@ jobs:
           PLATFORM: ${{ matrix.platform }}
         run: |
           set -euo pipefail
-          binary="$(ls out/institute-"$PLATFORM"-*)"
+          binary="$(ls out/institute-"$PLATFORM"-* | grep -v linter-runner)"
+          runner="$(ls out/institute-linter-runner-"$PLATFORM"-*)"
+          launch() { "$@"; }
           if [ "$(uname -s)" = Darwin ] && ! "$binary" --help >/dev/null 2>&1; then
             swift_usr="$(cd "$(dirname "$(xcrun --find swift)")/.." && pwd -P)"
+            launch() { echo "::error::the built planner does not launch"; exit 1; }
             for candidate in "$swift_usr/lib/swift-5.0/macosx" "$swift_usr/lib/swift/macosx"; do
-              [ -f "$candidate/libswiftCore.dylib" ] && DYLD_LIBRARY_PATH="$candidate" "$binary" --help >/dev/null && exit 0
+              if [ -f "$candidate/libswiftCore.dylib" ]; then
+                export DYLD_LIBRARY_PATH="$candidate"
+                launch() { "$@"; }
+                break
+              fi
             done
-            echo "::error::the built planner does not launch"; exit 1
           fi
-          "$binary" --help >/dev/null
+          launch "$binary" --help >/dev/null
+          launch "$runner" --inventory | grep -q '"bundle":"institute"' \
+            || { echo "::error::the built linter runner does not list the institute bundle"; exit 1; }
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: planner-${{ matrix.platform }}

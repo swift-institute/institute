@@ -5,20 +5,15 @@ extension Institute.Repository.Policy.Fleet {
         for repository: Swift.String
     ) throws(Error) -> Configuration {
         let owner = try self.owner(of: repository)
-        guard
-            let organization = organizations.first(where: {
-                $0.name == owner && $0.status == "active"
-            })
-        else {
+        guard let organization = Institute.Organization(rawValue: owner) else {
             throw .inactiveOrganization(owner)
         }
-        let lintBundle: Swift.String
-        switch organization.layer {
-        case "L1", "L2": lintBundle = "primitives"
-        case "L3": lintBundle = "standards"
-        case "L4", "control": lintBundle = "institute"
-        default: throw .invalidLayer(organization.layer)
-        }
+        let lintBundle: Swift.String =
+            switch organization.layer {
+            case .atoms, .molecules: "primitives"
+            case .standards: "standards"
+            case .compositions, .control: "institute"
+            }
         let authored = repositories?.first(where: { $0.name == repository })
         return Configuration(
             lintBundle: lintBundle,

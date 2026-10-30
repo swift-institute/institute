@@ -22,6 +22,7 @@ extension Institute.Source.Application {
         try await prepare(
             directory: try Self.artifactDirectory(packageRoot: subject.root),
             binding: .package(subject.binding),
+            repository: Institute.Repository.Coordinate(subject.repository),
             xcodeApplication: xcodeApplication,
             swiftLint: swiftLintSelection,
             linter: linterSelection
@@ -31,6 +32,7 @@ extension Institute.Source.Application {
     private func prepare(
         directory: File.Directory,
         binding: Institute.Source.Preparation.Binding,
+        repository: Institute.Repository.Coordinate?,
         xcodeApplication: Swift.String?,
         swiftLint swiftLintSelection: Executable,
         linter linterSelection: Executable
@@ -133,7 +135,8 @@ extension Institute.Source.Application {
                     swiftLint: (executable: swiftLintExecutable, tool: swiftLintTool, configurationPath: swiftLintConfiguration.description),
                     linter: (executable: linterExecutable, tool: linterTool, configurationPath: linter.description),
                     bundle: bundle,
-                    linterRules: rules
+                    linterRules: rules,
+                    repository: repository
                 ).digest
         }
         let preparation = Institute.Source.Preparation(
