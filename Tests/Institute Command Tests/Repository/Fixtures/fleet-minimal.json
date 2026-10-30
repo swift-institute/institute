@@ -1,6 +1,0 @@
-{
-  "schemaVersion": 1,
-  "organizations": [
-    {"name": "swift-institute", "layer": "control", "status": "active"}
-  ]
-}

@@ -14,7 +14,6 @@ func `CI source parses one exact package subject`() throws {
             "--repository", "swift-standards/swift-iso-639",
             "--revision", String(repeating: "a", count: 40),
             "--root", "/work/swift-iso-639",
-            "--bundle", "standards",
             "--xcode-application", "/Applications/Xcode_27.0.app",
             "--jobs", "3",
         ],
@@ -24,7 +23,6 @@ func `CI source parses one exact package subject`() throws {
     #expect(command.repository == "swift-standards/swift-iso-639")
     #expect(command.revision == String(repeating: "a", count: 40))
     #expect(command.root == "/work/swift-iso-639")
-    #expect(command.bundle == "standards")
     #expect(command.xcodeApplication == "/Applications/Xcode_27.0.app")
     #expect(command.jobs == 3)
 }
@@ -34,28 +32,25 @@ func `CI source parses one exact package subject`() throws {
         "--repository", "swift-standards/swift-iso-639",
         "--revision", "not-a-commit",
         "--root", "/work/swift-iso-639",
-        "--bundle", "standards",
         "--xcode-application", "/Applications/Xcode_27.0.app",
     ],
     [
         "--repository", "swift-standards/swift-iso-639",
         "--revision", String(repeating: "a", count: 40),
         "--root", "/work/swift-iso-639",
-        "--bundle", "standards",
         "--xcode-application", "/tmp/Xcode.app",
     ],
     [
         "--repository", "swift-standards/swift-iso-639",
         "--revision", String(repeating: "a", count: 40),
         "--root", "/work/swift-iso-639",
-        "--bundle", "unknown",
+        "--bundle", "standards",
         "--xcode-application", "/Applications/Xcode_27.0.app",
     ],
     [
         "--repository", "swift-standards/swift-iso-639",
         "--revision", String(repeating: "a", count: 40),
         "--root", "relative/swift-iso-639",
-        "--bundle", "standards",
         "--xcode-application", "/Applications/Xcode_27.0.app",
     ],
 ])
@@ -75,7 +70,6 @@ func `CI source exit policy defaults to advisory and parses strict`() throws {
         "--repository", "swift-standards/swift-iso-639",
         "--revision", String(repeating: "a", count: 40),
         "--root", "/work/swift-iso-639",
-        "--bundle", "standards",
         "--xcode-application", "/Applications/Xcode_27.0.app",
     ]
     let advisory = try Command.parse(Institute.CI.Command.Source.self, from: base, initial: .init())

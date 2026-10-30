@@ -11,23 +11,9 @@ extension Institute.CI.Command {
     // MARK: - plan
 
     static func plan(_ rest: [Swift.String]) {
-        let policyPath = value("--policy", in: rest)
-        let configuration: Institute.Repository.Policy.Fleet.Configuration?
-        if policyPath.isEmpty {
-            configuration = nil
-        } else {
-            do {
-                let fleet = try Institute.Repository.Policy.Fleet.read(at: policyPath)
-                guard fleet.schemaVersion == 1 else {
-                    refuse("plan requires fleet policy schemaVersion 1")
-                }
-                configuration = try fleet.configuration(
-                    for: value("--subject-repository", in: rest)
-                )
-            } catch {
-                refuse("plan could not resolve fleet policy: \(error)")
-            }
-        }
+        let subjectRepository = value("--subject-repository", in: rest)
+        let lintBundle = Institute.Organization.lintBundle(forRepository: subjectRepository)
+        let deviation = Institute.Repository.Policy.Deviation.read(root: value("--workspace", in: rest))
 
         let today = value("--today", in: rest)
         var deschedule: [Swift.String: Swift.String] = [:]
@@ -90,10 +76,8 @@ extension Institute.CI.Command {
                 ref: value("--ref", in: rest),
                 headMessage: value("--head-message", in: rest),
                 event: event,
-                platformSupport: configuration?.platforms
-                    ?? value("--platform-support", in: rest),
-                lintBundle: configuration?.lintBundle
-                    ?? value("--lint-bundle", in: rest),
+                platformSupport: deviation.platforms,
+                lintBundle: lintBundle,
                 packageContentChanged:
                     Institute.CI.Package.Diff
                     .packageContentChanged(
@@ -114,10 +98,8 @@ extension Institute.CI.Command {
             "gating": plan.gating.map(\.id).joined(separator: ",").json,
             "package-content-changed": plan.packageContentChanged.json,
             "linux-image": linuxImage.json,
-            "lint-bundle":
-                (configuration?.lintBundle
-                ?? value("--lint-bundle", in: rest)).json,
-            "embedded-target": (configuration?.embeddedTarget ?? "").json,
+            "lint-bundle": lintBundle.json,
+            "embedded-target": deviation.embeddedTarget.json,
             // `leg=reason` records; empty when nothing was descheduled.
             "descheduled": plan.descheduled
                 .map { "\($0.leg.id)=\($0.reason)" }

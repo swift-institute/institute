@@ -8,122 +8,32 @@ import Testing
 @Suite
 struct `Repository Policy BranchPin Tests` {
     @Test
-    func `fleet policy decodes active organizations`() throws {
-        let path = try #require(
-            BranchPinFoundation.resourcePath(forResource: "fleet-minimal", withExtension: "json")
-        )
-        let fleet = try Institute.Repository.Policy.Fleet.read(at: path)
-
-        #expect(fleet.schemaVersion == 1)
-        #expect(fleet.activeOrganizationNames == ["swift-institute"])
-        #expect(fleet.repositories == nil)
+    func `the lint bundle follows the owner's organization`() {
+        #expect(Institute.Repository.Coordinate("swift-atoms/swift-bool")?.organization.lintBundle == "primitives")
+        #expect(Institute.Repository.Coordinate("swift-molecules/swift-pool")?.organization.lintBundle == "primitives")
+        #expect(Institute.Repository.Coordinate("swift-ietf/swift-rfc-3986")?.organization.lintBundle == "standards")
+        #expect(Institute.Repository.Coordinate("swift-compositions/swift-kernel")?.organization.lintBundle == "institute")
+        #expect(Institute.Repository.Coordinate("swift-institute/institute")?.organization.lintBundle == "institute")
+        #expect(Institute.Repository.Coordinate("apple/swift-syntax") == nil)
+        #expect(Institute.Repository.Coordinate("swift-atoms") == nil)
+        #expect(Institute.Organization.lintBundle(forRepository: "swift-ietf/swift-rfc-3986") == "standards")
+        #expect(Institute.Organization.lintBundle(forRepository: "coenttb/kees") == "institute")
     }
 
     @Test
-    func `fleet policy resolves layer defaults and repository exceptions`() throws {
-        let path = try BranchPinFoundation.writeTemporaryFleetPolicy(
-            """
-            {
-              "schemaVersion": 1,
-              "organizations": [
-                {"name":"swift-atoms","layer":"L1","status":"active"},
-                {"name":"swift-standards","layer":"L3","status":"active"},
-                {"name":"swift-compositions","layer":"L4","status":"active"}
-              ],
-              "repositories": [
-                {
-                  "name":"swift-compositions/swift-kernel",
-                  "platforms":"windows",
-                  "embeddedTarget":"Kernel"
-                }
-              ]
-            }
-            """
+    func `repository deviations come from its metadata`() {
+        let deviation = Institute.Repository.Policy.Deviation(
+            metadata: """
+                description: "A kernel"
+                platforms: apple,linux  # no Windows API
+                embedded-target: 'Kernel'
+                settings:
+                  platforms: ignored
+                """
         )
-
-        let fleet = try Institute.Repository.Policy.Fleet.read(at: path)
-        #expect(
-            try fleet.configuration(for: "swift-atoms/swift-bool")
-                == .init(lintBundle: "primitives", platforms: "", embeddedTarget: "")
-        )
-        #expect(
-            try fleet.configuration(for: "swift-standards/swift-css-standard")
-                == .init(lintBundle: "standards", platforms: "", embeddedTarget: "")
-        )
-        #expect(
-            try fleet.configuration(for: "swift-compositions/swift-kernel")
-                == .init(
-                    lintBundle: "institute",
-                    platforms: "windows",
-                    embeddedTarget: "Kernel"
-                )
-        )
-    }
-
-    @Test
-    func `fleet policy refuses malformed and ambiguous desired state`() throws {
-        #expect(
-            throws: Institute.Repository.Policy.Fleet.Error.duplicateOrganization("swift-institute")
-        ) {
-            try Self.fleet(
-                organizations: """
-                    {"name":"swift-institute","layer":"control","status":"active"},
-                    {"name":"swift-institute","layer":"control","status":"active"}
-                    """
-            )
-        }
-        #expect(throws: Institute.Repository.Policy.Fleet.Error.invalidLayer("L5")) {
-            try Self.fleet(
-                organizations: #"{"name":"swift-institute","layer":"L5","status":"active"}"#
-            )
-        }
-        #expect(throws: Institute.Repository.Policy.Fleet.Error.invalidStatus("enabled")) {
-            try Self.fleet(
-                organizations:
-                    #"{"name":"swift-institute","layer":"control","status":"enabled"}"#
-            )
-        }
-        #expect(
-            throws: Institute.Repository.Policy.Fleet.Error.malformedRepository("swift-institute")
-        ) {
-            try Self.fleet(
-                organizations:
-                    #"{"name":"swift-institute","layer":"control","status":"active"}"#,
-                repositories: #"{"name":"swift-institute"}"#
-            )
-        }
-        #expect(
-            throws: Institute.Repository.Policy.Fleet.Error.inactiveOrganization("swift-institute")
-        ) {
-            try Self.fleet(
-                organizations:
-                    #"{"name":"swift-institute","layer":"control","status":"inactive"}"#,
-                repositories: #"{"name":"swift-institute/example"}"#
-            )
-        }
-        #expect(
-            throws: Institute.Repository.Policy.Fleet.Error.duplicateRepository("swift-institute/example")
-        ) {
-            try Self.fleet(
-                organizations:
-                    #"{"name":"swift-institute","layer":"control","status":"active"}"#,
-                repositories: """
-                    {"name":"swift-institute/example"},
-                    {"name":"swift-institute/example"}
-                    """
-            )
-        }
-    }
-
-    private static func fleet(
-        organizations: String,
-        repositories: String? = nil
-    ) throws -> Institute.Repository.Policy.Fleet {
-        let repositoryField = repositories.map { ",\"repositories\":[\($0)]" } ?? ""
-        let path = try BranchPinFoundation.writeTemporaryFleetPolicy(
-            "{\"schemaVersion\":1,\"organizations\":[\(organizations)]\(repositoryField)}"
-        )
-        return try Institute.Repository.Policy.Fleet.read(at: path)
+        #expect(deviation == .init(platforms: "apple,linux", embeddedTarget: "Kernel"))
+        #expect(Institute.Repository.Policy.Deviation(metadata: "description: x\n") == .init())
+        #expect(Institute.Repository.Policy.Deviation.read(root: "/nonexistent") == .init())
     }
 
     @Test

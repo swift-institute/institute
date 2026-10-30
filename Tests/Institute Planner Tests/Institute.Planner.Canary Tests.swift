@@ -25,9 +25,6 @@ extension Institute.Planner.Canary.Test {
     }
 
     static let revision = Swift.String(repeating: "1", count: 40)
-    static let fleet = """
-        {"schemaVersion": 1, "organizations": [{"name": "swift-atoms", "layer": "L1", "status": "active"}]}
-        """
     static let repository = "swift-atoms/swift-addition"
 
     /// A runner whose clones are empty directories at `revision` and whose
@@ -62,7 +59,6 @@ extension Institute.Planner.Canary.Test {
         let current = fixture.publish(Institute.Planner.Fixture.current, run: "100")
         fixture.publish(Institute.Planner.Fixture.candidate, run: "200")
         fixture.adopt(Institute.Planner.Fixture.current, rows: current)
-        fixture.files[Institute.Planner.Consumer.fleet] = [Byte](utf8: fleet)
         return fixture
     }
 }
@@ -100,7 +96,7 @@ extension Institute.Planner.Canary.Test.Integration {
                 "clone https://github.com/swift-atoms/swift-addition.git \(subject)",
                 "run \(work)/planner/institute-current ci -- source --exit-policy strict --repository swift-atoms/swift-addition --revision \(Institute.Planner.Canary.Test.revision) --root \(subject) --bundle primitives --xcode-application /Applications/Xcode.app",
                 "clone file://\(work)/swift-atoms/swift-addition/current \(subject)",
-                "run \(work)/planner/institute-candidate ci -- source --exit-policy strict --repository swift-atoms/swift-addition --revision \(Institute.Planner.Canary.Test.revision) --root \(subject) --bundle primitives --xcode-application /Applications/Xcode.app",
+                "run \(work)/planner/institute-candidate ci -- source --exit-policy strict --repository swift-atoms/swift-addition --revision \(Institute.Planner.Canary.Test.revision) --root \(subject) --xcode-application /Applications/Xcode.app",
             ]
         )
         let installed = try Institute.Planner.read(Institute.Planner.path("\(work)/planner/institute-candidate"))

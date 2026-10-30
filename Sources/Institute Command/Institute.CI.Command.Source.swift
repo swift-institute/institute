@@ -16,7 +16,6 @@ extension Institute.CI.Command {
         public var repository: Swift.String
         public var revision: Swift.String
         public var root: Swift.String
-        public var bundle: Swift.String
         public var xcodeApplication: Swift.String
         public var jobs: Swift.Int?
         public var exitPolicy: Swift.String
@@ -25,7 +24,6 @@ extension Institute.CI.Command {
             repository: Swift.String = "",
             revision: Swift.String = "",
             root: Swift.String = "",
-            bundle: Swift.String = "",
             xcodeApplication: Swift.String = "",
             jobs: Swift.Int? = nil,
             exitPolicy: Swift.String = Policy.advisory.rawValue
@@ -33,7 +31,6 @@ extension Institute.CI.Command {
             self.repository = repository
             self.revision = revision
             self.root = root
-            self.bundle = bundle
             self.xcodeApplication = xcodeApplication
             self.jobs = jobs
             self.exitPolicy = exitPolicy
@@ -47,13 +44,15 @@ extension Institute.CI.Command {
             Measure one checked-out package:
 
               institute ci -- source --repository <owner/name> --revision <commit>
-                --root <package-root> --bundle <primitives|standards|institute>
+                --root <package-root>
                 --xcode-application </Applications/Xcode.app>
                 [--jobs <positive-count>] [--exit-policy <advisory|strict>]
 
             --revision is an exact lowercase 40-character commit, --root an
             absolute path, and --xcode-application an application under
             /Applications. --exit-policy defaults to advisory.
+            The lint bundle follows the repository's organization; a repository
+            outside the Institute's organizations gets the institute bundle.
 
             The JSON report goes to standard output. A bounded summary goes to
             standard error: the outcome, every reason a report is unmeasured, and
@@ -83,11 +82,6 @@ extension Institute.CI.Command {
                     \.root,
                     name: .long(.literal("root")),
                     placeholder: "package-root"
-                )
-                Command_Schema.Command.Option(
-                    \.bundle,
-                    name: .long(.literal("bundle")),
-                    placeholder: "primitives|standards|institute"
                 )
                 Command_Schema.Command.Option(
                     \.xcodeApplication,
@@ -129,11 +123,6 @@ extension Institute.CI.Command {
             guard root.hasPrefix("/") else {
                 throw .validationFailed(reason: "--root must be an absolute package path")
             }
-            guard Institute.Source.Bundle(rawValue: bundle) != nil else {
-                throw .validationFailed(
-                    reason: "--bundle must be primitives, standards, or institute"
-                )
-            }
             guard xcodeApplication.hasPrefix("/Applications/"),
                 xcodeApplication.hasSuffix(".app")
             else {
@@ -150,7 +139,9 @@ extension Institute.CI.Command {
         }
 
         public mutating func run() async throws(Institute.Error) {
-            let bundle = try Institute.Source.Application.bundle(bundle)
+            let bundle = try Institute.Source.Application.bundle(
+                Institute.Organization.lintBundle(forRepository: repository)
+            )
             let subject = try Institute.Source.Workspace.subject(
                 repository: repository,
                 revision: revision,

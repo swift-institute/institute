@@ -19,12 +19,14 @@ extension Institute.Planner.Canary {
         "swift-compositions/swift-sqlite",
     ]
 
-    /// The `institute` arguments of one strict source measurement.
+    /// The `institute` arguments of one strict source measurement. `bundle` is
+    /// passed only to a pinned planner from before `ci -- source` derived the
+    /// bundle from the repository's organization.
     public static func arguments(
         repository: Swift.String,
         revision: Institute.Planner.Revision,
         root: Swift.String,
-        bundle: Swift.String,
+        bundle: Swift.String? = nil,
         xcode: Swift.String
     ) -> [Swift.String] {
         [
@@ -33,7 +35,7 @@ extension Institute.Planner.Canary {
             "--repository", repository,
             "--revision", revision.description,
             "--root", root,
-            "--bundle", bundle,
+        ] + (bundle.map { ["--bundle", $0] } ?? []) + [
             "--xcode-application", xcode,
         ]
     }

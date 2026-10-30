@@ -19,7 +19,6 @@ extension Institute.Planner {
 extension Institute.Planner.Consumer {
     public static let pin = ".institute-ci-pin"
     public static let ledger = ".institute-ci-planner"
-    public static let fleet = ".github/policy/fleet.json"
 
     /// The pin the consumer's default branch holds.
     public func pin() throws(Institute.Planner.Error) -> Institute.Planner.Pin {

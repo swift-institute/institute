@@ -25,19 +25,8 @@ extension Institute.CI.Command {
     private static func packageValidate(_ arguments: [Swift.String]) {
         let repository = value("--repository", in: arguments)
         let root = value("--root", in: arguments)
-        let policy = value("--policy", in: arguments)
-        guard !repository.isEmpty, !root.isEmpty, !policy.isEmpty else {
-            refuse("package validate requires --repository, --root, and --policy")
-        }
-
-        let fleet: Institute.Repository.Policy.Fleet
-        do throws(Institute.Repository.Policy.Fleet.Error) {
-            fleet = try Institute.Repository.Policy.Fleet.read(at: policy)
-        } catch {
-            refuse("package validate could not read fleet policy: \(error)")
-        }
-        guard fleet.schemaVersion == 1 else {
-            refuse("package validate requires fleet policy schemaVersion 1")
+        guard !repository.isEmpty, !root.isEmpty else {
+            refuse("package validate requires --repository and --root")
         }
 
         let manifest: Institute.Repository.Policy.Manifest
@@ -49,7 +38,7 @@ extension Institute.CI.Command {
         var refused = false
         for finding in Institute.Repository.Policy.BranchPin.findings(
             in: manifest.dependencies,
-            organizations: fleet.activeOrganizationNames
+            organizations: Swift.Set(Institute.Organization.allCases.map(\.rawValue))
         ) {
             refused = true
             print(

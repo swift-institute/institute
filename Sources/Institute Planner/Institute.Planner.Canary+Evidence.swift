@@ -39,16 +39,10 @@ extension Institute.Planner.Canary {
                 current: try install(current, at: "\(planner)/institute-current"),
                 candidate: try install(candidate, at: "\(planner)/institute-candidate")
             )
-            let fleet = try fleet(consumer, at: "\(planner)/fleet.json")
 
             var comparisons: [Comparison] = []
             for name in repositories {
-                let bundle: Swift.String
-                do throws(Institute.Repository.Policy.Fleet.Error) {
-                    bundle = try fleet.configuration(for: name).lintBundle
-                } catch {
-                    throw .missing("fleet lint bundle for \(name): \(error)")
-                }
+                let bundle = Institute.Organization.lintBundle(forRepository: name)
                 comparisons.append(
                     compare(
                         repository: name,
@@ -86,7 +80,7 @@ extension Institute.Planner.Canary {
     ) -> Comparison {
         let subject = "\(base)/subject"
         var revision = ""
-        func measure(_ binary: Swift.String) throws(Institute.Planner.Error) -> Outcome {
+        func measure(_ binary: Swift.String, bundle: Swift.String?) throws(Institute.Planner.Error) -> Outcome {
             let pinned = try Institute.Planner.Revision(revision)
             return Outcome(
                 try runner.execute(
@@ -104,13 +98,13 @@ extension Institute.Planner.Canary {
         do throws(Institute.Planner.Error) {
             try Institute.Planner.directory(Institute.Planner.path(base))
             revision = try runner.clone(url, subject).description
-            let current = try measure(binaries.current)
+            let current = try measure(binaries.current, bundle: bundle)
             try move(subject, to: "\(base)/current")
             let again = try runner.clone("file://\(base)/current", subject)
             guard again.description == revision else {
                 throw .local("\(repository): the second clone is at \(again), not \(revision)")
             }
-            let candidate = try measure(binaries.candidate)
+            let candidate = try measure(binaries.candidate, bundle: nil)
             try move(subject, to: "\(base)/candidate")
             return .init(
                 repository: repository,
@@ -144,23 +138,6 @@ extension Institute.Planner.Canary {
             throw .local("cannot make \(path) executable: \(error)")
         }
         return path
-    }
-
-    /// The fleet policy on the consumer's default branch, read through the
-    /// policy's own reader from a copy at `path`.
-    private static func fleet(
-        _ consumer: Institute.Planner.Consumer,
-        at path: Swift.String
-    ) throws(Institute.Planner.Error) -> Institute.Repository.Policy.Fleet {
-        try Institute.Planner.write(
-            consumer.read(Institute.Planner.Consumer.fleet),
-            to: Institute.Planner.path(path)
-        )
-        do throws(Institute.Repository.Policy.Fleet.Error) {
-            return try Institute.Repository.Policy.Fleet.read(at: path)
-        } catch {
-            throw .malformed(line: Institute.Planner.Consumer.fleet, reason: "\(error)")
-        }
     }
 
     private static func move(

@@ -44,3 +44,19 @@ extension Institute.Organization {
         self.init(rawValue: Swift.String(owner))
     }
 }
+
+extension Institute.Organization {
+    public var lintBundle: Swift.String {
+        switch layer {
+        case .atoms, .molecules: "primitives"
+        case .standards: "standards"
+        case .compositions, .control: "institute"
+        }
+    }
+}
+
+extension Institute.Organization {
+    public static func lintBundle(forRepository repository: Swift.String) -> Swift.String {
+        Institute.Repository.Coordinate(repository)?.organization.lintBundle ?? "institute"
+    }
+}
