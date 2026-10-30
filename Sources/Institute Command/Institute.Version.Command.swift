@@ -147,10 +147,39 @@ extension Institute.Version.Command.Tag {
     }
 }
 
+extension Institute.Version.Command {
+    /// `institute version organizations` — the organizations a sweep
+    /// covers, `Institute.Organization` in declaration order, as one JSON
+    /// array of names: the `version-tags` workflow's matrix, so the
+    /// workflow carries no roster of its own.
+    public struct Organizations: Sendable, Command_Schema.Command.`Protocol` {
+        public init() {}
+
+        public static var configuration: Command_Schema.Command.Configuration {
+            .init(name: "organizations", abstract: "Print the swept organizations as one JSON array.")
+        }
+
+        public static var schema: Command_Schema.Command.Schema.Definition<Self> {
+            .init {}
+        }
+
+        public mutating func run() async throws(Institute.Error) {
+            print(Self.matrix)
+        }
+
+        /// `["swift-institute","swift-atoms",…]`. Organization names are
+        /// lowercase letters and hyphens, so no character needs escaping.
+        static var matrix: Swift.String {
+            "[" + Institute.Organization.allCases.map { "\"\($0.rawValue)\"" }.joined(separator: ",") + "]"
+        }
+    }
+}
+
 extension Institute.Version {
     /// `institute version` — development versions of the Institute's packages.
     public enum Command: Sendable, Command_Schema.Command.`Protocol` {
         case tag(Tag)
+        case organizations(Organizations)
 
         public static var configuration: Command_Schema.Command.Configuration {
             .init(name: "version", abstract: "Tag the Institute's packages with development versions.")
@@ -165,6 +194,12 @@ extension Institute.Version {
                         initial: { .init() },
                         map: Self.tag
                     )
+                    Command_Schema.Command.Subcommand.Case(
+                        "organizations",
+                        help: .init(abstract: "Print the swept organizations as one JSON array."),
+                        initial: { .init() },
+                        map: Self.organizations
+                    )
                 }
             }
         }
@@ -174,6 +209,9 @@ extension Institute.Version {
             case .tag(var command):
                 try await command.run()
                 self = .tag(command)
+            case .organizations(var command):
+                try await command.run()
+                self = .organizations(command)
             }
         }
     }

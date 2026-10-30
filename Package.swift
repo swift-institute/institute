@@ -465,6 +465,7 @@ let package = Package(
                 "Institute Command",
                 "Institute Model",
                 "Institute Repository Policy",
+                "Institute Version",
                 "Source Report",
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "Command", package: "swift-arguments"),
