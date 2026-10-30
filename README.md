@@ -1,9 +1,9 @@
 # institute
 
 The `institute` command: the Swift Institute's central CI planner and the tools that keep its
-GitHub organizations on one policy. The domain model lives in
-[swift-institute/institute](https://github.com/swift-institute/institute); this package owns
-the executable and its command surface.
+GitHub organizations on one policy, together with the domain model behind them — workflow and
+repository policy, the CI contract and validation, Institute lint over one package, and the
+installation of the pinned planner.
 
 | Command | What it does |
 | --- | --- |
@@ -13,6 +13,33 @@ the executable and its command surface.
 | `planner canary\|adopt` | Judge a `publish-planner` run against the current planner on the canary repositories, and commit an adoptable pin to the consumer checkout. |
 | `repository …` | Repository policy across the organizations: caller workflows and the `.gitignore` canon. |
 | `github token` | Mint a GitHub App installation token for one organization, optionally narrowed. |
+
+## Targets
+
+Each target owns one area. Every arrow points down, and there are no cycles. Domain targets
+never parse arguments or write to the console; `Institute Command` does nothing else.
+
+| Target | Owns |
+|---|---|
+| `Institute CLI` | The `institute` executable: `main.swift` only |
+| `Institute Command` | The argument grammar and console output of every verb |
+| `Institute Planner` | The published planner: pins, releases, evidence, the canary and adoption |
+| `Institute GitHub` | The GitHub transport the planner reads releases and contents through |
+| `Institute Model` | The `Institute` namespace and its error, and the processor-count default for bounded fan-out |
+| `Institute Installation` | Installing a verified planner binary into the account and the link-materialization contract it uses |
+| `Institute CI Model` | The CI vocabulary: subjects, events, platforms, plans, verdicts |
+| `Institute CI Canon` | The canonical documents every repository carries, such as the `.gitignore` classes |
+| `Institute CI Contract` | The planner contract: what a plan and an aggregate must say |
+| `Institute CI Workflow` | The GitHub Actions workflow vocabulary |
+| `Institute CI Inventory` | What a checked-out repository contains, as CI reads it |
+| `Institute CI Validation` | The validation rules `ci -- package validate` applies |
+| `Institute Repository Policy` | Caller workflows and fleet policy across the organizations |
+| `Institute Source Policy`, `Institute Source Profile`, `Institute Source Workspace`, `Institute Source` | Institute lint: the pinned engines and profiles, the package subject, and one measurement |
+| `Source Measurement`, `Source Profile`, `Source Report`, `Source Execution`, `Source Repair`, `Source Linter`, `Source Swift Format`, `Source SwiftLint` | The engine-neutral source measurement the Institute lint is built on (see `VENDORED-SOURCE.md`) |
+
+A macOS front end, when it comes, is its own package under `App/` that depends on this one by
+path (`Institute Feature`, `Institute SwiftUI`, and its host under `App/Hosts/Institute`), so
+SwiftUI and its stack never enter the planner's build or its pinned dependency graph.
 
 ## How CI uses it
 
@@ -41,9 +68,8 @@ are one artifact.
 
 ## Developing it
 
-`institute control.xcworkspace` opens this package and `../institute` together, so a change
-to the domain library builds with the command from the working copies. Build and test through
-Xcode. `Package.resolved` is generated state and is never committed.
+Open this package's directory in Xcode and build and test there. `Package.resolved` is
+generated state and is never committed.
 
 ## License
 

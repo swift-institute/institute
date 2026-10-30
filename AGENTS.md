@@ -1,12 +1,17 @@
-# institute-application — agent instructions
+# institute — agent instructions
 
-Read `README.md` first: it lists the five commands and how a change reaches CI.
+Read `README.md` first: it lists the commands, the targets, and how a change reaches CI.
 
 ## Building and testing
 
-Open `institute control.xcworkspace` through Xcode's connector. It holds this package and
-`../institute`, so both build from the working copies. Every test target has its own scheme;
+Open this package's directory through Xcode's connector. Every test target has its own scheme;
 the `institute` scheme builds the executable and runs no tests.
+
+## Where code goes
+
+Domain targets never parse arguments or write to the console; `Institute Command` holds the
+argument grammar and console output and nothing else. A new verb's logic goes into the domain
+target that owns its vocabulary, and only its grammar and output into `Institute Command`.
 
 ## Gotchas
 

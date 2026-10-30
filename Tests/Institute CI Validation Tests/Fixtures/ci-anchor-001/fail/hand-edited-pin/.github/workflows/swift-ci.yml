@@ -1,0 +1,30 @@
+name: CI
+on: {}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout swift-foundations/swift-continuous-integration
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: swift-foundations/swift-continuous-integration
+          ref: 'fedcba9876543210fedcba9876543210fedcba98'
+          path: .ci-sources/swift-continuous-integration
+          persist-credentials: false
+      - name: swift-foundations/swift-continuous-integration source identity
+        id: swift-continuous-integration-identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          PINNED_COMMIT='0a1b2c3d4e5f60718293a4b5c6d7e8f901234567'
+          PINNED_TREE='1122334455667788990011223344556677889900'
+          PINNED_PATH='.'
+          ACTUAL_COMMIT="$(git -C "${GITHUB_WORKSPACE}"/'.ci-sources/swift-continuous-integration' rev-parse HEAD)"
+          ACTUAL_TREE="$(git -C "${GITHUB_WORKSPACE}"/'.ci-sources/swift-continuous-integration' rev-parse 'HEAD^{tree}')"
+          for OID in "$ACTUAL_COMMIT" "$ACTUAL_TREE"; do
+            [[ "$OID" =~ ^[0-9a-f]{40}$ ]] || { echo "::error::swift-foundations/swift-continuous-integration: refusing malformed object name '$OID'"; exit 1; }
+          done
+          [[ "$ACTUAL_COMMIT" == "$PINNED_COMMIT" ]] || { echo "::error::swift-foundations/swift-continuous-integration: checked-out commit '$ACTUAL_COMMIT' is not the pinned '$PINNED_COMMIT'. Refusing to execute unpinned CI sources."; exit 1; }
+          [[ "$ACTUAL_TREE" == "$PINNED_TREE" ]] || { echo "::error::swift-foundations/swift-continuous-integration: tree of '$PINNED_PATH' is '$ACTUAL_TREE', pinned '$PINNED_TREE'. The commit resolved but its content did not."; exit 1; }
+          echo "commit=$ACTUAL_COMMIT" >> "$GITHUB_OUTPUT"
+          echo "tree=$ACTUAL_TREE" >> "$GITHUB_OUTPUT"

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "producer": "institute-ci trust-anchor",
+  "action": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+  "sources": [
+    {
+      "repository": "swift-foundations/swift-continuous-integration",
+      "checkout": ".ci-sources/swift-continuous-integration",
+      "commit": "fedcba9876543210fedcba9876543210fedcba98",
+      "tree": {
+        "path": ".",
+        "oid": "1122334455667788990011223344556677889900"
+      }
+    }
+  ]
+}
