@@ -305,6 +305,34 @@ extension `SwiftUI Tests`.`View State` {
         #expect(`SwiftUI Tests`.findings(.`view state`, source).count == 3)
     }
 
+    /// The one exception to S3: a `Hover` modifier keeps whether the pointer is over it, for its own look.
+    @Test
+    func `a hover flag passes only as the single private Bool in the Hover modifier`() {
+        func hover(_ properties: Swift::String, named name: Swift::String = "Hover", conforming: Swift::String = "ViewModifier") -> Swift::String {
+            """
+            struct \(name): \(conforming) {
+              \(properties)
+              func body(content: Content) -> some View { content.onHover { hovering = $0 } }
+            }
+            """
+        }
+        let findings = { (source: Swift::String) in `SwiftUI Tests`.findings(.`view state`, source).count }
+        #expect(findings(hover("@State private var hovering = false")) == 0)
+        #expect(findings(hover("@State private var hovering: Bool = false")) == 0)
+        // Anywhere else, or anything more, is state in a view.
+        #expect(findings(hover("@State private var hovering = false", named: "Highlight")) == 1)
+        #expect(findings(hover("@State var hovering = false")) == 1)
+        #expect(findings(hover("@State private var hovering = 0")) == 1)
+        #expect(findings(hover("@State private var hovering = false\n  @State private var pressed = false")) == 2)
+        let row = """
+            struct Row: View {
+              @State private var hovering = false
+              var body: some View { Text("A").onHover { hovering = $0 } }
+            }
+            """
+        #expect(findings(row) == 1)
+    }
+
     @Test
     func `allowed properties do not fire`() {
         let source = """

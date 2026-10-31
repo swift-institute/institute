@@ -1,5 +1,7 @@
 public import Lint
+internal import Linter_Rule_Scope
 internal import Linter_Rule_SwiftUI
+internal import SwiftSyntax
 
 extension Lint.Rule {
 
@@ -177,16 +179,29 @@ extension Lint.Rule {
                 expectation: .clean
             ),
         ],
-        observe: Lint.SwiftUI.observe(
-            .viewState,
-            identifier: "view state",
-            message: "This rule checks view properties declared with `@State`, `@StateObject`, "
+        observe: Lint.Rule.measured { source, severity in
+            let message =
+                "This rule checks view properties declared with `@State`, `@StateObject`, "
                 + "`@ObservedObject`, `@AppStorage` or `@SceneStorage`, properties whose type is an "
                 + "`@Observable` class declared in this package, and stored properties of function type, "
-                + "\(Lint.SwiftUI.scope). A view holds no state. Fix: move the state into the feature's "
-                + "`State` and read it through `store`; replace a stored closure with `store.send(.case)`; "
-                + "anything persisted lives in SQLite."
-        )
+                + "\(Lint.SwiftUI.scope). A view holds no state; the one exception is the hover flag of "
+                + "`\(Lint.SwiftUI.Hover.modifiers.sorted().joined(separator: "`, `"))` (coenttb-app S3). Fix: move "
+                + "the state into the feature's `State` and read it through `store`; replace a stored closure with "
+                + "`store.send(.case)`; anything persisted lives in SQLite."
+            let visitor = Lint.SwiftUI.Visitor(index: Lint.Scope.Index.of(source))
+            visitor.walk(source.tree)
+            return visitor.hits
+                .filter { $0.kind == .viewState && !Lint.SwiftUI.Hover.allows($0.node) }
+                .map { hit in
+                    Lint.Scope.record(
+                        at: hit.node,
+                        in: source,
+                        severity: severity,
+                        identifier: "view state",
+                        message: "[view state]: \(hit.detail). \(message)"
+                    )
+                }
+        }
     )
 
     public static let `view logic` = Lint.Rule(

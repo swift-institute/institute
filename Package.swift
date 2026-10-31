@@ -880,6 +880,8 @@ let linterRuleTargets: [Target] = [
             dependencies: [
                 .product(name: "Lint", package: "swift-lint"),
                 .product(name: "Linter Rule SwiftUI", package: "swift-linter-rules"),
+                .product(name: "Linter Rule Scope", package: "swift-linter-rules"),
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
             ]
         ),
         .testTarget(
