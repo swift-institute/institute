@@ -1,6 +1,7 @@
 public import Lint
-internal import Linter_Rule_Feature
-internal import Linter_Rule_Framework
+internal import App_Linter_Rule_Feature
+internal import App_Linter_Rule_Framework
+internal import App_Linter_Rule_SwiftUI
 internal import Linter_Rule_SwiftUI
 
 extension Lint.Rule.Bundle {
