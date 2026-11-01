@@ -2,53 +2,60 @@ public import Lint
 internal import SwiftSyntax
 
 extension Lint.Rule {
-    public static let `manifest naming grammar` = Lint.Rule(
-        id: "manifest naming grammar",
-        default: .warning,
-        controls: [
-            .init(
-                id: "manifest naming grammar concatenated target",
-                source: "let package = Package(name: \"swift-example\", "
-                    + "targets: [.executableTarget(name: \"InstituteArchitectureCLI\")] )",
-                path: "Package.swift",
-                expectation: .findings(1)
-            ),
-            .init(
-                id: "manifest naming grammar spaced target",
-                source: "let package = Package(name: \"swift-example\", "
-                    + "targets: [.executableTarget(name: \"Institute Architecture CLI\")] )",
-                path: "Package.swift",
-                expectation: .clean
-            ),
-            .init(
-                id: "manifest naming grammar reported once at the declaration",
-                source: "let package = Package(name: \"swift-example\", targets: ["
-                    + ".target(name: \"QueueDoubleEnded\"), "
-                    + ".target(name: \"Consumer\", dependencies: [.target(name: \"QueueDoubleEnded\")]), "
-                    + ".testTarget(name: \"Consumer Tests\", dependencies: [.target(name: \"QueueDoubleEnded\")])])",
-                path: "Package.swift",
-                expectation: .findings(1)
-            ),
-            .init(
-                id: "manifest naming grammar upstream product",
-                source: "let package = Package(name: \"swift-example\", "
-                    + "targets: [.target(name: \"Consumer\", dependencies: "
-                    + "[.product(name: \"OrderedCollections\", package: \"swift-collections\")])])",
-                path: "Package.swift",
-                expectation: .clean
-            ),
-        ],
-        observe: Lint.Rule.measured { source, severity in
-            guard namingIsPackageManifest(source.file.filePath) else { return [] }
-            let visitor = NamingManifestGrammarVisitor(
-                source: source.file,
-                severity: severity,
-                converter: source.converter
-            )
-            visitor.walk(source.tree)
-            return visitor.matches
-        }
-    )
+    public static let `manifest naming grammar` = Lint.Rule.`manifest naming grammar`(words: [])
+
+    /// The rule for code that names targets and products after words of its own, such as the Apple frameworks an app's
+    /// adapters are named for: each of `words` reads as one word.
+    public static func `manifest naming grammar`(words: Swift::Set<Swift::String>) -> Lint.Rule {
+        Lint.Rule(
+            id: "manifest naming grammar",
+            default: .warning,
+            controls: [
+                .init(
+                    id: "manifest naming grammar concatenated target",
+                    source: "let package = Package(name: \"swift-example\", "
+                        + "targets: [.executableTarget(name: \"InstituteArchitectureCLI\")] )",
+                    path: "Package.swift",
+                    expectation: .findings(1)
+                ),
+                .init(
+                    id: "manifest naming grammar spaced target",
+                    source: "let package = Package(name: \"swift-example\", "
+                        + "targets: [.executableTarget(name: \"Institute Architecture CLI\")] )",
+                    path: "Package.swift",
+                    expectation: .clean
+                ),
+                .init(
+                    id: "manifest naming grammar reported once at the declaration",
+                    source: "let package = Package(name: \"swift-example\", targets: ["
+                        + ".target(name: \"QueueDoubleEnded\"), "
+                        + ".target(name: \"Consumer\", dependencies: [.target(name: \"QueueDoubleEnded\")]), "
+                        + ".testTarget(name: \"Consumer Tests\", dependencies: [.target(name: \"QueueDoubleEnded\")])])",
+                    path: "Package.swift",
+                    expectation: .findings(1)
+                ),
+                .init(
+                    id: "manifest naming grammar upstream product",
+                    source: "let package = Package(name: \"swift-example\", "
+                        + "targets: [.target(name: \"Consumer\", dependencies: "
+                        + "[.product(name: \"OrderedCollections\", package: \"swift-collections\")])])",
+                    path: "Package.swift",
+                    expectation: .clean
+                ),
+            ],
+            observe: Lint.Rule.measured { source, severity in
+                guard namingIsPackageManifest(source.file.filePath) else { return [] }
+                let visitor = NamingManifestGrammarVisitor(
+                    source: source.file,
+                    severity: severity,
+                    converter: source.converter,
+                    words: words
+                )
+                visitor.walk(source.tree)
+                return visitor.matches
+            }
+        )
+    }
 }
 
 internal func namingManifestIsKebabSlug(_ name: Swift::String) -> Swift::Bool {
@@ -67,8 +74,11 @@ internal func namingManifestIsKebabSlug(_ name: Swift::String) -> Swift::Bool {
     return !previousWasHyphen
 }
 
-internal func namingManifestCompoundWords(in name: Swift::String) -> [Swift::String] {
-    name.split(separator: " ").map(Swift::String.init).filter(namingWordIsCompound)
+internal func namingManifestCompoundWords(
+    in name: Swift::String,
+    words: Swift::Set<Swift::String>
+) -> [Swift::String] {
+    name.split(separator: " ").map(Swift::String.init).filter { namingWordIsCompound($0, words: words) }
 }
 
 @usableFromInline
@@ -125,12 +135,19 @@ internal final class NamingManifestGrammarVisitor: SyntaxVisitor {
     let source: Source.File
     let severity: Diagnostic.Severity
     let converter: SourceLocationConverter
+    let words: Swift::Set<Swift::String>
     var matches: [Diagnostic.Record] = []
 
-    init(source: Source.File, severity: Diagnostic.Severity, converter: SourceLocationConverter) {
+    init(
+        source: Source.File,
+        severity: Diagnostic.Severity,
+        converter: SourceLocationConverter,
+        words: Swift::Set<Swift::String>
+    ) {
         self.source = source
         self.severity = severity
         self.converter = converter
+        self.words = words
         super.init(viewMode: .sourceAccurate)
     }
 
@@ -162,7 +179,7 @@ internal final class NamingManifestGrammarVisitor: SyntaxVisitor {
         for argument in node.arguments where argument.label?.text == "name" {
             guard let (name, position) = literalText(argument.expression) else { continue }
             declaredName = name
-            let compounds = namingManifestCompoundWords(in: name)
+            let compounds = namingManifestCompoundWords(in: name, words: words)
             if !compounds.isEmpty {
                 emit(
                     at: position,

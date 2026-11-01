@@ -2,40 +2,47 @@ public import Lint
 internal import SwiftSyntax
 
 extension Lint.Rule {
-    public static let `compound type name` = Lint.Rule(
-        id: "compound type name",
-        default: .warning,
-        controls: [
-            .init(
-                id: "compound type name public compound",
-                source: "public struct FileDirectory {}",
-                path: "Sources/Naming Core/CompoundType.swift",
-                expectation: .findings(1)
-            ),
-            .init(
-                id: "compound type name single token",
-                source: "public struct Directory {}",
-                path: "Sources/Naming Core/SingleTokenType.swift",
-                expectation: .clean
-            ),
-            .init(
-                id: "compound type name spec namespace",
-                source: "public enum RFC_4122 {}",
-                path: "Sources/Naming Core/SpecNamespace.swift",
-                expectation: .clean
-            ),
-        ],
-        observe: Lint.Rule.measured { source, severity in
-            guard !namingIsPackageManifest(source.file.filePath) else { return [] }
-            let visitor = NamingCompoundTypeVisitor(
-                source: source.file,
-                severity: severity,
-                converter: source.converter
-            )
-            visitor.walk(source.tree)
-            return visitor.matches
-        }
-    )
+    public static let `compound type name` = Lint.Rule.`compound type name`(words: [])
+
+    /// The rule for code that names types after words of its own, such as the Apple frameworks an app's
+    /// adapters are named for: each of `words` reads as one word.
+    public static func `compound type name`(words: Swift::Set<Swift::String>) -> Lint.Rule {
+        Lint.Rule(
+            id: "compound type name",
+            default: .warning,
+            controls: [
+                .init(
+                    id: "compound type name public compound",
+                    source: "public struct FileDirectory {}",
+                    path: "Sources/Naming Core/CompoundType.swift",
+                    expectation: .findings(1)
+                ),
+                .init(
+                    id: "compound type name single token",
+                    source: "public struct Directory {}",
+                    path: "Sources/Naming Core/SingleTokenType.swift",
+                    expectation: .clean
+                ),
+                .init(
+                    id: "compound type name spec namespace",
+                    source: "public enum RFC_4122 {}",
+                    path: "Sources/Naming Core/SpecNamespace.swift",
+                    expectation: .clean
+                ),
+            ],
+            observe: Lint.Rule.measured { source, severity in
+                guard !namingIsPackageManifest(source.file.filePath) else { return [] }
+                let visitor = NamingCompoundTypeVisitor(
+                    source: source.file,
+                    severity: severity,
+                    converter: source.converter,
+                    words: words
+                )
+                visitor.walk(source.tree)
+                return visitor.matches
+            }
+        )
+    }
 }
 
 private let namingCompoundTypeMessage: Swift::String =
@@ -76,54 +83,25 @@ private let namingCompoundTypeBrandTokenCitations: [Swift::String: Swift::String
     "IPv4": "RFC 791 — protocol-version orthography (`IPv4.Address`, swift-rfc-791)",
     "IPv6": "RFC 8200 — protocol-version orthography",
     "PostgreSQL": "postgresql.org brand orthography",
-    "ActivityKit": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "AppIntents": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "AppKit": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "AVFoundation": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "BackgroundTasks": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "CloudKit": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "CoreData": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "CoreGraphics": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "CoreImage": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "CoreLocation": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "CoreServices": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "CoreSpotlight": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "CoreText": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "CoreTransferable": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "CryptoKit": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "EventKit": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "FoundationModels": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "ImageIO": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "LocalAuthentication": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "MapKit": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "MetricKit": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "OSLog": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "PDFKit": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "PhotosUI": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "QuickLook": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "QuickLookThumbnailing": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "ServiceManagement": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "StoreKit": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "SwiftData": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "SwiftUI": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "UIKit": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "UniformTypeIdentifiers": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "UserNotifications": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "VisionKit": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "WebKit": "Apple SDK module name, which an adapter target is named after (framework import)",
-    "WidgetKit": "Apple SDK module name, which an adapter target is named after (framework import)",
 ]
 
 internal final class NamingCompoundTypeVisitor: SyntaxVisitor {
     let source: Source.File
     let severity: Diagnostic.Severity
     let converter: SourceLocationConverter
+    let words: Swift::Set<Swift::String>
     var matches: [Diagnostic.Record] = []
 
-    init(source: Source.File, severity: Diagnostic.Severity, converter: SourceLocationConverter) {
+    init(
+        source: Source.File,
+        severity: Diagnostic.Severity,
+        converter: SourceLocationConverter,
+        words: Swift::Set<Swift::String>
+    ) {
         self.source = source
         self.severity = severity
         self.converter = converter
+        self.words = words
         super.init(viewMode: .sourceAccurate)
     }
 
@@ -189,11 +167,14 @@ internal final class NamingCompoundTypeVisitor: SyntaxVisitor {
     }
 
     private func isCompoundTypeIdentifier(_ name: Swift::String) -> Bool {
-        namingWordIsCompound(name)
+        namingWordIsCompound(name, words: words)
     }
 }
 
-internal func namingWordIsCompound(_ name: Swift::String) -> Bool {
+internal func namingWordIsCompound(_ name: Swift::String, words: Swift::Set<Swift::String>) -> Bool {
+    if words.contains(name) {
+        return false
+    }
     if namingCompoundTypeStdlibMethodMirrorCitations[name] != nil {
         return false
     }

@@ -331,16 +331,21 @@ extension Lint.Rule.`manifest naming grammar Tests`.`Edge Case` {
 
 extension Lint.Rule.`manifest naming grammar Tests`.`Edge Case` {
     @Test
-    func `a target named for its Apple framework is one word per name`() {
-        let manifest = """
-            let package = Package(name: "birdwatch", targets: [.target(name: "Birdwatch SwiftUI"), .target(name: "Birdwatch UserNotifications"), .target(name: "Processes AppKit")])
-            """
-        #expect(Lint.Rule.`manifest naming grammar Tests`.findings(in: manifest).isEmpty)
+    func `a framework name is concatenated unless the rule is given it`() {
+        let parsed = Lint.Source.parsed(
+            from: #"let package = Package(name: "reader", targets: [.target(name: "Reader SwiftUI")])"#,
+            file: "Package.swift"
+        )
+        #expect(!Lint.Rule.`manifest naming grammar`.observe(parsed, .warning).findings.isEmpty)
+        #expect(Lint.Rule.`manifest naming grammar`(words: ["SwiftUI"]).observe(parsed, .warning).findings.isEmpty)
     }
 
     @Test
-    func `a framework name run into another word is still concatenated`() {
-        let manifest = #"let package = Package(name: "birdwatch", targets: [.target(name: "BirdwatchSwiftUI")])"#
-        #expect(!Lint.Rule.`manifest naming grammar Tests`.findings(in: manifest).isEmpty)
+    func `a given word run into another word is still concatenated`() {
+        let parsed = Lint.Source.parsed(
+            from: #"let package = Package(name: "reader", targets: [.target(name: "ReaderSwiftUI")])"#,
+            file: "Package.swift"
+        )
+        #expect(!Lint.Rule.`manifest naming grammar`(words: ["SwiftUI"]).observe(parsed, .warning).findings.isEmpty)
     }
 }

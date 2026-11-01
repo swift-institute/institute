@@ -2,37 +2,44 @@ public import Lint
 internal import SwiftSyntax
 
 extension Lint.Rule {
-    public static let `path name grammar` = Lint.Rule(
-        id: "path name grammar",
-        default: .warning,
-        controls: [
-            .init(
-                id: "path name grammar concatenated directory",
-                source: "struct Command {}",
-                path: "Sources/InstituteArchitectureCLI/Command.swift",
-                expectation: .findings(1)
-            ),
-            .init(
-                id: "path name grammar spaced directory",
-                source: "struct Command {}",
-                path: "Sources/Institute Architecture CLI/Command.swift",
-                expectation: .clean
-            ),
-            .init(
-                id: "path name grammar out of surface",
-                source: "struct Command {}",
-                path: "Plugins/BadPluginName/Plugin.swift",
-                expectation: .clean
-            ),
-        ],
-        observe: Lint.Rule.measured { source, severity in
-            namingPathGrammarFindings(
-                source: source.file,
-                severity: severity,
-                tree: source.tree
-            )
-        }
-    )
+    public static let `path name grammar` = Lint.Rule.`path name grammar`(words: [])
+
+    /// The rule for code that names directories and files after words of its own, such as the Apple frameworks an app's
+    /// adapters are named for: each of `words` reads as one word.
+    public static func `path name grammar`(words: Swift::Set<Swift::String>) -> Lint.Rule {
+        Lint.Rule(
+            id: "path name grammar",
+            default: .warning,
+            controls: [
+                .init(
+                    id: "path name grammar concatenated directory",
+                    source: "struct Command {}",
+                    path: "Sources/InstituteArchitectureCLI/Command.swift",
+                    expectation: .findings(1)
+                ),
+                .init(
+                    id: "path name grammar spaced directory",
+                    source: "struct Command {}",
+                    path: "Sources/Institute Architecture CLI/Command.swift",
+                    expectation: .clean
+                ),
+                .init(
+                    id: "path name grammar out of surface",
+                    source: "struct Command {}",
+                    path: "Plugins/BadPluginName/Plugin.swift",
+                    expectation: .clean
+                ),
+            ],
+            observe: Lint.Rule.measured { source, severity in
+                namingPathGrammarFindings(
+                    source: source.file,
+                    severity: severity,
+                    tree: source.tree,
+                    words: words
+                )
+            }
+        )
+    }
 }
 
 internal func namingPathGrammarDirectoryIsExempt(_ segment: Swift::String) -> Swift::Bool {
@@ -48,8 +55,11 @@ internal func namingPathGrammarSnapshotDirectoryIsInvalid(
     return segment.filter { $0.isLetter }.lowercased() == "snapshots"
 }
 
-internal func namingPathGrammarCompoundWords(in segment: Swift::String) -> [Swift::String] {
-    segment.split(separator: " ").map(Swift::String.init).filter(namingWordIsCompound)
+internal func namingPathGrammarCompoundWords(
+    in segment: Swift::String,
+    words: Swift::Set<Swift::String>
+) -> [Swift::String] {
+    segment.split(separator: " ").map(Swift::String.init).filter { namingWordIsCompound($0, words: words) }
 }
 
 @usableFromInline
@@ -86,7 +96,8 @@ internal func namingPathGrammarBasenameMessage(
 internal func namingPathGrammarFindings(
     source: Source.File,
     severity: Diagnostic.Severity,
-    tree: SourceFileSyntax
+    tree: SourceFileSyntax,
+    words: Swift::Set<Swift::String>
 ) -> [Diagnostic.Record] {
     let path = source.filePath
     let parts = path.split(separator: "/", omittingEmptySubsequences: true).map(Swift::String.init)
@@ -122,9 +133,9 @@ internal func namingPathGrammarFindings(
             continue
         }
         guard !namingPathGrammarDirectoryIsExempt(segment) else { continue }
-        let words = namingPathGrammarCompoundWords(in: segment)
-        if !words.isEmpty {
-            emit(namingPathGrammarDirectoryMessage(segment: segment, words: words))
+        let compounds = namingPathGrammarCompoundWords(in: segment, words: words)
+        if !compounds.isEmpty {
+            emit(namingPathGrammarDirectoryMessage(segment: segment, words: compounds))
         }
     }
 
@@ -139,7 +150,7 @@ internal func namingPathGrammarFindings(
     collector.walk(tree)
     guard collector.declaresPrimaryType else { return records }
     for segment in basename.split(separator: ".").map(Swift::String.init) {
-        if namingWordIsCompound(segment) {
+        if namingWordIsCompound(segment, words: words) {
             emit(
                 namingPathGrammarBasenameMessage(
                     segment: segment,

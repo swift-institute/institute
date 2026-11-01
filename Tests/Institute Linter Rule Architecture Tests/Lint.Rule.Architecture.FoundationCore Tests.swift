@@ -134,9 +134,15 @@ extension Lint.Rule.`architecture foundation type Tests` {
 
 extension Lint.Rule.`architecture foundation type Tests`.`Edge Case` {
     @Test
-    func `an NS class in a file that imports AppKit is AppKit's, not Foundation's`() {
+    func `an NS class is Foundation's even in a file that imports AppKit`() {
         let source = "import AppKit\n\nfinal class Bridge: NSView {\n    var window: NSWindow?\n}"
-        #expect(Lint.Rule.`architecture foundation type Tests`.findings(in: source, file: "Sources/Model AppKit/Bridge.swift").isEmpty)
+        #expect(Lint.Rule.`architecture foundation type Tests`.findings(in: source, file: "Sources/Model AppKit/Bridge.swift").count == 2)
+    }
+
+    @Test
+    func `an NSObject delegate base is Foundation's`() {
+        let source = "fileprivate final class Bridge: NSObject, Delegate {}"
+        #expect(Lint.Rule.`architecture foundation type Tests`.findings(in: source).count == 1)
     }
 
     @Test

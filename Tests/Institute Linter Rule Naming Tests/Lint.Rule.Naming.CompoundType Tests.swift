@@ -432,3 +432,12 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
         #expect(findings.count == 1)
     }
 }
+
+extension Lint.Rule.`compound type name Tests`.`Edge Case` {
+    @Test
+    func `a framework name is compound unless the rule is given it`() {
+        let parsed = Lint.Source.parsed(from: "public enum SwiftUI {}", file: "Sources/Core/SwiftUI.swift")
+        #expect(Lint.Rule.`compound type name`.observe(parsed, .warning).findings.count == 1)
+        #expect(Lint.Rule.`compound type name`(words: ["SwiftUI"]).observe(parsed, .warning).findings.isEmpty)
+    }
+}
