@@ -1,10 +1,10 @@
 public import Command
 public import Command_Schema
 import Console
+import File_System
 import GitHub_App
 public import Institute_GitHub
 public import Institute_Model
-import Paths
 
 extension Institute.GitHub.Command {
     /// `institute github token` — mint one installation token.
@@ -102,8 +102,8 @@ extension Institute.GitHub.Command {
         }
 
         public mutating func run() async throws(Institute.Error) {
-            let name: Paths.Path.Component
-            do throws(Paths.Path.Component.Error) {
+            let name: Path::Path.Component
+            do throws(Path::Path.Component.Error) {
                 name = try .init(application)
             } catch {
                 throw .configuration("github token: --app \(application) is not a usable name")

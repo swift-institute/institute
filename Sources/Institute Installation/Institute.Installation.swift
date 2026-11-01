@@ -38,7 +38,7 @@ extension Institute {
             }
 
             let home: File.Directory
-            do throws(Paths.Path.Error) {
+            do throws(Path::Path.Error) {
                 home = try File.Directory(validating: value)
             } catch {
                 throw .configuration("HOME is not a usable path \(value): \(error)")
@@ -193,7 +193,7 @@ extension Institute.Installation {
             in: environmentPath
         ) where !value.isEmpty {
             let directory: File.Directory
-            do throws(Paths.Path.Error) {
+            do throws(Path::Path.Error) {
                 directory = try File.Directory(validating: Swift.String(value))
             } catch {
                 continue
@@ -409,7 +409,7 @@ extension Institute.Installation {
 
         if argument.contains("/") {
             let path: File.Path
-            do throws(Paths.Path.Error) {
+            do throws(Path::Path.Error) {
                 path = try File.Path(argument)
             } catch {
                 throw .configuration("the running Institute command path is invalid: \(error)")
@@ -427,7 +427,7 @@ extension Institute.Installation {
             in: environmentPath
         ) where !value.isEmpty {
             let directory: File.Directory
-            do throws(Paths.Path.Error) {
+            do throws(Path::Path.Error) {
                 directory = try File.Directory(validating: Swift.String(value))
             } catch {
                 continue
