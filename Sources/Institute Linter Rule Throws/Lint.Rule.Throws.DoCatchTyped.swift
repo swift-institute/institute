@@ -5,6 +5,7 @@ extension Lint.Rule {
     public static let `do throws for typed catch` = Lint.Rule(
         id: "do throws for typed catch",
         default: .warning,
+        suppression: .next,
         controls: [
             .init(
                 id: "do throws for typed catch bare do try",

@@ -784,6 +784,7 @@ let linterRuleTargets: [Target] = [
             name: "Institute Linter Rule Throws Tests",
             dependencies: [
                 .product(name: "Lint", package: "swift-lint"),
+                .product(name: "Linter", package: "swift-linter"),
                 .target(name: "Institute Linter Rule Throws"),
                 .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
                 .product(name: "SwiftParser", package: "swift-syntax"),
@@ -793,6 +794,7 @@ let linterRuleTargets: [Target] = [
             name: "Institute Linter Rule Try Tests",
             dependencies: [
                 .target(name: "Institute Linter Rule Try"),
+                .product(name: "Linter", package: "swift-linter"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
                 .product(name: "SwiftParser", package: "swift-syntax"),

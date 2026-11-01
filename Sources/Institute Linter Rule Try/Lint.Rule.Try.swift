@@ -5,6 +5,7 @@ extension Lint.Rule {
     public static let `try optional` = Lint.Rule(
         id: "try optional",
         default: .warning,
+        suppression: .next,
         controls: [
             .init(
                 id: "try optional erased failure",
