@@ -328,3 +328,19 @@ extension Lint.Rule.`manifest naming grammar Tests`.`Edge Case` {
         #expect(findings.first?.message.contains("ImageMagickShims") == true)
     }
 }
+
+extension Lint.Rule.`manifest naming grammar Tests`.`Edge Case` {
+    @Test
+    func `a target named for its Apple framework is one word per name`() {
+        let manifest = """
+            let package = Package(name: "birdwatch", targets: [.target(name: "Birdwatch SwiftUI"), .target(name: "Birdwatch UserNotifications"), .target(name: "Processes AppKit")])
+            """
+        #expect(Lint.Rule.`manifest naming grammar Tests`.findings(in: manifest).isEmpty)
+    }
+
+    @Test
+    func `a framework name run into another word is still concatenated`() {
+        let manifest = #"let package = Package(name: "birdwatch", targets: [.target(name: "BirdwatchSwiftUI")])"#
+        #expect(!Lint.Rule.`manifest naming grammar Tests`.findings(in: manifest).isEmpty)
+    }
+}

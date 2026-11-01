@@ -230,3 +230,17 @@ extension Lint.Rule.`path name grammar Tests`.`Edge Case` {
         #expect(findings.isEmpty)
     }
 }
+
+extension Lint.Rule.`path name grammar Tests`.`Edge Case` {
+    @Test
+    func `an adapter folder named for its Apple framework is one word per name`() {
+        for folder in ["Birdwatch SwiftUI", "Processes AppKit", "Birdwatch UserNotifications", "Reader FoundationModels"] {
+            #expect(Lint.Rule.`path name grammar Tests`.findings(in: "struct A {}", file: "Sources/\(folder)/A.swift").isEmpty, "\(folder)")
+        }
+    }
+
+    @Test
+    func `a framework name run into another word is still concatenated`() {
+        #expect(!Lint.Rule.`path name grammar Tests`.findings(in: "struct A {}", file: "Sources/BirdwatchSwiftUI/A.swift").isEmpty)
+    }
+}
