@@ -37,6 +37,30 @@ extension Lint.Rule {
                 expectation: .findings(1)
             ),
             .init(
+                id: "architecture foundation type a framework's required delegate base",
+                source: "import Sparkle\n\nfileprivate final class Bridge: NSObject, SPUUpdaterDelegate {}",
+                path: "Sources/Architecture Platform/Bridge.swift",
+                expectation: .clean
+            ),
+            .init(
+                id: "architecture foundation type foundation inside a required delegate",
+                source: "fileprivate final class Bridge: NSObject, SPUUpdaterDelegate {\n    var count: NSNumber?\n}",
+                path: "Sources/Architecture Platform/Bridge.swift",
+                expectation: .findings(1)
+            ),
+            .init(
+                id: "architecture foundation type public NSObject subclass",
+                source: "public final class Bridge: NSObject, SPUUpdaterDelegate {}",
+                path: "Sources/Architecture Platform/Bridge.swift",
+                expectation: .findings(1)
+            ),
+            .init(
+                id: "architecture foundation type NSObject subclass conforming to nothing",
+                source: "fileprivate final class Bridge: NSObject {}",
+                path: "Sources/Architecture Platform/Bridge.swift",
+                expectation: .findings(1)
+            ),
+            .init(
                 id: "architecture foundation type integration exemption",
                 source: "public var payload: Foundation.Data",
                 path: "Sources/Architecture Foundation Integration/QualifiedUse.swift",
@@ -92,6 +116,21 @@ private func architectureFoundationTypeImportsInterfaceFramework(_ tree: SourceF
         guard let declaration = statement.item.as(ImportDeclSyntax.self), let module = declaration.path.first?.name.text
         else { return false }
         return architectureFoundationTypeInterfaceFrameworks.contains(module)
+    }
+}
+
+/// Whether `node` is `NSObject` as the superclass of a `private` or `fileprivate` class that also conforms to a
+/// protocol: the base an Objective-C framework requires of its delegate (Sparkle's `SPUUpdaterDelegate`), which no
+/// Institute type can replace. Foundation types inside that class are still findings (#247).
+private func architectureFoundationTypeIsRequiredDelegateBase(_ node: IdentifierTypeSyntax) -> Swift::Bool {
+    guard node.name.text == "NSObject", node.genericArgumentClause == nil,
+        let inherited = node.parent?.as(InheritedTypeSyntax.self),
+        let list = inherited.parent?.as(InheritedTypeListSyntax.self),
+        list.first?.id == inherited.id, list.count > 1,
+        let declaration = list.parent?.parent?.as(ClassDeclSyntax.self)
+    else { return false }
+    return declaration.modifiers.contains { modifier in
+        modifier.name.tokenKind == .keyword(.private) || modifier.name.tokenKind == .keyword(.fileprivate)
     }
 }
 
@@ -174,7 +213,9 @@ internal final class ArchitectureFoundationTypeVisitor: SyntaxVisitor {
     }
 
     override func visit(_ node: IdentifierTypeSyntax) -> SyntaxVisitorContinueKind {
-        if classes == .foundation, architectureFoundationTypeIsFoundationClassName(node.name.text) {
+        if classes == .foundation, architectureFoundationTypeIsFoundationClassName(node.name.text),
+            !architectureFoundationTypeIsRequiredDelegateBase(node)
+        {
             record(at: node.positionAfterSkippingLeadingTrivia)
         }
         return .visitChildren
