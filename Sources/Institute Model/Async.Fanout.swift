@@ -1,6 +1,5 @@
 public import Async_Fanout
 internal import Kernel_System
-internal import Kernel_Thread
 
 // Bounded concurrent evaluation of independent work is owned by
 // swift-molecules/swift-async-fanout as `Async.Fanout`, and every consumer
@@ -15,7 +14,7 @@ extension Async.Fanout {
     /// Read from the machine rather than fixed, so a fan-out neither
     /// under-uses a large host nor oversubscribes a small one.
     public static var processors: Swift.Int {
-        Swift.Int(Kernel.Thread.Count(System.processorCount))
+        Swift.Int(CPU.Logical.count)
     }
 
     /// Every fan-out in this application spawns a child process per item —

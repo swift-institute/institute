@@ -139,7 +139,6 @@ private let allDeclaredRuleIDs: Swift::Set<Swift::String> = [
     "string utf8 scanning",
     "suite categories",
     "swift protocol qualification",
-    "system subdomain",
     "tag suffix",
     "tagged extension public init",
     "tagged unchecked with typed alternative",
@@ -353,7 +352,6 @@ extension `Lint Rule Bundle institute Tests`.`Severity` {
         "uint8 forwarder missing disfavored",
         "unchecked sendable revalidation anchor",
         "wrapper backing exposed",
-        "system subdomain",
         "apache license",
         "xctest import",
     ])

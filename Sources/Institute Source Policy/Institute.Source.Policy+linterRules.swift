@@ -109,7 +109,6 @@ extension Institute.Source.Policy {
         "string utf8 scanning",
         "suppression reason required",
         "swift protocol qualification",
-        "system subdomain",
         "tag suffix",
         "tagged extension public init",
         "tagged unchecked with typed alternative",

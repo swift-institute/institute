@@ -106,7 +106,6 @@ extension Lint.Rule.Bundle {
             .enable(.`platform layer import`, severity: .error),
             .enable(.`canimport conditional`),
             .enable(.`swift protocol qualification`),
-            .enable(.`system subdomain`, severity: .error),
             .enable(.`typealiased namespace bridge`),
             .enable(.`hoisted protocol alias`, severity: .error),
             .enable(.`minimal type body`),
