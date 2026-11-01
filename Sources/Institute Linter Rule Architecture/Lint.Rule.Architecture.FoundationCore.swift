@@ -19,6 +19,24 @@ extension Lint.Rule {
                 expectation: .clean
             ),
             .init(
+                id: "architecture foundation type appkit class in an appkit file",
+                source: "import AppKit\n\nfinal class Bridge: NSView {\n    var window: NSWindow?\n}",
+                path: "Sources/Architecture AppKit/Bridge.swift",
+                expectation: .clean
+            ),
+            .init(
+                id: "architecture foundation type foundation class without a ui framework",
+                source: "import Foundation\n\npublic var count: NSNumber",
+                path: "Sources/Architecture Core/Count.swift",
+                expectation: .findings(1)
+            ),
+            .init(
+                id: "architecture foundation type qualified use in an appkit file",
+                source: "import AppKit\n\npublic var payload: Foundation.Data",
+                path: "Sources/Architecture AppKit/Payload.swift",
+                expectation: .findings(1)
+            ),
+            .init(
                 id: "architecture foundation type integration exemption",
                 source: "public var payload: Foundation.Data",
                 path: "Sources/Architecture Foundation Integration/QualifiedUse.swift",
@@ -40,7 +58,8 @@ extension Lint.Rule {
             let visitor = ArchitectureFoundationTypeVisitor(
                 source: source.file,
                 severity: severity,
-                converter: source.converter
+                converter: source.converter,
+                classes: architectureFoundationTypeImportsInterfaceFramework(source.tree) ? .interface : .foundation
             )
             visitor.walk(source.tree)
             return visitor.matches
@@ -62,6 +81,18 @@ private func architectureFoundationTypeIsFoundationClassName(
     let remainder = name.dropFirst(2)
     guard let first = remainder.first, first.isUppercase else { return false }
     return remainder.contains { $0.isLowercase }
+}
+
+/// The frameworks whose own classes carry the `NS` or `UI` prefix: in a file that imports one, an `NS` name is
+/// judged that framework's, while a module-qualified Foundation type is still flagged.
+private let architectureFoundationTypeInterfaceFrameworks: Swift::Set<Swift::String> = ["AppKit", "UIKit"]
+
+private func architectureFoundationTypeImportsInterfaceFramework(_ tree: SourceFileSyntax) -> Swift::Bool {
+    tree.statements.contains { statement in
+        guard let declaration = statement.item.as(ImportDeclSyntax.self), let module = declaration.path.first?.name.text
+        else { return false }
+        return architectureFoundationTypeInterfaceFrameworks.contains(module)
+    }
 }
 
 private let architectureFoundationTypeIntegrationTargetSuffix: Swift::String =
@@ -114,12 +145,14 @@ internal final class ArchitectureFoundationTypeVisitor: SyntaxVisitor {
     let source: Source.File
     let severity: Diagnostic.Severity
     let converter: SourceLocationConverter
+    let classes: Classes
     var matches: [Diagnostic.Record] = []
 
-    init(source: Source.File, severity: Diagnostic.Severity, converter: SourceLocationConverter) {
+    init(source: Source.File, severity: Diagnostic.Severity, converter: SourceLocationConverter, classes: Classes) {
         self.source = source
         self.severity = severity
         self.converter = converter
+        self.classes = classes
         super.init(viewMode: .sourceAccurate)
     }
 
@@ -141,7 +174,7 @@ internal final class ArchitectureFoundationTypeVisitor: SyntaxVisitor {
     }
 
     override func visit(_ node: IdentifierTypeSyntax) -> SyntaxVisitorContinueKind {
-        if architectureFoundationTypeIsFoundationClassName(node.name.text) {
+        if classes == .foundation, architectureFoundationTypeIsFoundationClassName(node.name.text) {
             record(at: node.positionAfterSkippingLeadingTrivia)
         }
         return .visitChildren
@@ -155,5 +188,15 @@ internal final class ArchitectureFoundationTypeVisitor: SyntaxVisitor {
             return .skipChildren
         }
         return .visitChildren
+    }
+}
+
+extension ArchitectureFoundationTypeVisitor {
+    /// Whose classes an `NS` name in the file names.
+    enum Classes {
+        /// Foundation's: the file imports no interface framework.
+        case foundation
+        /// AppKit's or UIKit's: the file imports one.
+        case interface
     }
 }

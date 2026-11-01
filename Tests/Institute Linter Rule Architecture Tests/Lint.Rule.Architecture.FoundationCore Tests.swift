@@ -131,3 +131,28 @@ extension Lint.Rule.`architecture foundation type Tests` {
         #expect(findings.count == 1)
     }
 }
+
+extension Lint.Rule.`architecture foundation type Tests`.`Edge Case` {
+    @Test
+    func `an NS class in a file that imports AppKit is AppKit's, not Foundation's`() {
+        let source = "import AppKit\n\nfinal class Bridge: NSView {\n    var window: NSWindow?\n}"
+        #expect(Lint.Rule.`architecture foundation type Tests`.findings(in: source, file: "Sources/Model AppKit/Bridge.swift").isEmpty)
+    }
+
+    @Test
+    func `an NS class without an interface framework is still Foundation's`() {
+        let source = "import Foundation\n\npublic var count: NSNumber"
+        #expect(Lint.Rule.`architecture foundation type Tests`.findings(in: source).count == 1)
+    }
+
+    @Test
+    func `a module-qualified Foundation type is flagged even beside AppKit`() {
+        let source = "import AppKit\n\npublic var payload: Foundation.Data"
+        #expect(Lint.Rule.`architecture foundation type Tests`.findings(in: source, file: "Sources/Model AppKit/Payload.swift").count == 1)
+    }
+
+    @Test
+    func `the rule's controls hold`() {
+        for outcome in Lint.Rule.`architecture foundation type`.outcomes() { #expect(outcome.holds, "\(outcome)") }
+    }
+}
