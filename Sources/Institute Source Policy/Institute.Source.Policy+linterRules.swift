@@ -47,7 +47,6 @@ extension Institute.Source.Policy {
         "count minus one",
         "counter loop iteration",
         "dead case per platform",
-        "declarative manifest",
         "default trait",
         "diagnostic message format",
         "do throws for typed catch",
