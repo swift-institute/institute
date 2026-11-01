@@ -727,6 +727,7 @@ let linterRuleTargets: [Target] = [
             name: "Institute Linter Rule Idiom Tests",
             dependencies: [
                 .target(name: "Institute Linter Rule Idiom"),
+                .product(name: "Linter", package: "swift-linter"),
                 .product(name: "Linter Rule Testing", package: "swift-linter-rules"),
                 .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
                 .product(name: "SwiftParser", package: "swift-syntax"),

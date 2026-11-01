@@ -5,6 +5,7 @@ extension Lint.Rule {
     public static let `fatal error outside tests` = Lint.Rule(
         id: "fatal error outside tests",
         default: .warning,
+        suppression: .next,
         controls: [
             .init(
                 id: "fatal error outside tests source",
