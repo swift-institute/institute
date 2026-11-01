@@ -114,6 +114,7 @@ extension Institute.Source.Policy {
         "tagged extension public init",
         "tagged unchecked with typed alternative",
         "target import edge",
+        "task sleep",
         "test display name string",
         "test file suffix",
         "test function naming",

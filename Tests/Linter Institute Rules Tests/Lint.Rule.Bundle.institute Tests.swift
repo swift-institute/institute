@@ -77,6 +77,7 @@ private let allDeclaredRuleIDs: Swift::Set<Swift::String> = [
     "exported import",
     "comment in source",
     "fatal error outside tests",
+    "task sleep",
     "unchecked try outside tests",
     "test target naming",
     "default trait",

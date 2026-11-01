@@ -84,6 +84,7 @@ extension Lint.Rule.Bundle {
             .enable(.`exported import`),
             .enable(.`comment in source`),
             .enable(.`fatal error outside tests`),
+            .enable(.`task sleep`),
             .enable(.`unchecked try outside tests`),
             .enable(.`test target naming`),
             .enable(.`default trait`, severity: .error),
