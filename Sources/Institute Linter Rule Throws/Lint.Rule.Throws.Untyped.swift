@@ -5,6 +5,7 @@ extension Lint.Rule {
     public static let `untyped throws` = Lint.Rule(
         id: "untyped throws",
         default: .warning,
+        suppression: .next,
         controls: [
             .init(
                 id: "untyped throws bare function",
