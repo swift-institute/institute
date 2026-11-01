@@ -70,6 +70,7 @@ extension Lint.Rule.Bundle {
             .enable(.`redirected dependency url`, severity: .error),
             .enable(.`apache license`, severity: .error),
             .enable(.`canonical settings tail`),
+            .enable(.`declarative manifest`),
             .enable(.`statement where expression fits`),
             .enable(.`existential parameter`),
             .enable(.`platform floor`),

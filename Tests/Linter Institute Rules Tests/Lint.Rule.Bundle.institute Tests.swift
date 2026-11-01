@@ -62,6 +62,7 @@ private let allDeclaredRuleIDs: Swift::Set<Swift::String> = [
     "apache license",
     "type name capital",
     "canonical settings tail",
+    "declarative manifest",
     "statement where expression fits",
     "existential parameter",
     "platform floor",
