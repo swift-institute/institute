@@ -17,9 +17,9 @@ extension Lint.Framework {
         "ActivityKit", "AppIntents", "AppKit", "AVFoundation", "BackgroundTasks", "CloudKit", "Combine", "Contacts",
         "CoreData", "CoreGraphics", "CoreImage", "CoreLocation", "CoreServices", "CoreSpotlight", "CoreText",
         "CoreTransferable", "CryptoKit", "EventKit", "FoundationModels", "ImageIO", "LocalAuthentication", "MapKit",
-        "Network", "OSLog", "os", "PDFKit", "Photos", "PhotosUI", "Quartz", "QuickLook", "QuickLookThumbnailing",
-        "Security", "ServiceManagement", "StoreKit", "SwiftData", "SwiftUI", "UIKit", "UniformTypeIdentifiers",
-        "UserNotifications", "Vision", "VisionKit", "WebKit", "WidgetKit",
+        "MetricKit", "Network", "OSLog", "os", "PDFKit", "Photos", "PhotosUI", "Quartz", "QuickLook",
+        "QuickLookThumbnailing", "Security", "ServiceManagement", "StoreKit", "SwiftData", "SwiftUI", "UIKit",
+        "UniformTypeIdentifiers", "UserNotifications", "Vision", "VisionKit", "WebKit", "WidgetKit",
     ]
 
     /// What an adapter named for a framework may import beside it.

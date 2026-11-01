@@ -96,6 +96,7 @@ private let namingCompoundTypeBrandTokenCitations: [Swift::String: Swift::String
     "ImageIO": "Apple SDK module name, which an adapter target is named after (framework import)",
     "LocalAuthentication": "Apple SDK module name, which an adapter target is named after (framework import)",
     "MapKit": "Apple SDK module name, which an adapter target is named after (framework import)",
+    "MetricKit": "Apple SDK module name, which an adapter target is named after (framework import)",
     "OSLog": "Apple SDK module name, which an adapter target is named after (framework import)",
     "PDFKit": "Apple SDK module name, which an adapter target is named after (framework import)",
     "PhotosUI": "Apple SDK module name, which an adapter target is named after (framework import)",
