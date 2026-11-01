@@ -11,10 +11,18 @@ struct `Lint Rule Bundle app Tests` {
 extension `Lint Rule Bundle app Tests`.Unit {
     static var ids: [Swift::String] { Lint.Rule.Bundle.app.map(\.rule.id.underlying) }
 
+    /// Rules about a package that other packages build on, which an app's package is not (#242, #243, #244).
+    static let packageOnly: Swift::Set<Swift::String> = ["platform floor", "untraited partial dependency", "foundation import"]
+
     @Test
-    func `the app bundle holds every institute rule`() {
+    func `the app bundle holds every institute rule but those about a package other packages build on`() {
         let missing = Swift::Set(Lint.Rule.Bundle.institute.map(\.rule.id.underlying)).subtracting(Self.ids)
-        #expect(missing.isEmpty, "\(missing.sorted())")
+        #expect(missing == Self.packageOnly, "\(missing.sorted())")
+    }
+
+    @Test
+    func `the institute bundle still holds the package rules the app bundle leaves out`() {
+        #expect(Self.packageOnly.isSubset(of: Swift::Set(Lint.Rule.Bundle.institute.map(\.rule.id.underlying))))
     }
 
     @Test(arguments: ["framework import", "owned api", "view state", "view logic", "with animation", "feature user defaults"])
