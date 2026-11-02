@@ -11,14 +11,21 @@ extension Lint.Rule {
                 source: "let package = Package(name: \"Fixture\")",
                 path: "Package.swift",
                 expectation: .clean,
-                license: .text(manifestApacheLicenseTerms)
+                license: .text("Copyright 2025 Coen ten Thije Boonkkamp\n\n" + manifestApacheLicenseTerms)
+            ),
+            .init(
+                id: "apache license unfilled holder",
+                source: "let package = Package(name: \"Fixture\")",
+                path: "Package.swift",
+                expectation: .findings(1),
+                license: .text(manifestApacheLicenseTerms + "\n\n    Copyright [yyyy] [name of copyright owner]")
             ),
             .init(
                 id: "apache license reflowed markdown text",
                 source: "let package = Package(name: \"Fixture\")",
                 path: "Package.swift",
                 expectation: .clean,
-                license: .text("# Apache License\n\n**" + manifestApacheLicenseTerms.split(separator: "\n").joined(separator: " ") + "**")
+                license: .text("# Apache License\n\nCopyright 2025 Coen ten Thije Boonkkamp\n\n**" + manifestApacheLicenseTerms.split(separator: "\n").joined(separator: " ") + "**")
             ),
             .init(
                 id: "apache license missing file",
@@ -47,6 +54,13 @@ extension Lint.Rule {
                 path: "Package.swift",
                 expectation: .clean,
                 license: .text("MIT License\n\nCopyright (c) 2025 Point-Free, Inc.\n\nPermission is hereby granted")
+            ),
+            .init(
+                id: "apache license upstream holder without (c)",
+                source: "let package = Package(name: \"Fixture\")",
+                path: "Package.swift",
+                expectation: .clean,
+                license: .text(manifestApacheLicenseTerms + "\n\nCopyright 2022 The SwiftASN1 Project")
             ),
             .init(
                 id: "apache license own holder",
@@ -85,7 +99,9 @@ extension Lint.Rule {
             }
             let findings: [Diagnostic.Record]
             switch source.index.license {
-            case .text(let text) where manifestApacheLicenseNormalized(text).contains(manifestApacheLicenseCanonical):
+            case .text(let text)
+            where manifestApacheLicenseNormalized(text).contains(manifestApacheLicenseCanonical)
+                && manifestLicenseNamesOwnHolder(text):
                 findings = []
 
             case .text(let text) where manifestLicenseNamesUpstreamHolder(text):
@@ -118,6 +134,7 @@ internal func manifestIsRootPackageManifest(_ path: Swift::String) -> Swift::Boo
 package let manifestLicenseOwnHolders: [Swift::String] = [
     "coen ten thije boonkkamp",
     "swift institute",
+    "the swift institute",
     "free software foundation",
 ]
 
@@ -130,12 +147,29 @@ package func manifestLicenseNamesUpstreamHolder(_ text: Swift::String) -> Swift:
             rest = rest.dropFirst(4)
         } else if rest.hasPrefix("© ") {
             rest = rest.dropFirst(2)
-        } else {
+        } else if rest.first?.isNumber != true {
+            // Without `(c)` a year must follow, so the terms' own "Copyright License" and the appendix's
+            // unfilled `[yyyy]` never count as a holder.
             return false
         }
         let holder = rest.drop { $0.isNumber || $0 == "-" || $0 == "," || $0 == " " }
         guard holder.first?.isLetter == true else { return false }
         return !manifestLicenseOwnHolders.contains { holder.hasPrefix($0) }
+    }
+}
+
+/// Whether a line of `text` is the Institute's copyright, `Copyright <year> <holder>` (with or without `(c)`),
+/// naming one of its own holders: the Apache terms alone, with the appendix's `[name of copyright owner]`
+/// unfilled, say nothing about who licenses the package.
+package func manifestLicenseNamesOwnHolder(_ text: Swift::String) -> Swift::Bool {
+    text.split(separator: "\n").contains { line in
+        var rest = Swift::Substring(manifestApacheLicenseNormalized(Swift::String(line)))
+        guard rest.hasPrefix("copyright ") else { return false }
+        rest = rest.dropFirst("copyright ".count)
+        if rest.hasPrefix("(c) ") { rest = rest.dropFirst(4) } else if rest.hasPrefix("© ") { rest = rest.dropFirst(2) }
+        guard rest.first?.isNumber == true else { return false }
+        let holder = rest.drop { $0.isNumber || $0 == "-" || $0 == "," || $0 == " " }
+        return manifestLicenseOwnHolders.contains { holder.hasPrefix($0) }
     }
 }
 
@@ -146,7 +180,8 @@ internal func manifestApacheLicenseMessage(_ license: Lint.Source.Index.License)
         found = "the package has no LICENSE.md or LICENSE file at its root"
 
     case .text:
-        found = "the root LICENSE does not carry the complete Apache License 2.0 terms"
+        found = "the root LICENSE does not carry the complete Apache License 2.0 terms with the Institute's "
+            + "copyright line (`Copyright <year> Coen ten Thije Boonkkamp`)"
     }
     return "[apache license]: every Swift Institute package is licensed under the Apache License 2.0; "
         + found + ". Use the full Apache License 2.0 text (sections 1 to 9); a package that keeps an "
