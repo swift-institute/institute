@@ -15,6 +15,13 @@ extension Lint.Rule {
                 expectation: .clean
             ),
             .init(
+                id: "unification typealias witness of a protocol declared elsewhere",
+                source: "public struct Sample: Witness.Key {}\n"
+                    + "extension Sample { public typealias Value = Handler.Key }",
+                path: "Sources/Naming Core/ExternalWitness.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "unification typealias same name without a requirement",
                 source: "public protocol Keyed { associatedtype Other }\n"
                     + "public struct Sample: Keyed {}\n"
@@ -119,6 +126,22 @@ internal final class NamingUnificationTypealiasVisitor: SyntaxVisitor {
         return nil
     }
 
+    /// Whether `type` conforms to a protocol this package does not declare, other than a standard one with no
+    /// associated types. That protocol's associated types are unknown here, so a typealias on `type` may be the
+    /// witness of one, as `typealias Value = Agent.Sessions` is for a `Witness.Key` (coenttb/birdwatch#2).
+    private func conformsToProtocolDeclaredElsewhere(_ type: Swift::String) -> Swift::Bool {
+        index.reachableProtocols(of: type).contains { name in
+            index.associatedTypes[name] == nil && !Self.standardWithoutAssociatedTypes.contains(name)
+        }
+    }
+
+    /// Standard-library protocols that declare no associated type, so a typealias beside them witnesses nothing.
+    private static let standardWithoutAssociatedTypes: Swift::Set<Swift::String> = [
+        "Sendable", "SendableMetatype", "Equatable", "Hashable", "Comparable", "Codable", "Encodable", "Decodable",
+        "Error", "CustomStringConvertible", "CustomDebugStringConvertible", "AnyObject", "Copyable", "Escapable",
+        "BitwiseCopyable",
+    ]
+
     override func visit(_ node: TypeAliasDeclSyntax) -> SyntaxVisitorContinueKind {
         let lhsName = node.name.text
         guard let member = node.initializer.value.as(MemberTypeSyntax.self) else {
@@ -140,6 +163,7 @@ internal final class NamingUnificationTypealiasVisitor: SyntaxVisitor {
         }
         if let owner = enclosingTypeName(of: Syntax(node)),
             index.witnessesAssociatedType(named: lhsName, on: owner)
+                || conformsToProtocolDeclaredElsewhere(owner)
         {
             return .visitChildren
         }

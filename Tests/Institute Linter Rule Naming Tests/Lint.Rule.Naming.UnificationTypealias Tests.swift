@@ -175,3 +175,32 @@ extension Lint.Rule.`unification typealias Tests`.`Edge Case` {
         #expect(findings.count == 1)
     }
 }
+
+extension Lint.Rule.`unification typealias Tests`.`Edge Case` {
+    @Test
+    func `a typealias on a type conforming to a protocol declared elsewhere may be its witness`() {
+        let source = """
+            enum Key: Dependencies.Dependency.Key {}
+            extension Key { typealias Value = Agent.Sessions }
+            """
+        #expect(Lint.Rule.`unification typealias Tests`.findings(in: source).isEmpty)
+    }
+
+    @Test
+    func `a nested type conforming to a protocol declared elsewhere may witness it too`() {
+        let source = """
+            extension Agent.Sessions { enum Dependency: Dependencies::Dependency.Key {} }
+            extension Agent.Sessions.Dependency { typealias Value = Agent.Sessions }
+            """
+        #expect(Lint.Rule.`unification typealias Tests`.findings(in: source).isEmpty)
+    }
+
+    @Test
+    func `conforming only to standard protocols without associated types leaves a rename bridge flagged`() {
+        let source = """
+            struct Sample: Sendable, Equatable {}
+            extension Sample { typealias Value = Agent.Sessions }
+            """
+        #expect(Lint.Rule.`unification typealias Tests`.findings(in: source).count == 1)
+    }
+}
