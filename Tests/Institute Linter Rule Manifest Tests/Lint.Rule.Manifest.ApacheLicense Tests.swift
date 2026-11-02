@@ -29,14 +29,16 @@ extension Lint.Rule.`apache license Tests` {
 extension Lint.Rule.`apache license Tests`.Unit {
     @Test
     func `the full Apache License 2.0 text is clean`() {
-        let license = "                                 Apache License\n" + manifestApacheLicenseTerms
+        let license =
+            "                                 Apache License\n" + manifestApacheLicenseTerms
             + "\n\n   Copyright 2025 Coen ten Thije Boonkkamp"
         #expect(Lint.Rule.`apache license Tests`.observe(license: .text(license)).findings.isEmpty)
     }
 
     @Test
     func `the Apache terms with the appendix's holder unfilled are flagged`() {
-        let license = "                                 Apache License\n" + manifestApacheLicenseTerms
+        let license =
+            "                                 Apache License\n" + manifestApacheLicenseTerms
             + "\n\n    Copyright [yyyy] [name of copyright owner]"
         #expect(Lint.Rule.`apache license Tests`.observe(license: .text(license)).findings.count == 1)
     }

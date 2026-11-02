@@ -6,7 +6,6 @@ import Testing
 
 @testable import Institute_Linter_Rule_Structure
 
-
 @Suite
 struct `suppression reason required Tests` {
     @Suite struct Unit {}

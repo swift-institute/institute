@@ -1,6 +1,6 @@
 import Byte
-public import Institute_Model
 import Institute_Command
+public import Institute_Model
 import Institute_Repository_Policy
 import Testing
 

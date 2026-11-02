@@ -25,11 +25,13 @@ extension Lint.Rule {
         }
 
         @Test func `disable next with a reason is sanctioned`() {
-            let suppression = Self.suppression("""
+            let suppression = Self.suppression(
+                """
                 // swift-linter:disable:next fatal error outside tests
                 // REASON: a built-in URL literal; License Tests covers it.
                 guard let url = make() else { fatalError() }
-                """)
+                """
+            )
             #expect(suppression.suppresses(line: Text.Line.Number(3), rule: Self.rule.id, sanctioned: Self.rule.suppression))
         }
 

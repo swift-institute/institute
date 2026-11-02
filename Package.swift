@@ -500,383 +500,383 @@ let package = Package(
 )
 
 let linterRuleTargets: [Target] = [
-        .target(
-            name: "Institute Linter Rule Architecture",
-            dependencies: [
-                .target(name: "Institute Model"),
-                .product(name: "Lint", package: "swift-lint"),
-                .target(name: "Institute Linter Rule Manifest"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Institute Linter Rule Naming",
-            dependencies: [
-                .product(name: "Byte", package: "swift-byte"),
-                .product(name: "Lint", package: "swift-lint"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Institute Linter Rule Foundation",
-            dependencies: [
-                .product(name: "Lint", package: "swift-lint"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Institute Linter Rule Framework",
-            dependencies: [
-                .product(name: "Lint", package: "swift-lint"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Institute Linter Rule Byte",
-            dependencies: [
-                .product(name: "Lint", package: "swift-lint"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Institute Linter Rule Conformance",
-            dependencies: [
-                .product(name: "Lint", package: "swift-lint"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Institute Linter Rule Closure",
-            dependencies: [
-                .product(name: "Lint", package: "swift-lint"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Institute Linter Rule Idiom",
-            dependencies: [
-                .product(name: "Lint", package: "swift-lint"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Institute Linter Rule Manifest",
-            dependencies: [
-                .target(name: "Institute Model"),
-                .product(name: "Lint", package: "swift-lint"),
-                .product(name: "Linter Rule Scope", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-                .product(name: "SPM Standard", package: "swift-spm-standard"),
-                .product(name: "Byte", package: "swift-byte"),
-            ]
-        ),
-        .target(
-            name: "Institute Linter Rule Memory",
-            dependencies: [
-                .product(name: "Lint", package: "swift-lint"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Institute Linter Rule Platform",
-            dependencies: [
-                .target(name: "Institute Model"),
-                .product(name: "Lint", package: "swift-lint"),
-                .target(name: "Institute Linter Rule Manifest"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Institute Linter Rule Structure",
-            dependencies: [
-                .product(name: "Lint", package: "swift-lint"),
-                .target(name: "Institute Linter Rule Manifest"),
-                .product(name: "Linter Rule Structure", package: "swift-linter-rules"),
-                .product(name: "Cardinal", package: "swift-cardinal"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Institute Linter Rule Testing",
-            dependencies: [
-                .product(name: "Lint", package: "swift-lint"),
-                .target(name: "Institute Linter Rule Manifest"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Institute Linter Rule Throws",
-            dependencies: [
-                .product(name: "Lint", package: "swift-lint"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Institute Linter Rule Try",
-            dependencies: [
-                .product(name: "Lint", package: "swift-lint"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Institute Linter Rule Unchecked",
-            dependencies: [
-                .product(name: "Lint", package: "swift-lint"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Institute Linter Rule RawValue",
-            dependencies: [
-                .product(name: "Lint", package: "swift-lint"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Institute Linter Rule Cardinal",
-            dependencies: [
-                .product(name: "Lint", package: "swift-lint"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-                .product(name: "SwiftOperators", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Linter Institute Rules",
-            dependencies: [
-                .target(name: "Institute Model"),
-                .product(name: "Lint", package: "swift-lint"),
-                .target(name: "Institute Linter Rule Architecture"),
-                .target(name: "Institute Linter Rule Naming"),
-                .target(name: "Institute Linter Rule Foundation"),
-                .target(name: "Institute Linter Rule Framework"),
-                .target(name: "Institute Linter Rule Byte"),
-                .target(name: "Institute Linter Rule Conformance"),
-                .target(name: "Institute Linter Rule Closure"),
-                .target(name: "Institute Linter Rule Idiom"),
-                .target(name: "Institute Linter Rule Manifest"),
-                .target(name: "Institute Linter Rule Memory"),
-                .target(name: "Institute Linter Rule Platform"),
-                .target(name: "Institute Linter Rule Structure"),
-                .target(name: "Institute Linter Rule Testing"),
-                .target(name: "Institute Linter Rule Throws"),
-                .target(name: "Institute Linter Rule Try"),
-                .target(name: "Institute Linter Rule Unchecked"),
-                .target(name: "Institute Linter Rule RawValue"),
-                .target(name: "Institute Linter Rule Cardinal"),
-                .product(name: "Linter Rules", package: "swift-linter-rules"),
-            ]
-        ),
-        .testTarget(
-            name: "Institute Linter Rule Architecture Tests",
-            dependencies: [
-                .target(name: "Institute Linter Rule Architecture"),
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-            ]
-        ),
-        .testTarget(
-            name: "Institute Linter Rule Naming Tests",
-            dependencies: [
-                .target(name: "Institute Linter Rule Naming"),
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-            ]
-        ),
-        .testTarget(
-            name: "Institute Linter Rule Foundation Tests",
-            dependencies: [
-                .target(name: "Institute Linter Rule Foundation"),
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-            ]
-        ),
-        .testTarget(
-            name: "Institute Linter Rule Framework Tests",
-            dependencies: [
-                .target(name: "Institute Linter Rule Framework"),
-                .product(name: "Linter Rule Testing", package: "swift-linter-rules"),
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-            ]
-        ),
-        .testTarget(
-            name: "Institute Linter Rule Byte Tests",
-            dependencies: [
-                .target(name: "Institute Linter Rule Byte"),
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-            ]
-        ),
-        .testTarget(
-            name: "Institute Linter Rule Closure Tests",
-            dependencies: [
-                .target(name: "Institute Linter Rule Closure"),
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-            ]
-        ),
-        .testTarget(
-            name: "Institute Linter Rule Idiom Tests",
-            dependencies: [
-                .target(name: "Institute Linter Rule Idiom"),
-                .product(name: "Linter", package: "swift-linter"),
-                .product(name: "Linter Rule Testing", package: "swift-linter-rules"),
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-                .product(name: "Text", package: "swift-text"),
-            ]
-        ),
-        .testTarget(
-            name: "Institute Linter Rule Manifest Tests",
-            dependencies: [
-                .target(name: "Institute Model"),
-                .target(name: "Institute Linter Rule Manifest"),
-                .product(name: "Linter Rule Scope", package: "swift-linter-rules"),
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-            ]
-        ),
-        .testTarget(
-            name: "Institute Linter Rule Memory Tests",
-            dependencies: [
-                .target(name: "Institute Linter Rule Memory"),
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-            ]
-        ),
-        .testTarget(
-            name: "Institute Linter Rule Platform Tests",
-            dependencies: [
-                .target(name: "Institute Linter Rule Platform"),
-                .product(name: "Linter Rule Testing", package: "swift-linter-rules"),
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-            ]
-        ),
-        .testTarget(
-            name: "Institute Linter Rule Structure Tests",
-            dependencies: [
-                .target(name: "Institute Linter Rule Structure"),
-                .product(name: "Linter Rule Structure", package: "swift-linter-rules"),
-                .product(name: "Linter Rule Testing", package: "swift-linter-rules"),
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-            ]
-        ),
-        .testTarget(
-            name: "Institute Linter Rule Testing Tests",
-            dependencies: [
-                .target(name: "Institute Linter Rule Testing"),
-                .product(name: "Linter Rule Testing", package: "swift-linter-rules"),
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-                .product(name: "Text", package: "swift-text"),
-            ]
-        ),
-        .testTarget(
-            name: "Institute Linter Rule Throws Tests",
-            dependencies: [
-                .product(name: "Lint", package: "swift-lint"),
-                .product(name: "Linter", package: "swift-linter"),
-                .target(name: "Institute Linter Rule Throws"),
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-            ]
-        ),
-        .testTarget(
-            name: "Institute Linter Rule Try Tests",
-            dependencies: [
-                .target(name: "Institute Linter Rule Try"),
-                .product(name: "Linter", package: "swift-linter"),
-                .product(name: "Byte", package: "swift-byte"),
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-            ]
-        ),
-        .testTarget(
-            name: "Institute Linter Rule Unchecked Tests",
-            dependencies: [
-                .target(name: "Institute Linter Rule Unchecked"),
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-            ]
-        ),
-        .testTarget(
-            name: "Institute Linter Rule RawValue Tests",
-            dependencies: [
-                .target(name: "Institute Linter Rule RawValue"),
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-            ]
-        ),
-        .testTarget(
-            name: "Institute Linter Rule Cardinal Tests",
-            dependencies: [
-                .target(name: "Institute Linter Rule Cardinal"),
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-            ]
-        ),
-        .testTarget(
-            name: "Linter Institute Rules Tests",
-            dependencies: [
-                .target(name: "Linter Institute Rules"),
-                .product(name: "Linter Rules", package: "swift-linter-rules"),
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-            ]
-        ),
-        .target(
-            name: "Primitives Linter Rule Tower",
-            dependencies: [
-                .product(name: "Lint", package: "swift-lint"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Linter Primitives Rules",
-            dependencies: [
-                .product(name: "Lint", package: "swift-lint"),
-                .target(name: "Primitives Linter Rule Tower"),
-                .target(name: "Linter Institute Rules"),
-            ]
-        ),
-        .testTarget(
-            name: "Linter Primitives Rules Tests",
-            dependencies: [
-                .target(name: "Linter Primitives Rules"),
-                .product(name: "Lint", package: "swift-lint"),
-            ]
-        ),
-        .testTarget(
-            name: "Primitives Linter Rule Tower Tests",
-            dependencies: [
-                .target(name: "Primitives Linter Rule Tower"),
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Linter Standards Rules",
-            dependencies: [
-                .product(name: "Lint", package: "swift-lint"),
-                .target(name: "Linter Institute Rules"),
-                .target(name: "Institute Linter Rule Naming"),
-                .target(name: "Institute Linter Rule Structure"),
-            ]
-        ),
-        .testTarget(
-            name: "Linter Standards Rules Tests",
-            dependencies: [
-                .target(name: "Linter Standards Rules"),
-                .product(name: "Lint", package: "swift-lint"),
-                .target(name: "Linter Institute Rules"),
-                .target(name: "Institute Linter Rule Naming"),
-                .target(name: "Institute Linter Rule Structure"),
-                .target(name: "Institute Linter Rule Testing"),
-            ]
-        ),
+    .target(
+        name: "Institute Linter Rule Architecture",
+        dependencies: [
+            .target(name: "Institute Model"),
+            .product(name: "Lint", package: "swift-lint"),
+            .target(name: "Institute Linter Rule Manifest"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+        ]
+    ),
+    .target(
+        name: "Institute Linter Rule Naming",
+        dependencies: [
+            .product(name: "Byte", package: "swift-byte"),
+            .product(name: "Lint", package: "swift-lint"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+        ]
+    ),
+    .target(
+        name: "Institute Linter Rule Foundation",
+        dependencies: [
+            .product(name: "Lint", package: "swift-lint"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+        ]
+    ),
+    .target(
+        name: "Institute Linter Rule Framework",
+        dependencies: [
+            .product(name: "Lint", package: "swift-lint"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+        ]
+    ),
+    .target(
+        name: "Institute Linter Rule Byte",
+        dependencies: [
+            .product(name: "Lint", package: "swift-lint"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+        ]
+    ),
+    .target(
+        name: "Institute Linter Rule Conformance",
+        dependencies: [
+            .product(name: "Lint", package: "swift-lint"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+        ]
+    ),
+    .target(
+        name: "Institute Linter Rule Closure",
+        dependencies: [
+            .product(name: "Lint", package: "swift-lint"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+        ]
+    ),
+    .target(
+        name: "Institute Linter Rule Idiom",
+        dependencies: [
+            .product(name: "Lint", package: "swift-lint"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+        ]
+    ),
+    .target(
+        name: "Institute Linter Rule Manifest",
+        dependencies: [
+            .target(name: "Institute Model"),
+            .product(name: "Lint", package: "swift-lint"),
+            .product(name: "Linter Rule Scope", package: "swift-linter-rules"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+            .product(name: "SPM Standard", package: "swift-spm-standard"),
+            .product(name: "Byte", package: "swift-byte"),
+        ]
+    ),
+    .target(
+        name: "Institute Linter Rule Memory",
+        dependencies: [
+            .product(name: "Lint", package: "swift-lint"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+        ]
+    ),
+    .target(
+        name: "Institute Linter Rule Platform",
+        dependencies: [
+            .target(name: "Institute Model"),
+            .product(name: "Lint", package: "swift-lint"),
+            .target(name: "Institute Linter Rule Manifest"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+        ]
+    ),
+    .target(
+        name: "Institute Linter Rule Structure",
+        dependencies: [
+            .product(name: "Lint", package: "swift-lint"),
+            .target(name: "Institute Linter Rule Manifest"),
+            .product(name: "Linter Rule Structure", package: "swift-linter-rules"),
+            .product(name: "Cardinal", package: "swift-cardinal"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+        ]
+    ),
+    .target(
+        name: "Institute Linter Rule Testing",
+        dependencies: [
+            .product(name: "Lint", package: "swift-lint"),
+            .target(name: "Institute Linter Rule Manifest"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+        ]
+    ),
+    .target(
+        name: "Institute Linter Rule Throws",
+        dependencies: [
+            .product(name: "Lint", package: "swift-lint"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+        ]
+    ),
+    .target(
+        name: "Institute Linter Rule Try",
+        dependencies: [
+            .product(name: "Lint", package: "swift-lint"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+        ]
+    ),
+    .target(
+        name: "Institute Linter Rule Unchecked",
+        dependencies: [
+            .product(name: "Lint", package: "swift-lint"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+        ]
+    ),
+    .target(
+        name: "Institute Linter Rule RawValue",
+        dependencies: [
+            .product(name: "Lint", package: "swift-lint"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+        ]
+    ),
+    .target(
+        name: "Institute Linter Rule Cardinal",
+        dependencies: [
+            .product(name: "Lint", package: "swift-lint"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+            .product(name: "SwiftOperators", package: "swift-syntax"),
+        ]
+    ),
+    .target(
+        name: "Linter Institute Rules",
+        dependencies: [
+            .target(name: "Institute Model"),
+            .product(name: "Lint", package: "swift-lint"),
+            .target(name: "Institute Linter Rule Architecture"),
+            .target(name: "Institute Linter Rule Naming"),
+            .target(name: "Institute Linter Rule Foundation"),
+            .target(name: "Institute Linter Rule Framework"),
+            .target(name: "Institute Linter Rule Byte"),
+            .target(name: "Institute Linter Rule Conformance"),
+            .target(name: "Institute Linter Rule Closure"),
+            .target(name: "Institute Linter Rule Idiom"),
+            .target(name: "Institute Linter Rule Manifest"),
+            .target(name: "Institute Linter Rule Memory"),
+            .target(name: "Institute Linter Rule Platform"),
+            .target(name: "Institute Linter Rule Structure"),
+            .target(name: "Institute Linter Rule Testing"),
+            .target(name: "Institute Linter Rule Throws"),
+            .target(name: "Institute Linter Rule Try"),
+            .target(name: "Institute Linter Rule Unchecked"),
+            .target(name: "Institute Linter Rule RawValue"),
+            .target(name: "Institute Linter Rule Cardinal"),
+            .product(name: "Linter Rules", package: "swift-linter-rules"),
+        ]
+    ),
+    .testTarget(
+        name: "Institute Linter Rule Architecture Tests",
+        dependencies: [
+            .target(name: "Institute Linter Rule Architecture"),
+            .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+        ]
+    ),
+    .testTarget(
+        name: "Institute Linter Rule Naming Tests",
+        dependencies: [
+            .target(name: "Institute Linter Rule Naming"),
+            .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+        ]
+    ),
+    .testTarget(
+        name: "Institute Linter Rule Foundation Tests",
+        dependencies: [
+            .target(name: "Institute Linter Rule Foundation"),
+            .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+        ]
+    ),
+    .testTarget(
+        name: "Institute Linter Rule Framework Tests",
+        dependencies: [
+            .target(name: "Institute Linter Rule Framework"),
+            .product(name: "Linter Rule Testing", package: "swift-linter-rules"),
+            .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+        ]
+    ),
+    .testTarget(
+        name: "Institute Linter Rule Byte Tests",
+        dependencies: [
+            .target(name: "Institute Linter Rule Byte"),
+            .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+        ]
+    ),
+    .testTarget(
+        name: "Institute Linter Rule Closure Tests",
+        dependencies: [
+            .target(name: "Institute Linter Rule Closure"),
+            .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+        ]
+    ),
+    .testTarget(
+        name: "Institute Linter Rule Idiom Tests",
+        dependencies: [
+            .target(name: "Institute Linter Rule Idiom"),
+            .product(name: "Linter", package: "swift-linter"),
+            .product(name: "Linter Rule Testing", package: "swift-linter-rules"),
+            .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+            .product(name: "Text", package: "swift-text"),
+        ]
+    ),
+    .testTarget(
+        name: "Institute Linter Rule Manifest Tests",
+        dependencies: [
+            .target(name: "Institute Model"),
+            .target(name: "Institute Linter Rule Manifest"),
+            .product(name: "Linter Rule Scope", package: "swift-linter-rules"),
+            .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+        ]
+    ),
+    .testTarget(
+        name: "Institute Linter Rule Memory Tests",
+        dependencies: [
+            .target(name: "Institute Linter Rule Memory"),
+            .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+        ]
+    ),
+    .testTarget(
+        name: "Institute Linter Rule Platform Tests",
+        dependencies: [
+            .target(name: "Institute Linter Rule Platform"),
+            .product(name: "Linter Rule Testing", package: "swift-linter-rules"),
+            .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+        ]
+    ),
+    .testTarget(
+        name: "Institute Linter Rule Structure Tests",
+        dependencies: [
+            .target(name: "Institute Linter Rule Structure"),
+            .product(name: "Linter Rule Structure", package: "swift-linter-rules"),
+            .product(name: "Linter Rule Testing", package: "swift-linter-rules"),
+            .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+        ]
+    ),
+    .testTarget(
+        name: "Institute Linter Rule Testing Tests",
+        dependencies: [
+            .target(name: "Institute Linter Rule Testing"),
+            .product(name: "Linter Rule Testing", package: "swift-linter-rules"),
+            .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+            .product(name: "Text", package: "swift-text"),
+        ]
+    ),
+    .testTarget(
+        name: "Institute Linter Rule Throws Tests",
+        dependencies: [
+            .product(name: "Lint", package: "swift-lint"),
+            .product(name: "Linter", package: "swift-linter"),
+            .target(name: "Institute Linter Rule Throws"),
+            .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+        ]
+    ),
+    .testTarget(
+        name: "Institute Linter Rule Try Tests",
+        dependencies: [
+            .target(name: "Institute Linter Rule Try"),
+            .product(name: "Linter", package: "swift-linter"),
+            .product(name: "Byte", package: "swift-byte"),
+            .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+        ]
+    ),
+    .testTarget(
+        name: "Institute Linter Rule Unchecked Tests",
+        dependencies: [
+            .target(name: "Institute Linter Rule Unchecked"),
+            .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+        ]
+    ),
+    .testTarget(
+        name: "Institute Linter Rule RawValue Tests",
+        dependencies: [
+            .target(name: "Institute Linter Rule RawValue"),
+            .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+        ]
+    ),
+    .testTarget(
+        name: "Institute Linter Rule Cardinal Tests",
+        dependencies: [
+            .target(name: "Institute Linter Rule Cardinal"),
+            .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+        ]
+    ),
+    .testTarget(
+        name: "Linter Institute Rules Tests",
+        dependencies: [
+            .target(name: "Linter Institute Rules"),
+            .product(name: "Linter Rules", package: "swift-linter-rules"),
+            .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+        ]
+    ),
+    .target(
+        name: "Primitives Linter Rule Tower",
+        dependencies: [
+            .product(name: "Lint", package: "swift-lint"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+        ]
+    ),
+    .target(
+        name: "Linter Primitives Rules",
+        dependencies: [
+            .product(name: "Lint", package: "swift-lint"),
+            .target(name: "Primitives Linter Rule Tower"),
+            .target(name: "Linter Institute Rules"),
+        ]
+    ),
+    .testTarget(
+        name: "Linter Primitives Rules Tests",
+        dependencies: [
+            .target(name: "Linter Primitives Rules"),
+            .product(name: "Lint", package: "swift-lint"),
+        ]
+    ),
+    .testTarget(
+        name: "Primitives Linter Rule Tower Tests",
+        dependencies: [
+            .target(name: "Primitives Linter Rule Tower"),
+            .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+        ]
+    ),
+    .target(
+        name: "Linter Standards Rules",
+        dependencies: [
+            .product(name: "Lint", package: "swift-lint"),
+            .target(name: "Linter Institute Rules"),
+            .target(name: "Institute Linter Rule Naming"),
+            .target(name: "Institute Linter Rule Structure"),
+        ]
+    ),
+    .testTarget(
+        name: "Linter Standards Rules Tests",
+        dependencies: [
+            .target(name: "Linter Standards Rules"),
+            .product(name: "Lint", package: "swift-lint"),
+            .target(name: "Linter Institute Rules"),
+            .target(name: "Institute Linter Rule Naming"),
+            .target(name: "Institute Linter Rule Structure"),
+            .target(name: "Institute Linter Rule Testing"),
+        ]
+    ),
     .executableTarget(
         name: "Institute Linter Runner",
         dependencies: [

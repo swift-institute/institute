@@ -1,8 +1,8 @@
-public import Institute_Model
-public import Lint
 internal import Institute_Linter_Rule_Architecture
 internal import Institute_Linter_Rule_Manifest
 internal import Institute_Linter_Rule_Platform
+public import Institute_Model
+public import Lint
 
 extension Array where Element == Lint.Rule.Configuration {
     public func located(in repository: Institute.Repository.Coordinate?) -> Self {

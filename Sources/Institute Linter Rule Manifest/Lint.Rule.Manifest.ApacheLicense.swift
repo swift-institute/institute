@@ -180,7 +180,8 @@ internal func manifestApacheLicenseMessage(_ license: Lint.Source.Index.License)
         found = "the package has no LICENSE.md or LICENSE file at its root"
 
     case .text:
-        found = "the root LICENSE does not carry the complete Apache License 2.0 terms with the Institute's "
+        found =
+            "the root LICENSE does not carry the complete Apache License 2.0 terms with the Institute's "
             + "copyright line (`Copyright <year> Coen ten Thije Boonkkamp`)"
     }
     return "[apache license]: every Swift Institute package is licensed under the Apache License 2.0; "

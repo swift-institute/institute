@@ -229,8 +229,9 @@ extension Institute.Version.Client {
             var encoded = ""
             for byte in value.utf8 {
                 let scalar = Swift.Unicode.Scalar(byte)
-                if scalar.isASCII, scalar.properties.isAlphabetic || scalar.properties.numericType != nil
-                    || "-._~".unicodeScalars.contains(scalar)
+                if scalar.isASCII,
+                    scalar.properties.isAlphabetic || scalar.properties.numericType != nil
+                        || "-._~".unicodeScalars.contains(scalar)
                 {
                     encoded.unicodeScalars.append(scalar)
                 } else {

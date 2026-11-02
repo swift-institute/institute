@@ -1,6 +1,6 @@
+import Institute_Model
 import Lint
 import Linter_Rules_Test_Support
-import Institute_Model
 import Testing
 
 @testable import Institute_Linter_Rule_Manifest

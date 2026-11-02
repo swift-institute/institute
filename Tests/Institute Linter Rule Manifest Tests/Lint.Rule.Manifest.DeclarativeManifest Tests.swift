@@ -44,12 +44,13 @@ extension Lint.Rule.`declarative manifest Tests`.Unit {
 
     @Test
     func `products mapped from their names are flagged at the closure`() {
-        let source = Lint.Rule.`declarative manifest Tests`.package + """
-            package.products += [
-                "Core WebKit",
-            ].map { .library(name: $0, targets: [$0]) }
+        let source =
+            Lint.Rule.`declarative manifest Tests`.package + """
+                package.products += [
+                    "Core WebKit",
+                ].map { .library(name: $0, targets: [$0]) }
 
-            """
+                """
         let findings = Lint.Rule.`declarative manifest Tests`.observation(source).findings
         #expect(findings.count == 1)
         #expect(findings.first?.message.hasPrefix("[declarative manifest]: a closure") == true)
@@ -57,12 +58,13 @@ extension Lint.Rule.`declarative manifest Tests`.Unit {
 
     @Test
     func `a top-level loop other than the settings tail is flagged`() {
-        let source = Lint.Rule.`declarative manifest Tests`.package + """
-            for target in extraTargets {
-                target.swiftSettings = shared
-            }
+        let source =
+            Lint.Rule.`declarative manifest Tests`.package + """
+                for target in extraTargets {
+                    target.swiftSettings = shared
+                }
 
-            """
+                """
         #expect(Lint.Rule.`declarative manifest Tests`.observation(source).findings.count == 1)
     }
 
@@ -88,24 +90,26 @@ extension Lint.Rule.`declarative manifest Tests`.`Edge Case` {
 
     @Test
     func `appends and #if blocks the parser reads are clean`() {
-        let source = Lint.Rule.`declarative manifest Tests`.package + """
-            #if canImport(Darwin)
-            package.products += [.library(name: "Core WebKit", targets: ["Core WebKit"])]
-            package.targets.append(.target(name: "Core WebKit"))
-            #endif
+        let source =
+            Lint.Rule.`declarative manifest Tests`.package + """
+                #if canImport(Darwin)
+                package.products += [.library(name: "Core WebKit", targets: ["Core WebKit"])]
+                package.targets.append(.target(name: "Core WebKit"))
+                #endif
 
-            """
+                """
         #expect(Lint.Rule.`declarative manifest Tests`.observation(source).findings.isEmpty)
     }
 
     @Test
     func `a closure inside an #if block is flagged`() {
-        let source = Lint.Rule.`declarative manifest Tests`.package + """
-            #if os(macOS)
-            package.targets += ["A"].map { .target(name: $0) }
-            #endif
+        let source =
+            Lint.Rule.`declarative manifest Tests`.package + """
+                #if os(macOS)
+                package.targets += ["A"].map { .target(name: $0) }
+                #endif
 
-            """
+                """
         #expect(Lint.Rule.`declarative manifest Tests`.observation(source).findings.count == 1)
     }
 

@@ -25,11 +25,13 @@ extension Lint.Rule {
         }
 
         @Test func `disable next with a reason is sanctioned`() {
-            let suppression = Self.suppression("""
+            let suppression = Self.suppression(
+                """
                 // swift-linter:disable:next try optional
                 // REASON: FileManager.removeItem throws untyped.
                 let value = try? FileManager.default.removeItem(atPath: path)
-                """)
+                """
+            )
             #expect(suppression.suppresses(line: Text.Line.Number(3), rule: Self.rule.id, sanctioned: Self.rule.suppression))
         }
 

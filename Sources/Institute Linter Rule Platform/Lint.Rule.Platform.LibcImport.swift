@@ -1,6 +1,6 @@
 internal import Institute_Linter_Rule_Manifest
-public import Lint
 public import Institute_Model
+public import Lint
 internal import SwiftSyntax
 
 extension Lint.Rule {

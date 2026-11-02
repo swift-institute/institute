@@ -26,11 +26,13 @@ extension Lint.Rule {
         }
 
         @Test func `disable next with a reason is sanctioned`() {
-            let suppression = Self.suppression("""
+            let suppression = Self.suppression(
+                """
                 // swift-linter:disable:next untyped throws
                 // REASON: the database's synchronous write takes an untyped closure.
                 func apply(_ database: Database) throws {}
-                """)
+                """
+            )
             #expect(suppression.suppresses(line: Text.Line.Number(3), rule: Self.rule.id, sanctioned: Self.rule.suppression))
         }
 

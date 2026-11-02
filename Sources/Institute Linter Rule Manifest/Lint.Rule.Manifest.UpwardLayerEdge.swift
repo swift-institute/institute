@@ -1,5 +1,5 @@
-public import Lint
 public import Institute_Model
+public import Lint
 internal import SwiftSyntax
 
 extension Lint.Rule {
