@@ -1,4 +1,5 @@
 import Institute_CI_Model
+import Institute_CI_Validation
 import Institute_Model
 import Institute_Repository_Policy
 import Package_Manager
@@ -77,6 +78,16 @@ extension Institute.CI.Command {
             }
         } catch {
             refuse("package validate could not evaluate symbolic links: \(error)")
+        }
+
+        do throws(Institute.CI.Validation.EnvironmentDefect) {
+            let tracked = try Institute.CI.Validation.Gitignore.indexedPaths(in: root)
+            for path in Institute.Repository.Policy.ToolState.findings(in: tracked) {
+                refused = true
+                print("\(repository)\tTOOL-STATE-001\t\(Institute.Repository.Policy.ToolState.message(path))")
+            }
+        } catch {
+            refuse("package validate could not read the tracked paths: \(error)")
         }
 
         if refused { terminate(1) }

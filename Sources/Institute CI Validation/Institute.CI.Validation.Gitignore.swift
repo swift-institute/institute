@@ -583,7 +583,7 @@ extension Institute.CI.Validation.Gitignore {
 
     /// Stage-0 pathnames from the real index. Records of any other shape are
     /// refused rather than treated as an empty index.
-    static func indexedPaths(
+    package static func indexedPaths(
         in root: String,
         environment: [String: String] = Environment.Snapshot.current().values
     ) throws(Institute.CI.Validation.EnvironmentDefect) -> [String] {
