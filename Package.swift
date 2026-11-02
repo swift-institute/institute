@@ -37,6 +37,10 @@ let package = Package(
             name: "Institute Linter Rule Naming",
             targets: ["Institute Linter Rule Naming"]
         ),
+        .library(
+            name: "Institute Linter Rule Manifest",
+            targets: ["Institute Linter Rule Manifest"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/swift-atoms/swift-ascii.git", branch: "main"),
