@@ -97,13 +97,13 @@ extension Institute.Source {
                     id: .init("swift-linter"),
                     platform: .macOSARM64,
                     version: "ci-binaries",
-                    revision: "5fec33c35b3b09fcd2952ce5b388d517605edd2b",
+                    revision: "e4fffc9c3022f426e0cbc593b2d4596647a05f77",
                     toolchain: "Apple Swift 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)",
                     schema: "swift-linter-structured:2",
                     executable: .init(
-                        name: "institute-linter-runner-macos-arm64-86d89bdf1ecfcc98b10a8b64ac10013de8a8133d69a96a8b00e4dfedd5b90871",
+                        name: "institute-linter-runner-macos-arm64-40c65efb5f1d12a2a47b98fede3ee5189c2a9db050c416f0cab005f7916dbb79",
                         digest: .init(
-                            "86d89bdf1ecfcc98b10a8b64ac10013de8a8133d69a96a8b00e4dfedd5b90871"
+                            "40c65efb5f1d12a2a47b98fede3ee5189c2a9db050c416f0cab005f7916dbb79"
                         ),
                         origin: .release(
                             base:
