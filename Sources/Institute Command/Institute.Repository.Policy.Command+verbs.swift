@@ -1,12 +1,9 @@
 import Byte
 import Calendar_Gregorian
 import GitHub_App
-import Institute_CI_Model
-import Institute_CI_Validation
 public import Institute_Model
 public import Institute_Repository_Policy
 import JSON
-import Package_Manager
 import RFC_3339
 import Time
 
@@ -135,56 +132,6 @@ extension Institute.Repository.Policy.Command {
             generatedOn: date ?? Self.today
         )
         print(render(draft), terminator: "")
-    }
-
-    static func draftReadme(_ arguments: [Swift.String]) throws(Error) {
-        var repository: Swift.String?
-        var root: Swift.String?
-        var iterator = arguments.makeIterator()
-        while let argument = iterator.next() {
-            switch argument {
-            case "--repository": repository = iterator.next()
-            case "--root": root = iterator.next()
-
-            default:
-                throw configuration("unknown draft-readme argument \(argument)")
-            }
-        }
-        guard let repository, let root else {
-            throw configuration("draft-readme requires --repository and --root")
-        }
-        let subject = Institute.CI.Validation.Subject(repository: repository, root: root)
-        guard let description = Institute.CI.Validation.Readme.description(of: subject) else {
-            throw configuration("draft-readme found no description in \(root)/.github/metadata.yaml")
-        }
-        let evaluation: Package.Manifest.Evaluation
-        do {
-            evaluation = try Package.Manager().evaluation(at: root)
-        } catch {
-            throw configuration("draft-readme could not evaluate \(root)/Package.swift: \(error)")
-        }
-        let products = evaluation.products.filter { product in
-            if case .library = product.kind { return true }
-            return false
-        }
-        .map { product in
-            Institute.Repository.Policy.Readme.Draft.Product(
-                name: "\(product.name)",
-                targets: product.targets.map { "\($0)" }
-            )
-        }
-        let draft = Institute.Repository.Policy.Readme.Draft(
-            repository: repository,
-            description: description,
-            products: products,
-            traits: evaluation.traits.map(\.name).filter { $0 != "default" }.sorted(),
-            defaultTraits: (evaluation.traits.first { $0.name == "default" }?.enabledTraits ?? []).sorted(),
-            errors: Institute.CI.Validation.Readme.thrownErrors(in: subject),
-            license: Institute.Repository.Policy.Readme.Draft.license(
-                from: try text(at: root + "/LICENSE.md", label: "license")
-            )
-        )
-        print(Institute.Repository.Policy.Readme.Draft.Render()(draft), terminator: "")
     }
 
     /// Today in UTC, `YYYY-MM-DD` — the header stamp the retired script

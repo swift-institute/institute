@@ -11,7 +11,7 @@ installation of the pinned planner.
 | `ci -- package validate\|plan\|aggregate` | The verbs the central `swift-ci.yml` runs: validate a subject repository, plan its job matrix, aggregate the verdict. |
 | `ci -- source` | Institute lint over one checked-out package at an exact revision. CI's `Quality · source` job is the evidence; a local run is guidance. |
 | `planner canary\|adopt` | Judge a `publish-planner` run against the current planner on the canary repositories, and commit an adoptable pin to the consumer checkout. |
-| `repository …` | Repository policy across the organizations: caller workflows, the `.gitignore` canon, and drafts of a repository's `metadata.yaml` (`draft-metadata`) and README (`draft-readme`). |
+| `repository …` | Repository policy across the organizations: caller workflows, the `.gitignore` canon, and a first draft of a repository's `metadata.yaml` (`draft-metadata`). |
 | `github token` | Mint a GitHub App installation token for one organization, optionally narrowed. |
 | `organizations` | Print `Institute.Organization`, the one roster of the Institute's organizations, as a JSON array, optionally for one `--layer`. Workflows that fan out over the organizations read their matrix from it. |
 | `version tag` | Tag each package's `main` head that passed CI with its next development version (`0.0.N` from `0.0.100`); `--backfill` tags only repositories not yet on the line, `--dry-run` writes nothing. `swift-institute/.github`'s `version-tags.yml` runs it. |
