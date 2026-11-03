@@ -143,14 +143,15 @@ struct InstituteValidationCorpusTests {
 
     @Test func `the fixture corpus is where the suite expects it`() throws {
         let directories = try Self.corpus.ruleDirectories()
-        // 50 rule directories plus `schema-correspondence`, the flat
-        // scenario tree GH-REPO-063's own suite runs directly.
+        // 49 rule directories plus `schema-correspondence`, the flat
+        // scenario tree GH-REPO-063's own suite runs directly. `readme-013`
+        // retired with its rule on 2026-11-03.
         // `ci-anchor-001` is the trust anchor's ladder (Q3,
         // swift-institute/.github#461); `gh-ignore-003` is the
         // deny-by-default shape rule (linter-rules#68).
         #expect(
-            directories.count == 51,
-            "expected the 51-directory Institute-side corpus, found \(directories.count)"
+            directories.count == 50,
+            "expected the 50-directory Institute-side corpus, found \(directories.count)"
         )
     }
 

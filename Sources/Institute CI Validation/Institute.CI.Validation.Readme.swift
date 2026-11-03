@@ -18,16 +18,15 @@ extension Institute.CI.Validation {
     /// - **Universal** — `README-017` (exactly one H1, first non-empty
     ///   line), `README-026` (no internal rule-ID citations outside code
     ///   blocks).
-    /// - **Family E** (sub-package) — `README-013` (Error Handling section
-    ///   when the package publicly throws an error type it declares
-    ///   itself), `README-016` (no Roadmap/TODO/Changelog), `README-160`
-    ///   (nothing the manifest or LICENSE.md already says: no Installation,
-    ///   Products, Traits or License section, no `.package(` snippet).
-    ///   `README-003` was removed 2026-07-30, superseded in full by
-    ///   swift-institute/.github#126. `README-001` (License section) and
-    ///   `README-008` (Installation section) were removed 2026-11-03: a
-    ///   README is the guide an agent reads before using the code and
-    ///   repeats nothing the manifest or licence says (Coen, 3 Nov).
+    /// - **Family E** (sub-package) — `README-016` (no Roadmap/TODO/Changelog),
+    ///   `README-160` (only what Swift cannot express: no section but
+    ///   `## Laws`, no code block, no `.package(` snippet). `README-003`
+    ///   was removed 2026-07-30, superseded in full by
+    ///   swift-institute/.github#126. `README-001` (License section),
+    ///   `README-008` (Installation section) and `README-013` (Error
+    ///   Handling section) were removed 2026-11-03: the code is meant to be
+    ///   self-evident, and a README holds only what the language cannot
+    ///   say; an error type is already in `throws(...)` (Coen, 3 Nov).
     ///   Retired rule IDs are never recycled.
     /// - **Family C** (process) — `README-137` (no Installation, badges,
     ///   or Quick Start), `README-138` (length budget).
@@ -61,7 +60,6 @@ extension Institute.CI.Validation {
     /// the retired implementation is the port's one unwaived gate.
     public struct Readme: Validator {
         public let rules: [Rule] = [
-            "README-013",
             "README-016",
             "README-017",
             "README-026",
@@ -111,14 +109,10 @@ extension Institute.CI.Validation {
 
         static let h1Line = Pattern(#"^#\s+\S"#)
         static let h2Line = Pattern(#"^##\s+\S"#)
+        static let h2OrDeeper = Pattern(#"^#{2,6}\s+\S"#)
         static let fencedBlock = Pattern(#"```.*?```"#, dotMatchesNewlines: true)
         static let installDependency = Pattern(#"\.package\("#)
         static let statusLine = Pattern(#">\s*\*\*Status:\s*([^*]+?)\*\*"#)
-        static let errorDeclaration = Pattern(
-            #"\b(?:enum|struct|final\s+class|class|actor)\s+([A-Za-z_][A-Za-z0-9_]*)"#
-        )
-        static let publicThrows = Pattern(#"\bpublic[^\n]*\bthrows\(([^)]+)\)"#)
-        static let identifierHead = Pattern(#"^[A-Za-z_][A-Za-z0-9_]*"#)
 
         public init() {}
 
@@ -345,16 +339,26 @@ extension Institute.CI.Validation.Readme {
         var findings: [Finding] = []
         // [README-003] removed 2026-07-30: superseded in full by
         // swift-institute/.github#126.
-        // [README-160] Nothing the manifest or LICENSE.md already says.
-        for repeated in ["## Installation", "## Products", "## Traits", "## License"]
-        where content.contains(repeated) {
+        // [README-160] Only what the language cannot express.
+        for line in splitLines(content) where h2OrDeeper.firstMatch(in: String(line)) != nil {
+            let heading = String(line).trimmedWhitespace
+            guard heading != "## Laws" else { continue }
             findings.append(
                 Finding(
                     repository: subject.repository,
                     rule: "README-160",
                     message: "\(name): contains section "
-                        + Institute.CI.Validation.Retired.quoted(repeated)
-                        + ", which repeats Package.swift or LICENSE.md"
+                        + Institute.CI.Validation.Retired.quoted(heading)
+                        + "; a README's only section is `## Laws`"
+                )
+            )
+        }
+        if content.contains("```") {
+            findings.append(
+                Finding(
+                    repository: subject.repository,
+                    rule: "README-160",
+                    message: "\(name): contains a code block; the tests are the examples"
                 )
             )
         }
@@ -364,18 +368,6 @@ extension Institute.CI.Validation.Readme {
                     repository: subject.repository,
                     rule: "README-160",
                     message: "\(name): contains a `.package(` snippet, which repeats Package.swift"
-                )
-            )
-        }
-        // [README-013] Error Handling threshold (Wave 2b Decision 5).
-        if declaresThrownError(subject), !content.contains("## Error Handling") {
-            findings.append(
-                Finding(
-                    repository: subject.repository,
-                    rule: "README-013",
-                    message: "\(name): package has public throws(NonNever) signatures but "
-                        + "README lacks `## Error Handling` section (Wave 2b finalization "
-                        + "Decision 5 threshold)"
                 )
             )
         }
@@ -392,55 +384,6 @@ extension Institute.CI.Validation.Readme {
             )
         }
         return findings
-    }
-
-    /// `[README-013]`'s threshold: the package publicly throws an error
-    /// type it DECLARES in its own `Sources`.
-    ///
-    /// A facade / re-export package throws a *dependency-owned* error
-    /// type and declares no error type of its own. The README-013 remedy
-    /// — documenting the package's OWN error tree — is impossible for
-    /// such a package, so it must not fire. The finding keys on
-    /// ownership: a public `throws(T)` whose `T` resolves to a simple
-    /// name the package itself declares. Type aliases are excluded on
-    /// purpose: `typealias Error = Dep.Error` re-exports a dependency's
-    /// error and is not ownership.
-    static func declaresThrownError(
-        _ subject: Institute.CI.Validation.Subject
-    ) -> Bool {
-        let sources = subject.path("Sources")
-        guard Institute.CI.Validation.isDirectory(sources)
-        else { return false }
-        var declared: Set<String> = []
-        var thrown: Set<String> = []
-        for element in Institute.CI.Validation.filesRecursively(at: sources) {
-            guard element.hasSuffix(".swift"),
-                let content = Institute.CI.Validation.text(at: "\(sources)/\(element)")
-            else { continue }
-            for match in errorDeclaration.matches(in: content) {
-                guard let name = match.groups[1], name.contains("Error") else { continue }
-                declared.insert(name)
-            }
-            for match in publicThrows.matches(in: content) {
-                let raw = (match.groups[1] ?? "")
-                    .trimmedWhitespace
-                guard !raw.isEmpty, raw != "Never" else { continue }
-                let name = thrownTypeName(raw)
-                if !name.isEmpty { thrown.insert(name) }
-            }
-        }
-        return !declared.isDisjoint(with: thrown)
-    }
-
-    /// A typed-throws payload reduced to the error type's own simple
-    /// name: `Self.Error` → `Error`, `MyError<Token>` → `MyError`.
-    static func thrownTypeName(_ thrown: String) -> String {
-        var base = thrown
-        if let angle = base.range(of: "<") { base = String(base[..<angle.lowerBound]) }
-        if let bracket = base.range(of: "[") { base = String(base[..<bracket.lowerBound]) }
-        let tail = (base.split(separator: ".").last.map(String.init) ?? base)
-            .trimmedWhitespace
-        return identifierHead.firstMatch(in: tail)?.whole ?? ""
     }
 
     static func familyC(

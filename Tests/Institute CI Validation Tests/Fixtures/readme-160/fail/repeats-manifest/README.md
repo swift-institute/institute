@@ -1,6 +1,10 @@
 # swift-example-broken
 
-A package whose README repeats what its manifest and licence already say.
+A package whose README restates what the code and manifest already say.
+
+## Model
+
+`Example` holds a value.
 
 ## Installation
 
@@ -9,7 +13,3 @@ dependencies: [
     .package(url: "https://github.com/swift-compositions/swift-example-broken.git", branch: "main")
 ]
 ```
-
-## License
-
-Apache 2.0. See [LICENSE](LICENSE).
