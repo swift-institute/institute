@@ -18,14 +18,17 @@ extension Institute.CI.Validation {
     /// - **Universal** — `README-017` (exactly one H1, first non-empty
     ///   line), `README-026` (no internal rule-ID citations outside code
     ///   blocks).
-    /// - **Family E** (sub-package) — `README-001` (License section),
-    ///   `README-008` (Installation with both `.package(` and a
-    ///   target-declaration block), `README-013` (Error Handling section
+    /// - **Family E** (sub-package) — `README-013` (Error Handling section
     ///   when the package publicly throws an error type it declares
-    ///   itself), `README-016` (no Roadmap/TODO/Changelog).
+    ///   itself), `README-016` (no Roadmap/TODO/Changelog), `README-160`
+    ///   (nothing the manifest or LICENSE.md already says: no Installation,
+    ///   Products, Traits or License section, no `.package(` snippet).
     ///   `README-003` was removed 2026-07-30, superseded in full by
-    ///   swift-institute/.github#126; the rule ID is retired, never
-    ///   recycled.
+    ///   swift-institute/.github#126. `README-001` (License section) and
+    ///   `README-008` (Installation section) were removed 2026-11-03: a
+    ///   README is the guide an agent reads before using the code and
+    ///   repeats nothing the manifest or licence says (Coen, 3 Nov).
+    ///   Retired rule IDs are never recycled.
     /// - **Family C** (process) — `README-137` (no Installation, badges,
     ///   or Quick Start), `README-138` (length budget).
     /// - **Family F** (placeholder) — `README-150` (H1 + status
@@ -58,8 +61,6 @@ extension Institute.CI.Validation {
     /// the retired implementation is the port's one unwaived gate.
     public struct Readme: Validator {
         public let rules: [Rule] = [
-            "README-001",
-            "README-008",
             "README-013",
             "README-016",
             "README-017",
@@ -69,6 +70,7 @@ extension Institute.CI.Validation {
             "README-138",
             "README-150",
             "README-151",
+            "README-160",
             "README-family-unset",
             "README-presence",
             "README-read-failed",
@@ -111,7 +113,6 @@ extension Institute.CI.Validation {
         static let h2Line = Pattern(#"^##\s+\S"#)
         static let fencedBlock = Pattern(#"```.*?```"#, dotMatchesNewlines: true)
         static let installDependency = Pattern(#"\.package\("#)
-        static let installTarget = Pattern(#"\.(?:target|testTarget|executableTarget)\("#)
         static let statusLine = Pattern(#">\s*\*\*Status:\s*([^*]+?)\*\*"#)
         static let errorDeclaration = Pattern(
             #"\b(?:enum|struct|final\s+class|class|actor)\s+([A-Za-z_][A-Za-z0-9_]*)"#
@@ -344,50 +345,25 @@ extension Institute.CI.Validation.Readme {
         var findings: [Finding] = []
         // [README-003] removed 2026-07-30: superseded in full by
         // swift-institute/.github#126.
-        // [README-001] License section present.
-        if !content.contains("## License") {
+        // [README-160] Nothing the manifest or LICENSE.md already says.
+        for repeated in ["## Installation", "## Products", "## Traits", "## License"]
+        where content.contains(repeated) {
             findings.append(
                 Finding(
                     repository: subject.repository,
-                    rule: "README-001",
-                    message: "\(name): missing `## License` section"
+                    rule: "README-160",
+                    message: "\(name): contains section "
+                        + Institute.CI.Validation.Retired.quoted(repeated)
+                        + ", which repeats Package.swift or LICENSE.md"
                 )
             )
         }
-        // [README-008] Installation section presence, then both the
-        // `.package(` and target-declaration blocks within it.
-        if let heading = content.range(of: "## Installation") {
-            let searchStart = content.index(after: heading.lowerBound)
-            let nextSection = content[searchStart...].firstRange(of: "\n## ")
-            let section = String(
-                content[heading.lowerBound..<(nextSection?.lowerBound ?? content.endIndex)]
-            )
-            if installDependency.firstMatch(in: section) == nil {
-                findings.append(
-                    Finding(
-                        repository: subject.repository,
-                        rule: "README-008",
-                        message: "\(name): Installation section missing `.package(...)` "
-                            + "dependency block"
-                    )
-                )
-            }
-            if installTarget.firstMatch(in: section) == nil {
-                findings.append(
-                    Finding(
-                        repository: subject.repository,
-                        rule: "README-008",
-                        message: "\(name): Installation section missing "
-                            + "`.target(dependencies: ...)` block"
-                    )
-                )
-            }
-        } else {
+        if installDependency.firstMatch(in: content) != nil {
             findings.append(
                 Finding(
                     repository: subject.repository,
-                    rule: "README-008",
-                    message: "\(name): missing `## Installation` section"
+                    rule: "README-160",
+                    message: "\(name): contains a `.package(` snippet, which repeats Package.swift"
                 )
             )
         }

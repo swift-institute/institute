@@ -7,7 +7,7 @@ import Testing
 @testable import Institute_CI_Validation
 
 /// The family-routing behaviour of `Institute.CI.Validation.Readme` that the
-/// fixture corpus (readme-008/013/017/026) does not carry: exemption,
+/// fixture corpus (readme-013/017/026/160) does not carry: exemption,
 /// the unset family, the Family G profile paths, and Family F's implicit
 /// README. The per-rule predicates themselves are exercised by the
 /// shared harness over the corpus, and proved against the retired
@@ -83,7 +83,7 @@ struct CIValidationReadmeTests {
     @Suite
     struct Registry {
         @Test func `every corpus directory resolves to a registered rule`() {
-            for directory in ["readme-008", "readme-013", "readme-017", "readme-026"] {
+            for directory in ["readme-013", "readme-017", "readme-026", "readme-160"] {
                 #expect(
                     Institute.CI.Validation.Registry.rule(
                         forCorpusDirectory: directory
