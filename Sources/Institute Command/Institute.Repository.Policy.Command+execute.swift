@@ -23,10 +23,13 @@ extension Institute.Repository.Policy.Command {
             case "draft-metadata":
                 try draftMetadata(rest)
 
+            case "draft-readme":
+                try draftReadme(rest)
+
             default:
                 throw Error.configuration(
                     "institute repository requires census, capability-records, "
-                        + "render-caller, or draft-metadata"
+                        + "render-caller, draft-metadata, or draft-readme"
                 )
             }
         } catch {

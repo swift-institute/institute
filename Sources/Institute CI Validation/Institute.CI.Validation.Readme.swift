@@ -432,9 +432,13 @@ extension Institute.CI.Validation.Readme {
     static func declaresThrownError(
         _ subject: Institute.CI.Validation.Subject
     ) -> Bool {
+        !thrownErrors(in: subject).isEmpty
+    }
+
+    public static func thrownErrors(in subject: Institute.CI.Validation.Subject) -> [String] {
         let sources = subject.path("Sources")
         guard Institute.CI.Validation.isDirectory(sources)
-        else { return false }
+        else { return [] }
         var declared: Set<String> = []
         var thrown: Set<String> = []
         for element in Institute.CI.Validation.filesRecursively(at: sources) {
@@ -453,7 +457,18 @@ extension Institute.CI.Validation.Readme {
                 if !name.isEmpty { thrown.insert(name) }
             }
         }
-        return !declared.isDisjoint(with: thrown)
+        return declared.intersection(thrown).sorted()
+    }
+
+    public static func description(of subject: Institute.CI.Validation.Subject) -> String? {
+        let document: Institute.CI.Workflow.YAML.Node
+        do {
+            guard let text = try subject.text(at: ".github/metadata.yaml") else { return nil }
+            document = try Institute.CI.Workflow.YAML.Parser.parse(text)
+        } catch {
+            return nil
+        }
+        return document.mapping?["description"]?.text
     }
 
     /// A typed-throws payload reduced to the error type's own simple

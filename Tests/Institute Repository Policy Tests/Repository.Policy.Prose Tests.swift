@@ -24,16 +24,17 @@ extension Institute.Repository.Policy.Prose {
                 "Sources/Core/markdown.swift",
                 "README.md.txt",
             ]
+            let repository = "swift-atoms/swift-affine"
+            let findings = Institute.Repository.Policy.Prose.findings(in: tracked, repository: repository)
             #expect(
-                Institute.Repository.Policy.Prose.findings(
-                    in: tracked, repository: "swift-atoms/swift-affine") == [
-                        ".github/PULL_REQUEST_TEMPLATE.md",
-                        "CONTRIBUTING.md",
-                        "Docs/design.markdown",
-                        "NOTES.md",
-                        "Research/INVESTIGATION-ARC.MD",
-                        "Sources/Core/README.md",
-                    ]
+                findings == [
+                    ".github/PULL_REQUEST_TEMPLATE.md",
+                    "CONTRIBUTING.md",
+                    "Docs/design.markdown",
+                    "NOTES.md",
+                    "Research/INVESTIGATION-ARC.MD",
+                    "Sources/Core/README.md",
+                ]
             )
         }
 
@@ -52,13 +53,9 @@ extension Institute.Repository.Policy.Prose {
                 "brand/README.md",
                 "profile/NOTES.md",
             ]
-            #expect(
-                Institute.Repository.Policy.Prose.findings(
-                    in: tracked, repository: "swift-molecules/.github") == [
-                        "brand/README.md",
-                        "profile/NOTES.md",
-                    ]
-            )
+            let repository = "swift-molecules/.github"
+            let findings = Institute.Repository.Policy.Prose.findings(in: tracked, repository: repository)
+            #expect(findings == ["brand/README.md", "profile/NOTES.md"])
         }
     }
 }
