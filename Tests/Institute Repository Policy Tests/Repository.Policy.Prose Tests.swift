@@ -70,5 +70,15 @@ extension Institute.Repository.Policy.Prose {
             let findings = Institute.Repository.Policy.Prose.findings(in: tracked, repository: "swift-institute/Issues")
             #expect(findings.isEmpty)
         }
+
+        @Test
+        func `a fork kept for upstream pull requests is exempt, and a fork used as a package is not`() {
+            let tracked = ["README.md", "Documentation/Usage.md", "CHANGELOG.md"]
+            let prose = Institute.Repository.Policy.Prose.self
+            let pullRequests = prose.findings(in: tracked, repository: "coenttb/swift-package-manager")
+            let package = prose.findings(in: tracked, repository: "swift-compositions/swift-sqlite")
+            #expect(pullRequests.isEmpty)
+            #expect(package == ["CHANGELOG.md", "Documentation/Usage.md"])
+        }
     }
 }
