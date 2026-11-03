@@ -86,6 +86,9 @@ extension Institute.CI.Command {
                 refused = true
                 print("\(repository)\tTOOL-STATE-001\t\(Institute.Repository.Policy.ToolState.message(path))")
             }
+            for path in Institute.Repository.Policy.Prose.findings(in: tracked, repository: repository) {
+                print("\(repository)\tPROSE-001\t\(Institute.Repository.Policy.Prose.message(path))")
+            }
         } catch {
             refuse("package validate could not read the tracked paths: \(error)")
         }
