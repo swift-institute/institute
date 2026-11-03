@@ -8,6 +8,7 @@ extension Institute.Repository.Policy.Prose {
     public static let extensions: Swift.Set<Swift.String> = ["md", "markdown", "mdx"]
 
     public static func findings(in tracked: [Swift.String], repository: Swift.String) -> [Swift.String] {
+        guard !Admitted.repositories.contains(repository) else { return [] }
         let communityHealth = repository.split(separator: "/").last == ".github"
         return tracked.filter { path in
             isProse(path) && !isAdmitted(path, communityHealth: communityHealth)
@@ -18,7 +19,7 @@ extension Institute.Repository.Policy.Prose {
     public static func message(_ path: Swift.String) -> Swift.String {
         "`\(path)` is prose outside README.md. A repository's prose is its README.md, written for agents to read "
             + "first; fold this into it or delete it. Admitted besides: LICENSE.md, an organization's community-health "
-            + "files in its .github repository, and DocC catalogs."
+            + "files in its .github repository, DocC catalogs, and test fixtures under a tests directory's fixtures."
     }
 
     static func isProse(_ path: Swift.String) -> Swift.Bool {
@@ -26,9 +27,16 @@ extension Institute.Repository.Policy.Prose {
         return extensions.contains(name[name.index(after: dot)...].lowercased())
     }
 
+    static func isFixture(_ components: [Swift.Substring]) -> Swift.Bool {
+        let directories = components.dropLast().map { $0.lowercased() }
+        guard let tests = directories.firstIndex(of: "tests") else { return false }
+        return directories[(tests + 1)...].contains("fixtures")
+    }
+
     static func isAdmitted(_ path: Swift.String, communityHealth: Swift.Bool) -> Swift.Bool {
         let components = path.split(separator: "/", omittingEmptySubsequences: true)
         if components.dropLast().contains(where: { $0.hasSuffix(".docc") }) { return true }
+        if isFixture(components) { return true }
         if Admitted.root.contains(path) { return true }
         guard communityHealth else { return false }
         let relative = components.first == ".github" ? components.dropFirst().joined(separator: "/") : path

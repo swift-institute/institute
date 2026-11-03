@@ -23,6 +23,10 @@ extension Institute.Repository.Policy.Prose {
                 "Sources/Statute/Statute.docc/Articles/Article 1.md",
                 "Sources/Core/markdown.swift",
                 "README.md.txt",
+                "Tests/Core Tests/Fixtures/valid/MANIFEST.md",
+                ".github/scripts/tests/fixtures/skill-links/pass/alpha/SKILL.md",
+                "Tests/Core Tests/NOTES.md",
+                "Fixtures/notes.md",
             ]
             let repository = "swift-atoms/swift-affine"
             let findings = Institute.Repository.Policy.Prose.findings(in: tracked, repository: repository)
@@ -31,9 +35,11 @@ extension Institute.Repository.Policy.Prose {
                     ".github/PULL_REQUEST_TEMPLATE.md",
                     "CONTRIBUTING.md",
                     "Docs/design.markdown",
+                    "Fixtures/notes.md",
                     "NOTES.md",
                     "Research/INVESTIGATION-ARC.MD",
                     "Sources/Core/README.md",
+                    "Tests/Core Tests/NOTES.md",
                 ]
             )
         }
@@ -56,6 +62,13 @@ extension Institute.Repository.Policy.Prose {
             let repository = "swift-molecules/.github"
             let findings = Institute.Repository.Policy.Prose.findings(in: tracked, repository: repository)
             #expect(findings == ["brand/README.md", "profile/NOTES.md"])
+        }
+
+        @Test
+        func `swift-institute Issues is exempt: its reproducer folders are the issue record`() {
+            let tracked = ["README.md", "swift-issue-borrowing-actor-closure/README.md", "Tooling/NOTES.md"]
+            let findings = Institute.Repository.Policy.Prose.findings(in: tracked, repository: "swift-institute/Issues")
+            #expect(findings.isEmpty)
         }
     }
 }
