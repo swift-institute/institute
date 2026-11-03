@@ -143,6 +143,7 @@ extension Institute.CI.Validation {
             Probe(".swift-lint/eval/Package.swift"),
             Probe("Sources/.swift-lint/manifest.json"),
             Probe(".build/debug/thing.o"),
+            Probe("Tests/.build/index-build/checkouts/swift-thing/Package.swift"),
             Probe("institute control.xcworkspace/xcuserdata/user.xcuserdatad/state.plist"),
             Probe("institute control.xcworkspace/xcshareddata/swiftpm/Package.resolved"),
         ]
