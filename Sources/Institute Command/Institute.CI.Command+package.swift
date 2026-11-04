@@ -93,6 +93,17 @@ extension Institute.CI.Command {
             refuse("package validate could not read the tracked paths: \(error)")
         }
 
+        // Report-only while the README rewrite runs: a finding is printed and
+        // never sets `refused`, and neither does a README it cannot read.
+        do throws(Institute.CI.Validation.EnvironmentDefect) {
+            let subject = Institute.CI.Validation.Subject(repository: repository, root: root)
+            for finding in try Institute.CI.Validation.Readme().findings(in: subject) {
+                print(finding.tsv)
+            }
+        } catch {
+            print("\(repository)\tREADME-read-failed\t\(error)")
+        }
+
         if refused { terminate(1) }
     }
 
