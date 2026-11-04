@@ -378,7 +378,8 @@ extension Institute.CI.Validation.Readme {
             )
         }
         // [README-161] The title is the repository's name.
-        let repository = subject.repository.split(separator: "/").last.map(String.init)
+        let repository =
+            subject.repository.split(separator: "/").last.map(String.init)
             ?? subject.repository
         let lines = splitLines(content)
         if let first = lines.first(where: { !$0.trimmedWhitespace.isEmpty }),
