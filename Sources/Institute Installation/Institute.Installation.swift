@@ -399,6 +399,11 @@ extension Institute.Installation {
     ///
     /// - Throws: ``Institute/Error`` when `PATH` or the executable cannot be
     ///   resolved.
+    public static func managed(_ file: File) -> Swift.Bool {
+        guard let home = Environment.read("HOME"), !home.isEmpty else { return false }
+        return "\(file.path)" == home + "/.local/share/swift-institute/institute/bin/institute"
+    }
+
     public static func running() throws(Institute.Error) -> File {
         guard let environmentPath = Environment.read("PATH") else {
             throw .configuration("PATH is not available, so the running executable cannot be found")

@@ -123,3 +123,43 @@ extension Institute.Planner.Freshness.Test.`Edge Case` {
         )
     }
 }
+
+extension Institute.Planner.Freshness.Test {
+    func replaced(_ scenario: Scenario, running: [Byte], installed: Bool) throws(Institute.Planner.Error) -> Bool {
+        try Institute.Planner.Freshness.replaced(
+            running: FIPS_180_4.SHA256.digest(running),
+            platform: .macos,
+            consumer: scenario.fixture.consumer,
+            release: scenario.fixture.release,
+            installed: installed
+        )
+    }
+
+    @Test func `an installed binary behind its pin is replaced`() throws {
+        let scenario = Scenario()
+        #expect(try replaced(scenario, running: scenario.binary(scenario.older), installed: true))
+    }
+
+    @Test func `a current installed binary is left alone`() throws {
+        let scenario = Scenario()
+        #expect(try !replaced(scenario, running: scenario.binary(scenario.pinned), installed: true))
+    }
+
+    @Test func `a development build behind the pin is refused, not replaced`() {
+        let scenario = Scenario()
+        #expect(throws: Institute.Planner.Error.self) {
+            try replaced(scenario, running: scenario.binary(scenario.older), installed: false)
+        }
+    }
+
+    @Test func `an installed binary is refused, not replaced, when the pin has no row for its platform`() {
+        var scenario = Scenario()
+        scenario.fixture.adopt(
+            Institute.Planner.Fixture.current,
+            rows: scenario.pinned.filter { !$0.contains(" macos-arm64 ") }
+        )
+        #expect(throws: Institute.Planner.Error.self) {
+            try replaced(scenario, running: scenario.binary(scenario.older), installed: true)
+        }
+    }
+}

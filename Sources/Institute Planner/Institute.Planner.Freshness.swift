@@ -1,5 +1,5 @@
 public import FIPS_180_4
-import File_System
+public import File_System
 import Institute_Installation
 public import Institute_Model
 
@@ -39,25 +39,68 @@ extension Institute.Planner.Freshness {
         )
     }
 
-    /// Refuses unless this process is the planner the live consumer pins for
-    /// the platform it runs on.
-    public static func enforce() throws(Institute.Error) {
+    /// Whether a binary should be replaced by the pinned planner rather than
+    /// run: `false` when it is current, `true` when it is stale and is the
+    /// account's own installation. A stale binary that isn't, such as a
+    /// development build, is refused, because replacing it would silently run
+    /// other code than was asked for; so is any failure to compare it.
+    static func replaced(
+        running: FIPS_180_4.Digest,
+        platform: Institute.Planner.Platform,
+        consumer: Institute.Planner.Consumer,
+        release: Institute.Planner.Release,
+        installed: Swift.Bool
+    ) throws(Institute.Planner.Error) -> Swift.Bool {
+        do throws(Institute.Planner.Error) {
+            try verify(running: running, platform: platform, consumer: consumer, release: release)
+            return false
+        } catch {
+            guard case .stale = error, installed else { throw error }
+            return true
+        }
+    }
+
+    /// Makes sure the live consumer's pinned planner is what runs: refuses a
+    /// binary that may not run, and when this process is the account's own
+    /// installation and behind its pin, installs the pinned planner, verifies
+    /// it and returns it, for the caller to run instead of carrying on.
+    /// Returns `nil` when this process is current.
+    public static func refresh() throws(Institute.Error) -> File? {
         guard let platform = Institute.Planner.Platform.host else {
             throw .configuration(
                 "no planner is published for this platform, so this binary cannot be verified"
             )
         }
-        let executable = try Institute.Installation.running()
+        let running = try Institute.Installation.running()
+        let pinned: Institute.Planner.Executable
         do throws(Institute.Planner.Error) {
-            let bytes = try Institute.Planner.read(executable.path)
+            let behind = try replaced(
+                running: Institute.Planner.digest(of: Institute.Planner.read(running.path)),
+                platform: platform,
+                consumer: .published,
+                release: .published,
+                installed: platform == .macos && Institute.Installation.managed(running)
+            )
+            guard behind else { return nil }
+            pinned = try Institute.Planner.Pinned.executable(
+                consumer: .published,
+                release: .published,
+                platform: platform
+            )
+        } catch {
+            throw .configuration("institute refuses to run: \(error)")
+        }
+        let installation = try pinned.install()
+        do throws(Institute.Planner.Error) {
             try verify(
-                running: Institute.Planner.digest(of: bytes),
+                running: Institute.Planner.digest(of: Institute.Planner.read(installation.executable.path)),
                 platform: platform,
                 consumer: .published,
                 release: .published
             )
         } catch {
-            throw .configuration("institute refuses to run: \(error)")
+            throw .configuration("the planner institute installed does not verify: \(error)")
         }
+        return installation.executable
     }
 }

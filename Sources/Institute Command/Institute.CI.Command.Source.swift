@@ -1,6 +1,7 @@
 public import Command
 public import Command_Schema
 import Console
+import File_System
 public import Institute_CI_Model
 public import Institute_Model
 import Institute_Planner
@@ -194,7 +195,10 @@ extension Institute.CI.Command {
             terminate(64)
         }
         do throws(Institute.Error) {
-            try Institute.Planner.Freshness.enforce()
+            if let installed = try Institute.Planner.Freshness.refresh() {
+                Console.Output.error("institute: installed the pinned planner, and runs this command with it\n")
+                try Self.rerun(with: installed)
+            }
             try await command.run()
         } catch {
             Console.Output.error("institute ci source: \(error)\n")
@@ -204,6 +208,21 @@ extension Institute.CI.Command {
 }
 
 extension Institute.CI.Command.Source {
+    static func rerun(with planner: File) throws(Institute.Error) -> Never {
+        let output: Process.Output
+        do throws(Process.Error) {
+            output = try Process.Spawn.run(
+                .init(executable: "\(planner.path)", arguments: Swift.Array(CommandLine.arguments.dropFirst()))
+            )
+        } catch {
+            throw .configuration("the installed planner did not start: \(error)")
+        }
+        guard case .exited(let code) = output.status else {
+            throw .configuration("the installed planner ended with \(output.status)")
+        }
+        Process.Exit.normal(code)
+    }
+
     static func summary(
         _ report: Source_Report::Source.Report,
         exitCode: Swift::Int32,
