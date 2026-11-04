@@ -27,17 +27,21 @@ extension Institute.CI.Validation {
     ///   Handling section) were removed 2026-11-03: the code is meant to be
     ///   self-evident, and a README holds only what the language cannot
     ///   say; an error type is already in `throws(...)` (Coen, 3 Nov).
-    ///   Retired rule IDs are never recycled.
+    ///   Retired rule IDs are never recycled. `README-161` (the first line is
+    ///   `# <repository name>`) and `README-162` (one paragraph before
+    ///   `## Laws`) complete the shape (Coen, 4 Nov).
     /// - **Family C** (process) — `README-137` (no Installation, badges,
     ///   or Quick Start), `README-138` (length budget).
     /// - **Family F** (placeholder) — `README-150` (H1 + status
     ///   blockquote only), `README-151` (status value in the canonical
     ///   set). A Family F repository without a README is clean: absence
     ///   *is* the namespace reservation.
-    /// - **Family G** (org profile) — `README-116` (no installation
-    ///   block). The profile lives at repo-root `profile/README.md` when
-    ///   the subject IS the org's `.github` repository, and at
-    ///   `.github/profile/README.md` otherwise.
+    /// - **Family G** (org profile) — `README-117` (no section but
+    ///   `## Start here`, no code block), which supersedes `README-116`. The
+    ///   control organization's profile is the Institute's entry point, so
+    ///   it is the one profile the shape doesn't bind. The profile lives at
+    ///   repo-root `profile/README.md` when the subject IS the org's
+    ///   `.github` repository, and at `.github/profile/README.md` otherwise.
     ///
     /// A repository whose metadata declares `readme.exempt:
     /// vendored-upstream` is skipped and emits nothing — out of scope by
@@ -63,12 +67,14 @@ extension Institute.CI.Validation {
             "README-016",
             "README-017",
             "README-026",
-            "README-116",
+            "README-117",
             "README-137",
             "README-138",
             "README-150",
             "README-151",
             "README-160",
+            "README-161",
+            "README-162",
             "README-family-unset",
             "README-presence",
             "README-read-failed",
@@ -371,6 +377,34 @@ extension Institute.CI.Validation.Readme {
                 )
             )
         }
+        // [README-161] The title is the repository's name.
+        let repository = subject.repository.split(separator: "/").last.map(String.init)
+            ?? subject.repository
+        let lines = splitLines(content)
+        if let first = lines.first(where: { !$0.trimmedWhitespace.isEmpty }),
+            String(first).trimmedWhitespace != "# \(repository)"
+        {
+            findings.append(
+                Finding(
+                    repository: subject.repository,
+                    rule: "README-161",
+                    message: "\(name): first line is "
+                        + Institute.CI.Validation.Retired.quoted(prefix(first, 80))
+                        + "; it must be `# \(repository)`"
+                )
+            )
+        }
+        // [README-162] One paragraph before `## Laws`.
+        let paragraphs = paragraphCount(in: lines)
+        if paragraphs != 1 {
+            findings.append(
+                Finding(
+                    repository: subject.repository,
+                    rule: "README-162",
+                    message: "\(name): has \(paragraphs) paragraphs before `## Laws`; it must have one"
+                )
+            )
+        }
         // [README-016] forbidden sections.
         for forbidden in ["## Roadmap", "## TODO", "## Changelog"]
         where content.contains(forbidden) {
@@ -384,6 +418,23 @@ extension Institute.CI.Validation.Readme {
             )
         }
         return findings
+    }
+
+    /// The paragraphs after the title and before the first section.
+    static func paragraphCount(in lines: [Substring]) -> Int {
+        var count = 0
+        var inParagraph = false
+        for line in lines {
+            let text = String(line)
+            if h2OrDeeper.firstMatch(in: text) != nil { break }
+            if h1Line.firstMatch(in: text) != nil || line.trimmedWhitespace.isEmpty {
+                inParagraph = false
+            } else if !inParagraph {
+                inParagraph = true
+                count += 1
+            }
+        }
+        return count
     }
 
     static func familyC(
@@ -485,14 +536,34 @@ extension Institute.CI.Validation.Readme {
         name: String,
         content: String
     ) -> [Institute.CI.Validation.Finding] {
-        guard content.contains("## Installation") else { return [] }
-        // [README-116] org profile MUST NOT include installation block.
-        return [
-            Institute.CI.Validation.Finding(
-                repository: repository,
-                rule: "README-116",
-                message: "\(name): org-profile README has `## Installation` section (forbidden)"
+        // [README-117] The control organization's profile is the one exception.
+        guard repository != "\(Institute.Organization.`swift-institute`.rawValue)/.github" else {
+            return []
+        }
+        typealias Finding = Institute.CI.Validation.Finding
+        var findings: [Finding] = []
+        for line in splitLines(content) where h2OrDeeper.firstMatch(in: String(line)) != nil {
+            let heading = String(line).trimmedWhitespace
+            guard heading != "## Start here" else { continue }
+            findings.append(
+                Finding(
+                    repository: repository,
+                    rule: "README-117",
+                    message: "\(name): contains section "
+                        + Institute.CI.Validation.Retired.quoted(heading)
+                        + "; a profile's only section is `## Start here`"
+                )
             )
-        ]
+        }
+        if content.contains("```") {
+            findings.append(
+                Finding(
+                    repository: repository,
+                    rule: "README-117",
+                    message: "\(name): contains a code block"
+                )
+            )
+        }
+        return findings
     }
 }

@@ -76,7 +76,71 @@ struct CIValidationReadmeTests {
                 to: ".github/profile/README.md"
             )
             let findings = try validator.findings(in: repository.subject)
-            #expect(findings.map(\.rule) == ["README-116"])
+            #expect(findings.map(\.rule) == ["README-117"])
+        }
+    }
+
+    @Suite
+    struct `Family G Shape` {
+        let validator = Institute.CI.Validation.Readme()
+
+        func findings(_ profile: String, repository: String = "swift-atoms/.github") throws -> [Institute.CI.Validation.Finding] {
+            let temporary = TemporaryRepository(repository: repository)
+            temporary.write("readme:\n  family: G\n", to: ".github/metadata.yaml")
+            temporary.write(profile, to: "profile/README.md")
+            return try validator.findings(in: temporary.subject)
+        }
+
+        @Test func `a start here section is the one allowed`() throws {
+            #expect(try findings("# Org\n\nUse this.\n\n## Start here\n\n- a\n").isEmpty)
+        }
+
+        @Test func `any other section is a finding`() throws {
+            #expect(try findings("# Org\n\n## License\n\nApache.\n").map(\.rule) == ["README-117"])
+        }
+
+        @Test func `a code block is a finding`() throws {
+            #expect(try findings("# Org\n\n```swift\nlet a = 1\n```\n").map(\.rule) == ["README-117"])
+        }
+
+        @Test func `the control organization's profile is not bound`() throws {
+            #expect(try findings("# Org\n\n## CI\n\nText.\n", repository: "swift-institute/.github").isEmpty)
+        }
+    }
+
+    @Suite
+    struct `Family E Shape` {
+        let validator = Institute.CI.Validation.Readme()
+
+        func rules(_ readme: String) throws -> [Institute.CI.Validation.Rule] {
+            let temporary = TemporaryRepository(repository: "swift-atoms/swift-example")
+            temporary.write("readme:\n  family: E\n", to: ".github/metadata.yaml")
+            temporary.write(readme, to: "README.md")
+            return try validator.findings(in: temporary.subject).map(\.rule)
+        }
+
+        @Test func `the finished shape has no findings`() throws {
+            #expect(try rules("# swift-example\n\nUse this.\nSecond line.\n\n## Laws\n\n- A law.\n").isEmpty)
+        }
+
+        @Test func `no laws section is fine`() throws {
+            #expect(try rules("# swift-example\n\nUse this.\n").isEmpty)
+        }
+
+        @Test func `a title that isn't the repository's name is a finding`() throws {
+            #expect(try rules("# Example\n\nUse this.\n") == ["README-161"])
+        }
+
+        @Test func `two paragraphs are a finding`() throws {
+            #expect(try rules("# swift-example\n\nUse this.\n\nAnd this.\n\n## Laws\n\n- A law.\n") == ["README-162"])
+        }
+
+        @Test func `no paragraph is a finding`() throws {
+            #expect(try rules("# swift-example\n\n## Laws\n\n- A law.\n") == ["README-162"])
+        }
+
+        @Test func `text after the laws heading doesn't count`() throws {
+            #expect(try rules("# swift-example\n\nUse this.\n\n## Laws\n\nIntro.\n\nMore.\n").isEmpty)
         }
     }
 

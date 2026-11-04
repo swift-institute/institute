@@ -9,17 +9,19 @@ import struct Swift.String
 extension Institute.CI.Command {
     static func package(_ arguments: [Swift.String]) {
         guard let operation = arguments.first else {
-            refuse("package requires validate, plan, or aggregate")
+            refuse("package requires validate, readme, plan, or aggregate")
         }
         let rest = Array(arguments.dropFirst())
         switch operation {
         case "validate": packageValidate(rest)
 
+        case "readme": packageReadme(rest)
+
         case "plan": plan(rest)
 
         case "aggregate": aggregate(rest)
 
-        default: refuse("package requires validate, plan, or aggregate")
+        default: refuse("package requires validate, readme, plan, or aggregate")
         }
     }
 
@@ -93,20 +95,32 @@ extension Institute.CI.Command {
             refuse("package validate could not read the tracked paths: \(error)")
         }
 
-        // A README finding fails the build. README-138 is the exception: a
-        // process README over its length budget is told where content might
-        // go, which is a suggestion and not a defect.
-        do throws(Institute.CI.Validation.EnvironmentDefect) {
-            let subject = Institute.CI.Validation.Subject(repository: repository, root: root)
-            for finding in try Institute.CI.Validation.Readme().findings(in: subject) {
-                if finding.rule != "README-138" { refused = true }
-                print(finding.tsv)
-            }
-        } catch {
-            refuse("package validate could not read the README: \(error)")
-        }
+        if readmeFindings(repository: repository, root: root) { refused = true }
 
         if refused { terminate(1) }
+    }
+
+    /// `package readme`: the README rules alone, for a repository with no
+    /// package to validate, such as an organization's `.github`.
+    private static func packageReadme(_ arguments: [Swift.String]) {
+        let repository = value("--repository", in: arguments)
+        let root = value("--root", in: arguments)
+        guard !repository.isEmpty, !root.isEmpty else {
+            refuse("package readme requires --repository and --root")
+        }
+        if readmeFindings(repository: repository, root: root) { terminate(1) }
+    }
+
+    /// Prints each README finding, and says whether there were any.
+    private static func readmeFindings(repository: Swift.String, root: Swift.String) -> Swift.Bool {
+        do throws(Institute.CI.Validation.EnvironmentDefect) {
+            let subject = Institute.CI.Validation.Subject(repository: repository, root: root)
+            let findings = try Institute.CI.Validation.Readme().findings(in: subject)
+            for finding in findings { print(finding.tsv) }
+            return !findings.isEmpty
+        } catch {
+            refuse("could not read the README: \(error)")
+        }
     }
 
     private static func identityMessage(
