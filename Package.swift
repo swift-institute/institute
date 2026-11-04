@@ -42,6 +42,10 @@ let package = Package(
             targets: ["Institute Linter Rule Manifest"]
         ),
         .library(
+            name: "Institute Model",
+            targets: ["Institute Model"]
+        ),
+        .library(
             name: "Institute Repository Policy",
             targets: ["Institute Repository Policy"]
         ),
