@@ -29,7 +29,7 @@ extension Institute.Source {
                             stdin: .inherit,
                             stdout: .pipe,
                             stderr: .pipe,
-                            workingDirectory: directory,
+                            directory: directory,
                             timeout: timeout
                         )
                     )
