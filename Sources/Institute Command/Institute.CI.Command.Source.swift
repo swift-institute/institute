@@ -197,7 +197,7 @@ extension Institute.CI.Command {
         do throws(Institute.Error) {
             if let installed = try Institute.Planner.Freshness.refresh() {
                 Console.Output.error("institute: installed the pinned planner, and runs this command with it\n")
-                try Self.rerun(with: installed)
+                try Source.rerun(with: installed)
             }
             try await command.run()
         } catch {
