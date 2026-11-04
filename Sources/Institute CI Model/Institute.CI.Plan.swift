@@ -91,8 +91,8 @@ extension Institute.CI {
         /// `platformSupport` = the comma-separated family list;
         /// `lintBundle` = primitives|standards|institute.
         /// - Parameter packageContentChanged: false when the event diff
-        ///   selected no package build work. Build legs are then dropped
-        ///   and the no-gating-build-leg guard stands down, because
+        ///   selected no package work. Those legs are then dropped, and the
+        ///   no-gating-build-leg guard stands down, because
         ///   building nothing is the planned outcome rather than a green
         ///   over nothing.
         /// - Parameter deschedule: leg ids the caller's policy has ruled
@@ -195,11 +195,13 @@ extension Institute.CI {
             self.legs = legs
         }
 
-        /// Legs that compile or cross-compile the package, beyond the
-        /// release build legs ``Leg/buildLeg`` names. A run that selected
-        /// no package work schedules none of them.
+        /// Legs that compile, cross-compile or measure the package, beyond
+        /// the release build legs ``Leg/buildLeg`` names. A run that selected
+        /// no package work schedules none of them: `source` measures the same
+        /// sources as the last run, and needs a macOS runner to do it. The
+        /// Plan job still validates the repository, its README included.
         static let packageWorkLegs: Set<String> = [
-            "linux-6-4", "linux-nightly", "apple-simulator-build", "embedded",
+            "source", "linux-6-4", "linux-nightly", "apple-simulator-build", "embedded",
             "embedded-wasm-sdk", "android-build", "static-linux-musl-build",
         ]
 

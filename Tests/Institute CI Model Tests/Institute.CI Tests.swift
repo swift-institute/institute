@@ -257,15 +257,15 @@ struct ContinuousIntegrationPlanTests {
         #expect(!plan.packageContentChanged)
         let ids = Set(plan.legs.map(\.id))
         for dropped in [
-            "linux-release", "macos-release", "windows-release", "linux-6-4",
+            "source", "linux-release", "macos-release", "windows-release", "linux-6-4",
             "linux-nightly", "apple-simulator-build", "embedded",
             "embedded-wasm-sdk", "android-build", "static-linux-musl-build",
         ] {
             #expect(!ids.contains(dropped), Comment(rawValue: dropped))
         }
-        // The quality gates and the aggregate's own surface survive: the
-        // narrowing is of package work, not of the run.
-        #expect(ids.contains("source"))
+        // Nothing is left to gate. The Plan job has already validated the
+        // repository, and the aggregate accepts a run with no package work.
+        #expect(plan.gating.isEmpty)
     }
 
     @Test
@@ -536,6 +536,35 @@ struct ContinuousIntegrationAggregateTests {
         )
         #expect(verdict.pass)
         #expect(!verdict.findings.contains(.nothingBuilt))
+    }
+
+    @Test
+    func aRunWithNoPackageWorkMayGateNothing() {
+        let verdict = Institute.CI.AggregateVerdict(
+            planResult: "success",
+            results: needs(["source": "skipped"]),
+            gating: [],
+            subjectRepository: "o/r",
+            subjectSha: "abc",
+            tier: "build",
+            requireFullTier: false,
+            packageContentChanged: false
+        )
+        #expect(verdict.pass)
+    }
+
+    @Test
+    func aRunWithPackageWorkMustGateSomething() {
+        let verdict = Institute.CI.AggregateVerdict(
+            planResult: "success",
+            results: needs(["source": "skipped"]),
+            gating: [],
+            subjectRepository: "o/r",
+            subjectSha: "abc",
+            tier: "build",
+            requireFullTier: false
+        )
+        #expect(verdict.findings.contains(.emptyGating))
     }
 
     @Test

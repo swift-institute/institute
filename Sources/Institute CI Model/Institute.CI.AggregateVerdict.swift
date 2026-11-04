@@ -57,7 +57,7 @@ extension Institute.CI {
             if planResult != "success" {
                 findings.append(.planDidNotSucceed(result: planResult))
             }
-            if gating.isEmpty {
+            if gating.isEmpty && packageContentChanged {
                 findings.append(.emptyGating)
             }
             if subjectRepository.isEmpty || subjectSha.isEmpty {
