@@ -28,6 +28,8 @@ extension Lint.Rule.Bundle {
             .enable(.`suppression reason required`, severity: .error),
             .enable(.`architecture import boundary`),
             .enable(.`architecture foundation type`),
+            .enable(.`raw concept`),
+            .enable(.`concept parallel`),
             .enable(.`architecture namespace shape`, severity: .error),
             .enable(.`associated type shadows namespace`),
             .enable(.`bool public parameter`),
