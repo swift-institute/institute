@@ -367,8 +367,7 @@ let package = Package(
         ),
         .testTarget(
             name: "Institute CI Inventory Tests",
-            dependencies: [.product(name: "GitHub Standard", package: "swift-github-standard"), "Institute CI Inventory"],
-            exclude: ["Fixtures"]
+            dependencies: [.product(name: "GitHub Standard", package: "swift-github-standard"), "Institute CI Inventory"]
         ),
         .testTarget(
             name: "Institute CI Validation Tests",
