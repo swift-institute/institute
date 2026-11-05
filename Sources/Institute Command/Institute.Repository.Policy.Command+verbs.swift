@@ -1,8 +1,8 @@
 import Byte
 import Calendar_Gregorian
 import GitHub_App
-public import Institute_Model
-public import Institute_Repository_Policy
+import Institute_Model
+import Institute_Repository_Policy
 import JSON
 import RFC_3339
 import Time

@@ -1,7 +1,7 @@
-public import File_System
-public import Institute_Model
-public import Institute_Source_Policy
-public import Source_Profile
+import File_System
+import Institute_Model
+import Institute_Source_Policy
+import Source_Profile
 import Thread_Pool
 
 extension Institute.Source.Acquisition {

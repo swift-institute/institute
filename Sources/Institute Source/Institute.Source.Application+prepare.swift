@@ -1,7 +1,7 @@
-public import FIPS_180_4
+import FIPS_180_4
 public import File_System
 public import Institute_Model
-public import Institute_Source_Policy
+import Institute_Source_Policy
 internal import Institute_Source_Profile
 public import Source_Profile
 public import Source_Repair

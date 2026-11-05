@@ -1,5 +1,5 @@
 import GitHub_Standard
-public import Institute_CI_Inventory
+import Institute_CI_Inventory
 public import Institute_CI_Model
 public import Institute_CI_Workflow
 public import Institute_Model

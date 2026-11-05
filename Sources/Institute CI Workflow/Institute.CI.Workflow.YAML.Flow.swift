@@ -1,6 +1,6 @@
 import GitHub_Standard
-public import Institute_CI_Model
-public import Institute_Model
+import Institute_CI_Model
+import Institute_Model
 
 extension Institute.CI.Workflow.YAML {
     /// Reader for a single-line flow collection — `[main]`,

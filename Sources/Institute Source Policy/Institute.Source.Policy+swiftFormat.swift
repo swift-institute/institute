@@ -1,4 +1,4 @@
-public import Institute_Model
+import Institute_Model
 internal import Source_Profile
 
 extension Institute.Source.Policy {

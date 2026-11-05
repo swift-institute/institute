@@ -1,7 +1,7 @@
 import Byte
 import Institute_CI_Contract
-public import Institute_CI_Model
-public import Institute_Model
+import Institute_CI_Model
+import Institute_Model
 import JSON
 
 import struct Swift.String

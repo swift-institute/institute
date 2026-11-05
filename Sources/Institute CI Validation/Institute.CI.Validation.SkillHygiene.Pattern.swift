@@ -1,5 +1,5 @@
-public import Institute_CI_Model
-public import Institute_Model
+import Institute_CI_Model
+import Institute_Model
 
 import struct Swift.String
 

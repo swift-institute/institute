@@ -358,9 +358,7 @@ extension Institute.CI.Validation.Gitignore {
     }
 
     private static var currentWorkingDirectory: String? {
-        guard let path = try? File.Path("."),
-            let resolved = try? File.System.Canonical.resolve(path)
-        else { return nil }
+        guard let resolved = try? File.System.Canonical.resolve(File.Path(".")) else { return nil }
         return resolved.description
     }
 
@@ -387,7 +385,7 @@ extension Institute.CI.Validation.Gitignore {
     /// compose `canon/canon`.
     static func siblingCanonPath(of packageCanon: String, for `class`: Class) -> String {
         guard let path = try? File.Path(packageCanon), let parent = path.parent,
-            let sibling = try? File.Path.Component("gitignore-\(`class`.rawValue).txt")
+            let sibling = try? File.Path.Component("gitignore-\(`class`.rawValue).txt" as String)
         else { return packageCanon.directoryPortion + "/gitignore-\(`class`.rawValue).txt" }
         return (parent / sibling).description
     }
@@ -542,7 +540,7 @@ extension Institute.CI.Validation.Gitignore {
         // reads as kept. The junk control caught exactly this.
         do {
             try Self.retryingTransientWindowsFailures {
-                let path = try File.Path("\(root)/.gitignore")
+                let path = try File.Path("\(root)/.gitignore" as String)
                 try File(path).write.atomic(gitignore)
             }
         } catch {
@@ -573,9 +571,8 @@ extension Institute.CI.Validation.Gitignore {
             let temporary = Environment.read("TMPDIR") ?? "/tmp"
         #endif
         guard let anchorParent = try? File.Path(temporary),
-            let anchorComponent = try? File.Path.Component("scratch"),
             let unique = try? File.Path.Temporary.sibling(
-                of: anchorParent / anchorComponent,
+                of: anchorParent / File.Path.Component("scratch"),
                 prefix: prefix
             )
         else { return nil }

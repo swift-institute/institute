@@ -14,7 +14,7 @@
 // that prose defines. Disabled for the whole file because the entire
 // body is vendored text, not authored logic.
 
-public import Institute_Model
+import Institute_Model
 
 extension Institute.Source.Policy {
   /// The transitional SwiftLint policy retained until its final invariant

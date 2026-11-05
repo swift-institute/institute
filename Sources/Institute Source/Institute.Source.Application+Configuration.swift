@@ -1,10 +1,10 @@
 internal import Byte
-public import File_System
+import File_System
 internal import Institute_Model
-public import Institute_Source_Policy
+import Institute_Source_Policy
 internal import Institute_Source_Profile
 internal import JSON
-public import Source_Measurement
+import Source_Measurement
 internal import Source_Profile
 
 extension Institute.Source.Application {

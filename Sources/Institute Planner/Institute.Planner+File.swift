@@ -1,6 +1,6 @@
 import Byte
 package import File_System
-public import Institute_Model
+package import Institute_Model
 
 extension Institute.Planner {
     /// A path the verbs were handed or derived.

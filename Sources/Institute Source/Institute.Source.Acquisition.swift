@@ -1,5 +1,5 @@
 public import Institute_Model
-public import Institute_Source_Policy
+import Institute_Source_Policy
 public import Source_Profile
 
 extension Institute.Source {

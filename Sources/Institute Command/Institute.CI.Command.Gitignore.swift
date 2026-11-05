@@ -1,4 +1,4 @@
-public import Institute_CI_Canon
+import Institute_CI_Canon
 public import Institute_CI_Model
 public import Institute_CI_Validation
 public import Institute_Model

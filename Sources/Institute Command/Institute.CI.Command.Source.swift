@@ -5,12 +5,12 @@ import File_System
 public import Institute_CI_Model
 public import Institute_Model
 import Institute_Planner
-public import Institute_Source
+import Institute_Source
 import Institute_Source_Policy
-public import Institute_Source_Workspace
-public import JSON
+import Institute_Source_Workspace
+import JSON
 import Process
-public import Source_Report
+import Source_Report
 
 extension Institute.CI.Command {
     public struct Source: Sendable, Command_Schema.Command.`Protocol` {

@@ -1,7 +1,7 @@
 public import Environment
 import GitHub_Standard
 public import Institute_CI_Model
-public import Institute_CI_Workflow
+import Institute_CI_Workflow
 public import Institute_Model
 
 import struct Swift.String

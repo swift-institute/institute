@@ -1,14 +1,14 @@
 public import File_System
 public import Institute_Model
-public import Institute_Source_Profile
-public import Institute_Source_Workspace
-public import JSON
-public import Process
+import Institute_Source_Profile
+import Institute_Source_Workspace
+import JSON
+import Process
 public import Source_Execution
 public import Source_Measurement
 public import Source_Profile
-public import Source_Repair
-public import Source_Report
+import Source_Repair
+import Source_Report
 
 extension Institute.Source {
     /// The executable source-quality capability. It deliberately has no build

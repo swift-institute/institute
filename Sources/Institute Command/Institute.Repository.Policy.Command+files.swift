@@ -1,7 +1,7 @@
 import Byte
 import File_System
-public import Institute_Model
-public import Institute_Repository_Policy
+import Institute_Model
+import Institute_Repository_Policy
 
 import struct Swift.String
 

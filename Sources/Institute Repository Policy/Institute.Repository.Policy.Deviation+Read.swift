@@ -4,7 +4,7 @@ public import Institute_Model
 
 extension Institute.Repository.Policy.Deviation {
     public static func read(root: Swift.String) -> Self {
-        guard let filePath = try? File.Path("\(root)/\(Self.path)") else { return Self() }
+        guard let filePath = try? File.Path("\(root)/\(Self.path)" as Swift.String) else { return Self() }
         let bytes: [Byte]
         do throws(Either<File.System.Read.Full.Error, Never>) {
             bytes = try File(filePath).read.full { view in

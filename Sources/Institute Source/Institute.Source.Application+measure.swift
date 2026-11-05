@@ -1,9 +1,9 @@
-public import Async_Fanout
-public import FIPS_180_4
+import Async_Fanout
+import FIPS_180_4
 public import Institute_Model
 public import Institute_Source_Policy
 internal import Institute_Source_Profile
-public import Institute_Source_Workspace
+import Institute_Source_Workspace
 public import Source_Execution
 import Source_Linter
 public import Source_Measurement

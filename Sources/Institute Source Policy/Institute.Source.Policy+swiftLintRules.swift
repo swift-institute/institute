@@ -1,4 +1,4 @@
-public import Institute_Model
+import Institute_Model
 
 extension Institute.Source.Policy {
     /// The exact SwiftLint 0.65.1 predicates enabled by

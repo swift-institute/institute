@@ -1,6 +1,6 @@
 import GitHub_Standard
 public import Institute_CI_Model
-public import Institute_CI_Workflow
+import Institute_CI_Workflow
 public import Institute_Model
 import Standard_Library_Extensions
 

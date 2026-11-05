@@ -1,4 +1,4 @@
-public import Byte
+import Byte
 public import File_System
 public import Institute_Model
 import JSON

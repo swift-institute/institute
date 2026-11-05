@@ -2,7 +2,7 @@ import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_CI_Workflow
 public import Institute_Model
-public import JSON
+import JSON
 
 extension Institute.CI.Inventory {
     /// The trust anchor: the sources a workflow revision is entitled to

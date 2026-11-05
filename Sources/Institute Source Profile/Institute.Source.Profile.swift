@@ -1,7 +1,7 @@
 public import Institute_Model
 public import Institute_Source_Policy
 public import Source_Measurement
-public import Source_Profile
+import Source_Profile
 
 extension Institute_Model.Institute.Source {
     public struct Profile: Sendable {
