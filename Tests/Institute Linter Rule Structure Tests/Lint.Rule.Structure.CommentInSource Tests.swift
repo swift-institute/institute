@@ -100,6 +100,20 @@ extension `Lint.Rule Tests`.`comment in source Tests`.`Edge Case` {
     }
 
     @Test
+    func `swift-format and SwiftLint directives are admitted`() {
+        let findings = `Lint.Rule Tests`.`comment in source Tests`.findings(
+            """
+            // swift-format-ignore: NeverUseForceTry
+            let value = try! load()
+            // swiftlint:disable:next force_try
+            let other = try! load()
+            let third = try! load() // swiftlint:disable:this force_try
+            """
+        )
+        #expect(findings.isEmpty)
+    }
+
+    @Test
     func `comment markers inside string literals are not comments`() {
         let findings = `Lint.Rule Tests`.`comment in source Tests`.findings(
             """
@@ -214,6 +228,27 @@ extension `Lint.Rule Tests`.`comment in source Tests`.Integration {
     func `repair keeps swift-linter directives`() {
         let source = "// swift-linter:disable:next some rule\nlet value = 1"
         #expect(Lint.Rule.`comment in source`.repair(Lint.Source.parsed(from: source, file: "Sources/Fixture/Fixture.swift")) == .unchanged)
+    }
+
+    @Test
+    func `repair keeps swift-format and SwiftLint directives`() {
+        let repaired = Self.repaired(
+            """
+            // note
+            // swift-format-ignore: NeverUseForceTry
+            let value = try! load()
+            // swiftlint:disable:next force_try
+            let other = try! load()
+            """
+        )
+        #expect(
+            repaired == """
+                // swift-format-ignore: NeverUseForceTry
+                let value = try! load()
+                // swiftlint:disable:next force_try
+                let other = try! load()
+                """
+        )
     }
 
     @Test

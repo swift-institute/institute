@@ -45,6 +45,14 @@ extension Lint.Rule {
                 expectation: .clean
             ),
             .init(
+                id: "comment in source engine directives",
+                source: "// swift-format-ignore: NeverUseForceTry\nlet value = try! load()\n"
+                    + "// swiftlint:disable:next force_try\nlet other = try! load()\n"
+                    + "// swift-format-ignore-file",
+                path: "Sources/Structure Core/Value.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "comment in source directive reason",
                 source: "func f() {\n    // swift-linter:disable:next do throws for typed catch\n    // REASON: Task.sleep throws untyped\n    try await Task.sleep(for: .seconds(1))\n}",
                 path: "Sources/Structure Core/Value.swift",
@@ -109,8 +117,9 @@ internal let structureCommentInSourceMessage: Swift::String =
     + "`/* */` comments; names, types and tests carry the meaning. Admitted: `///` "
     + "and `/** */` documentation, the disclosure lines the skills require "
     + "(`// SAFETY:`, `// WHY:`, `// TRACKING:`, `// WHEN TO REMOVE:`, "
-    + "`// REMOVE-WHEN:`, with their continuation lines), and `// swift-linter:` "
-    + "directives with their `// REASON:` line. This checks that a comment is one "
+    + "`// REMOVE-WHEN:`, with their continuation lines), `// swift-linter:` "
+    + "directives with their `// REASON:` line, and the `// swift-format-ignore` and "
+    + "`// swiftlint:` directives the source gate's other engines read. This checks that a comment is one "
     + "of these, not that what it says is true."
 
 internal final class StructureCommentInSourceVisitor: SyntaxVisitor {
@@ -144,7 +153,7 @@ internal final class StructureCommentInSourceVisitor: SyntaxVisitor {
                 case .docLineComment(let text), .blockComment(let text), .docBlockComment(let text): text
                 default: nil
                 }
-            guard let text, !text.hasPrefix("// swift-linter:") else { continue }
+            guard let text, !structureCommentInSourceIsDirective(text) else { continue }
             let location = converter.location(for: position)
             matches.append(
                 Diagnostic.Record(
@@ -205,6 +214,16 @@ internal let structureCommentInSourceMarkers: [Swift::String] = [
     "SAFETY:", "WHY:", "TRACKING:", "WHEN TO REMOVE:", "REMOVE-WHEN:",
 ]
 
+/// The directive prefixes of the engines the source gate runs: swift-linter's own, and swift-format's and SwiftLint's,
+/// whose rules the gate also enforces and which those engines read from a line comment.
+internal let structureCommentInSourceDirectivePrefixes: [Swift::String] = [
+    "// swift-linter:", "// swift-format-ignore", "// swiftlint:",
+]
+
+internal func structureCommentInSourceIsDirective(_ text: Swift::String) -> Swift::Bool {
+    structureCommentInSourceDirectivePrefixes.contains { text.hasPrefix($0) }
+}
+
 internal func structureCommentInSourceIsMarker(_ text: Swift::String) -> Swift::Bool {
     guard text.hasPrefix("//") else { return false }
     let body = text.dropFirst(2).drop { $0 == " " || $0 == "\t" }
@@ -228,7 +247,7 @@ internal func structureCommentInSourceAdmittedIndices(_ trivia: Trivia) -> Swift
             else { continue }
             if text.hasPrefix("// REASON:"), prior.hasPrefix("// swift-linter:disable:") {
                 admitted.insert(index)
-            } else if admitted.contains(previous), !text.hasPrefix("// swift-linter:") {
+            } else if admitted.contains(previous), !structureCommentInSourceIsDirective(text) {
                 admitted.insert(index)
             }
         default:
@@ -255,7 +274,7 @@ internal func structureCommentInSourcePreviousLine(
 
 internal func structureCommentInSourceIsRemovable(_ piece: TriviaPiece) -> Swift::Bool {
     switch piece {
-    case .lineComment(let text): !text.hasPrefix("// swift-linter:")
+    case .lineComment(let text): !structureCommentInSourceIsDirective(text)
     case .docLineComment, .blockComment, .docBlockComment: true
     default: false
     }
