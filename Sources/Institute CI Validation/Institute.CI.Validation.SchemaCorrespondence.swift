@@ -64,13 +64,25 @@ extension Institute.CI.Validation {
         /// one scenario directory, so its caller names them explicitly —
         /// the shape the retired script's three positional arguments
         /// had.
+        // swift-linter:disable:next raw concept
+        // REASON: an override of where an input lives, relative to the subject root or absolute, joined as text by the validator exactly like its manifestPath and workflowPath defaults; looked at File.Path.
         public let schemaFile: String?
+        // swift-linter:disable:next raw concept
+        // REASON: an override of where an input lives, relative to the subject root or absolute, joined as text by the validator exactly like its manifestPath and workflowPath defaults; looked at File.Path.
         public let syncWorkflowFile: String?
+        // swift-linter:disable:next raw concept
+        // REASON: an override of where an input lives, relative to the subject root or absolute, joined as text by the validator exactly like its manifestPath and workflowPath defaults; looked at File.Path.
         public let readmeValidatorFile: String?
 
         public init(
+            // swift-linter:disable:next raw concept
+            // REASON: an override of where an input lives, relative to the subject root or absolute, joined as text by the validator exactly like its manifestPath and workflowPath defaults; looked at File.Path.
             schemaFile: String? = nil,
+            // swift-linter:disable:next raw concept
+            // REASON: an override of where an input lives, relative to the subject root or absolute, joined as text by the validator exactly like its manifestPath and workflowPath defaults; looked at File.Path.
             syncWorkflowFile: String? = nil,
+            // swift-linter:disable:next raw concept
+            // REASON: an override of where an input lives, relative to the subject root or absolute, joined as text by the validator exactly like its manifestPath and workflowPath defaults; looked at File.Path.
             readmeValidatorFile: String? = nil
         ) {
             self.schemaFile = schemaFile

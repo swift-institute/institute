@@ -4,8 +4,8 @@ public import Source_Profile
 extension Institute.Source.Policy {
     public func linterRules(for bundle: Institute.Source.Bundle) -> [Source_Profile.Source.Rule.ID] {
         guard let engine = engines.first(where: { $0.id.token == "swift-linter" }),
-            engine.revision == "e4fffc9c3022f426e0cbc593b2d4596647a05f77",
-            engine.executable.digest == .init("40c65efb5f1d12a2a47b98fede3ee5189c2a9db050c416f0cab005f7916dbb79")
+            engine.revision == "3a43c132b72118b045a4eeb002fcd2937e974414",
+            engine.executable.digest == .init("e3629c0aa00f7561795a7294cce8398aaaac9f9f21d0c595bb58b26e7e30d60f")
         else { return [] }
         let tokens: [Swift.String]
         switch bundle {
@@ -29,6 +29,7 @@ extension Institute.Source.Policy {
         "binary serializable uint8 witness",
         "bitpattern rawvalue chain",
         "bool public parameter",
+        "blocking call in async",
         "borrowing self short circuit",
         "bounded index static capacity",
         "byte conforms to arithmetic protocol",
@@ -39,6 +40,7 @@ extension Institute.Source.Policy {
         "chained rawvalue access",
         "closure typed throws annotation",
         "comment in source",
+        "concept parallel",
         "compound platform namespace root",
         "compound suite name",
         "configuration before content",
@@ -94,6 +96,7 @@ extension Institute.Source.Policy {
         "pointer advanced by",
         "property named flags",
         "protocol sentinel under generic front door",
+        "raw concept",
         "raw value access",
         "redirected dependency url",
         "redundant prefix",

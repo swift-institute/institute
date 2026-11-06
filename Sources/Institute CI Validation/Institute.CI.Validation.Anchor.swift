@@ -59,9 +59,15 @@ extension Institute.CI.Validation {
         /// The workflow the anchor is emitted into, by default.
         public static let workflowPath = ".github/workflows/swift-ci.yml"
 
+        // swift-linter:disable:next raw concept
+        // REASON: an override of where an input lives, relative to the subject root or absolute, joined as text by the validator exactly like its manifestPath and workflowPath defaults; looked at File.Path.
         public let manifestFile: String?
+        // swift-linter:disable:next raw concept
+        // REASON: an override of where an input lives, relative to the subject root or absolute, joined as text by the validator exactly like its manifestPath and workflowPath defaults; looked at File.Path.
         public let workflowFile: String?
 
+        // swift-linter:disable:next raw concept
+        // REASON: an override of where an input lives, relative to the subject root or absolute, joined as text by the validator exactly like its manifestPath and workflowPath defaults; looked at File.Path.
         public init(manifestFile: String? = nil, workflowFile: String? = nil) {
             self.manifestFile = manifestFile
             self.workflowFile = workflowFile

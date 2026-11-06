@@ -58,6 +58,8 @@ extension Institute.Source.Workspace {
 
     public static func subject(
         identity: Swift.String,
+        // swift-linter:disable:next raw concept
+        // REASON: a member root as the workspace lists it; this function is where it becomes a File.Directory, with a configuration error when it can't; looked at File.Directory, File.Path.
         root rootPath: Swift.String,
         paths: [Swift.String]
     ) throws(Institute.Error) -> Source.Subject {

@@ -4,6 +4,8 @@ extension Source.Profile {
         public let executable: Swift.String
         public let tool: Digest
         public let configuration: Digest
+        // swift-linter:disable:next raw concept
+        // REASON: a field of the serialized source profile, written into its JSON and handed to the engine as an argument; the profile's digest covers the text as written; looked at File.Path.
         public let configurationPath: Swift.String
         public let environment: [Swift.String: Swift.String]
         public let artifactKinds: [Source.Artifact.Kind]
@@ -14,6 +16,8 @@ extension Source.Profile {
             executable: Swift.String,
             tool: Digest,
             configuration: Digest,
+            // swift-linter:disable:next raw concept
+            // REASON: a field of the serialized source profile, written into its JSON and handed to the engine as an argument; the profile's digest covers the text as written; looked at File.Path.
             configurationPath: Swift.String,
             environment: [Swift.String: Swift.String] = [:],
             artifactKinds: [Source.Artifact.Kind],

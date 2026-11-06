@@ -1,6 +1,6 @@
 import GitHub_Standard
-import Path
 public import Institute_Model
+import Path
 public import Source_Profile
 
 extension Institute.Source {
@@ -99,13 +99,13 @@ extension Institute.Source {
                     id: .init("swift-linter"),
                     platform: .macOSARM64,
                     version: "ci-binaries",
-                    revision: "e4fffc9c3022f426e0cbc593b2d4596647a05f77",
+                    revision: "3a43c132b72118b045a4eeb002fcd2937e974414",
                     toolchain: "Apple Swift 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)",
                     schema: "swift-linter-structured:2",
                     executable: .init(
-                        name: "institute-linter-runner-macos-arm64-40c65efb5f1d12a2a47b98fede3ee5189c2a9db050c416f0cab005f7916dbb79",
+                        name: "institute-linter-runner-macos-arm64-e3629c0aa00f7561795a7294cce8398aaaac9f9f21d0c595bb58b26e7e30d60f",
                         digest: .init(
-                            "40c65efb5f1d12a2a47b98fede3ee5189c2a9db050c416f0cab005f7916dbb79"
+                            "e3629c0aa00f7561795a7294cce8398aaaac9f9f21d0c595bb58b26e7e30d60f"
                         ),
                         origin: .release(
                             base:

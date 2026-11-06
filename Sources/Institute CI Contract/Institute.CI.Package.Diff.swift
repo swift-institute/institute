@@ -21,7 +21,11 @@ extension Institute.CI.Package {
 
         public static func packageContentChanged(
             event: Swift.String,
+            // swift-linter:disable:next raw concept
+            // REASON: GITHUB_EVENT_PATH as the runner passes it, read once; a parse would only move a failure that already falls back to changed; looked at File.Path.
             eventPath: Swift.String,
+            // swift-linter:disable:next raw concept
+            // REASON: GITHUB_REPOSITORY as the workflow passes it, interpolated into the pull-files API route; looked at GitHub.Repository.Slug.
             repository: Swift.String,
             workspace: Swift.String
         ) -> Bool {

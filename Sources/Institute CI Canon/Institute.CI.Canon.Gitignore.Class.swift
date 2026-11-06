@@ -51,6 +51,8 @@ extension Institute.CI.Canon.Gitignore {
 
 extension Institute.CI.Canon.Gitignore.Class {
     /// Canon's path for this class within the control-plane checkout.
+    // swift-linter:disable:next raw concept
+    // REASON: a path inside the control-plane checkout, interpolated from the class name; its one caller parses it with File.Path and treats failure as no canon; looked at File.Path.
     public var canonPath: String { "canon/gitignore-\(rawValue).txt" }
 
     /// The central typed exception list: repositories whose class is

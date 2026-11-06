@@ -46,6 +46,8 @@ extension Institute.CI {
             planResult: String,
             results: [String: String],
             gating: [String],
+            // swift-linter:disable:next raw concept
+            // REASON: GITHUB_REPOSITORY as the workflow passes it, only compared with the owning repository's coordinate, so a malformed value still gets an answer; looked at GitHub.Repository.Slug, Institute.Repository.Coordinate.
             subjectRepository: String,
             subjectSha: String,
             tier: String,

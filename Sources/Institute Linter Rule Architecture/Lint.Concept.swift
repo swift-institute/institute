@@ -131,8 +131,17 @@ extension Lint.Concept {
         "database": 20,
         "reader": 6,
         "snuffel": 6,
-        "swift-licensing": 1,
+        "swift-ecma-424": 2,
+        "swift-github-standard": 6,
+        "swift-iso-14496-22": 3,
+        "swift-iso-32000": 4,
+        "swift-iso-5962": 2,
+        "swift-manifest": 2,
         "swift-processes": 4,
+        "swift-rfc-3986": 1,
+        "swift-rfc-5322": 2,
+        "swift-w3c-css": 4,
+        "swift-w3c-epub": 2,
     ]
 
     public static let rules: Swift::Set<Swift::String> = ["raw concept", "concept parallel"]

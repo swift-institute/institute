@@ -43,6 +43,8 @@ extension Institute.CI {
         public static let boundary = "2026-09-09"
 
         /// The Swift release floor this exception stands in for.
+        // swift-linter:disable:next raw concept
+        // REASON: a Swift release name as swift.org tags it, such as 6.4, two components, interpolated into image and release-tag names; looked at Version, whose Version.Semantic needs three.
         public let swiftVersion: String
         /// The exact image identity the Linux legs run, by digest.
         public let image: String
@@ -52,6 +54,8 @@ extension Institute.CI {
         public let recheck: String
 
         public init(
+            // swift-linter:disable:next raw concept
+            // REASON: a Swift release name as swift.org tags it, such as 6.4, two components, interpolated into image and release-tag names; looked at Version, whose Version.Semantic needs three.
             swiftVersion: String,
             image: String,
             upstreamRelease: String,
@@ -64,11 +68,15 @@ extension Institute.CI {
         }
 
         /// The official release image for a floor, absent any exception.
+        // swift-linter:disable:next raw concept
+        // REASON: a Swift release name as swift.org tags it, such as 6.4, two components, interpolated into image and release-tag names; looked at Version, whose Version.Semantic needs three.
         public static func stableImage(swiftVersion: String) -> String {
             "swift:\(swiftVersion)"
         }
 
         /// The upstream coordinate a floor's exception must name.
+        // swift-linter:disable:next raw concept
+        // REASON: a Swift release name as swift.org tags it, such as 6.4, two components, interpolated into image and release-tag names; looked at Version, whose Version.Semantic needs three.
         public static func releaseCoordinate(swiftVersion: String) -> String {
             "https://github.com/swiftlang/swift/releases/tag/swift-\(swiftVersion)-RELEASE"
         }
@@ -79,6 +87,8 @@ extension Institute.CI {
         /// `swift:<floor>` image. Present, it must validate first: an
         /// exception that cannot justify itself never resolves to an image.
         public static func resolve(
+            // swift-linter:disable:next raw concept
+            // REASON: a Swift release name as swift.org tags it, such as 6.4, two components, interpolated into image and release-tag names; looked at Version, whose Version.Semantic needs three.
             swiftVersion: String,
             exception: Self?,
             today: String

@@ -77,6 +77,8 @@ extension Institute.CI {
         /// deschedules the classified leg and records why.
         public func disposition(
             today: String,
+            // swift-linter:disable:next raw concept
+            // REASON: GITHUB_REPOSITORY as the workflow passes it, only compared with the owning repository's coordinate, so a malformed value still gets an answer; looked at GitHub.Repository.Slug, Institute.Repository.Coordinate.
             subjectRepository: String
         ) throws(Error) -> Disposition {
             guard !Self.classifiedLeg.gating else {

@@ -3,6 +3,8 @@ public import Institute_Model
 extension Institute.Repository.Policy.Census {
     /// One census coordinate; sixteen fields, censusVersion 1.
     public struct Row: Sendable, Equatable {
+        // swift-linter:disable:next raw concept
+        // REASON: the census format's version, a CI wire field written as 1; looked at Version, whose Version.Semantic needs three components.
         public var censusVersion: String
         // swift-linter:disable:next raw concept
         // REASON: the subject a census row names, a CI wire field: real rows hold owner/name, sentinel rows a label such as `sentinel` or `17-organization fleet`; looked at GitHub.Repository.Slug, which refuses those labels.
@@ -15,6 +17,8 @@ extension Institute.Repository.Policy.Census {
         public var coordinateId: String
         public var line: Int
         public var engine: String
+        // swift-linter:disable:next raw concept
+        // REASON: a census row's excerpt digest as the wire format spells it; sentinel rows write it empty, which FIPS_180_4.Digest refuses; looked at FIPS_180_4.Digest.
         public var excerptSha256: String
         public var family: String
         public var intendedOwner: String
@@ -25,6 +29,8 @@ extension Institute.Repository.Policy.Census {
         public var notes: String
 
         public init(
+            // swift-linter:disable:next raw concept
+            // REASON: the census format's version, a CI wire field written as 1; looked at Version, whose Version.Semantic needs three components.
             censusVersion: String = "1",
             // swift-linter:disable:next raw concept
             // REASON: the subject a census row names, a CI wire field: real rows hold owner/name, sentinel rows a label such as `sentinel` or `17-organization fleet`; looked at GitHub.Repository.Slug, which refuses those labels.
@@ -37,6 +43,8 @@ extension Institute.Repository.Policy.Census {
             coordinateId: String,
             line: Int,
             engine: String,
+            // swift-linter:disable:next raw concept
+            // REASON: a census row's excerpt digest as the wire format spells it; sentinel rows write it empty, which FIPS_180_4.Digest refuses; looked at FIPS_180_4.Digest.
             excerptSha256: String,
             family: String,
             intendedOwner: String,
