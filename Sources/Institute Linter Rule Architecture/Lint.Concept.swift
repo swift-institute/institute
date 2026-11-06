@@ -15,6 +15,23 @@ extension Lint.Concept {
         "directory": "File.Directory",
         "folder": "File.Directory",
         "iban": "ISO_13616.IBAN",
+        "url": "WHATWG_URL.URL",
+        "href": "WHATWG_URL.URL",
+        "digest": "FIPS_180_4.Digest",
+        "sha256": "FIPS_180_4.Digest",
+        "email": "EmailAddress",
+        "uuid": "RFC_4122.UUID",
+        "language": "RFC_5646.LanguageTag",
+        "lang": "RFC_5646.LanguageTag",
+        "country": "ISO_3166.Code",
+        "date": "Gregorian.Date",
+        "timestamp": "RFC_3339.DateTime",
+        "host": "RFC_3986.URI.Host",
+        "domain": "Domain",
+        "mimetype": "RFC_9110.MediaType",
+        "mediatype": "RFC_9110.MediaType",
+        "contenttype": "RFC_9110.MediaType",
+        "version": "Version",
     ]
 
     /// A top-level type name and the target that owns it.
