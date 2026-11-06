@@ -1,3 +1,4 @@
+import File_System
 import GitHub_Standard
 import Institute_CI_Canon
 import Institute_CI_Model
@@ -15,7 +16,7 @@ struct CIValidationGitignoreTests {
 
     /// The real class canon, found the way the validator finds it. A
     /// hand-written stand-in would test the test.
-    static func canon(for class: Class) throws -> String {
+    static func canon(for class: Class) throws -> Swift.String {
         let package = try #require(Gitignore.resolvedCanonPath)
         let path = Gitignore.siblingCanonPath(of: package, for: `class`)
         return try #require(Gitignore.read(path))

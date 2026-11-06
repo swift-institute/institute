@@ -81,6 +81,50 @@ extension `Lint.Rule Tests`.`declarative manifest Tests`.Unit {
     }
 }
 
+extension `Lint.Rule Tests`.`declarative manifest Tests`.Unit {
+    @Test
+    func `a Target.Dependency accessor extension is flagged by name`() {
+        let source = """
+            extension Target.Dependency {
+                static var owner: Self { .product(name: "Owner", package: "swift-owner") }
+            }
+
+            let package = Package(name: "Fixture", targets: [.target(name: "A", dependencies: [.owner])])
+            """
+        let findings = `Lint.Rule Tests`.`declarative manifest Tests`.observation(source).findings
+        #expect(findings.count == 1)
+        #expect(findings.first?.message.contains("`extension Target.Dependency`") == true)
+    }
+
+    @Test
+    func `a String name-constant extension is flagged by name`() {
+        let source = """
+            extension String {
+                static let owner: Self = "Owner"
+            }
+
+            let package = Package(name: "Fixture", targets: [.target(name: .owner)])
+            """
+        let findings = `Lint.Rule Tests`.`declarative manifest Tests`.observation(source).findings
+        #expect(findings.count == 1)
+        #expect(findings.first?.message.contains("`extension String`") == true)
+    }
+
+    @Test
+    func `dependencies and names written as literals are clean`() {
+        let source = """
+            let package = Package(
+                name: "Fixture",
+                targets: [
+                    .target(name: "A", dependencies: [.product(name: "Owner", package: "swift-owner"), .target(name: "B")]),
+                    .target(name: "B"),
+                ]
+            )
+            """
+        #expect(`Lint.Rule Tests`.`declarative manifest Tests`.observation(source).findings.isEmpty)
+    }
+}
+
 extension `Lint.Rule Tests`.`declarative manifest Tests`.`Edge Case` {
     @Test
     func `the canonical settings tail is exempt`() {

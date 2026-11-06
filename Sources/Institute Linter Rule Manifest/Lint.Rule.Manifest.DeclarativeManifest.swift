@@ -8,7 +8,8 @@ extension Lint.Rule {
     /// running it, and the Institute's manifest rules read it the same way. Both take literal `Package(...)` arguments,
     /// `let` constants, `package.<property>.append(...)` or `+=` at top level and `#if`; a closure, a `var`, a loop or
     /// other control flow makes the manifest a program they cannot read. The canonical settings tail is the one loop
-    /// the Institute sanctions (#249).
+    /// the Institute sanctions (#249). Names are string literals: an `extension Target.Dependency` or
+    /// `extension String` that stands in for them is reported by name (Coen, 6 Nov).
     public static let `declarative manifest` = Lint.Rule(
         id: "declarative manifest",
         default: .warning,
@@ -26,6 +27,27 @@ extension Lint.Rule {
                     + "package.products += [\"A\"].map { .library(name: $0, targets: [$0]) }\n",
                 path: "Package.swift",
                 expectation: .findings(1)
+            ),
+            .init(
+                id: "declarative manifest dependency accessor",
+                source: "extension Target.Dependency {\n    static var owner: Self { .product(name: \"Owner\", package: \"swift-owner\") }\n}\n\n"
+                    + "let package = Package(name: \"Fixture\", targets: [.target(name: \"A\", dependencies: [.owner])])\n",
+                path: "Package.swift",
+                expectation: .findings(1)
+            ),
+            .init(
+                id: "declarative manifest name constant",
+                source: "extension String {\n    static let owner: Self = \"Owner\"\n}\n\n"
+                    + "let package = Package(name: \"Fixture\", targets: [.target(name: .owner)])\n",
+                path: "Package.swift",
+                expectation: .findings(1)
+            ),
+            .init(
+                id: "declarative manifest literal names",
+                source: "let package = Package(name: \"Fixture\", targets: [.target(name: \"A\", dependencies: "
+                    + "[.product(name: \"Owner\", package: \"swift-owner\"), .target(name: \"B\")]), .target(name: \"B\")])\n",
+                path: "Package.swift",
+                expectation: .clean
             ),
             .init(
                 id: "declarative manifest loop",
@@ -158,6 +180,17 @@ private func manifestDeclarativeKind(_ item: CodeBlockItemSyntax.Item) -> Swift:
         return "a loop other than the settings tail"
     }
     if item.is(FunctionDeclSyntax.self) { return "a function" }
+    if let extensionDecl = item.as(ExtensionDeclSyntax.self) {
+        switch extensionDecl.extendedType.trimmedDescription {
+        case "Target.Dependency", "PackageDescription.Target.Dependency":
+            return "an `extension Target.Dependency` whose members stand in for dependencies (write each one out as "
+                + "`.product(name: \"…\", package: \"…\")` or `.target(name: \"…\")`)"
+        case "String", "Swift.String":
+            return "an `extension String` whose constants stand in for names (write each name as a string literal)"
+        default:
+            return "an extension"
+        }
+    }
     if item.is(DeclSyntax.self) { return "a declaration other than `let`" }
     return "top-level control flow or a computed statement"
 }
