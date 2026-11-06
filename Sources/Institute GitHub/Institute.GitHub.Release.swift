@@ -1,5 +1,6 @@
 import Byte
 public import File_System
+public import GitHub_Standard
 public import Institute_Model
 import JSON
 import Process
@@ -21,7 +22,7 @@ extension Institute.GitHub.Release {
     /// Every asset name on the release `tag` of `repository`, across all
     /// pages of the release-assets listing.
     public static func assets(
-        repository: Swift.String,
+        repository: GitHub_Standard::GitHub.Repository.Slug,
         tag: Swift.String
     ) throws(Error) -> [Swift.String] {
         let release = try object("/repos/\(repository)/releases/tags/\(tag)")
@@ -49,7 +50,7 @@ extension Institute.GitHub.Release {
     /// Downloads the asset named `asset` of release `tag` to `destination`,
     /// replacing any file there.
     public static func download(
-        repository: Swift.String,
+        repository: GitHub_Standard::GitHub.Repository.Slug,
         tag: Swift.String,
         asset: Swift.String,
         to destination: File.Path
@@ -66,7 +67,7 @@ extension Institute.GitHub.Release {
                     executable: "/usr/bin/env",
                     arguments: [
                         "gh", "release", "download", tag,
-                        "--repo", repository,
+                        "--repo", repository.description,
                         "--pattern", asset,
                         "--output", destination.description,
                         "--clobber",

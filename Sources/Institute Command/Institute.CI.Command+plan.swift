@@ -1,4 +1,5 @@
 import Console
+import GitHub_Standard
 import Institute_CI_Contract
 import Institute_CI_Model
 import Institute_Model
@@ -12,7 +13,7 @@ extension Institute.CI.Command {
 
     static func plan(_ rest: [Swift.String]) {
         let subjectRepository = value("--subject-repository", in: rest)
-        let lintBundle = Institute.Organization.lintBundle(forRepository: subjectRepository)
+        let lintBundle = Institute.Organization.lintBundle(forRepository: GitHub_Standard::GitHub.Repository.Slug(subjectRepository))
         let deviation = Institute.Repository.Policy.Deviation.read(root: value("--workspace", in: rest))
 
         let today = value("--today", in: rest)

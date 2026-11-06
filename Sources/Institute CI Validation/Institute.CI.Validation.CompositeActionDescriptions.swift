@@ -79,7 +79,7 @@ extension Institute.CI.Validation {
         static func findings(
             in body: Institute.CI.Workflow.YAML.Mapping,
             action: String,
-            repository: String,
+            repository: GitHub_Standard::GitHub.Repository.Slug,
             rule: Rule
         ) -> [Finding] {
             var findings: [Finding] = []

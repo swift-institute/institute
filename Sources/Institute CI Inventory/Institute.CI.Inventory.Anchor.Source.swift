@@ -1,4 +1,4 @@
-import GitHub_Standard
+public import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_CI_Workflow
 public import Institute_Model
@@ -16,7 +16,7 @@ extension Institute.CI.Inventory.Anchor {
     /// revision that was never measured.
     public struct Source: Sendable, Equatable {
         /// `owner/name`, as `actions/checkout` spells it.
-        public let repository: String
+        public let repository: GitHub_Standard::GitHub.Repository.Slug
 
         /// The workspace-relative directory the checkout lands in.
         public let checkout: String
@@ -27,7 +27,7 @@ extension Institute.CI.Inventory.Anchor {
         /// The executed subtree and its object name.
         public let tree: Tree
 
-        public init(repository: String, checkout: String, commit: Revision, tree: Tree) {
+        public init(repository: GitHub_Standard::GitHub.Repository.Slug, checkout: String, commit: Revision, tree: Tree) {
             self.repository = repository
             self.checkout = checkout
             self.commit = commit
@@ -36,7 +36,7 @@ extension Institute.CI.Inventory.Anchor {
 
         /// The repository's own name, without its owner.
         public var name: String {
-            repository.split(separator: "/").last.map(String.init) ?? repository
+            repository.description.split(separator: "/").last.map(String.init) ?? repository.description
         }
 
         /// The step id the identity check reports under: the repository
@@ -62,7 +62,7 @@ extension Institute.CI.Inventory.Anchor {
         public var node: Institute.CI.Workflow.YAML.Node {
             .mapping(
                 .init([
-                    (.text("repository"), .text(repository)),
+                    (.text("repository"), .text(repository.description)),
                     (.text("checkout"), .text(checkout)),
                     (.text("commit"), .text(commit.rawValue)),
                     (.text("tree"), tree.node),

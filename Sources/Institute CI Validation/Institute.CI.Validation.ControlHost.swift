@@ -1,4 +1,4 @@
-import GitHub_Standard
+public import GitHub_Standard
 public import Institute_CI_Model
 import Institute_CI_Workflow
 public import Institute_Model
@@ -17,7 +17,7 @@ extension Institute.CI.Validation {
     public struct ControlHost: Validator {
         public let rules: [Rule] = ["CI-CONTROL-001"]
 
-        public static let canonicalRepository = "swift-institute/.github"
+        public static let canonicalRepository: GitHub_Standard::GitHub.Repository.Slug = "swift-institute/.github"
         public static let workflowPath = ".github/workflows/control-validate.yml"
 
         public init() {}
@@ -78,7 +78,7 @@ extension Institute.CI.Validation {
             return result
         }
 
-        private func finding(_ repository: String, _ message: String) -> Finding {
+        private func finding(_ repository: GitHub_Standard::GitHub.Repository.Slug, _ message: String) -> Finding {
             Finding(repository: repository, rule: rules[0], message: message)
         }
     }

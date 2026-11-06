@@ -2,6 +2,7 @@ public import File_System
 import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_Model
+import Package_Manager
 
 import struct Swift.String
 
@@ -68,7 +69,9 @@ extension Institute.CI.Validation {
                         // moving-target violation.
                         branch != "main"
                     else { continue }
-                    let baselined = baseline.suppresses(repository: subject.repository, url: url)
+                    let baselined =
+                        Package.Manifest.Dependency.Location(url)
+                        .map { baseline.suppresses(repository: subject.repository, url: $0) } ?? false
                     findings.append(
                         Finding(
                             repository: subject.repository,

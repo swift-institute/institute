@@ -1,5 +1,6 @@
 public import Command
 public import Command_Schema
+import GitHub_Standard
 public import Institute_Model
 public import Institute_Version
 import Process
@@ -76,7 +77,7 @@ extension Institute.Version.Command {
             for organization in organizations where Institute.Organization(rawValue: organization) == nil {
                 throw .validationFailed(reason: "--org \(organization) is not an Institute organization")
             }
-            for repository in repositories where Institute.Repository.Coordinate(repository) == nil {
+            for repository in repositories where GitHub_Standard::GitHub.Repository.Slug(repository).flatMap({ Institute.Repository.Coordinate($0) }) == nil {
                 throw .validationFailed(
                     reason: "--repository must be owner/name in an Institute organization, got \(repository)"
                 )
@@ -84,7 +85,9 @@ extension Institute.Version.Command {
         }
 
         public mutating func run() async throws(Institute.Error) {
-            let coordinates = Swift.Set(repositories.compactMap(Institute.Repository.Coordinate.init))
+            let coordinates = Swift.Set(
+                repositories.compactMap { GitHub_Standard::GitHub.Repository.Slug($0).flatMap { Institute.Repository.Coordinate($0) } }
+            )
             let named = Swift.Set(organizations.compactMap(Institute.Organization.init(rawValue:)))
                 .union(coordinates.map(\.organization))
             let selected = Institute.Organization.allCases.filter { named.isEmpty || named.contains($0) }

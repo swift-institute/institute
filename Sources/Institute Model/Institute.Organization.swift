@@ -1,3 +1,5 @@
+public import GitHub_Standard
+
 extension Institute {
     public enum Organization: Swift.String, Swift.CaseIterable, Swift.Sendable {
         case `swift-institute`
@@ -58,8 +60,9 @@ extension Institute.Organization {
 }
 
 extension Institute.Organization {
-    public static func lintBundle(forRepository repository: Swift.String) -> Swift.String {
-        Institute.Repository.Coordinate(repository)?.organization.lintBundle ?? "institute"
+    /// The bundle `repository` lints under: a repository outside the Institute's organizations, or none named, is `institute`.
+    public static func lintBundle(forRepository repository: GitHub_Standard::GitHub.Repository.Slug?) -> Swift.String {
+        repository.flatMap { Institute.Repository.Coordinate($0) }?.organization.lintBundle ?? "institute"
     }
 }
 

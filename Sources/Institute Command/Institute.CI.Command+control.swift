@@ -1,4 +1,5 @@
 import Console
+import GitHub_Standard
 import Institute_CI_Model
 import Institute_CI_Validation
 import Institute_Model
@@ -11,9 +12,8 @@ extension Institute.CI.Command {
             refuse("control requires validate")
         }
         let rest = Array(arguments.dropFirst())
-        let repository = value("--repository", in: rest)
         let root = value("--root", in: rest)
-        guard !repository.isEmpty, !root.isEmpty else {
+        guard let repository = GitHub_Standard::GitHub.Repository.Slug(value("--repository", in: rest)), !root.isEmpty else {
             refuse(
                 "control validate requires --repository <owner/name> --root <candidate-directory>"
             )

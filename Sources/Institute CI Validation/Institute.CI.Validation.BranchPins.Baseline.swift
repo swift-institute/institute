@@ -1,7 +1,8 @@
 public import File_System
-import GitHub_Standard
+public import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_Model
+public import Package_Manager
 
 import struct Swift.String
 
@@ -21,14 +22,10 @@ extension Institute.CI.Validation.BranchPins {
     public struct Baseline: Sendable, Equatable {
         /// One suppressed declaration.
         public struct Entry: Sendable, Hashable {
-            public let repository: String
-            // swift-linter:disable:next raw concept
-            // REASON: a dependency URL as a manifest spells it, the ledger's key and compared whole; SwiftPM admits git@host:org/repo forms that RFC_3986.URI and WHATWG_URL.URL refuse.
-            public let url: String
+            public let repository: GitHub_Standard::GitHub.Repository.Slug
+            public let url: Package.Manifest.Dependency.Location
 
-            // swift-linter:disable:next raw concept
-            // REASON: a dependency URL as a manifest spells it, the ledger's key and compared whole; SwiftPM admits git@host:org/repo forms that RFC_3986.URI and WHATWG_URL.URL refuse.
-            public init(repository: String, url: String) {
+            public init(repository: GitHub_Standard::GitHub.Repository.Slug, url: Package.Manifest.Dependency.Location) {
                 self.repository = repository
                 self.url = url
             }
@@ -42,9 +39,7 @@ extension Institute.CI.Validation.BranchPins {
             self.entries = entries
         }
 
-        // swift-linter:disable:next raw concept
-        // REASON: a dependency URL as a manifest spells it, the ledger's key and compared whole; SwiftPM admits git@host:org/repo forms that RFC_3986.URI and WHATWG_URL.URL refuse.
-        public func suppresses(repository: String, url: String) -> Bool {
+        public func suppresses(repository: GitHub_Standard::GitHub.Repository.Slug, url: Package.Manifest.Dependency.Location) -> Bool {
             entries.contains(Entry(repository: repository, url: url))
         }
 
@@ -52,7 +47,7 @@ extension Institute.CI.Validation.BranchPins {
         ///
         /// Lines are `repository<TAB>url`. Blank lines and `#` comments
         /// are ignored, and a line that does not split into exactly two
-        /// tab-separated fields is ignored rather than guessed at — a
+        /// tab-separated fields, an `owner/name` and a location, is ignored rather than guessed at — a
         /// malformed ledger line must not silently suppress something
         /// adjacent to what it names.
         public static func read(
@@ -70,8 +65,11 @@ extension Institute.CI.Validation.BranchPins {
                 let trimmed = line.trimmedWhitespace
                 guard !trimmed.isEmpty, !trimmed.hasPrefix("#") else { continue }
                 let fields = trimmed.split(separator: "\t", omittingEmptySubsequences: false).map(String.init)
-                guard fields.count == 2 else { continue }
-                entries.insert(Entry(repository: fields[0], url: fields[1]))
+                guard fields.count == 2,
+                    let repository = GitHub_Standard::GitHub.Repository.Slug(fields[0]),
+                    let url = Package.Manifest.Dependency.Location(fields[1])
+                else { continue }
+                entries.insert(Entry(repository: repository, url: url))
             }
             return Self(entries: entries)
         }

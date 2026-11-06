@@ -61,7 +61,7 @@ extension Institute.CI.Validation {
                 let named = marker.trimmingWhitespace
                 return subOrganizations.contains(named) ? named : nil
             }
-            let parts = subject.repository.split(separator: "/", maxSplits: 1)
+            let parts = subject.repository.description.split(separator: "/", maxSplits: 1)
             guard parts.count == 2, parts[1] == ".github",
                 subOrganizations.contains(String(parts[0]))
             else { return nil }

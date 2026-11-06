@@ -1,4 +1,4 @@
-import GitHub_Standard
+public import GitHub_Standard
 public import Institute_CI_Model
 import Institute_CI_Workflow
 public import Institute_Model
@@ -17,7 +17,7 @@ extension Institute.CI.Validation {
 
         public init() {}
 
-        public static let canonicalRepository = "swift-institute/.github"
+        public static let canonicalRepository: GitHub_Standard::GitHub.Repository.Slug = "swift-institute/.github"
 
         /// Every job the planner can select, plus its two orchestration jobs.
         public static let catalogue: [String] = [
@@ -37,7 +37,7 @@ extension Institute.CI.Validation {
         public func findings(in subject: Subject) throws(EnvironmentDefect) -> [Finding] {
             guard
                 subject.repository == Self.canonicalRepository
-                    || subject.repository.contains("-test/")
+                    || subject.repository.description.contains("-test/")
             else { return [] }
             guard let text = try subject.text(at: ".github/workflows/swift-ci.yml") else {
                 return [finding(subject.repository, "CI-010", "universal workflow is absent")]
@@ -149,7 +149,7 @@ extension Institute.CI.Validation {
             return result
         }
 
-        private func finding(_ repository: String, _ rule: Rule, _ message: String) -> Finding {
+        private func finding(_ repository: GitHub_Standard::GitHub.Repository.Slug, _ rule: Rule, _ message: String) -> Finding {
             Finding(repository: repository, rule: rule, message: message)
         }
 

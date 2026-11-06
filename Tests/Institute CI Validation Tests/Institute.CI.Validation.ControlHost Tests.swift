@@ -1,3 +1,4 @@
+import GitHub_Standard
 import Institute_CI_Model
 public import Institute_Model
 import Testing
@@ -30,7 +31,7 @@ struct CIValidationControlHostTests {
 
     static func findings(
         workflow: String? = valid,
-        repository: String = Validator.canonicalRepository
+        repository: GitHub_Standard::GitHub.Repository.Slug = Validator.canonicalRepository
     ) throws -> [Institute.CI.Validation.Finding] {
         let subject = TemporaryRepository(repository: repository)
         if let workflow {

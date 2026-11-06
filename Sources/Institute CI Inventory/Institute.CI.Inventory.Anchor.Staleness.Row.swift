@@ -1,4 +1,4 @@
-import GitHub_Standard
+public import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_CI_Workflow
 public import Institute_Model
@@ -12,7 +12,7 @@ extension Institute.CI.Inventory.Anchor.Staleness {
     /// would be worse than no report, since the whole value of this one
     /// is telling a reader which pins they have actually looked at.
     public struct Row: Sendable, Equatable {
-        public let repository: String
+        public let repository: GitHub_Standard::GitHub.Repository.Slug
 
         /// The pinned commit.
         public let pinned: Institute.CI.Inventory.Anchor.Revision
@@ -24,7 +24,7 @@ extension Institute.CI.Inventory.Anchor.Staleness {
         public let distance: Int?
 
         public init(
-            repository: String,
+            repository: GitHub_Standard::GitHub.Repository.Slug,
             pinned: Institute.CI.Inventory.Anchor.Revision,
             head: Institute.CI.Inventory.Anchor.Revision?,
             distance: Int?
@@ -45,7 +45,7 @@ extension Institute.CI.Inventory.Anchor.Staleness {
         public var node: Institute.CI.Workflow.YAML.Node {
             .mapping(
                 .init([
-                    (.text("repository"), .text(repository)),
+                    (.text("repository"), .text(repository.description)),
                     (.text("pinned"), .text(pinned.rawValue)),
                     (
                         .text("head"),

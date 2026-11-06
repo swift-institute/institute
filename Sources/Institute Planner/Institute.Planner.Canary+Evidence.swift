@@ -1,3 +1,4 @@
+public import GitHub_Standard
 import File_System
 public import Institute_Model
 import Institute_Repository_Policy
@@ -19,7 +20,7 @@ extension Institute.Planner.Canary {
     /// having run, which no candidate can be adopted over.
     public static func evidence(
         run: Swift.String,
-        repositories: [Swift.String],
+        repositories: [GitHub_Standard::GitHub.Repository.Slug],
         work: Swift.String,
         xcode: Swift.String,
         release: Institute.Planner.Release,
@@ -70,7 +71,7 @@ extension Institute.Planner.Canary {
 
     /// Clones, measures with both binaries, and compares one repository.
     static func compare(
-        repository: Swift.String,
+        repository: GitHub_Standard::GitHub.Repository.Slug,
         url: Swift.String,
         bundle: Swift.String,
         base: Swift.String,

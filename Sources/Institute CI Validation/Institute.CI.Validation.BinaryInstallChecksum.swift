@@ -95,7 +95,7 @@ extension Institute.CI.Validation {
 
         static func findings(
             in script: String,
-            repository: String,
+            repository: GitHub_Standard::GitHub.Repository.Slug,
             workflow: String,
             job: String,
             step: String

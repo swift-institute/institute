@@ -1,4 +1,5 @@
 import Lint
+import Linter_Rules_Test_Support
 import Testing
 
 @testable import Institute_Linter_Rule_Architecture

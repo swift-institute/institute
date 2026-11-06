@@ -1,4 +1,5 @@
 import File_System
+import GitHub_Standard
 import Institute_CI_Model
 import Institute_CI_Validation
 import Institute_Model
@@ -27,9 +28,8 @@ extension Institute.CI.Command {
     }
 
     private static func packageValidate(_ arguments: [Swift.String]) {
-        let repository = value("--repository", in: arguments)
         let root = value("--root", in: arguments)
-        guard !repository.isEmpty, !root.isEmpty else {
+        guard let repository = GitHub_Standard::GitHub.Repository.Slug(value("--repository", in: arguments)), !root.isEmpty else {
             refuse("package validate requires --repository and --root")
         }
 
@@ -46,7 +46,7 @@ extension Institute.CI.Command {
         ) {
             refused = true
             print(
-                "\(repository)\tBRANCH-PIN-001\t\(finding.document): `\(finding.url)` "
+                "\(repository)\tBRANCH-PIN-001\t\(finding.document): `\(finding.url.text)` "
                     + "pinned to branch \"\(finding.branch)\"; Institute dependencies use main"
             )
         }
@@ -104,16 +104,15 @@ extension Institute.CI.Command {
     /// `package readme`: the README rules alone, for a repository with no
     /// package to validate, such as an organization's `.github`.
     private static func packageReadme(_ arguments: [Swift.String]) {
-        let repository = value("--repository", in: arguments)
         let root = value("--root", in: arguments)
-        guard !repository.isEmpty, !root.isEmpty else {
+        guard let repository = GitHub_Standard::GitHub.Repository.Slug(value("--repository", in: arguments)), !root.isEmpty else {
             refuse("package readme requires --repository and --root")
         }
         if readmeFindings(repository: repository, root: root) { terminate(1) }
     }
 
     /// Prints each README finding, and says whether there were any.
-    private static func readmeFindings(repository: Swift.String, root: Swift.String) -> Swift.Bool {
+    private static func readmeFindings(repository: GitHub_Standard::GitHub.Repository.Slug, root: Swift.String) -> Swift.Bool {
         do throws(Institute.CI.Validation.EnvironmentDefect) {
             let subject = Institute.CI.Validation.Subject(repository: repository, root: root)
             let findings = try Institute.CI.Validation.Readme().findings(in: subject)

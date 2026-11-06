@@ -1,6 +1,7 @@
 import Byte
 import FIPS_180_4
 import File_System
+import GitHub_Standard
 import Institute_Model
 import Source_Report
 import Synchronization
@@ -25,7 +26,7 @@ extension Institute.Planner.Canary.Test {
     }
 
     static let revision = Swift.String(repeating: "1", count: 40)
-    static let repository = "swift-atoms/swift-addition"
+    static let repository: GitHub_Standard::GitHub.Repository.Slug = "swift-atoms/swift-addition"
 
     /// A runner whose clones are empty directories at `revision` and whose
     /// planners answer by binary name.

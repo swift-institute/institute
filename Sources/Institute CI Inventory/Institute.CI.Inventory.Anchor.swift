@@ -1,4 +1,4 @@
-import GitHub_Standard
+public import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_CI_Workflow
 public import Institute_Model
@@ -73,10 +73,10 @@ extension Institute.CI.Inventory {
         ) throws(Institute.CI.Inventory.Error) {
             guard !sources.isEmpty else { throw .noSources }
             guard Self.isPinned(action) else { throw .unpinnedAction(action) }
-            var seen: Set<String> = []
+            var seen: Set<GitHub_Standard::GitHub.Repository.Slug> = []
             for source in sources {
                 guard seen.insert(source.repository).inserted else {
-                    throw .duplicateSource(source.repository)
+                    throw .duplicateSource(source.repository.description)
                 }
             }
             self.producer = producer
@@ -94,7 +94,7 @@ extension Institute.CI.Inventory {
         }
 
         /// The pinned source for a repository coordinate, if any.
-        public func source(_ repository: String) -> Source? {
+        public func source(_ repository: GitHub_Standard::GitHub.Repository.Slug) -> Source? {
             sources.first { $0.repository == repository }
         }
     }
@@ -134,7 +134,7 @@ extension Institute.CI.Inventory.Anchor {
                 .text("with"),
                 .mapping(
                     .init([
-                        (.text("repository"), .text(source.repository)),
+                        (.text("repository"), .text(source.repository.description)),
                         (.text("ref"), .text(source.commit.rawValue)),
                         (.text("path"), .text(source.checkout)),
                         (.text("persist-credentials"), .boolean(false)),
@@ -283,8 +283,11 @@ extension Institute.CI.Inventory.Anchor {
             guard let source = entry.dictionary else {
                 throw .unreadableAnchor(message: "a `sources` entry is not an object")
             }
-            guard let repository = Swift.String(source["repository"]) else {
+            guard let name = Swift.String(source["repository"]) else {
                 throw .unreadableAnchor(message: "a `sources` entry declares no `repository`")
+            }
+            guard let repository = GitHub_Standard::GitHub.Repository.Slug(name) else {
+                throw .unreadableAnchor(message: "`\(name)` is not an `owner/name` repository")
             }
             guard let checkout = Swift.String(source["checkout"]) else {
                 throw .unreadableAnchor(

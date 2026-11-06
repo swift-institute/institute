@@ -1,3 +1,4 @@
+import GitHub_Standard
 import Byte
 import Institute_Command
 public import Institute_Model
@@ -15,7 +16,7 @@ struct `Repository Policy BranchPin Tests` {
         #expect(Institute.Repository.Coordinate("swift-compositions/swift-kernel")?.organization.lintBundle == "institute")
         #expect(Institute.Repository.Coordinate("swift-institute/institute")?.organization.lintBundle == "institute")
         #expect(Institute.Repository.Coordinate("apple/swift-syntax") == nil)
-        #expect(Institute.Repository.Coordinate("swift-atoms") == nil)
+        #expect(Institute.Organization.lintBundle(forRepository: nil) == "institute")
         #expect(Institute.Organization.lintBundle(forRepository: "swift-ietf/swift-rfc-3986") == "standards")
         #expect(Institute.Organization.lintBundle(forRepository: "coenttb/kees") == "institute")
         #expect(Institute.Organization.`swift-ietf`.implementsExternalSpecification == true)
@@ -42,17 +43,17 @@ struct `Repository Policy BranchPin Tests` {
     func `only non-main Institute branches refuse`() {
         let dependencies: [Package.Manifest.Dependency.SourceControl] = [
             .init(
-                url: "https://github.com/swift-foundations/swift-alpha.git",
+                url: Package.Manifest.Dependency.Location("https://github.com/swift-foundations/swift-alpha.git")!,
                 branch: "feature/x",
                 document: "Package.swift"
             ),
             .init(
-                url: "https://github.com/swift-foundations/swift-beta.git",
+                url: Package.Manifest.Dependency.Location("https://github.com/swift-foundations/swift-beta.git")!,
                 branch: "main",
                 document: "Package.swift"
             ),
             .init(
-                url: "https://github.com/elsewhere/swift-gamma.git",
+                url: Package.Manifest.Dependency.Location("https://github.com/elsewhere/swift-gamma.git")!,
                 branch: "feature/x",
                 document: "Package.swift"
             ),
@@ -67,7 +68,7 @@ struct `Repository Policy BranchPin Tests` {
             findings == [
                 .init(
                     document: "Package.swift",
-                    url: "https://github.com/swift-foundations/swift-alpha.git",
+                    url: Package.Manifest.Dependency.Location("https://github.com/swift-foundations/swift-alpha.git")!,
                     branch: "feature/x"
                 )
             ]

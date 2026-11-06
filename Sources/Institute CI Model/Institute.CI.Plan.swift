@@ -1,3 +1,4 @@
+public import GitHub_Standard
 public import Institute_Model
 
 extension Institute.CI {
@@ -19,11 +20,11 @@ extension Institute.CI {
         }
 
         public struct Subject: Sendable, Equatable {
-            public let repository: String
+            public let repository: GitHub_Standard::GitHub.Repository.Slug
             public let ref: String
             public let sha: String
 
-            public init(repository: String, ref: String, sha: String) {
+            public init(repository: GitHub_Standard::GitHub.Repository.Slug, ref: String, sha: String) {
                 self.repository = repository
                 self.ref = ref
                 self.sha = sha

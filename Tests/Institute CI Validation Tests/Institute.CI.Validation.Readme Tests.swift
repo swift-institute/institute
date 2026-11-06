@@ -84,7 +84,7 @@ struct CIValidationReadmeTests {
     struct `Family G Shape` {
         let validator = Institute.CI.Validation.Readme()
 
-        func findings(_ profile: String, repository: String = "swift-atoms/.github") throws -> [Institute.CI.Validation.Finding] {
+        func findings(_ profile: String, repository: GitHub_Standard::GitHub.Repository.Slug = "swift-atoms/.github") throws -> [Institute.CI.Validation.Finding] {
             let temporary = TemporaryRepository(repository: repository)
             temporary.write("readme:\n  family: G\n", to: ".github/metadata.yaml")
             temporary.write(profile, to: "profile/README.md")

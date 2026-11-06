@@ -1,3 +1,4 @@
+import GitHub_Standard
 import Environment
 import Institute_Model
 import Linter
@@ -9,6 +10,7 @@ import Linter_Standards_Rules
 enum Runner {
     static func main() {
         let repository = Environment.read(Institute.Repository.Coordinate.variable)
+            .flatMap { GitHub.Repository.Slug($0) }
             .flatMap(Institute.Repository.Coordinate.init)
         Lint.run(bundles: [
             "institute": Lint.Rule.Bundle.institute.located(in: repository),

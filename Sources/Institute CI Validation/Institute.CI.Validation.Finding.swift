@@ -1,4 +1,4 @@
-import GitHub_Standard
+public import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_Model
 
@@ -13,11 +13,11 @@ extension Institute.CI.Validation {
     /// the message — because the aggregation step splits on tabs and
     /// would otherwise read a wrapped sentence as extra columns.
     public struct Finding: Sendable, Equatable, Comparable {
-        public let repository: String
+        public let repository: GitHub_Standard::GitHub.Repository.Slug
         public let rule: Rule
         public let message: String
 
-        public init(repository: String, rule: Rule, message: String) {
+        public init(repository: GitHub_Standard::GitHub.Repository.Slug, rule: Rule, message: String) {
             self.repository = repository
             self.rule = rule
             self.message = message

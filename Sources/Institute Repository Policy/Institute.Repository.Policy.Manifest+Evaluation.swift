@@ -1,3 +1,4 @@
+public import GitHub_Standard
 public import Institute_Model
 public import Package_Manager
 
@@ -17,7 +18,7 @@ extension Institute.Repository.Policy.Manifest {
     /// root manifests and `Package.resolved`. Repositories exempt from the
     /// identity rule have none.
     public func identityFindings(
-        repository: Swift.String
+        repository: GitHub_Standard::GitHub.Repository.Slug
     ) -> [Package.Manifest.Identity.Conflict.Finding] {
         guard !Self.identityExempt(repository: repository) else { return [] }
         var entries: [Package.Manifest.Identity.Conflict.Entry] = []
@@ -35,7 +36,7 @@ extension Institute.Repository.Policy.Manifest {
 
     /// Whether `repository` (`owner/name`) is outside the identity rule.
     /// swift-html-prism is the one exemption.
-    static func identityExempt(repository: Swift.String) -> Swift.Bool {
-        repository.split(separator: "/").last == "swift-html-prism"
+    static func identityExempt(repository: GitHub_Standard::GitHub.Repository.Slug) -> Swift.Bool {
+        repository.description.split(separator: "/").last == "swift-html-prism"
     }
 }

@@ -1,6 +1,7 @@
 internal import Byte
 internal import FIPS_180_4
 import File_System
+public import GitHub_Standard
 public import Git_Foundation
 public import Institute_Model
 internal import Institute_Source_Policy
@@ -9,7 +10,7 @@ public import Source_Measurement
 
 extension Institute.Source.Workspace {
     public static func subject(
-        repository: Swift.String,
+        repository: GitHub_Standard::GitHub.Repository.Slug,
         revision: Swift.String,
         root: Swift.String,
         using git: Git.Client = .init()
@@ -91,9 +92,8 @@ extension Institute.Source.Workspace {
         where !packages.contains(where: { path.split(separator: "/").starts(with: $0) }) {
             candidates.insert(path)
         }
-        let controls = Institute.Source.Policy.current.negativeControls(
-            for: repository(of: identity)
-        )
+        let controls =
+            repository(of: identity).map { Institute.Source.Policy.current.negativeControls(for: $0) } ?? [:]
         // A declaration whose fixture is gone would leave its rule without a
         // control, so it is an error — once there are sources to look in. An
         // empty enumeration is a binding without sources (the target catalog's),
@@ -147,9 +147,9 @@ extension Institute.Source.Workspace {
     }
 
     /// The `owner/name` a subject identity measures: a CI subject is named
-    /// `repository@revision`.
-    private static func repository(of identity: Swift.String) -> Swift.String {
-        Swift.String(identity.prefix { $0 != "@" })
+    /// `repository@revision`. Any other identity names no repository.
+    private static func repository(of identity: Swift.String) -> GitHub_Standard::GitHub.Repository.Slug? {
+        GitHub_Standard::GitHub.Repository.Slug(identity.prefix { $0 != "@" })
     }
 
     private static func bytes(

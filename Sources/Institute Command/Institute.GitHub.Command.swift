@@ -108,12 +108,18 @@ extension Institute.GitHub.Command {
             } catch {
                 throw .configuration("github token: --app \(application) is not a usable name")
             }
+            let signingKey: Path::Path?
+            do throws(Path::Path.Error) {
+                signingKey = keyPath.isEmpty ? nil : try Path::Path(keyPath)
+            } catch {
+                throw .configuration("github token: the signing key path \(keyPath) is not a usable path")
+            }
             let app: GitHub_App.GitHub.App
             let result: (token: GitHub_App.GitHub.App.Token, cached: Swift.Bool)
             do throws(GitHub_App.GitHub.App.Error) {
                 app = try .resolve(
                     identity: applicationIdentity.isEmpty ? nil : applicationIdentity,
-                    keyPath: keyPath.isEmpty ? nil : keyPath,
+                    keyPath: signingKey,
                     // The bot's name: the login-keychain service holding its
                     // key and identity, and its token cache under ~/.config.
                     name: name

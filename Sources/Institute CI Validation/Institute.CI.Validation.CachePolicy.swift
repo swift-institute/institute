@@ -67,7 +67,7 @@ extension Institute.CI.Validation {
         /// can carry both.
         static func findings(
             in with: Institute.CI.Workflow.YAML.Mapping,
-            repository: String,
+            repository: GitHub_Standard::GitHub.Repository.Slug,
             document: String,
             job: String
         ) -> [Finding] {

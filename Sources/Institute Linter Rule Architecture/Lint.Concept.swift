@@ -8,7 +8,8 @@ extension Lint {
 }
 
 extension Lint.Concept {
-    /// A parameter or property name, lowercased, and the type that owns what it holds.
+    /// A concept's word or words, lowercased and run together, and the type that owns what it holds. `owner(of:)`
+    /// matches these against the whole words at the end of a name.
     package static let values: [Swift::String: Swift::String] = [
         "path": "File.Path",
         "filepath": "File.Path",
@@ -32,7 +33,59 @@ extension Lint.Concept {
         "mediatype": "RFC_9110.MediaType",
         "contenttype": "RFC_9110.MediaType",
         "version": "Version",
+        "uri": "RFC_3986.URI",
+        "link": "RFC_3986.URI",
+        "file": "Path",
+        "filename": "Path.Component",
+        "checksum": "FIPS_180_4.Digest",
+        "created": "RFC_3339.DateTime",
+        "createdat": "RFC_3339.DateTime",
+        "modified": "RFC_3339.DateTime",
+        "published": "RFC_3339.DateTime",
+        "expires": "RFC_3339.DateTime",
+        "currency": "ISO_4217.Code",
+        "repository": "GitHub.Repository.Slug",
     ]
+
+    /// Concepts usually held as a number, and their owners. Only these count an integer as raw.
+    package static let numbers: [Swift::String: Swift::String] = [
+        "port": "RFC_3986.URI.Port"
+    ]
+
+    /// Who owns what `name` holds, by the whole words at its end: `documentationURL` is a URL and `originalPath` a path,
+    /// while `onHashChange` and `allocation` are neither.
+    package static func owner(of name: Swift::String, in concepts: [Swift::String: Swift::String] = values) -> Swift::String? {
+        let words = Self.words(of: name)
+        for start in words.indices {
+            if let owner = concepts[words[start...].joined()] { return owner }
+        }
+        return nil
+    }
+
+    /// The lowercased camelCase words of a name. An acronym is one word, so `URLPath` is `url` and `path`, and digits stay
+    /// with the word they follow, so `sha256` is one word.
+    package static func words(of name: Swift::String) -> [Swift::String] {
+        var words: [Swift::String] = []
+        var current = ""
+        let characters = Swift::Array(name)
+        for (index, character) in characters.enumerated() {
+            guard character.isLetter || character.isNumber else {
+                if !current.isEmpty { words.append(current.lowercased()) }
+                current = ""
+                continue
+            }
+            if character.isUppercase, let previous = current.last {
+                let next = index + 1 < characters.endIndex ? characters[index + 1] : nil
+                if !previous.isUppercase || next?.isLowercase == true {
+                    words.append(current.lowercased())
+                    current = ""
+                }
+            }
+            current.append(character)
+        }
+        if !current.isEmpty { words.append(current.lowercased()) }
+        return words
+    }
 
     /// A top-level type name and the target that owns it.
     package static let types: [Swift::String: Swift::String] = [
@@ -50,10 +103,7 @@ extension Lint.Concept {
 
     /// A concept apps hold in a stand-in, and the owner the stand-in moves to. Phase 6 of coenttb/work#239 replaces each and
     /// removes its entry; that phase is done when this is empty.
-    package static let interim: [Swift::String: Swift::String] = [
-        "Ledger.Day": "ISO_8601.CalendarDate",
-        "Reader.Date": "ISO_8601.CalendarDate.Reduced",
-    ]
+    package static let interim: [Swift::String: Swift::String] = [:]
 
     /// Target suffixes that are leaves: SQL rows, schemas, command-line arguments and integrations with other types.
     package static let leaves: [Swift::String] = [" SQL", " Schema", " Command", " CLI", " MCP", " Integration"]

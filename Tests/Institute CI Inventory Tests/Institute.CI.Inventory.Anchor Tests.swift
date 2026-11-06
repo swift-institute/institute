@@ -23,14 +23,14 @@ struct CIInventoryAnchorTests {
     static let action = "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1"
 
     static func source(
-        _ repository: String = "swift-foundations/swift-continuous-integration",
+        _ repository: GitHub_Standard::GitHub.Repository.Slug = "swift-foundations/swift-continuous-integration",
         commit: String = commit,
         path: String = "."
     ) throws -> Anchor.Source {
         Anchor.Source(
             repository: repository,
             checkout: ".ci-sources/"
-                + (repository.split(separator: "/").last.map(String.init) ?? repository),
+                + (repository.description.split(separator: "/").last.map(String.init) ?? repository.description),
             commit: try Anchor.Revision(commit),
             tree: Anchor.Source.Tree(path: path, oid: try Anchor.Revision(Self.tree))
         )
@@ -93,7 +93,7 @@ struct CIInventoryAnchorTests {
         let repeated = try Self.source()
         #expect(
             throws: Institute.CI.Inventory.Error
-                .duplicateSource(repeated.repository)
+                .duplicateSource(repeated.repository.description)
         ) {
             try Anchor(producer: "p", action: Self.action, sources: [repeated, repeated])
         }
@@ -125,7 +125,7 @@ struct CIInventoryAnchorTests {
         let step = try Self.anchor([source]).checkoutStep(for: source)
         #expect(step["uses"]?.text == Self.action)
         #expect(step["with"]?["ref"]?.text == Self.commit)
-        #expect(step["with"]?["repository"]?.text == source.repository)
+        #expect(step["with"]?["repository"]?.text == source.repository.description)
         #expect(step["with"]?["persist-credentials"]?.boolean == false)
     }
 

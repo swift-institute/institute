@@ -1,4 +1,4 @@
-import GitHub_Standard
+public import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_Model
 
@@ -40,7 +40,7 @@ extension Institute.CI.Control {
 
         /// Reads `root` strictly as data; it never executes candidate code, actions, or workflows.
         public static func run(
-            repository: String,
+            repository: GitHub_Standard::GitHub.Repository.Slug,
             root: String
         ) -> Institute.CI.Validation.Run {
             guard Institute.CI.Validation.isDirectory(root)

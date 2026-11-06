@@ -1,3 +1,4 @@
+public import GitHub_Standard
 public import Institute_Model
 public import Path
 public import Source_Profile
@@ -17,7 +18,7 @@ extension Institute.Source.Policy {
     /// failed control, never a silently clean file.
     public struct NegativeControl: Hashable, Sendable {
         /// The owning repository, `owner/name`.
-        public let repository: Swift.String
+        public let repository: GitHub_Standard::GitHub.Repository.Slug
         /// The fixture's path relative to the repository root.
         public let path: Path::Path
         /// The rule the fixture violates.
@@ -26,7 +27,7 @@ extension Institute.Source.Policy {
         public let findings: Swift.Int
 
         public init(
-            repository: Swift.String,
+            repository: GitHub_Standard::GitHub.Repository.Slug,
             path: Path::Path,
             rule: Source.Rule.ID,
             findings: Swift.Int = 1
@@ -44,7 +45,7 @@ extension Institute.Source.Policy {
 
     /// The negative controls declared for `repository`, keyed by path.
     public func negativeControls(
-        for repository: Swift.String
+        for repository: GitHub_Standard::GitHub.Repository.Slug
     ) -> [Swift.String: NegativeControl] {
         var controls: [Swift.String: NegativeControl] = [:]
         for control in negativeControls where control.repository == repository {

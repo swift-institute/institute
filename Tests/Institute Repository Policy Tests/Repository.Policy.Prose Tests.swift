@@ -1,3 +1,4 @@
+import GitHub_Standard
 public import Institute_Model
 import Institute_Repository_Policy
 import Testing
@@ -28,7 +29,7 @@ extension Institute.Repository.Policy.Prose {
                 "Tests/Core Tests/NOTES.md",
                 "Fixtures/notes.md",
             ]
-            let repository = "swift-atoms/swift-affine"
+            let repository: GitHub_Standard::GitHub.Repository.Slug = "swift-atoms/swift-affine"
             let findings = Institute.Repository.Policy.Prose.findings(in: tracked, repository: repository)
             #expect(
                 findings == [
@@ -59,7 +60,7 @@ extension Institute.Repository.Policy.Prose {
                 "brand/README.md",
                 "profile/NOTES.md",
             ]
-            let repository = "swift-molecules/.github"
+            let repository: GitHub_Standard::GitHub.Repository.Slug = "swift-molecules/.github"
             let findings = Institute.Repository.Policy.Prose.findings(in: tracked, repository: repository)
             #expect(findings == ["brand/README.md", "profile/NOTES.md"])
         }

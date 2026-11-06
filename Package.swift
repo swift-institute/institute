@@ -182,6 +182,7 @@ let package = Package(
         .target(
             name: "Institute Model",
             dependencies: [
+                .product(name: "GitHub Standard", package: "swift-github-standard"),
                 .product(name: "Async Fanout", package: "swift-async-fanout"),
                 .product(name: "Kernel", package: "swift-kernel"),
             ]
@@ -189,6 +190,7 @@ let package = Package(
         .target(
             name: "Institute Source Workspace",
             dependencies: [
+                .product(name: "GitHub Standard", package: "swift-github-standard"),
                 "Institute Model",
                 "Institute Source Policy",
                 .product(name: "Byte", package: "swift-byte"),
@@ -202,6 +204,7 @@ let package = Package(
         .target(
             name: "Institute Source Policy",
             dependencies: [
+                .product(name: "GitHub Standard", package: "swift-github-standard"),
                 .product(name: "Path", package: "swift-path"),
                 .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
                 "Institute Model",
@@ -213,12 +216,14 @@ let package = Package(
         .target(
             name: "Institute CI Model",
             dependencies: [
-                "Institute Model"
+                .product(name: "GitHub Standard", package: "swift-github-standard"),
+                "Institute Model",
             ]
         ),
         .target(
             name: "Institute CI Canon",
             dependencies: [
+                .product(name: "GitHub Standard", package: "swift-github-standard"),
                 "Institute CI Model",
                 "Institute Model",
                 .product(name: "ASCII", package: "swift-ascii"),
@@ -281,6 +286,7 @@ let package = Package(
         .target(
             name: "Institute Repository Policy",
             dependencies: [
+                .product(name: "GitHub Standard", package: "swift-github-standard"),
                 .product(name: "ISO 8601", package: "swift-iso-8601"),
                 .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
                 "Institute Model",
@@ -303,6 +309,7 @@ let package = Package(
         .target(
             name: "Institute Source",
             dependencies: [
+                .product(name: "GitHub Standard", package: "swift-github-standard"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "JSON", package: "swift-json"),
                 "Institute Model",
@@ -327,6 +334,7 @@ let package = Package(
         .testTarget(
             name: "Institute Tests",
             dependencies: [
+                .product(name: "GitHub Standard", package: "swift-github-standard"),
                 .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
                 "Institute Installation",
                 "Institute Model",
@@ -354,7 +362,7 @@ let package = Package(
         ),
         .testTarget(
             name: "Institute CI Canon Tests",
-            dependencies: ["Institute CI Canon"]
+            dependencies: [.product(name: "GitHub Standard", package: "swift-github-standard"), "Institute CI Canon"]
         ),
         .testTarget(
             name: "Institute CI Workflow Tests",
@@ -367,6 +375,7 @@ let package = Package(
         .testTarget(
             name: "Institute Repository Policy Tests",
             dependencies: [
+                .product(name: "GitHub Standard", package: "swift-github-standard"),
                 "Institute Repository Policy",
                 "Institute Model",
                 .product(name: "JSON", package: "swift-json"),
@@ -388,6 +397,7 @@ let package = Package(
         .testTarget(
             name: "Institute CI Validation Tests",
             dependencies: [
+                .product(name: "Path", package: "swift-path"),
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
                 "Institute CI Inventory",
                 "Institute CI Validation",
@@ -400,6 +410,7 @@ let package = Package(
         .target(
             name: "Institute GitHub",
             dependencies: [
+                .product(name: "GitHub Standard", package: "swift-github-standard"),
                 "Institute Model",
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "File System", package: "swift-file-system"),
@@ -432,6 +443,7 @@ let package = Package(
         .target(
             name: "Institute Planner",
             dependencies: [
+                .product(name: "GitHub Standard", package: "swift-github-standard"),
                 "Institute GitHub",
                 "Institute Installation",
                 "Institute Model",
@@ -448,6 +460,7 @@ let package = Package(
         .target(
             name: "Institute Command",
             dependencies: [
+                .product(name: "GitHub Standard", package: "swift-github-standard"),
                 .product(name: "ISO 8601", package: "swift-iso-8601"),
                 "Institute CI Canon",
                 "Institute CI Contract",
@@ -491,6 +504,7 @@ let package = Package(
         .testTarget(
             name: "Institute Planner Tests",
             dependencies: [
+                .product(name: "GitHub Standard", package: "swift-github-standard"),
                 .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
                 "Institute Model",
                 "Institute Planner",
@@ -505,6 +519,7 @@ let package = Package(
         .testTarget(
             name: "Institute Command Tests",
             dependencies: [
+                .product(name: "GitHub Standard", package: "swift-github-standard"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "ISO 8601", package: "swift-iso-8601"),
                 .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
@@ -760,6 +775,7 @@ let linterRuleTargets: [Target] = [
     .testTarget(
         name: "Institute Linter Rule Manifest Tests",
         dependencies: [
+            .product(name: "GitHub Standard", package: "swift-github-standard"),
             .target(name: "Institute Model"),
             .target(name: "Institute Linter Rule Manifest"),
             .product(name: "Linter Rule Scope", package: "swift-linter-rules"),
@@ -909,6 +925,7 @@ let linterRuleTargets: [Target] = [
     .executableTarget(
         name: "Institute Linter Runner",
         dependencies: [
+            .product(name: "GitHub Standard", package: "swift-github-standard"),
             .product(name: "Linter", package: "swift-linter"),
             .target(name: "Linter Institute Rules"),
             .target(name: "Linter Primitives Rules"),

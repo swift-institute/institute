@@ -116,7 +116,7 @@ extension Institute.CI.Validation {
         ]
 
         struct Exemption {
-            let repository: String
+            let repository: GitHub_Standard::GitHub.Repository.Slug
             let path: String
             let admits: FindingClass
             let ruling: String
@@ -189,7 +189,7 @@ extension Institute.CI.Validation {
                 while let last = named.last, last.isWhitespace { named = named.dropLast() }
                 return named.isEmpty ? "swift-ietf" : String(named)
             }
-            return String(subject.repository.prefix { $0 != "/" })
+            return String(subject.repository.description.prefix { $0 != "/" })
         }
 
         // MARK: - [GH-REPO-074]
@@ -300,7 +300,7 @@ extension Institute.CI.Validation {
 
         // MARK: - [CI-030]
 
-        static func pinFindings(in text: String, repository: String) -> [Finding] {
+        static func pinFindings(in text: String, repository: GitHub_Standard::GitHub.Repository.Slug) -> [Finding] {
             Line.all(text).compactMap { line in
                 guard let reference = line.intraInstituteReference, reference.ref != "main"
                 else { return nil }
@@ -316,7 +316,7 @@ extension Institute.CI.Validation {
 
         static func secretFindings(
             in text: String,
-            repository: String,
+            repository: GitHub_Standard::GitHub.Repository.Slug,
             organization: String
         ) -> [Finding] {
             let crossOrganization = subOrganizations.contains(organization)
@@ -330,7 +330,7 @@ extension Institute.CI.Validation {
             }
         }
 
-        static func sameOrganizationFindings(_ job: Job, repository: String) -> [Finding] {
+        static func sameOrganizationFindings(_ job: Job, repository: GitHub_Standard::GitHub.Repository.Slug) -> [Finding] {
             if job.lines.contains(where: \.isSecretsInherit) { return [] }
             let explicit = job.lines.contains { $0.isSecretsBlock || $0.isSecretsInlineMap }
             return [
@@ -344,7 +344,7 @@ extension Institute.CI.Validation {
             ]
         }
 
-        static func crossOrganizationFindings(_ job: Job, repository: String) -> [Finding] {
+        static func crossOrganizationFindings(_ job: Job, repository: GitHub_Standard::GitHub.Repository.Slug) -> [Finding] {
             if job.lines.contains(where: \.isSecretsInherit) {
                 return [
                     classified(
@@ -397,7 +397,7 @@ extension Institute.CI.Validation {
         /// while the aggregation layer stops counting it.
         static func classified(
             _ findingClass: FindingClass,
-            repository: String,
+            repository: GitHub_Standard::GitHub.Repository.Slug,
             message: String
         ) -> Finding {
             guard
@@ -422,7 +422,7 @@ extension Institute.CI.Validation {
 
         // MARK: - INTEGRATED-DOCS-ADMISSION
 
-        static func integratedDocsFindings(in text: String, repository: String) -> [Finding] {
+        static func integratedDocsFindings(in text: String, repository: GitHub_Standard::GitHub.Repository.Slug) -> [Finding] {
             jobs(in: text).compactMap { job in
                 guard job.name == "ci",
                     let value = job.withBlockValue("integrated-docs")

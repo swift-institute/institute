@@ -24,10 +24,8 @@ extension Institute.CI.Validation.ThinCallers {
 
         /// A reusable-workflow reference to an org `.github` repository.
         public struct Reference: Sendable, Equatable {
-            /// `<org>/.github/.github/workflows/<file>`.
-            // swift-linter:disable:next raw concept
-            // REASON: `<org>/.github/.github/workflows/<file>`, a GitHub `uses:` coordinate naming a repository and a file in it, not a file-system path: File.Path misdescribes it and GitHub_Standard has no type for it.
-            public let path: String
+            /// The workflow the reference names.
+            public let coordinate: Coordinate
             /// Whatever follows `@`.
             public let ref: String
         }
@@ -138,26 +136,17 @@ extension Institute.CI.Validation.ThinCallers {
 
         /// The intra-Institute reusable this line references.
         ///
-        /// The discriminator is the `<org>/.github/.github/workflows/`
-        /// double infix, unique to org-`.github` repositories: from
-        /// GitHub's point of view the calling repository is third-party,
-        /// so the `<org>/.github` repository's own `.github/workflows/`
-        /// directory is reached through the nested path. A third-party
-        /// reusable has the single-infix shape and is not one of these.
+        /// The discriminator is ``Reference/Coordinate``'s double infix,
+        /// unique to org-`.github` repositories.
         var intraInstituteReference: Reference? {
             guard indent > 0, let value = usesValue,
                 let separator = value.lastIndex(of: "@")
             else { return nil }
-            let path = String(value[..<separator])
             let ref = String(value[value.index(after: separator)...])
-            guard !ref.isEmpty, !ref.contains(where: \.isWhitespace) else { return nil }
-            let segments = path.split(separator: "/", omittingEmptySubsequences: false)
-            guard segments.count == 5, segments[1] == ".github", segments[2] == ".github",
-                segments[3] == "workflows",
-                segments[0].allSatisfy(Self.isReferenceCharacter),
-                segments[4].allSatisfy(Self.isReferenceCharacter)
+            guard !ref.isEmpty, !ref.contains(where: \.isWhitespace),
+                let coordinate = Reference.Coordinate(String(value[..<separator]))
             else { return nil }
-            return Reference(path: path, ref: ref)
+            return Reference(coordinate: coordinate, ref: ref)
         }
 
         /// `^\s+NAME:\s*\$\{\{\s*secrets\.NAME\s*\}\}\s*(#.*)?$` — the

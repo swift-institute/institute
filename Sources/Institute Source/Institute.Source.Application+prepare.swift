@@ -22,7 +22,7 @@ extension Institute.Source.Application {
         try await prepare(
             directory: try Self.artifactDirectory(packageRoot: subject.root),
             binding: .package(subject.binding),
-            repository: Institute.Repository.Coordinate(subject.repository),
+            repository: subject.repository.flatMap { Institute.Repository.Coordinate($0) },
             xcodeApplication: xcodeApplication,
             swiftLint: swiftLintSelection,
             linter: linterSelection

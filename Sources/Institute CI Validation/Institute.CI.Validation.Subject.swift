@@ -1,4 +1,4 @@
-import GitHub_Standard
+public import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_CI_Workflow
 public import Institute_Model
@@ -19,10 +19,10 @@ extension Institute.CI.Validation {
     /// share one definition of "the workflows of this repository",
     /// including its ordering.
     public struct Subject: Sendable, Equatable {
-        public let repository: String
+        public let repository: GitHub_Standard::GitHub.Repository.Slug
         public let root: String
 
-        public init(repository: String, root: String) {
+        public init(repository: GitHub_Standard::GitHub.Repository.Slug, root: String) {
             self.repository = repository
             self.root = root
         }

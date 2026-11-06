@@ -1,3 +1,4 @@
+import GitHub_Standard
 import Institute_Model
 import Lint
 import Linter_Rules_Test_Support
@@ -20,7 +21,7 @@ extension Lint.Rule.`upward layer edge Tests` {
         repository: Swift::String?,
         file: Swift::String = "/home/runner/work/checkout/Package.swift"
     ) -> Lint.Rule.Observation {
-        Lint.Rule.`upward layer edge`(in: repository.flatMap(Institute.Repository.Coordinate.init))
+        Lint.Rule.`upward layer edge`(in: repository.flatMap { GitHub.Repository.Slug($0) }.flatMap(Institute.Repository.Coordinate.init))
             .observe(Lint.Source.parsed(from: source, file: file), .warning)
     }
 

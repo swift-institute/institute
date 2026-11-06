@@ -1,3 +1,4 @@
+public import GitHub_Standard
 public import Institute_Model
 
 extension Institute.Repository.Policy {
@@ -7,9 +8,9 @@ extension Institute.Repository.Policy {
 extension Institute.Repository.Policy.Prose {
     public static let extensions: Swift.Set<Swift.String> = ["md", "markdown", "mdx"]
 
-    public static func findings(in tracked: [Swift.String], repository: Swift.String) -> [Swift.String] {
-        guard !Admitted.repositories.contains(repository) else { return [] }
-        let communityHealth = repository.split(separator: "/").last == ".github"
+    public static func findings(in tracked: [Swift.String], repository: GitHub_Standard::GitHub.Repository.Slug) -> [Swift.String] {
+        guard !Admitted.repositories.contains(repository.description) else { return [] }
+        let communityHealth = repository.description.split(separator: "/").last == ".github"
         return tracked.filter { path in
             isProse(path) && !isAdmitted(path, communityHealth: communityHealth)
         }

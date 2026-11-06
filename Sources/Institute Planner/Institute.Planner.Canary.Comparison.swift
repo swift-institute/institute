@@ -1,3 +1,4 @@
+public import GitHub_Standard
 public import Institute_Model
 public import JSON
 
@@ -5,7 +6,7 @@ extension Institute.Planner.Canary {
     /// One canary repository measured by both planners, and every
     /// difference between the two outcomes.
     public struct Comparison: Sendable, Equatable {
-        public let repository: Swift.String
+        public let repository: GitHub_Standard::GitHub.Repository.Slug
         public let revision: Swift.String
         public let bundle: Swift.String
         public let current: Outcome
@@ -13,7 +14,7 @@ extension Institute.Planner.Canary {
         public let differences: [Difference]
 
         public init(
-            repository: Swift.String,
+            repository: GitHub_Standard::GitHub.Repository.Slug,
             revision: Swift.String,
             bundle: Swift.String,
             current: Outcome,
@@ -99,7 +100,7 @@ extension Institute.Planner.Canary.Comparison {
 extension Institute.Planner.Canary.Comparison: JSON.Serializable {
     public static func serialize(_ value: Self) -> JSON {
         [
-            "repository": value.repository.json,
+            "repository": value.repository.description.json,
             "revision": value.revision.json,
             "bundle": value.bundle.json,
             "current": value.current.json,
@@ -109,8 +110,12 @@ extension Institute.Planner.Canary.Comparison: JSON.Serializable {
     }
 
     public static func deserialize(_ json: JSON) throws(JSON.Error) -> Self {
+        let name = try Swift.String(json: json["repository"])
+        guard let repository = GitHub_Standard::GitHub.Repository.Slug(name) else {
+            throw .typeMismatch(expected: "an owner/name repository", got: name)
+        }
         let comparison = Self(
-            repository: try Swift.String(json: json["repository"]),
+            repository: repository,
             revision: try Swift.String(json: json["revision"]),
             bundle: try Swift.String(json: json["bundle"]),
             current: try .init(json: json["current"]),

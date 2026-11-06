@@ -1,3 +1,5 @@
+public import GitHub_Standard
+
 extension Institute.Repository {
     public struct Coordinate: Swift.Hashable, Swift.Sendable {
         public let organization: Institute.Organization
@@ -8,8 +10,8 @@ extension Institute.Repository {
             self.name = name
         }
 
-        public init?(_ repository: Swift.String) {
-            let components = repository.split(separator: "/", omittingEmptySubsequences: false)
+        public init?(_ repository: GitHub_Standard::GitHub.Repository.Slug) {
+            let components = repository.description.split(separator: "/", omittingEmptySubsequences: false)
             guard components.count == 2, !components[1].isEmpty,
                 let organization = Institute.Organization(rawValue: Swift.String(components[0]))
             else { return nil }

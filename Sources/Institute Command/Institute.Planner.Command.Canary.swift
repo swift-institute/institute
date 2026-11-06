@@ -3,6 +3,7 @@ public import Command
 public import Command_Schema
 import Console
 import File_System
+import GitHub_Standard
 public import Institute_Model
 public import Institute_Planner
 import JSON
@@ -37,7 +38,7 @@ extension Institute.Planner.Command {
                 abstract: "Run a published planner against the current one.",
                 discussion: """
                     Without --repository, the canaries are \
-                    \(Institute.Planner.Canary.repositories.joined(separator: ", ")). \
+                    \(Institute.Planner.Canary.repositories.map(\.description).joined(separator: ", ")). \
                     --work-path must not exist yet; it defaults to a fresh temporary \
                     directory. --output-path defaults to evidence.json in the work path.
                     """
@@ -77,8 +78,7 @@ extension Institute.Planner.Command {
                 throw .validationFailed(reason: "duplicate --repository")
             }
             for repository in repositories {
-                let parts = repository.split(separator: "/", omittingEmptySubsequences: false)
-                guard parts.count == 2, parts.allSatisfy({ !$0.isEmpty }) else {
+                guard GitHub_Standard::GitHub.Repository.Slug(repository) != nil else {
                     throw .validationFailed(reason: "--repository must be owner/name, got \(repository)")
                 }
             }
@@ -88,7 +88,10 @@ extension Institute.Planner.Command {
         }
 
         public mutating func run() async throws(Institute.Error) {
-            let selected = repositories.isEmpty ? Institute.Planner.Canary.repositories : repositories
+            let selected =
+                repositories.isEmpty
+                ? Institute.Planner.Canary.repositories
+                : repositories.compactMap { GitHub_Standard::GitHub.Repository.Slug($0) }
             let work = try workPath.isEmpty ? Self.temporary() : workPath
             let workDirectory = try Self.path(work)
             guard !File(workDirectory).stat.exists else {
@@ -138,7 +141,7 @@ extension Institute.Planner.Command.Canary {
         ]
         for comparison in evidence.repositories {
             lines.append(
-                padded(comparison.repository, 36)
+                padded(comparison.repository.description, 36)
                     + padded(comparison.current.status.rawValue, 12)
                     + padded(comparison.candidate.status.rawValue, 12)
                     + padded("\(comparison.differences.count(where: { $0.kind == .regression }))", 13)

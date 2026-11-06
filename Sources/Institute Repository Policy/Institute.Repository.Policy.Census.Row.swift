@@ -4,6 +4,8 @@ extension Institute.Repository.Policy.Census {
     /// One census coordinate; sixteen fields, censusVersion 1.
     public struct Row: Sendable, Equatable {
         public var censusVersion: String
+        // swift-linter:disable:next raw concept
+        // REASON: the subject a census row names, a CI wire field: real rows hold owner/name, sentinel rows a label such as `sentinel` or `17-organization fleet`; looked at GitHub.Repository.Slug, which refuses those labels.
         public var repository: String
         public var headSha: String
         // swift-linter:disable:next raw concept
@@ -24,6 +26,8 @@ extension Institute.Repository.Policy.Census {
 
         public init(
             censusVersion: String = "1",
+            // swift-linter:disable:next raw concept
+            // REASON: the subject a census row names, a CI wire field: real rows hold owner/name, sentinel rows a label such as `sentinel` or `17-organization fleet`; looked at GitHub.Repository.Slug, which refuses those labels.
             repository: String,
             headSha: String,
             // swift-linter:disable:next raw concept

@@ -1,4 +1,4 @@
-import GitHub_Standard
+public import GitHub_Standard
 public import Institute_CI_Model
 import Institute_CI_Workflow
 public import Institute_Model
@@ -12,7 +12,7 @@ extension Institute.CI.Inventory.Anchor.Staleness {
     /// fail, and a report that can fail is one someone will eventually
     /// gate on.
     public struct Observation: Sendable, Equatable {
-        public let repository: String
+        public let repository: GitHub_Standard::GitHub.Repository.Slug
 
         /// The observed tip of the source repository's `main`.
         public let head: Institute.CI.Inventory.Anchor.Revision
@@ -22,7 +22,7 @@ extension Institute.CI.Inventory.Anchor.Staleness {
         public let distance: Int?
 
         public init(
-            repository: String,
+            repository: GitHub_Standard::GitHub.Repository.Slug,
             head: Institute.CI.Inventory.Anchor.Revision,
             distance: Int? = nil
         ) {

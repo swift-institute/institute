@@ -19,10 +19,10 @@ import struct Swift.String
 /// adding to the corpus, so the differential gate keeps comparing two
 /// implementations over identical bytes.
 struct TemporaryRepository: ~Copyable {
-    let repository: String
+    let repository: GitHub_Standard::GitHub.Repository.Slug
     let root: String
 
-    init(repository: String = "swift-institute-test/fixture") {
+    init(repository: GitHub_Standard::GitHub.Repository.Slug = "swift-institute-test/fixture") {
         self.repository = repository
         self.root = NSTemporaryDirectory() + "institute-ci-tests/" + UUID().uuidString
         try? FileManager.default.createDirectory(

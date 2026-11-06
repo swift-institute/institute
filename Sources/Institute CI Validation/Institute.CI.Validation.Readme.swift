@@ -230,9 +230,9 @@ extension Institute.CI.Validation.Readme {
     /// `.github` repo, the profile is at repo-root `profile/README.md` —
     /// not a nested `.github/profile/README.md`, which is the
     /// org-relative view and wrong inside the repo itself.
-    static func readmePath(family: String, repository: String) -> String {
+    static func readmePath(family: String, repository: GitHub_Standard::GitHub.Repository.Slug) -> String {
         guard family == "G" else { return "README.md" }
-        let lastComponent = repository.split(separator: "/").last.map(String.init) ?? repository
+        let lastComponent = repository.description.split(separator: "/").last.map(String.init) ?? repository.description
         return lastComponent == ".github"
             ? "profile/README.md"
             : ".github/profile/README.md"
@@ -278,7 +278,7 @@ extension Institute.CI.Validation.Readme {
     }
 
     static func universal(
-        _ repository: String,
+        _ repository: GitHub_Standard::GitHub.Repository.Slug,
         name: String,
         content: String
     ) -> [Institute.CI.Validation.Finding] {
@@ -379,8 +379,8 @@ extension Institute.CI.Validation.Readme {
         }
         // [README-161] The title is the repository's name.
         let repository =
-            subject.repository.split(separator: "/").last.map(String.init)
-            ?? subject.repository
+            subject.repository.description.split(separator: "/").last.map(String.init)
+            ?? subject.repository.description
         let lines = splitLines(content)
         if let first = lines.first(where: { !$0.trimmedWhitespace.isEmpty }),
             String(first).trimmedWhitespace != "# \(repository)"
@@ -439,7 +439,7 @@ extension Institute.CI.Validation.Readme {
     }
 
     static func familyC(
-        _ repository: String,
+        _ repository: GitHub_Standard::GitHub.Repository.Slug,
         name: String,
         content: String
     ) -> [Institute.CI.Validation.Finding] {
@@ -492,7 +492,7 @@ extension Institute.CI.Validation.Readme {
     }
 
     static func familyF(
-        _ repository: String,
+        _ repository: GitHub_Standard::GitHub.Repository.Slug,
         name: String,
         content: String
     ) -> [Institute.CI.Validation.Finding] {
@@ -533,12 +533,12 @@ extension Institute.CI.Validation.Readme {
     }
 
     static func familyG(
-        _ repository: String,
+        _ repository: GitHub_Standard::GitHub.Repository.Slug,
         name: String,
         content: String
     ) -> [Institute.CI.Validation.Finding] {
         // [README-117] The control organization's profile is the one exception.
-        guard repository != "\(Institute.Organization.`swift-institute`.rawValue)/.github" else {
+        guard repository.description != "\(Institute.Organization.`swift-institute`.rawValue)/.github" else {
             return []
         }
         typealias Finding = Institute.CI.Validation.Finding

@@ -1,3 +1,4 @@
+public import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_Model
 
@@ -61,7 +62,7 @@ extension Institute.CI.Canon.Gitignore.Class {
     /// an unruled member would flip a conformant repository divergent.
     /// Admission to this list rides the convergence ruling, not this
     /// file's history.
-    public static let assignments: [String: Self] = [:]
+    public static let assignments: [GitHub_Standard::GitHub.Repository.Slug: Self] = [:]
 
     /// The class of a repository, decided from its full `owner/name`
     /// and the text of its root manifest (`nil` when it has none).
@@ -70,9 +71,9 @@ extension Institute.CI.Canon.Gitignore.Class {
     /// outranks derivation, the control-plane org outranks manifest
     /// facts, and the manifest's generator fact outranks the ordinary
     /// default.
-    public static func of(repository: String, manifest: String?) -> Self {
+    public static func of(repository: GitHub_Standard::GitHub.Repository.Slug, manifest: String?) -> Self {
         if let assigned = assignments[repository] { return assigned }
-        if repository.hasPrefix("swift-institute/") { return .institute }
+        if repository.description.hasPrefix("swift-institute/") { return .institute }
         guard let manifest else { return .scaffold }
         if manifest.contains("Generation\"") || manifest.contains("Generator\"") {
             // A target or product named for generation is the one

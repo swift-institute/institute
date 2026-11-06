@@ -1,3 +1,4 @@
+public import GitHub_Standard
 public import Institute_Model
 
 extension Institute {
@@ -20,13 +21,13 @@ extension Institute {
 
 extension Institute.Planner {
     /// The repository whose `ci-binaries` release carries the planner.
-    public static let publisher = "swift-institute/institute"
+    public static let publisher: GitHub_Standard::GitHub.Repository.Slug = "swift-institute/institute"
 
     /// The release every planner asset is published on.
     public static let tag = "ci-binaries"
 
     /// The repository that adopts a planner and reads its pin live.
-    public static let consumer = "swift-institute/.github"
+    public static let consumer: GitHub_Standard::GitHub.Repository.Slug = "swift-institute/.github"
 
     /// Whether `text` is exactly `count` lowercase hexadecimal characters.
     static func isHex(_ text: some StringProtocol, count: Swift.Int) -> Swift.Bool {

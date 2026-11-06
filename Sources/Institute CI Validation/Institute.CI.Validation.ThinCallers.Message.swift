@@ -49,7 +49,7 @@ extension Institute.CI.Validation.ThinCallers {
 
         public static func unpinnedReference(_ reference: Line.Reference) -> String {
             """
-            .github/workflows/ci.yml `uses: \(reference.path)@\(reference.ref)` — \
+            .github/workflows/ci.yml `uses: \(reference.coordinate.text)@\(reference.ref)` — \
             per [CI-030] intra-Institute reusable refs MUST pin to `@main` during \
             active dev. Tag pins (`@v1`, `@v1.0.0`) and SHA pins are forbidden \
             until the reusable surface stabilizes at `@v1` per \

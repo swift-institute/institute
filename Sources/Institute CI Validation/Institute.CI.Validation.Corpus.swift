@@ -1,4 +1,4 @@
-import GitHub_Standard
+public import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_Model
 
@@ -49,7 +49,7 @@ extension Institute.CI.Validation {
             /// The reporting name the retired harness used. Preserved
             /// byte-for-byte: it appears in the TSV the differential gate
             /// compares.
-            public var repository: String { "swift-institute-test/\(name)" }
+            public var repository: GitHub_Standard::GitHub.Repository.Slug { "swift-institute-test/\(name)" }
 
             public var subject: Subject {
                 Subject(repository: repository, root: root)

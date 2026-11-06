@@ -53,7 +53,7 @@ extension Institute.CI.Validation {
         static func findings(
             in job: Institute.CI.Workflow.Job,
             of document: Institute.CI.Workflow.Document,
-            repository: String,
+            repository: GitHub_Standard::GitHub.Repository.Slug,
             rule: Rule
         ) -> [Finding] {
             var findings: [Finding] = []

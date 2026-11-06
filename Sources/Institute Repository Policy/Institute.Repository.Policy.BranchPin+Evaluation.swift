@@ -8,7 +8,7 @@ extension Institute.Repository.Policy.BranchPin {
     ) -> [Finding] {
         dependencies.compactMap { dependency in
             guard let branch = dependency.branch, branch != "main",
-                let organization = organization(of: dependency.url),
+                let organization = organization(of: dependency.url.text),
                 organizations.contains(organization)
             else { return nil }
             return .init(
@@ -17,7 +17,7 @@ extension Institute.Repository.Policy.BranchPin {
                 branch: branch
             )
         }.sorted {
-            ($0.document, $0.url, $0.branch) < ($1.document, $1.url, $1.branch)
+            ($0.document, $0.url.text, $0.branch) < ($1.document, $1.url.text, $1.branch)
         }
     }
 

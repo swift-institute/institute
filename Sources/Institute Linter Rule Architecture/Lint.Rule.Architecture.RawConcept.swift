@@ -27,6 +27,30 @@ extension Lint.Rule {
                 expectation: .findings(1)
             ),
             .init(
+                id: "raw concept whole words at the end of a name",
+                source: "public struct Entry {\n    public var documentationURL: String\n    public var originalPath: String\n    public var modificationDate: String\n    public var fileName: String\n    public var counterpartyIBAN: String\n}",
+                path: "Sources/Ledger/Entry.swift",
+                expectation: .findings(5)
+            ),
+            .init(
+                id: "raw concept a word inside another or not at the end",
+                source: "public struct Entry {\n    public var onHashChange: String\n    public var hashAlgorithm: String\n    public var shadowed: String\n    public var allocation: String\n    public var direction: String\n    public var pathStyle: String\n}",
+                path: "Sources/Ledger/Entry.swift",
+                expectation: .clean
+            ),
+            .init(
+                id: "raw concept a port as a number",
+                source: "public func connect(port: Int) {}\npublic func listen(localPort: UInt16?) {}",
+                path: "Sources/Ledger/Connect.swift",
+                expectation: .findings(2)
+            ),
+            .init(
+                id: "raw concept a number that isn't a port",
+                source: "public func read(path: Int, count: Int) {}",
+                path: "Sources/Ledger/Read.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "raw concept owner's type",
                 source: "public func read(path: File.Path) {}",
                 path: "Sources/Ledger/Read.swift",
@@ -108,7 +132,11 @@ private final class RawConceptVisitor: SyntaxVisitor {
     }
 
     private func report(_ node: Syntax, name: Swift::String, type: TypeSyntax) {
-        guard let owner = Lint.Concept.values[name.lowercased()], Self.isRaw(type) else { return }
+        let owner =
+            Self.isRaw(type)
+            ? Lint.Concept.owner(of: name)
+            : Self.isNumber(type) ? Lint.Concept.owner(of: name, in: Lint.Concept.numbers) : nil
+        guard let owner else { return }
         let location = converter.location(for: node.positionAfterSkippingLeadingTrivia)
         matches.append(
             Diagnostic.Record(
@@ -120,7 +148,7 @@ private final class RawConceptVisitor: SyntaxVisitor {
                 ),
                 severity: severity,
                 identifier: "raw concept",
-                message: "[raw concept]: `\(name)` is a raw string in a public signature, and \(owner) owns what it holds. "
+                message: "[raw concept]: `\(name)` is a raw value in a public signature, and \(owner) owns what it holds. "
                     + "Fix: take \(owner), converting at the leaf. If it is something else, as a URL's path is, suppress "
                     + "this with a reason."
             )
@@ -133,6 +161,11 @@ private final class RawConceptVisitor: SyntaxVisitor {
 
     private static func isCallSite(_ parameter: FunctionParameterSyntax) -> Swift::Bool {
         parameter.defaultValue?.value.is(MacroExpansionExprSyntax.self) == true
+    }
+
+    private static func isNumber(_ type: TypeSyntax) -> Swift::Bool {
+        if let optional = type.as(OptionalTypeSyntax.self) { return isNumber(optional.wrappedType) }
+        return ["Int", "Swift.Int", "Swift::Int", "UInt16", "Swift.UInt16", "Swift::UInt16"].contains(type.trimmedDescription)
     }
 
     private static func isRaw(_ type: TypeSyntax) -> Swift::Bool {

@@ -1,3 +1,4 @@
+public import GitHub_Standard
 import Institute_CI_Canon
 public import Institute_CI_Model
 public import Institute_CI_Validation
@@ -11,7 +12,7 @@ extension Institute.CI.Command {
     public enum Gitignore {
         public enum Action: Sendable, Equatable {
             case render(canon: String, target: String?)
-            case validate(repository: String, root: String, canon: String?)
+            case validate(repository: GitHub_Standard::GitHub.Repository.Slug, root: String, canon: String?)
             case fixtures(corpus: String)
         }
 
@@ -22,6 +23,7 @@ extension Institute.CI.Command {
             case unknownArgument(String)
             case duplicateArgument(String)
             case missingRequiredArgument(String)
+            case invalidRepository(String)
             case invalidCanon(String)
 
             public var message: String {
@@ -43,6 +45,9 @@ extension Institute.CI.Command {
 
                 case .missingRequiredArgument(let option):
                     "missing required \(option)"
+
+                case .invalidRepository(let value):
+                    "--repository must be owner/name, got `\(value)`"
 
                 case .invalidCanon(let message):
                     message
@@ -67,10 +72,11 @@ extension Institute.CI.Command {
                     arguments.dropFirst(),
                     admitting: ["--repository", "--root", "--canon"]
                 )
-                guard let repository = values["--repository"] else {
+                guard let name = values["--repository"] else {
                     throw .missingRequiredArgument("--repository")
                 }
                 guard let root = values["--root"] else { throw .missingRequiredArgument("--root") }
+                guard let repository = GitHub_Standard::GitHub.Repository.Slug(name) else { throw .invalidRepository(name) }
                 return .validate(repository: repository, root: root, canon: values["--canon"])
 
             case "validate-gitignore-fixtures":
@@ -100,7 +106,7 @@ extension Institute.CI.Command {
         /// Evaluates one checked-out repository. Findings remain the shared
         /// TSV wire format so every GH-IGNORE identifier survives aggregation.
         public static func findings(
-            repository: String,
+            repository: GitHub_Standard::GitHub.Repository.Slug,
             root: String,
             canon: String?
         ) throws(Institute.CI.Validation.EnvironmentDefect)

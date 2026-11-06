@@ -2,6 +2,7 @@ public import Command
 public import Command_Schema
 import Console
 import File_System
+import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_Model
 import Institute_Planner
@@ -103,13 +104,7 @@ extension Institute.CI.Command {
         }
 
         public mutating func validate() throws(Command_Schema.Command.Error) {
-            let repositoryComponents = repository.split(
-                separator: "/",
-                omittingEmptySubsequences: false
-            )
-            guard repositoryComponents.count == 2,
-                repositoryComponents.allSatisfy({ !$0.isEmpty })
-            else {
+            guard GitHub_Standard::GitHub.Repository.Slug(repository) != nil else {
                 throw .validationFailed(reason: "--repository must be owner/name")
             }
             guard revision.utf8.count == 40,
@@ -140,11 +135,14 @@ extension Institute.CI.Command {
         }
 
         public mutating func run() async throws(Institute.Error) {
+            guard let slug = GitHub_Standard::GitHub.Repository.Slug(self.repository) else {
+                throw .configuration("--repository must be owner/name")
+            }
             let bundle = try Institute.Source.Application.bundle(
-                Institute.Organization.lintBundle(forRepository: repository)
+                Institute.Organization.lintBundle(forRepository: slug)
             )
             let subject = try Institute.Source.Workspace.subject(
-                repository: repository,
+                repository: slug,
                 revision: revision,
                 root: root
             )

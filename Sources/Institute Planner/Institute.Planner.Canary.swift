@@ -1,3 +1,4 @@
+public import GitHub_Standard
 public import Institute_Model
 
 extension Institute.Planner {
@@ -12,7 +13,7 @@ extension Institute.Planner.Canary {
     /// One repository per layer, chosen for having no commits since the
     /// current pin, so a difference between the two planners is the
     /// planner's and not the repository's.
-    public static let repositories = [
+    public static let repositories: [GitHub_Standard::GitHub.Repository.Slug] = [
         "swift-atoms/swift-addition",
         "swift-molecules/swift-array",
         "swift-ietf/swift-rfc-3986",
@@ -21,7 +22,7 @@ extension Institute.Planner.Canary {
 
     /// The `institute` arguments of one strict source measurement.
     public static func arguments(
-        repository: Swift.String,
+        repository: GitHub_Standard::GitHub.Repository.Slug,
         revision: Institute.Planner.Revision,
         root: Swift.String,
         xcode: Swift.String
@@ -29,7 +30,7 @@ extension Institute.Planner.Canary {
         [
             "ci", "--", "source",
             "--exit-policy", "strict",
-            "--repository", repository,
+            "--repository", repository.description,
             "--revision", revision.description,
             "--root", root,
             "--xcode-application", xcode,

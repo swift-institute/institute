@@ -1,3 +1,4 @@
+import GitHub_Standard
 import File_System
 import Git_Foundation
 import Institute_Model
@@ -27,7 +28,7 @@ func `Package source subject refuses a claimed revision that is not HEAD`() thro
     #expect(throws: Institute.Error.self) {
         _ = try Institute.Source.Workspace.subject(
             repository: "swift-standards/swift-example",
-            revision: String(repeating: "0", count: 40),
+            revision: Swift.String(repeating: "0", count: 40),
             root: fixture.root
         )
     }
