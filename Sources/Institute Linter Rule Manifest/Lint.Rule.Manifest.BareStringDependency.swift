@@ -6,7 +6,7 @@ internal import SwiftSyntax
 extension Lint.Rule {
     public static let `bare string dependency` = Lint.Rule(
         id: "bare string dependency",
-        default: .warning,
+        default: .error,
         controls: [
             .init(
                 id: "bare string dependency manifest string",

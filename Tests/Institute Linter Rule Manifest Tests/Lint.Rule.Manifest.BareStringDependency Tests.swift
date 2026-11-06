@@ -46,6 +46,11 @@ extension `Lint.Rule Tests`.`bare string dependency Tests` {
 
 extension `Lint.Rule Tests`.`bare string dependency Tests`.Unit {
     @Test
+    func `a bare string dependency is an error by default`() {
+        #expect(Lint.Rule.`bare string dependency`.severity.default == .error)
+    }
+
+    @Test
     func `bare string in a target dependencies array is flagged`() {
         let source = """
             let package = Package(
