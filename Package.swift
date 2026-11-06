@@ -102,7 +102,7 @@ let package = Package(
         .target(
             name: "Source Profile",
             dependencies: [
-                "Source Measurement",
+                .target(name: "Source Measurement"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "JSON", package: "swift-json"),
             ],
@@ -111,8 +111,8 @@ let package = Package(
         .target(
             name: "Source Swift Format",
             dependencies: [
-                "Source Measurement",
-                "Source Profile",
+                .target(name: "Source Measurement"),
+                .target(name: "Source Profile"),
                 .product(name: "Path", package: "swift-path"),
             ],
             swiftSettings: vendoredSourceSettings
@@ -120,8 +120,8 @@ let package = Package(
         .target(
             name: "Source SwiftLint",
             dependencies: [
-                "Source Measurement",
-                "Source Profile",
+                .target(name: "Source Measurement"),
+                .target(name: "Source Profile"),
                 .product(name: "JSON", package: "swift-json"),
             ],
             swiftSettings: vendoredSourceSettings
@@ -129,8 +129,8 @@ let package = Package(
         .target(
             name: "Source Linter",
             dependencies: [
-                "Source Measurement",
-                "Source Profile",
+                .target(name: "Source Measurement"),
+                .target(name: "Source Profile"),
                 .product(name: "JSON", package: "swift-json"),
             ],
             swiftSettings: vendoredSourceSettings
@@ -139,18 +139,18 @@ let package = Package(
             name: "Source Execution",
             dependencies: [
                 .product(name: "Path", package: "swift-path"),
-                "Source Measurement",
-                "Source Profile",
-                "Source Swift Format",
-                "Source SwiftLint",
-                "Source Linter",
+                .target(name: "Source Measurement"),
+                .target(name: "Source Profile"),
+                .target(name: "Source Swift Format"),
+                .target(name: "Source SwiftLint"),
+                .target(name: "Source Linter"),
             ],
             swiftSettings: vendoredSourceSettings
         ),
         .target(
             name: "Source Report",
             dependencies: [
-                "Source Measurement", "Source Profile", .product(name: "JSON", package: "swift-json"),
+                .target(name: "Source Measurement"), .target(name: "Source Profile"), .product(name: "JSON", package: "swift-json"),
                 .product(name: "Path", package: "swift-path"),
             ],
             swiftSettings: vendoredSourceSettings
@@ -160,9 +160,9 @@ let package = Package(
             dependencies: [
                 .product(name: "Path", package: "swift-path"),
                 .product(name: "Source", package: "swift-source"),
-                "Source Measurement",
-                "Source Profile",
-                "Source Report",
+                .target(name: "Source Measurement"),
+                .target(name: "Source Profile"),
+                .target(name: "Source Report"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "JSON", package: "swift-json"),
             ],
@@ -171,7 +171,7 @@ let package = Package(
         .target(
             name: "Institute Installation",
             dependencies: [
-                "Institute Model",
+                .target(name: "Institute Model"),
                 .product(name: "Environment", package: "swift-environment"),
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "Kernel", package: "swift-kernel"),
@@ -190,13 +190,13 @@ let package = Package(
             name: "Institute Source Workspace",
             dependencies: [
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
-                "Institute Model",
-                "Institute Source Policy",
+                .target(name: "Institute Model"),
+                .target(name: "Institute Source Policy"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "Git", package: "swift-git"),
-                "Source Measurement",
+                .target(name: "Source Measurement"),
                 .product(name: "SPM Standard", package: "swift-spm-standard"),
             ]
         ),
@@ -206,33 +206,33 @@ let package = Package(
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
                 .product(name: "Path", package: "swift-path"),
                 .product(name: "File System", package: "swift-file-system"),
-                "Institute Model",
+                .target(name: "Institute Model"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
-                "Source Profile",
+                .target(name: "Source Profile"),
             ]
         ),
         .target(
             name: "Institute CI Model",
             dependencies: [
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
-                "Institute Model",
+                .target(name: "Institute Model"),
             ]
         ),
         .target(
             name: "Institute CI Canon",
             dependencies: [
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
-                "Institute CI Model",
-                "Institute Model",
+                .target(name: "Institute CI Model"),
+                .target(name: "Institute Model"),
                 .product(name: "ASCII", package: "swift-ascii"),
             ]
         ),
         .target(
             name: "Institute CI Contract",
             dependencies: [
-                "Institute CI Model",
-                "Institute Model",
+                .target(name: "Institute CI Model"),
+                .target(name: "Institute Model"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "File System", package: "swift-file-system"),
@@ -244,8 +244,8 @@ let package = Package(
             name: "Institute CI Workflow",
             dependencies: [
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
-                "Institute CI Model",
-                "Institute Model",
+                .target(name: "Institute CI Model"),
+                .target(name: "Institute Model"),
             ]
         ),
         .target(
@@ -253,20 +253,20 @@ let package = Package(
             dependencies: [
                 .product(name: "JSON", package: "swift-json"),
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
-                "Institute CI Model",
-                "Institute CI Workflow",
-                "Institute Model",
+                .target(name: "Institute CI Model"),
+                .target(name: "Institute CI Workflow"),
+                .target(name: "Institute Model"),
                 .product(name: "File System", package: "swift-file-system"),
             ]
         ),
         .target(
             name: "Institute CI Validation",
             dependencies: [
-                "Institute CI Canon",
-                "Institute CI Inventory",
-                "Institute CI Model",
-                "Institute CI Workflow",
-                "Institute Model",
+                .target(name: "Institute CI Canon"),
+                .target(name: "Institute CI Inventory"),
+                .target(name: "Institute CI Model"),
+                .target(name: "Institute CI Workflow"),
+                .target(name: "Institute Model"),
                 .product(name: "ASCII", package: "swift-ascii"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "Environment", package: "swift-environment"),
@@ -286,7 +286,7 @@ let package = Package(
             dependencies: [
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
                 .product(name: "ISO 8601", package: "swift-iso-8601"),
-                "Institute Model",
+                .target(name: "Institute Model"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "File System", package: "swift-file-system"),
@@ -297,10 +297,10 @@ let package = Package(
         .target(
             name: "Institute Source Profile",
             dependencies: [
-                "Institute Model",
-                "Institute Source Policy",
-                "Source Measurement",
-                "Source Profile",
+                .target(name: "Institute Model"),
+                .target(name: "Institute Source Policy"),
+                .target(name: "Source Measurement"),
+                .target(name: "Source Profile"),
             ]
         ),
         .target(
@@ -309,22 +309,22 @@ let package = Package(
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "JSON", package: "swift-json"),
-                "Institute Model",
-                "Institute Source Policy",
-                "Institute Source Profile",
-                "Institute Source Workspace",
+                .target(name: "Institute Model"),
+                .target(name: "Institute Source Policy"),
+                .target(name: "Institute Source Profile"),
+                .target(name: "Institute Source Workspace"),
                 .product(name: "Async Fanout", package: "swift-async-fanout"),
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "Process", package: "swift-process"),
-                "Source Execution",
-                "Source Measurement",
-                "Source Profile",
-                "Source Repair",
-                "Source Linter",
-                "Source Report",
-                "Source Swift Format",
-                "Source SwiftLint",
+                .target(name: "Source Execution"),
+                .target(name: "Source Measurement"),
+                .target(name: "Source Profile"),
+                .target(name: "Source Repair"),
+                .target(name: "Source Linter"),
+                .target(name: "Source Report"),
+                .target(name: "Source Swift Format"),
+                .target(name: "Source SwiftLint"),
                 .product(name: "Thread Pool", package: "swift-threads"),
             ]
         ),
@@ -332,48 +332,48 @@ let package = Package(
             name: "Institute Tests",
             dependencies: [
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
-                "Institute Installation",
-                "Institute Model",
-                "Institute Source",
-                "Institute Source Policy",
-                "Institute Source Profile",
-                "Institute Source Workspace",
+                .target(name: "Institute Installation"),
+                .target(name: "Institute Model"),
+                .target(name: "Institute Source"),
+                .target(name: "Institute Source Policy"),
+                .target(name: "Institute Source Profile"),
+                .target(name: "Institute Source Workspace"),
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "Git", package: "swift-git"),
                 .product(name: "JSON", package: "swift-json"),
-                "Source Execution",
-                "Source Measurement",
-                "Source Profile",
-                "Source Repair",
-                "Source Report",
-                "Source Swift Format",
-                "Source SwiftLint",
+                .target(name: "Source Execution"),
+                .target(name: "Source Measurement"),
+                .target(name: "Source Profile"),
+                .target(name: "Source Repair"),
+                .target(name: "Source Report"),
+                .target(name: "Source Swift Format"),
+                .target(name: "Source SwiftLint"),
                 .product(name: "Xcode Workspace Standard", package: "swift-xcode-standard"),
             ],
             path: "Tests/Institute Tests"
         ),
         .testTarget(
             name: "Institute CI Model Tests",
-            dependencies: ["Institute CI Model"]
+            dependencies: [.target(name: "Institute CI Model")]
         ),
         .testTarget(
             name: "Institute CI Canon Tests",
-            dependencies: [.product(name: "GitHub Standard", package: "swift-github-standard"), "Institute CI Canon"]
+            dependencies: [.product(name: "GitHub Standard", package: "swift-github-standard"), .target(name: "Institute CI Canon")]
         ),
         .testTarget(
             name: "Institute CI Workflow Tests",
             dependencies: [
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
-                "Institute CI Model",
-                "Institute CI Workflow",
+                .target(name: "Institute CI Model"),
+                .target(name: "Institute CI Workflow"),
             ]
         ),
         .testTarget(
             name: "Institute Repository Policy Tests",
             dependencies: [
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
-                "Institute Repository Policy",
-                "Institute Model",
+                .target(name: "Institute Repository Policy"),
+                .target(name: "Institute Model"),
                 .product(name: "JSON", package: "swift-json"),
             ]
         ),
@@ -381,23 +381,23 @@ let package = Package(
             name: "Institute Source Policy Tests",
             dependencies: [
                 .product(name: "JSON", package: "swift-json"),
-                "Institute Source Policy",
-                "Institute Model",
-                "Source Profile",
+                .target(name: "Institute Source Policy"),
+                .target(name: "Institute Model"),
+                .target(name: "Source Profile"),
             ]
         ),
         .testTarget(
             name: "Institute CI Inventory Tests",
-            dependencies: [.product(name: "GitHub Standard", package: "swift-github-standard"), "Institute CI Inventory"]
+            dependencies: [.product(name: "GitHub Standard", package: "swift-github-standard"), .target(name: "Institute CI Inventory")]
         ),
         .testTarget(
             name: "Institute CI Validation Tests",
             dependencies: [
                 .product(name: "Path", package: "swift-path"),
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
-                "Institute CI Inventory",
-                "Institute CI Validation",
-                "Institute Model",
+                .target(name: "Institute CI Inventory"),
+                .target(name: "Institute CI Validation"),
+                .target(name: "Institute Model"),
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "Process", package: "swift-process"),
             ],
@@ -407,7 +407,7 @@ let package = Package(
             name: "Institute GitHub",
             dependencies: [
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
-                "Institute Model",
+                .target(name: "Institute Model"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "JSON", package: "swift-json"),
@@ -419,8 +419,8 @@ let package = Package(
             name: "Institute Version",
             dependencies: [
                 .product(name: "File System", package: "swift-file-system"),
-                "Institute GitHub",
-                "Institute Model",
+                .target(name: "Institute GitHub"),
+                .target(name: "Institute Model"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "JSON", package: "swift-json"),
             ]
@@ -429,20 +429,20 @@ let package = Package(
             name: "Institute Version Tests",
             dependencies: [
                 .product(name: "File System", package: "swift-file-system"),
-                "Institute Model",
-                "Institute Repository Policy",
-                "Institute Version",
+                .target(name: "Institute Model"),
+                .target(name: "Institute Repository Policy"),
+                .target(name: "Institute Version"),
             ]
         ),
         .target(
             name: "Institute Planner",
             dependencies: [
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
-                "Institute GitHub",
-                "Institute Installation",
-                "Institute Model",
-                "Institute Repository Policy",
-                "Source Report",
+                .target(name: "Institute GitHub"),
+                .target(name: "Institute Installation"),
+                .target(name: "Institute Model"),
+                .target(name: "Institute Repository Policy"),
+                .target(name: "Source Report"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "File System", package: "swift-file-system"),
@@ -456,20 +456,20 @@ let package = Package(
             dependencies: [
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
                 .product(name: "ISO 8601", package: "swift-iso-8601"),
-                "Institute CI Canon",
-                "Institute CI Contract",
-                "Institute CI Model",
-                "Institute CI Validation",
-                "Institute GitHub",
-                "Institute Installation",
-                "Institute Model",
-                "Institute Planner",
-                "Institute Repository Policy",
-                "Institute Source",
-                "Institute Source Policy",
-                "Institute Source Workspace",
-                "Institute Version",
-                "Source Report",
+                .target(name: "Institute CI Canon"),
+                .target(name: "Institute CI Contract"),
+                .target(name: "Institute CI Model"),
+                .target(name: "Institute CI Validation"),
+                .target(name: "Institute GitHub"),
+                .target(name: "Institute Installation"),
+                .target(name: "Institute Model"),
+                .target(name: "Institute Planner"),
+                .target(name: "Institute Repository Policy"),
+                .target(name: "Institute Source"),
+                .target(name: "Institute Source Policy"),
+                .target(name: "Institute Source Workspace"),
+                .target(name: "Institute Version"),
+                .target(name: "Source Report"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "Calendar Gregorian", package: "swift-calendar-gregorian"),
                 .product(name: "Command", package: "swift-arguments"),
@@ -490,8 +490,8 @@ let package = Package(
         .executableTarget(
             name: "Institute CLI",
             dependencies: [
-                "Institute Command",
-                "Institute Model",
+                .target(name: "Institute Command"),
+                .target(name: "Institute Model"),
                 .product(name: "Command", package: "swift-arguments"),
             ]
         ),
@@ -499,9 +499,9 @@ let package = Package(
             name: "Institute Planner Tests",
             dependencies: [
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
-                "Institute Model",
-                "Institute Planner",
-                "Source Report",
+                .target(name: "Institute Model"),
+                .target(name: "Institute Planner"),
+                .target(name: "Source Report"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "File System", package: "swift-file-system"),
@@ -516,14 +516,14 @@ let package = Package(
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "ISO 8601", package: "swift-iso-8601"),
                 .product(name: "File System", package: "swift-file-system"),
-                "Institute CI Canon",
-                "Institute CI Model",
-                "Institute CI Validation",
-                "Institute Command",
-                "Institute Model",
-                "Institute Repository Policy",
-                "Institute Version",
-                "Source Report",
+                .target(name: "Institute CI Canon"),
+                .target(name: "Institute CI Model"),
+                .target(name: "Institute CI Validation"),
+                .target(name: "Institute Command"),
+                .target(name: "Institute Model"),
+                .target(name: "Institute Repository Policy"),
+                .target(name: "Institute Version"),
+                .target(name: "Source Report"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "Command", package: "swift-arguments"),
                 .product(name: "JSON", package: "swift-json"),
