@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Throws
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `hoisted error in public throws Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`hoisted error in public throws Tests` {
+extension `Lint.Rule Tests`.`hoisted error in public throws Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -38,11 +38,11 @@ extension Lint.Rule.`hoisted error in public throws Tests` {
     }
 }
 
-extension Lint.Rule.`hoisted error in public throws Tests`.Unit {
+extension `Lint.Rule Tests`.`hoisted error in public throws Tests`.Unit {
     @Test
     func `public func with hoisted error type is flagged`() {
         let source = "public func op() throws(__FooError) {}"
-        let findings = Lint.Rule.`hoisted error in public throws Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
         let count = findings.count
         #expect(count == 1)
         if count == 1 {
@@ -60,14 +60,14 @@ extension Lint.Rule.`hoisted error in public throws Tests`.Unit {
                 func op() throws(__FooError) {}
             }
             """
-        let findings = Lint.Rule.`hoisted error in public throws Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `public func with generic hoisted error is flagged`() {
         let source = "public func insert<K, V>() throws(__DictionaryError<K, V>) {}"
-        let findings = Lint.Rule.`hoisted error in public throws Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -78,7 +78,7 @@ extension Lint.Rule.`hoisted error in public throws Tests`.Unit {
                 public init() throws(__InitError) {}
             }
             """
-        let findings = Lint.Rule.`hoisted error in public throws Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -86,7 +86,7 @@ extension Lint.Rule.`hoisted error in public throws Tests`.Unit {
     func `qualified hoisted error A_B___FooError is flagged`() {
         // Member-type access where the leaf is hoisted: A.B.__FooError.
         let source = "public func op() throws(A.B.__FooError) {}"
-        let findings = Lint.Rule.`hoisted error in public throws Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -97,7 +97,7 @@ extension Lint.Rule.`hoisted error in public throws Tests`.Unit {
                 open func op() throws(__BaseError) {}
             }
             """
-        let findings = Lint.Rule.`hoisted error in public throws Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -108,51 +108,51 @@ extension Lint.Rule.`hoisted error in public throws Tests`.Unit {
             public func b() throws(__BError) {}
             public func c() throws(MyError) {}
             """
-        let findings = Lint.Rule.`hoisted error in public throws Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
         #expect(findings.count == 2)
     }
 }
 
-extension Lint.Rule.`hoisted error in public throws Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`hoisted error in public throws Tests`.`Edge Case` {
     @Test
     func `public func with public error path is NOT flagged`() {
         let source = "public func op() throws(MyDomain.Error) {}"
-        let findings = Lint.Rule.`hoisted error in public throws Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `public func with bare Error name is NOT flagged`() {
         let source = "public func op() throws(MyError) {}"
-        let findings = Lint.Rule.`hoisted error in public throws Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `internal func with hoisted error is flagged`() {
         let source = "func op() throws(__InternalError) {}"
-        let findings = Lint.Rule.`hoisted error in public throws Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `private func with hoisted error is flagged`() {
         let source = "private func op() throws(__PrivateError) {}"
-        let findings = Lint.Rule.`hoisted error in public throws Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `package func with hoisted error is flagged`() {
         let source = "package func op() throws(__PackageError) {}"
-        let findings = Lint.Rule.`hoisted error in public throws Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `public func without throws clause is NOT flagged`() {
         let source = "public func op() {}"
-        let findings = Lint.Rule.`hoisted error in public throws Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -161,7 +161,7 @@ extension Lint.Rule.`hoisted error in public throws Tests`.`Edge Case` {
         // Untyped throws is its own anti-pattern (API-ERR-001) but does
         // not have a hoisted-type leaf to flag here.
         let source = "public func op() throws {}"
-        let findings = Lint.Rule.`hoisted error in public throws Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -169,7 +169,7 @@ extension Lint.Rule.`hoisted error in public throws Tests`.`Edge Case` {
     func `single underscore prefix is NOT flagged`() {
         // Single-underscore is a different SPI convention, not hoisted.
         let source = "public func op() throws(_FooError) {}"
-        let findings = Lint.Rule.`hoisted error in public throws Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -181,21 +181,21 @@ extension Lint.Rule.`hoisted error in public throws Tests`.`Edge Case` {
                 try? __internalHelper()
             }
             """
-        let findings = Lint.Rule.`hoisted error in public throws Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `do throws with hoisted error is flagged`() {
         let source = "do throws(__ReadError) {} catch {}"
-        let findings = Lint.Rule.`hoisted error in public throws Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `closure type with hoisted error is flagged`() {
         let source = "let read: () throws(__ReadError) -> Void"
-        let findings = Lint.Rule.`hoisted error in public throws Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }

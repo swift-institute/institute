@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Memory
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `pointer advanced by Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`pointer advanced by Tests` {
+extension `Lint.Rule Tests`.`pointer advanced by Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "Sources/test.swift"
@@ -38,7 +38,7 @@ extension Lint.Rule.`pointer advanced by Tests` {
     }
 }
 
-extension Lint.Rule.`pointer advanced by Tests`.Unit {
+extension `Lint.Rule Tests`.`pointer advanced by Tests`.Unit {
     @Test
     func `unsafe advanced by call is flagged`() {
         let source = """
@@ -47,7 +47,7 @@ extension Lint.Rule.`pointer advanced by Tests`.Unit {
                 use(next)
             }
             """
-        let findings = Lint.Rule.`pointer advanced by Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`pointer advanced by Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "pointer advanced by")
@@ -63,12 +63,12 @@ extension Lint.Rule.`pointer advanced by Tests`.Unit {
                 use(p1, p2)
             }
             """
-        let findings = Lint.Rule.`pointer advanced by Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`pointer advanced by Tests`.findings(in: source)
         #expect(findings.count == 2)
     }
 }
 
-extension Lint.Rule.`pointer advanced by Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`pointer advanced by Tests`.`Edge Case` {
     /// THE range regression test: `Strideable.advanced(by:)` over a range's
     /// `Bound` is a safe stdlib op (no `unsafe`) and MUST NOT fire. This is
     /// the false-positive class that swift-range' 8 findings were.
@@ -83,7 +83,7 @@ extension Lint.Rule.`pointer advanced by Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`pointer advanced by Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`pointer advanced by Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -95,7 +95,7 @@ extension Lint.Rule.`pointer advanced by Tests`.`Edge Case` {
                 use(next)
             }
             """
-        let findings = Lint.Rule.`pointer advanced by Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`pointer advanced by Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -107,7 +107,7 @@ extension Lint.Rule.`pointer advanced by Tests`.`Edge Case` {
                 use(next)
             }
             """
-        let findings = Lint.Rule.`pointer advanced by Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`pointer advanced by Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -119,7 +119,7 @@ extension Lint.Rule.`pointer advanced by Tests`.`Edge Case` {
                 use(p)
             }
             """
-        let findings = Lint.Rule.`pointer advanced by Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`pointer advanced by Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -133,7 +133,7 @@ extension Lint.Rule.`pointer advanced by Tests`.`Edge Case` {
                 use(next)
             }
             """
-        let findings = Lint.Rule.`pointer advanced by Tests`.findings(
+        let findings = `Lint.Rule Tests`.`pointer advanced by Tests`.findings(
             in: source,
             file: "Tests/Memory Tests/Memory Arithmetic Tests.swift"
         )
@@ -150,7 +150,7 @@ extension Lint.Rule.`pointer advanced by Tests`.`Edge Case` {
                 use(p)
             }
             """
-        let findings = Lint.Rule.`pointer advanced by Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`pointer advanced by Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -166,7 +166,7 @@ extension Lint.Rule.`pointer advanced by Tests`.`Edge Case` {
                 use(p)
             }
             """
-        let findings = Lint.Rule.`pointer advanced by Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`pointer advanced by Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -180,7 +180,7 @@ extension Lint.Rule.`pointer advanced by Tests`.`Edge Case` {
                 use(p)
             }
             """
-        let findings = Lint.Rule.`pointer advanced by Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`pointer advanced by Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -195,7 +195,7 @@ extension Lint.Rule.`pointer advanced by Tests`.`Edge Case` {
                 use(p)
             }
             """
-        let findings = Lint.Rule.`pointer advanced by Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`pointer advanced by Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -209,7 +209,7 @@ extension Lint.Rule.`pointer advanced by Tests`.`Edge Case` {
                 use(next)
             }
             """
-        let findings = Lint.Rule.`pointer advanced by Tests`.findings(
+        let findings = `Lint.Rule Tests`.`pointer advanced by Tests`.findings(
             in: source,
             file: "Experiments/Memory Arithmetic/Sandbox.swift"
         )
@@ -226,7 +226,7 @@ extension Lint.Rule.`pointer advanced by Tests`.`Edge Case` {
                 use(next)
             }
             """
-        let findings = Lint.Rule.`pointer advanced by Tests`.findings(
+        let findings = `Lint.Rule Tests`.`pointer advanced by Tests`.findings(
             in: source,
             file: "Examples/Memory Arithmetic/Demo.swift"
         )

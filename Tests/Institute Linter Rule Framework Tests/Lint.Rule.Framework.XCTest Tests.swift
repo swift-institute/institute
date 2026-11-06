@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Framework
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `xctest import Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`xctest import Tests` {
+extension `Lint.Rule Tests`.`xctest import Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`xctest import`.observe(parsed, .warning).findings
@@ -37,11 +37,11 @@ extension Lint.Rule.`xctest import Tests` {
 // REASON: this suite's fixture sources deliberately embed 'import XCTest' as
 // string literals under test
 // (self-referential fixture shape, rule-exemptions skill); re-enabled at end of file.
-extension Lint.Rule.`xctest import Tests`.Unit {
+extension `Lint.Rule Tests`.`xctest import Tests`.Unit {
     @Test
     func `bare XCTest import is flagged`() {
         let source = "import XCTest"
-        let findings = Lint.Rule.`xctest import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`xctest import Tests`.findings(in: source)
         let count = findings.count
         #expect(count == 1)
         if count == 1 {
@@ -53,7 +53,7 @@ extension Lint.Rule.`xctest import Tests`.Unit {
     @Test
     func `XCTest submodule import is flagged`() {
         let source = "import XCTest.XCTestCase"
-        let findings = Lint.Rule.`xctest import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`xctest import Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -64,7 +64,7 @@ extension Lint.Rule.`xctest import Tests`.Unit {
             import XCTest
             import Foundation
             """
-        let findings = Lint.Rule.`xctest import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`xctest import Tests`.findings(in: source)
         // Only XCTest is in scope of this rule; Foundation is handled by [PRIM-FOUND-001].
         #expect(findings.count == 1)
     }
@@ -72,25 +72,25 @@ extension Lint.Rule.`xctest import Tests`.Unit {
     @Test
     func `public import of XCTest is flagged`() {
         let source = "public import XCTest"
-        let findings = Lint.Rule.`xctest import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`xctest import Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `internal import of XCTest is flagged`() {
         let source = "internal import XCTest"
-        let findings = Lint.Rule.`xctest import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`xctest import Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`xctest import Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`xctest import Tests`.`Edge Case` {
     @Test
     func `Testing framework import is NOT flagged`() {
         let source = """
             import Testing
             """
-        let findings = Lint.Rule.`xctest import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`xctest import Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -100,7 +100,7 @@ extension Lint.Rule.`xctest import Tests`.`Edge Case` {
             import Swift
             import Synchronization
             """
-        let findings = Lint.Rule.`xctest import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`xctest import Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -110,7 +110,7 @@ extension Lint.Rule.`xctest import Tests`.`Edge Case` {
         // `XCTestHelpers` — not the XCTest framework itself. Only the
         // first path component is checked for equality with "XCTest".
         let source = "import XCTestHelpers"
-        let findings = Lint.Rule.`xctest import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`xctest import Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -120,14 +120,14 @@ extension Lint.Rule.`xctest import Tests`.`Edge Case` {
         // [SWIFT-TEST-013] does NOT pull XCTest. It must remain
         // importable from Swift Testing macro tests.
         let source = "import SwiftSyntaxMacrosGenericTestSupport"
-        let findings = Lint.Rule.`xctest import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`xctest import Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `empty source produces no findings`() {
         let source = ""
-        let findings = Lint.Rule.`xctest import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`xctest import Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

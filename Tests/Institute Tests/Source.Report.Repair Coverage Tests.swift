@@ -438,13 +438,15 @@ func `An apostrophe in a one-line formatter message does not absorb the next dia
     #expect(findings[0].diagnostic.message == "don't document this")
 }
 
-extension Source.Measurement {
+enum `Source.Measurement Tests` {}
+
+extension `Source.Measurement Tests` {
     @Suite struct Severity {
         @Suite struct Unit {}
     }
 }
 
-extension Source.Measurement.Severity.Unit {
+extension `Source.Measurement Tests`.Severity.Unit {
     @Test(arguments: [[], ["Warning"], ["Error"], ["Warning", "Error"]])
     func `SwiftLint preserves configured severity and accepts matching process status`(
         severities: [Swift::String]
@@ -496,7 +498,7 @@ extension Source.Measurement.Severity.Unit {
     }
 }
 
-extension Source.Measurement.Severity.Unit {
+extension `Source.Measurement Tests`.Severity.Unit {
     @Test(arguments: ["not JSON", "{}", "[{}]", "[" + swiftLintFinding("Sources/A.swift", line: 1, rule: "line_length", severity: "Unknown") + "]"])
     func `SwiftLint malformed or unknown severity output remains unmeasured`(output: Swift::String) {
         let measurement = Source.Measurement.swiftLint(

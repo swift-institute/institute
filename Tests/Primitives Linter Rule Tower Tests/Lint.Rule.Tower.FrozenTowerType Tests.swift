@@ -6,7 +6,7 @@ import Testing
 
 @testable import Primitives_Linter_Rule_Tower
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `frozen tower type Tests` {
         @Suite struct Unit {}
@@ -16,7 +16,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`frozen tower type Tests` {
+extension `Lint.Rule Tests`.`frozen tower type Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -26,10 +26,10 @@ extension Lint.Rule.`frozen tower type Tests` {
     }
 }
 
-extension Lint.Rule.`frozen tower type Tests`.Unit {
+extension `Lint.Rule Tests`.`frozen tower type Tests`.Unit {
     @Test
     func `unfrozen public stored struct under a tower root is flagged`() {
-        let findings = Lint.Rule.`frozen tower type Tests`.findings(
+        let findings = `Lint.Rule Tests`.`frozen tower type Tests`.findings(
             in: """
                 extension Storage {
                     public struct Generational {
@@ -48,7 +48,7 @@ extension Lint.Rule.`frozen tower type Tests`.Unit {
 
     @Test
     func `unfrozen top-level tower family struct is flagged`() {
-        let findings = Lint.Rule.`frozen tower type Tests`.findings(
+        let findings = `Lint.Rule Tests`.`frozen tower type Tests`.findings(
             in: """
                 public struct Shared<Element> {
                     internal var box: AnyObject
@@ -60,7 +60,7 @@ extension Lint.Rule.`frozen tower type Tests`.Unit {
 
     @Test
     func `deep member-type extension roots at the outermost tower namespace`() {
-        let findings = Lint.Rule.`frozen tower type Tests`.findings(
+        let findings = `Lint.Rule Tests`.`frozen tower type Tests`.findings(
             in: """
                 extension Tree.N.Nested {
                     public struct Header {
@@ -73,10 +73,10 @@ extension Lint.Rule.`frozen tower type Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`frozen tower type Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`frozen tower type Tests`.`Edge Case` {
     @Test
     func `escapable-suppressed view type is exempt`() {
-        let findings = Lint.Rule.`frozen tower type Tests`.findings(
+        let findings = `Lint.Rule Tests`.`frozen tower type Tests`.findings(
             in: """
                 extension Buffer {
                     public struct Span: ~Escapable {
@@ -90,7 +90,7 @@ extension Lint.Rule.`frozen tower type Tests`.`Edge Case` {
 
     @Test
     func `curated exemption names stay unfrozen`() {
-        let findings = Lint.Rule.`frozen tower type Tests`.findings(
+        let findings = `Lint.Rule Tests`.`frozen tower type Tests`.findings(
             in: """
                 extension Buffer {
                     public struct Checkpoint { var mark: Int }
@@ -103,7 +103,7 @@ extension Lint.Rule.`frozen tower type Tests`.`Edge Case` {
 
     @Test
     func `Iterator- and View-suffixed types are exempt`() {
-        let findings = Lint.Rule.`frozen tower type Tests`.findings(
+        let findings = `Lint.Rule Tests`.`frozen tower type Tests`.findings(
             in: """
                 extension Queue {
                     public struct ChunkIterator { var position: Int }
@@ -116,7 +116,7 @@ extension Lint.Rule.`frozen tower type Tests`.`Edge Case` {
 
     @Test
     func `static-only members are not stored data-plane state`() {
-        let findings = Lint.Rule.`frozen tower type Tests`.findings(
+        let findings = `Lint.Rule Tests`.`frozen tower type Tests`.findings(
             in: """
                 extension Stack {
                     public struct Limits {
@@ -130,10 +130,10 @@ extension Lint.Rule.`frozen tower type Tests`.`Edge Case` {
     }
 }
 
-extension Lint.Rule.`frozen tower type Tests`.Negative {
+extension `Lint.Rule Tests`.`frozen tower type Tests`.Negative {
     @Test
     func `frozen tower struct is compliant`() {
-        let findings = Lint.Rule.`frozen tower type Tests`.findings(
+        let findings = `Lint.Rule Tests`.`frozen tower type Tests`.findings(
             in: """
                 extension Storage {
                     @frozen
@@ -148,7 +148,7 @@ extension Lint.Rule.`frozen tower type Tests`.Negative {
 
     @Test
     func `non-tower namespaces are out of scope`() {
-        let findings = Lint.Rule.`frozen tower type Tests`.findings(
+        let findings = `Lint.Rule Tests`.`frozen tower type Tests`.findings(
             in: """
                 extension Cardinal {
                     public struct Counter { var n: Int }
@@ -161,7 +161,7 @@ extension Lint.Rule.`frozen tower type Tests`.Negative {
 
     @Test
     func `non-public and computed-only structs are out of scope`() {
-        let findings = Lint.Rule.`frozen tower type Tests`.findings(
+        let findings = `Lint.Rule Tests`.`frozen tower type Tests`.findings(
             in: """
                 extension Storage {
                     struct Ledger { var bits: Int }

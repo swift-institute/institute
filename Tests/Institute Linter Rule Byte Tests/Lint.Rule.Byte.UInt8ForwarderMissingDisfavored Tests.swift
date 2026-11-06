@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Byte
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `uint8 forwarder missing disfavored Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`uint8 forwarder missing disfavored Tests` {
+extension `Lint.Rule Tests`.`uint8 forwarder missing disfavored Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -38,7 +38,7 @@ extension Lint.Rule.`uint8 forwarder missing disfavored Tests` {
     }
 }
 
-extension Lint.Rule.`uint8 forwarder missing disfavored Tests`.Unit {
+extension `Lint.Rule Tests`.`uint8 forwarder missing disfavored Tests`.Unit {
     @Test
     func `function in extension on Byte array taking UInt8 is flagged`() {
         let source = """
@@ -46,7 +46,7 @@ extension Lint.Rule.`uint8 forwarder missing disfavored Tests`.Unit {
                 public func append(_ value: UInt8) {}
             }
             """
-        let result = Lint.Rule.`uint8 forwarder missing disfavored Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 forwarder missing disfavored Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -57,7 +57,7 @@ extension Lint.Rule.`uint8 forwarder missing disfavored Tests`.Unit {
                 public func raw() -> [UInt8] { [] }
             }
             """
-        let result = Lint.Rule.`uint8 forwarder missing disfavored Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 forwarder missing disfavored Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -68,7 +68,7 @@ extension Lint.Rule.`uint8 forwarder missing disfavored Tests`.Unit {
                 public init(byte: UInt8) { self = [] }
             }
             """
-        let result = Lint.Rule.`uint8 forwarder missing disfavored Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 forwarder missing disfavored Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -82,7 +82,7 @@ extension Lint.Rule.`uint8 forwarder missing disfavored Tests`.Unit {
                 public func append(_ value: UInt8) {}
             }
             """
-        let result = Lint.Rule.`uint8 forwarder missing disfavored Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 forwarder missing disfavored Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -93,7 +93,7 @@ extension Lint.Rule.`uint8 forwarder missing disfavored Tests`.Unit {
                 public func append(_ value: UInt8) {}
             }
             """
-        let result = Lint.Rule.`uint8 forwarder missing disfavored Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 forwarder missing disfavored Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -104,7 +104,7 @@ extension Lint.Rule.`uint8 forwarder missing disfavored Tests`.Unit {
                 public func raw() -> some Collection<UInt8> { [] }
             }
             """
-        let result = Lint.Rule.`uint8 forwarder missing disfavored Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 forwarder missing disfavored Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -115,7 +115,7 @@ extension Lint.Rule.`uint8 forwarder missing disfavored Tests`.Unit {
                 public func pair(_ value: (UInt8, UInt8)) {}
             }
             """
-        let result = Lint.Rule.`uint8 forwarder missing disfavored Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 forwarder missing disfavored Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -126,12 +126,12 @@ extension Lint.Rule.`uint8 forwarder missing disfavored Tests`.Unit {
                 public func onByte(_ handler: (UInt8) -> Void) {}
             }
             """
-        let result = Lint.Rule.`uint8 forwarder missing disfavored Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 forwarder missing disfavored Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 }
 
-extension Lint.Rule.`uint8 forwarder missing disfavored Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`uint8 forwarder missing disfavored Tests`.`Edge Case` {
     @Test
     func `function with disfavored overload is NOT flagged`() {
         let source = """
@@ -140,7 +140,7 @@ extension Lint.Rule.`uint8 forwarder missing disfavored Tests`.`Edge Case` {
                 public func append(_ value: UInt8) {}
             }
             """
-        let result = Lint.Rule.`uint8 forwarder missing disfavored Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 forwarder missing disfavored Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 
@@ -151,7 +151,7 @@ extension Lint.Rule.`uint8 forwarder missing disfavored Tests`.`Edge Case` {
                 public func append(_ value: Byte) {}
             }
             """
-        let result = Lint.Rule.`uint8 forwarder missing disfavored Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 forwarder missing disfavored Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 
@@ -162,7 +162,7 @@ extension Lint.Rule.`uint8 forwarder missing disfavored Tests`.`Edge Case` {
                 public func append(_ value: UInt8) {}
             }
             """
-        let result = Lint.Rule.`uint8 forwarder missing disfavored Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 forwarder missing disfavored Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 
@@ -173,12 +173,12 @@ extension Lint.Rule.`uint8 forwarder missing disfavored Tests`.`Edge Case` {
                 public func append(_ value: UInt8) {}
             }
             """
-        let result = Lint.Rule.`uint8 forwarder missing disfavored Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 forwarder missing disfavored Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 }
 
-extension Lint.Rule.`uint8 forwarder missing disfavored Tests`.Integration {
+extension `Lint.Rule Tests`.`uint8 forwarder missing disfavored Tests`.Integration {
     @Test
     func `multiple UInt8 forwarders are all flagged independently`() {
         let source = """
@@ -189,14 +189,14 @@ extension Lint.Rule.`uint8 forwarder missing disfavored Tests`.Integration {
                 public func three(_ value: UInt8) {}
             }
             """
-        let result = Lint.Rule.`uint8 forwarder missing disfavored Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 forwarder missing disfavored Tests`.findings(in: source)
         #expect(result.count == 2)
     }
 
     @Test
     func `large file with no byte-domain extensions yields no findings`() {
         let source = String(repeating: "extension Foo { func bar() {} }\n", count: 200)
-        let result = Lint.Rule.`uint8 forwarder missing disfavored Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 forwarder missing disfavored Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 }

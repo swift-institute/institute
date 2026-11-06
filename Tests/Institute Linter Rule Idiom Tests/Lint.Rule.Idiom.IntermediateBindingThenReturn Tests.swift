@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Idiom
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `intermediate binding then return Tests` {
         @Suite struct Unit {}
@@ -26,14 +26,14 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`intermediate binding then return Tests` {
+extension `Lint.Rule Tests`.`intermediate binding then return Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`intermediate binding then return`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`intermediate binding then return Tests`.Unit {
+extension `Lint.Rule Tests`.`intermediate binding then return Tests`.Unit {
     @Test
     func `let then return same identifier is flagged`() {
         let source = """
@@ -42,7 +42,7 @@ extension Lint.Rule.`intermediate binding then return Tests`.Unit {
                 return result
             }
             """
-        let findings = Lint.Rule.`intermediate binding then return Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`intermediate binding then return Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "intermediate binding then return")
@@ -50,7 +50,7 @@ extension Lint.Rule.`intermediate binding then return Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`intermediate binding then return Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`intermediate binding then return Tests`.`Edge Case` {
     @Test
     func `var binding is NOT flagged`() {
         let source = """
@@ -60,7 +60,7 @@ extension Lint.Rule.`intermediate binding then return Tests`.`Edge Case` {
                 return result
             }
             """
-        let findings = Lint.Rule.`intermediate binding then return Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`intermediate binding then return Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -72,7 +72,7 @@ extension Lint.Rule.`intermediate binding then return Tests`.`Edge Case` {
                 return result
             }
             """
-        let findings = Lint.Rule.`intermediate binding then return Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`intermediate binding then return Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -85,7 +85,7 @@ extension Lint.Rule.`intermediate binding then return Tests`.`Edge Case` {
                 return result
             }
             """
-        let findings = Lint.Rule.`intermediate binding then return Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`intermediate binding then return Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -97,7 +97,7 @@ extension Lint.Rule.`intermediate binding then return Tests`.`Edge Case` {
                 return other(local)
             }
             """
-        let findings = Lint.Rule.`intermediate binding then return Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`intermediate binding then return Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

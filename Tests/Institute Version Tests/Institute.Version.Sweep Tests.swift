@@ -3,14 +3,16 @@ import Testing
 
 @testable import Institute_Version
 
-extension Institute.Version.Sweep {
+enum `Institute.Version.Sweep Tests` {}
+
+extension `Institute.Version.Sweep Tests` {
     @Suite struct Test {
         @Suite struct Unit {}
         @Suite struct `Edge Case` {}
     }
 }
 
-extension Institute.Version.Sweep.Test {
+extension `Institute.Version.Sweep Tests`.Test {
     static let a = Fixture.commit("a")
     static let b = Fixture.commit("b")
     static let c = Fixture.commit("c")
@@ -32,8 +34,8 @@ extension Institute.Version.Sweep.Test {
     }
 }
 
-extension Institute.Version.Sweep.Test.Unit {
-    typealias T = Institute.Version.Sweep.Test
+extension `Institute.Version.Sweep Tests`.Test.Unit {
+    typealias T = `Institute.Version.Sweep Tests`.Test
 
     @Test func `the first passing head of a repository gets 0.0.100`() {
         let fixture = Fixture(.init(gates: [T.a: .passed]))
@@ -116,8 +118,8 @@ extension Institute.Version.Sweep.Test.Unit {
     }
 }
 
-extension Institute.Version.Sweep.Test.`Edge Case` {
-    typealias T = Institute.Version.Sweep.Test
+extension `Institute.Version.Sweep Tests`.Test.`Edge Case` {
+    typealias T = `Institute.Version.Sweep Tests`.Test
 
     @Test(arguments: [Institute.Version.Relation.behind, .diverged])
     func `a head that does not descend from the latest tag is refused`(_ relation: Institute.Version.Relation) {

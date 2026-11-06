@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Closure
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `unlabeled lifecycle closure Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`unlabeled lifecycle closure Tests` {
+extension `Lint.Rule Tests`.`unlabeled lifecycle closure Tests` {
     static func findings(
         in source: String,
         file: String = "Sources/X/Test.swift"
@@ -38,13 +38,13 @@ extension Lint.Rule.`unlabeled lifecycle closure Tests` {
     }
 }
 
-extension Lint.Rule.`unlabeled lifecycle closure Tests`.Unit {
+extension `Lint.Rule Tests`.`unlabeled lifecycle closure Tests`.Unit {
     @Test
     func `single unlabelled closure is permitted`() {
         let source = """
             func f(_ body: () -> Void) {}
             """
-        let findings = Lint.Rule.`unlabeled lifecycle closure Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unlabeled lifecycle closure Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -53,7 +53,7 @@ extension Lint.Rule.`unlabeled lifecycle closure Tests`.Unit {
         let source = """
             func f(_ body: () -> Void, _ completion: () -> Void) {}
             """
-        let findings = Lint.Rule.`unlabeled lifecycle closure Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unlabeled lifecycle closure Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -62,7 +62,7 @@ extension Lint.Rule.`unlabeled lifecycle closure Tests`.Unit {
         let source = """
             func f(_ body: () -> Void, completion: () -> Void) {}
             """
-        let findings = Lint.Rule.`unlabeled lifecycle closure Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unlabeled lifecycle closure Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -71,7 +71,7 @@ extension Lint.Rule.`unlabeled lifecycle closure Tests`.Unit {
         let source = """
             func f(_ body: () -> Void, _ completion: () -> Void, _ teardown: () -> Void) {}
             """
-        let findings = Lint.Rule.`unlabeled lifecycle closure Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unlabeled lifecycle closure Tests`.findings(in: source)
         #expect(findings.count == 2)
     }
 
@@ -85,7 +85,7 @@ extension Lint.Rule.`unlabeled lifecycle closure Tests`.Unit {
             """
         // This file's rule only checks unlabelled secondary closures.
         // The misordering is the closure_param_position rule's job.
-        let findings = Lint.Rule.`unlabeled lifecycle closure Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unlabeled lifecycle closure Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -96,18 +96,18 @@ extension Lint.Rule.`unlabeled lifecycle closure Tests`.Unit {
                 init(_ body: () -> Void, _ completion: () -> Void) {}
             }
             """
-        let findings = Lint.Rule.`unlabeled lifecycle closure Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unlabeled lifecycle closure Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`unlabeled lifecycle closure Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`unlabeled lifecycle closure Tests`.`Edge Case` {
     @Test
     func `escaping second closure unlabelled is flagged`() {
         let source = """
             func f(_ body: () -> Void, _ completion: @escaping () -> Void) {}
             """
-        let findings = Lint.Rule.`unlabeled lifecycle closure Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unlabeled lifecycle closure Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -116,14 +116,14 @@ extension Lint.Rule.`unlabeled lifecycle closure Tests`.`Edge Case` {
         let source = """
             func f(_ body: () -> Void, _ completion: (() -> Void)?) {}
             """
-        let findings = Lint.Rule.`unlabeled lifecycle closure Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unlabeled lifecycle closure Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `function with non-closure params only is not flagged`() {
         let source = "func f(a: Int, b: String) {}"
-        let findings = Lint.Rule.`unlabeled lifecycle closure Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unlabeled lifecycle closure Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

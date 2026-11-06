@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Memory
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `unchecked sendable revalidation anchor Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`unchecked sendable revalidation anchor Tests` {
+extension `Lint.Rule Tests`.`unchecked sendable revalidation anchor Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "Sources/X/Test.swift"
@@ -40,7 +40,7 @@ extension Lint.Rule.`unchecked sendable revalidation anchor Tests` {
 
 // MARK: - Unit (positive — rule fires)
 
-extension Lint.Rule.`unchecked sendable revalidation anchor Tests`.Unit {
+extension `Lint.Rule Tests`.`unchecked sendable revalidation anchor Tests`.Unit {
     @Test
     func `compiler-limitation context with no anchor is flagged`() {
         // Category D citation triggers the in-scope gate. No WHEN TO
@@ -50,7 +50,7 @@ extension Lint.Rule.`unchecked sendable revalidation anchor Tests`.Unit {
             // (missing WHEN TO REMOVE and TRACKING)
             extension Container: @unchecked Sendable {}
             """
-        let findings = Lint.Rule.`unchecked sendable revalidation anchor Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked sendable revalidation anchor Tests`.findings(in: source)
         let count = findings.count
         #expect(count == 1)
         if count == 1 {
@@ -67,7 +67,7 @@ extension Lint.Rule.`unchecked sendable revalidation anchor Tests`.Unit {
             // (missing TRACKING)
             extension Container.Variant: @unchecked Sendable where Element: Sendable {}
             """
-        let findings = Lint.Rule.`unchecked sendable revalidation anchor Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked sendable revalidation anchor Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -79,7 +79,7 @@ extension Lint.Rule.`unchecked sendable revalidation anchor Tests`.Unit {
                 private let _erased: () -> Int
             }
             """
-        let findings = Lint.Rule.`unchecked sendable revalidation anchor Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked sendable revalidation anchor Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -92,7 +92,7 @@ extension Lint.Rule.`unchecked sendable revalidation anchor Tests`.Unit {
                 private var atomic: UnsafeMutablePointer<Int>?
             }
             """
-        let findings = Lint.Rule.`unchecked sendable revalidation anchor Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked sendable revalidation anchor Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -105,14 +105,14 @@ extension Lint.Rule.`unchecked sendable revalidation anchor Tests`.Unit {
                 private let storage: UnsafeMutablePointer<UInt8>
             }
             """
-        let findings = Lint.Rule.`unchecked sendable revalidation anchor Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked sendable revalidation anchor Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
 // MARK: - Edge Case (negative — rule does NOT fire)
 
-extension Lint.Rule.`unchecked sendable revalidation anchor Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`unchecked sendable revalidation anchor Tests`.`Edge Case` {
     @Test
     func `naked unchecked Sendable with no leading comment is not flagged`() {
         // No comment block at all — no compiler-limitation indicator —
@@ -122,7 +122,7 @@ extension Lint.Rule.`unchecked sendable revalidation anchor Tests`.`Edge Case` {
         let source = """
             extension Container: @unchecked Sendable where Element: Sendable {}
             """
-        let findings = Lint.Rule.`unchecked sendable revalidation anchor Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked sendable revalidation anchor Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -136,7 +136,7 @@ extension Lint.Rule.`unchecked sendable revalidation anchor Tests`.`Edge Case` {
                 private let _raw: UnsafeMutableRawPointer
             }
             """
-        let findings = Lint.Rule.`unchecked sendable revalidation anchor Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked sendable revalidation anchor Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -149,7 +149,7 @@ extension Lint.Rule.`unchecked sendable revalidation anchor Tests`.`Edge Case` {
             // I take semantic responsibility: callers must externally synchronize access.
             public struct ManualSync: @unchecked Sendable {}
             """
-        let findings = Lint.Rule.`unchecked sendable revalidation anchor Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked sendable revalidation anchor Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -162,7 +162,7 @@ extension Lint.Rule.`unchecked sendable revalidation anchor Tests`.`Edge Case` {
             /// This type uses an unchecked conformance for performance reasons.
             extension Coordinator: @unchecked Sendable {}
             """
-        let findings = Lint.Rule.`unchecked sendable revalidation anchor Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked sendable revalidation anchor Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -171,7 +171,7 @@ extension Lint.Rule.`unchecked sendable revalidation anchor Tests`.`Edge Case` {
         let source = """
             public struct Container: @unchecked Codable {}
             """
-        let findings = Lint.Rule.`unchecked sendable revalidation anchor Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked sendable revalidation anchor Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -180,7 +180,7 @@ extension Lint.Rule.`unchecked sendable revalidation anchor Tests`.`Edge Case` {
         let source = """
             public struct ValueType: Sendable {}
             """
-        let findings = Lint.Rule.`unchecked sendable revalidation anchor Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked sendable revalidation anchor Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -200,7 +200,7 @@ extension Lint.Rule.`unchecked sendable revalidation anchor Tests`.`Edge Case` {
             // TRACKING: unsafe-audit-findings.md Category D SP-7.
             public struct AnyClock: @unchecked Sendable {}
             """
-        let findings = Lint.Rule.`unchecked sendable revalidation anchor Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked sendable revalidation anchor Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

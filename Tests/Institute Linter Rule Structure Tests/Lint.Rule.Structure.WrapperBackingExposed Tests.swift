@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Structure
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `wrapper backing exposed Tests` {
         @Suite struct Unit {}
@@ -26,14 +26,14 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`wrapper backing exposed Tests` {
+extension `Lint.Rule Tests`.`wrapper backing exposed Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`wrapper backing exposed`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`wrapper backing exposed Tests`.Unit {
+extension `Lint.Rule Tests`.`wrapper backing exposed Tests`.Unit {
     @Test
     func `default-internal _backing in struct is flagged`() {
         let source = """
@@ -41,7 +41,7 @@ extension Lint.Rule.`wrapper backing exposed Tests`.Unit {
                 let _backing: IO.Blocking.Lane
             }
             """
-        let findings = Lint.Rule.`wrapper backing exposed Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`wrapper backing exposed Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "wrapper backing exposed")
@@ -56,7 +56,7 @@ extension Lint.Rule.`wrapper backing exposed Tests`.Unit {
                 internal var _wrapped: Underlying
             }
             """
-        let findings = Lint.Rule.`wrapper backing exposed Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`wrapper backing exposed Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -67,12 +67,12 @@ extension Lint.Rule.`wrapper backing exposed Tests`.Unit {
                 package var _underlying: Storage
             }
             """
-        let findings = Lint.Rule.`wrapper backing exposed Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`wrapper backing exposed Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`wrapper backing exposed Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`wrapper backing exposed Tests`.`Edge Case` {
     @Test
     func `private _backing is NOT flagged`() {
         let source = """
@@ -80,7 +80,7 @@ extension Lint.Rule.`wrapper backing exposed Tests`.`Edge Case` {
                 private let _backing: IO.Blocking.Lane
             }
             """
-        let findings = Lint.Rule.`wrapper backing exposed Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`wrapper backing exposed Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -91,7 +91,7 @@ extension Lint.Rule.`wrapper backing exposed Tests`.`Edge Case` {
                 fileprivate var _wrapped: Underlying
             }
             """
-        let findings = Lint.Rule.`wrapper backing exposed Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`wrapper backing exposed Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -105,7 +105,7 @@ extension Lint.Rule.`wrapper backing exposed Tests`.`Edge Case` {
                 private(set) var _backing: IO.Blocking.Lane
             }
             """
-        let findings = Lint.Rule.`wrapper backing exposed Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`wrapper backing exposed Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -116,7 +116,7 @@ extension Lint.Rule.`wrapper backing exposed Tests`.`Edge Case` {
                 fileprivate(set) var _wrapped: Underlying
             }
             """
-        let findings = Lint.Rule.`wrapper backing exposed Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`wrapper backing exposed Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -128,7 +128,7 @@ extension Lint.Rule.`wrapper backing exposed Tests`.`Edge Case` {
                 var _backing: IO.Blocking.Lane
             }
             """
-        let findings = Lint.Rule.`wrapper backing exposed Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`wrapper backing exposed Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -140,7 +140,7 @@ extension Lint.Rule.`wrapper backing exposed Tests`.`Edge Case` {
                 var _internal: String
             }
             """
-        let findings = Lint.Rule.`wrapper backing exposed Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`wrapper backing exposed Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -149,7 +149,7 @@ extension Lint.Rule.`wrapper backing exposed Tests`.`Edge Case` {
         let source = """
             let _backing = 0
             """
-        let findings = Lint.Rule.`wrapper backing exposed Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`wrapper backing exposed Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -162,7 +162,7 @@ extension Lint.Rule.`wrapper backing exposed Tests`.`Edge Case` {
                 var _backing: Underlying { get }
             }
             """
-        let findings = Lint.Rule.`wrapper backing exposed Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`wrapper backing exposed Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -174,7 +174,7 @@ extension Lint.Rule.`wrapper backing exposed Tests`.`Edge Case` {
                 var wrapped: Other
             }
             """
-        let findings = Lint.Rule.`wrapper backing exposed Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`wrapper backing exposed Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -188,7 +188,7 @@ extension Lint.Rule.`wrapper backing exposed Tests`.`Edge Case` {
                 public var _backing: Int { 0 }
             }
             """
-        let findings = Lint.Rule.`wrapper backing exposed Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`wrapper backing exposed Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -199,7 +199,7 @@ extension Lint.Rule.`wrapper backing exposed Tests`.`Edge Case` {
                 public static var _backing = 0
             }
             """
-        let findings = Lint.Rule.`wrapper backing exposed Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`wrapper backing exposed Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -213,7 +213,7 @@ extension Lint.Rule.`wrapper backing exposed Tests`.`Edge Case` {
                 var _backing: Int = 0, other: Int = 0
             }
             """
-        let findings = Lint.Rule.`wrapper backing exposed Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`wrapper backing exposed Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -226,7 +226,7 @@ extension Lint.Rule.`wrapper backing exposed Tests`.`Edge Case` {
                 var other: Int = 0, _backing: Int = 0
             }
             """
-        let findings = Lint.Rule.`wrapper backing exposed Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`wrapper backing exposed Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -242,7 +242,7 @@ extension Lint.Rule.`wrapper backing exposed Tests`.`Edge Case` {
                 var _backing: Int = 0, _wrapped: Int = 0
             }
             """
-        let findings = Lint.Rule.`wrapper backing exposed Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`wrapper backing exposed Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -261,7 +261,7 @@ extension Lint.Rule.`wrapper backing exposed Tests`.`Edge Case` {
                 #endif
             }
             """
-        let findings = Lint.Rule.`wrapper backing exposed Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`wrapper backing exposed Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }

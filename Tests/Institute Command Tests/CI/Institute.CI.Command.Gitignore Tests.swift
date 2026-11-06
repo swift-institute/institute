@@ -10,7 +10,9 @@ import Testing
 // with the corpus itself, in the institute package's CI Validation test
 // suite; this suite owns only the command family's argument grammar and
 // rendering seam.
-extension Institute.CI.Command.Gitignore {
+enum `Institute.CI.Command.Gitignore Tests` {}
+
+extension `Institute.CI.Command.Gitignore Tests` {
     @Suite
     struct Test {
         static let terminator = Institute.CI.Canon.Gitignore.terminator
@@ -46,10 +48,10 @@ extension Institute.CI.Command.Gitignore {
 
             @Test func `renderer emits only complete canonical bytes`() throws {
                 let rendered = try Institute.CI.Command.Gitignore.render(
-                    canon: Institute.CI.Command.Gitignore.Test.canon,
+                    canon: `Institute.CI.Command.Gitignore Tests`.Test.canon,
                     target: "# tail\n"
                 )
-                #expect(rendered == Institute.CI.Command.Gitignore.Test.canon)
+                #expect(rendered == `Institute.CI.Command.Gitignore Tests`.Test.canon)
                 #expect(!rendered.contains("# tail"))
             }
         }

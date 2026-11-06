@@ -18,7 +18,7 @@ import Text
 
 @testable import Institute_Linter_Rule_Testing
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `test file suffix Tests` {
         @Suite struct Unit {}
@@ -27,7 +27,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`test file suffix Tests` {
+extension `Lint.Rule Tests`.`test file suffix Tests` {
     /// A minimal suite file body: one top-level `@Suite` type.
     static let suiteSource = "@Suite struct `Fixture Tests` {}"
 
@@ -47,11 +47,11 @@ extension Lint.Rule.`test file suffix Tests` {
     }
 }
 
-extension Lint.Rule.`test file suffix Tests`.Unit {
+extension `Lint.Rule Tests`.`test file suffix Tests`.Unit {
     @Test
     func `joined Tests suffix on a Suite file is flagged with the rename`() {
-        let findings = Lint.Rule.`test file suffix Tests`.findings(
-            source: Lint.Rule.`test file suffix Tests`.suiteSource,
+        let findings = `Lint.Rule Tests`.`test file suffix Tests`.findings(
+            source: `Lint.Rule Tests`.`test file suffix Tests`.suiteSource,
             file: "Tests/File Tests/FooTests.swift"
         )
         #expect(findings.count == 1)
@@ -66,8 +66,8 @@ extension Lint.Rule.`test file suffix Tests`.Unit {
 
     @Test
     func `Test-only file with no suffix is flagged with an appended suffix`() {
-        let findings = Lint.Rule.`test file suffix Tests`.findings(
-            source: Lint.Rule.`test file suffix Tests`.testFunctionSource,
+        let findings = `Lint.Rule Tests`.`test file suffix Tests`.findings(
+            source: `Lint.Rule Tests`.`test file suffix Tests`.testFunctionSource,
             file: "Tests/File Tests/Behaviors.swift"
         )
         #expect(findings.count == 1)
@@ -80,8 +80,8 @@ extension Lint.Rule.`test file suffix Tests`.Unit {
 
     @Test
     func `space-separated Tests suffix is permitted`() {
-        let findings = Lint.Rule.`test file suffix Tests`.findings(
-            source: Lint.Rule.`test file suffix Tests`.suiteSource,
+        let findings = `Lint.Rule Tests`.`test file suffix Tests`.findings(
+            source: `Lint.Rule Tests`.`test file suffix Tests`.suiteSource,
             file: "Tests/File Tests/File.Directory Tests.swift"
         )
         #expect(findings.isEmpty)
@@ -96,7 +96,7 @@ extension Lint.Rule.`test file suffix Tests`.Unit {
 
             @Suite struct `Fixture Tests` {}
             """
-        let findings = Lint.Rule.`test file suffix Tests`.findings(
+        let findings = `Lint.Rule Tests`.`test file suffix Tests`.findings(
             source: source,
             file: "Tests/File Tests/FooTests.swift"
         )
@@ -106,11 +106,11 @@ extension Lint.Rule.`test file suffix Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`test file suffix Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`test file suffix Tests`.`Edge Case` {
     @Test
     func `subject segment containing Tests does not fire`() {
-        let findings = Lint.Rule.`test file suffix Tests`.findings(
-            source: Lint.Rule.`test file suffix Tests`.suiteSource,
+        let findings = `Lint.Rule Tests`.`test file suffix Tests`.findings(
+            source: `Lint.Rule Tests`.`test file suffix Tests`.suiteSource,
             file: "Tests/File Tests/Tests.Helpers Tests.swift"
         )
         #expect(findings.isEmpty)
@@ -118,8 +118,8 @@ extension Lint.Rule.`test file suffix Tests`.`Edge Case` {
 
     @Test
     func `trailing whitespace variance is a rename not a pass`() {
-        let findings = Lint.Rule.`test file suffix Tests`.findings(
-            source: Lint.Rule.`test file suffix Tests`.suiteSource,
+        let findings = `Lint.Rule Tests`.`test file suffix Tests`.findings(
+            source: `Lint.Rule Tests`.`test file suffix Tests`.suiteSource,
             file: "Tests/File Tests/Foo Tests .swift"
         )
         #expect(findings.count == 1)
@@ -135,8 +135,8 @@ extension Lint.Rule.`test file suffix Tests`.`Edge Case` {
         // #24 defect 8: `hasSuffix(" Tests")` alone also accepts a
         // double-spaced basename, since "  Tests" itself ends in
         // " Tests" — exactly one space must precede `Tests`.
-        let findings = Lint.Rule.`test file suffix Tests`.findings(
-            source: Lint.Rule.`test file suffix Tests`.suiteSource,
+        let findings = `Lint.Rule Tests`.`test file suffix Tests`.findings(
+            source: `Lint.Rule Tests`.`test file suffix Tests`.suiteSource,
             file: "Tests/File Tests/Foo  Tests.swift"
         )
         #expect(findings.count == 1)
@@ -144,8 +144,8 @@ extension Lint.Rule.`test file suffix Tests`.`Edge Case` {
 
     @Test
     func `dot-separated Tests suffix remains nonconforming`() {
-        let findings = Lint.Rule.`test file suffix Tests`.findings(
-            source: Lint.Rule.`test file suffix Tests`.suiteSource,
+        let findings = `Lint.Rule Tests`.`test file suffix Tests`.findings(
+            source: `Lint.Rule Tests`.`test file suffix Tests`.suiteSource,
             file: "Tests/File Tests/File.Directory.Tests.swift"
         )
         #expect(findings.count == 1)
@@ -157,8 +157,8 @@ extension Lint.Rule.`test file suffix Tests`.`Edge Case` {
         // strips to empty after dropping the trailing "Tests", so the
         // rename falls back to appending " Tests" to the (empty) base
         // rather than producing a leading-space or empty subject.
-        let findings = Lint.Rule.`test file suffix Tests`.findings(
-            source: Lint.Rule.`test file suffix Tests`.suiteSource,
+        let findings = `Lint.Rule Tests`.`test file suffix Tests`.findings(
+            source: `Lint.Rule Tests`.`test file suffix Tests`.suiteSource,
             file: "Tests/File Tests/Tests.swift"
         )
         #expect(findings.count == 1)
@@ -175,8 +175,8 @@ extension Lint.Rule.`test file suffix Tests`.`Edge Case` {
         // segment (dot-prefixed) — documented behavior, not a design
         // change here. A literal hidden directory (e.g. `.build`) is the
         // exemption's actual target.
-        let findings = Lint.Rule.`test file suffix Tests`.findings(
-            source: Lint.Rule.`test file suffix Tests`.suiteSource,
+        let findings = `Lint.Rule Tests`.`test file suffix Tests`.findings(
+            source: `Lint.Rule Tests`.`test file suffix Tests`.suiteSource,
             file: "Tests/.build/FooTests.swift"
         )
         #expect(findings.isEmpty)
@@ -189,7 +189,7 @@ extension Lint.Rule.`test file suffix Tests`.`Edge Case` {
               @Test func `walks the directory`() {}
             }
             """
-        let findings = Lint.Rule.`test file suffix Tests`.findings(
+        let findings = `Lint.Rule Tests`.`test file suffix Tests`.findings(
             source: source,
             file: "Tests/File Tests/File.WalkTests.swift"
         )
@@ -197,11 +197,11 @@ extension Lint.Rule.`test file suffix Tests`.`Edge Case` {
     }
 }
 
-extension Lint.Rule.`test file suffix Tests`.Integration {
+extension `Lint.Rule Tests`.`test file suffix Tests`.Integration {
     @Test
     func `helper file with no Suite or Test declarations must not fire`() {
-        let findings = Lint.Rule.`test file suffix Tests`.findings(
-            source: Lint.Rule.`test file suffix Tests`.helperSource,
+        let findings = `Lint.Rule Tests`.`test file suffix Tests`.findings(
+            source: `Lint.Rule Tests`.`test file suffix Tests`.helperSource,
             file: "Tests/Support/Fixture.swift"
         )
         #expect(findings.isEmpty)
@@ -214,7 +214,7 @@ extension Lint.Rule.`test file suffix Tests`.Integration {
 
             @Test func `fixture round-trips`() {}
             """
-        let findings = Lint.Rule.`test file suffix Tests`.findings(
+        let findings = `Lint.Rule Tests`.`test file suffix Tests`.findings(
             source: source,
             file: "Tests/Support/Fixture.swift"
         )
@@ -223,8 +223,8 @@ extension Lint.Rule.`test file suffix Tests`.Integration {
 
     @Test
     func `non-test targets are out of scope entirely`() {
-        let findings = Lint.Rule.`test file suffix Tests`.findings(
-            source: Lint.Rule.`test file suffix Tests`.suiteSource,
+        let findings = `Lint.Rule Tests`.`test file suffix Tests`.findings(
+            source: `Lint.Rule Tests`.`test file suffix Tests`.suiteSource,
             file: "Sources/File/FileTests.swift"
         )
         #expect(findings.isEmpty)
@@ -239,11 +239,11 @@ extension Lint.Rule.`test file suffix Tests`.Integration {
         #expect(conformingName.hasSuffix(" Tests.swift"))
         let joinedName =
             Swift::String(conformingName.dropLast(" Tests.swift".count)) + "Tests.swift"
-        let firing = Lint.Rule.`test file suffix Tests`.findings(
+        let firing = `Lint.Rule Tests`.`test file suffix Tests`.findings(
             source: "@Suite struct `test file suffix Tests` {}",
             file: "Tests/Institute Linter Rule Testing Tests/\(joinedName)"
         )
-        let conforming = Lint.Rule.`test file suffix Tests`.findings(
+        let conforming = `Lint.Rule Tests`.`test file suffix Tests`.findings(
             source: "@Suite struct `test file suffix Tests` {}",
             file: "Tests/Institute Linter Rule Testing Tests/\(conformingName)"
         )

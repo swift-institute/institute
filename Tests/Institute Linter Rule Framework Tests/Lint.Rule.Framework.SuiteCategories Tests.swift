@@ -17,7 +17,9 @@ import Testing
 
 @testable import Institute_Linter_Rule_Framework
 
-extension Lint.Rule {
+enum `Lint.Rule Tests` {}
+
+extension `Lint.Rule Tests` {
     @Suite
     struct `suite categories Tests` {
         @Suite struct Unit {}
@@ -26,14 +28,14 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`suite categories Tests` {
+extension `Lint.Rule Tests`.`suite categories Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`suite categories`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`suite categories Tests`.Unit {
+extension `Lint.Rule Tests`.`suite categories Tests`.Unit {
     @Test
     func `canonical three-category structure passes`() {
         // Canonical post-2026-05-15: three sub-suites required
@@ -48,7 +50,7 @@ extension Lint.Rule.`suite categories Tests`.Unit {
                 @Suite struct Integration {}
             }
             """
-        let findings = Lint.Rule.`suite categories Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`suite categories Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -67,7 +69,7 @@ extension Lint.Rule.`suite categories Tests`.Unit {
                 @Suite(.serialized) struct Performance {}
             }
             """
-        let findings = Lint.Rule.`suite categories Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`suite categories Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -79,7 +81,7 @@ extension Lint.Rule.`suite categories Tests`.Unit {
                 @Test func basic() {}
             }
             """
-        let findings = Lint.Rule.`suite categories Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`suite categories Tests`.findings(in: source)
         let count = findings.count
         #expect(count == 1)
         if count == 1 {
@@ -101,7 +103,7 @@ extension Lint.Rule.`suite categories Tests`.Unit {
                 @Suite struct Integration {}
             }
             """
-        let findings = Lint.Rule.`suite categories Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`suite categories Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -114,7 +116,7 @@ extension Lint.Rule.`suite categories Tests`.Unit {
                 @Suite struct `Edge Case` {}
             }
             """
-        let findings = Lint.Rule.`suite categories Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`suite categories Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -129,7 +131,7 @@ extension Lint.Rule.`suite categories Tests`.Unit {
                 @Suite struct Unit {}
             }
             """
-        let findings = Lint.Rule.`suite categories Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`suite categories Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].message.contains("Edge Case"))
@@ -151,7 +153,7 @@ extension Lint.Rule.`suite categories Tests`.Unit {
                 @Testing.Suite struct Integration {}
             }
             """
-        let findings = Lint.Rule.`suite categories Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`suite categories Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -166,12 +168,12 @@ extension Lint.Rule.`suite categories Tests`.Unit {
                 @Test func basic() {}
             }
             """
-        let findings = Lint.Rule.`suite categories Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`suite categories Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`suite categories Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`suite categories Tests`.`Edge Case` {
     @Test
     func `extension-form file (no top-level @Suite struct) is not flagged`() {
         // Extension form contributes tests via `extension X.Test.Unit`.
@@ -185,7 +187,7 @@ extension Lint.Rule.`suite categories Tests`.`Edge Case` {
                 @Test func basic() {}
             }
             """
-        let findings = Lint.Rule.`suite categories Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`suite categories Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -207,7 +209,7 @@ extension Lint.Rule.`suite categories Tests`.`Edge Case` {
                 @Test func basic() {}
             }
             """
-        let findings = Lint.Rule.`suite categories Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`suite categories Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -218,7 +220,7 @@ extension Lint.Rule.`suite categories Tests`.`Edge Case` {
                 let value: Int
             }
             """
-        let findings = Lint.Rule.`suite categories Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`suite categories Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -237,14 +239,14 @@ extension Lint.Rule.`suite categories Tests`.`Edge Case` {
                 @Suite struct Integration {}
             }
             """
-        let findings = Lint.Rule.`suite categories Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`suite categories Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `empty source produces no findings`() {
         let source = ""
-        let findings = Lint.Rule.`suite categories Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`suite categories Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -262,7 +264,7 @@ extension Lint.Rule.`suite categories Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`suite categories Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`suite categories Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].message.contains("Edge Case"))
@@ -282,7 +284,7 @@ extension Lint.Rule.`suite categories Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`suite categories Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`suite categories Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -300,7 +302,7 @@ extension Lint.Rule.`suite categories Tests`.`Edge Case` {
                 @Suite struct Unit {}
             }
             """
-        let findings = Lint.Rule.`suite categories Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`suite categories Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -314,7 +316,7 @@ extension Lint.Rule.`suite categories Tests`.`Edge Case` {
                 @Suite struct Integration {}
             }
             """
-        let findings = Lint.Rule.`suite categories Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`suite categories Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].message.contains("Unit"))
@@ -334,7 +336,7 @@ extension Lint.Rule.`suite categories Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`suite categories Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`suite categories Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

@@ -18,7 +18,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Idiom
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `counter loop iteration fix Tests` {
         @Suite struct Unit {}
@@ -29,7 +29,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`counter loop iteration fix Tests` {
+extension `Lint.Rule Tests`.`counter loop iteration fix Tests` {
     /// The rewritten text, or `nil` when the rule declines to rewrite.
     static func fixed(_ source: String, file: String = "test.swift") -> String? {
         let parsed = Lint.Source.parsed(from: source, file: file)
@@ -75,7 +75,7 @@ extension Lint.Rule.`counter loop iteration fix Tests` {
     }
 }
 
-extension Lint.Rule.`counter loop iteration fix Tests`.`Round Trip` {
+extension `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Round Trip` {
     @Test
     func `half-open counter loop climbs to forEach`() {
         let source = """
@@ -85,9 +85,9 @@ extension Lint.Rule.`counter loop iteration fix Tests`.`Round Trip` {
                 }
             }
             """
-        Lint.Rule.`counter loop iteration fix Tests`.roundTrips(source)
+        `Lint.Rule Tests`.`counter loop iteration fix Tests`.roundTrips(source)
         #expect(
-            Lint.Rule.`counter loop iteration fix Tests`
+            `Lint.Rule Tests`.`counter loop iteration fix Tests`
                 .fixed(source)?.contains("(0..<items.count).forEach { i in") == true
         )
     }
@@ -101,7 +101,7 @@ extension Lint.Rule.`counter loop iteration fix Tests`.`Round Trip` {
                 }
             }
             """
-        Lint.Rule.`counter loop iteration fix Tests`.roundTrips(source)
+        `Lint.Rule Tests`.`counter loop iteration fix Tests`.roundTrips(source)
     }
 
     @Test
@@ -113,9 +113,9 @@ extension Lint.Rule.`counter loop iteration fix Tests`.`Round Trip` {
                 }
             }
             """
-        Lint.Rule.`counter loop iteration fix Tests`.roundTrips(source)
+        `Lint.Rule Tests`.`counter loop iteration fix Tests`.roundTrips(source)
         #expect(
-            Lint.Rule.`counter loop iteration fix Tests`.fixed(source)?.contains("((0..<n)")
+            `Lint.Rule Tests`.`counter loop iteration fix Tests`.fixed(source)?.contains("((0..<n)")
                 == false
         )
     }
@@ -130,14 +130,14 @@ extension Lint.Rule.`counter loop iteration fix Tests`.`Round Trip` {
                 }
             }
             """
-        Lint.Rule.`counter loop iteration fix Tests`.roundTrips(source)
-        let output = Lint.Rule.`counter loop iteration fix Tests`.fixed(source)
+        `Lint.Rule Tests`.`counter loop iteration fix Tests`.roundTrips(source)
+        let output = `Lint.Rule Tests`.`counter loop iteration fix Tests`.fixed(source)
         #expect(output?.contains("let doubled = index * 2") == true)
         #expect(output?.contains("record(doubled)") == true)
     }
 }
 
-extension Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable` {
+extension `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable` {
     /// Asserts the rule still fires but declines to rewrite — the loop stays
     /// a finding for a person to restructure.
     static func declines(
@@ -145,11 +145,11 @@ extension Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable` {
         sourceLocation: Testing.SourceLocation = #_sourceLocation
     ) {
         #expect(
-            !Lint.Rule.`counter loop iteration fix Tests`.findings(in: source).isEmpty,
+            !`Lint.Rule Tests`.`counter loop iteration fix Tests`.findings(in: source).isEmpty,
             sourceLocation: sourceLocation
         )
         #expect(
-            Lint.Rule.`counter loop iteration fix Tests`.fixed(source) == nil,
+            `Lint.Rule Tests`.`counter loop iteration fix Tests`.fixed(source) == nil,
             sourceLocation: sourceLocation
         )
     }
@@ -257,8 +257,8 @@ extension Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable` {
                 }
             }
             """
-        #expect(Lint.Rule.`counter loop iteration fix Tests`.findings(in: source).isEmpty)
-        #expect(Lint.Rule.`counter loop iteration fix Tests`.fixed(source) == nil)
+        #expect(`Lint.Rule Tests`.`counter loop iteration fix Tests`.findings(in: source).isEmpty)
+        #expect(`Lint.Rule Tests`.`counter loop iteration fix Tests`.fixed(source) == nil)
     }
 
     @Test
@@ -270,12 +270,12 @@ extension Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable` {
                 }
             }
             """
-        #expect(Lint.Rule.`counter loop iteration fix Tests`.findings(in: source).isEmpty)
-        #expect(Lint.Rule.`counter loop iteration fix Tests`.fixed(source) == nil)
+        #expect(`Lint.Rule Tests`.`counter loop iteration fix Tests`.findings(in: source).isEmpty)
+        #expect(`Lint.Rule Tests`.`counter loop iteration fix Tests`.fixed(source) == nil)
     }
 }
 
-extension Lint.Rule.`counter loop iteration fix Tests`.`Round Trip` {
+extension `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Round Trip` {
     @Test
     func `a single-line body climbs too`() {
         let source = """
@@ -284,11 +284,11 @@ extension Lint.Rule.`counter loop iteration fix Tests`.`Round Trip` {
                 for i in 0..<n { sum += i }
             }
             """
-        Lint.Rule.`counter loop iteration fix Tests`.roundTrips(source)
+        `Lint.Rule Tests`.`counter loop iteration fix Tests`.roundTrips(source)
     }
 }
 
-extension Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable` {
+extension `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable` {
     @Test
     func `a loop in a builder-attributed body is not rewritten`() {
         let source = """
@@ -301,7 +301,7 @@ extension Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable` {
                 }
             }
             """
-        Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable`.declines(source)
+        `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable`.declines(source)
     }
 
     @Test
@@ -315,7 +315,7 @@ extension Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable` {
                 }
             }
             """
-        Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable`.declines(source)
+        `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable`.declines(source)
     }
 
     @Test
@@ -329,11 +329,11 @@ extension Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable` {
                 }
             }
             """
-        Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable`.declines(source)
+        `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable`.declines(source)
     }
 }
 
-extension Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable` {
+extension `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable` {
     /// A closure's parameter signature does not prove the closure is a plain
     /// function value. `init(@ListBuilder content: (Int) -> [String])` is
     /// called exactly this way, and a builder with a `buildExpression(_:
@@ -347,7 +347,7 @@ extension Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable` {
                 }
             }
             """
-        Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable`.declines(source)
+        `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable`.declines(source)
     }
 
     /// The accepted false refusal that pays for the fixture above: a closure
@@ -366,7 +366,7 @@ extension Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable` {
                 }
             }
             """
-        Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable`.declines(source)
+        `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable`.declines(source)
     }
 
     @Test
@@ -379,7 +379,7 @@ extension Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable` {
                 }
             }
             """
-        Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable`.declines(source)
+        `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable`.declines(source)
     }
 
     @Test
@@ -390,7 +390,7 @@ extension Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable` {
                 for /* index into table */ j in 0..<n { sum += j }
             }
             """
-        Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable`.declines(source)
+        `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable`.declines(source)
     }
 
     @Test
@@ -404,11 +404,11 @@ extension Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable` {
                 }
             }
             """
-        Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable`.declines(source)
+        `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable`.declines(source)
     }
 }
 
-extension Lint.Rule.`counter loop iteration fix Tests`.`Round Trip` {
+extension `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Round Trip` {
     /// The guard is about comments, not about whitespace: an unusually spaced
     /// header still climbs.
     @Test
@@ -421,7 +421,7 @@ extension Lint.Rule.`counter loop iteration fix Tests`.`Round Trip` {
                 }
             }
             """
-        Lint.Rule.`counter loop iteration fix Tests`.roundTrips(source)
+        `Lint.Rule Tests`.`counter loop iteration fix Tests`.roundTrips(source)
     }
 
     /// A comment INSIDE the body is carried over with its statements, and is
@@ -437,15 +437,15 @@ extension Lint.Rule.`counter loop iteration fix Tests`.`Round Trip` {
                 }
             }
             """
-        Lint.Rule.`counter loop iteration fix Tests`.roundTrips(source)
+        `Lint.Rule Tests`.`counter loop iteration fix Tests`.roundTrips(source)
         #expect(
-            Lint.Rule.`counter loop iteration fix Tests`.fixed(source)?.contains("// accumulate")
+            `Lint.Rule Tests`.`counter loop iteration fix Tests`.fixed(source)?.contains("// accumulate")
                 == true
         )
     }
 }
 
-extension Lint.Rule.`counter loop iteration fix Tests`.`Round Trip` {
+extension `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Round Trip` {
     /// Positive control for #49: a plain body with no ownership-annotated
     /// parameter in scope still climbs to `forEach`, matching every other
     /// round-trip fixture in this file. Guards against a predicate that
@@ -461,7 +461,7 @@ extension Lint.Rule.`counter loop iteration fix Tests`.`Round Trip` {
                 return result
             }
             """
-        Lint.Rule.`counter loop iteration fix Tests`.roundTrips(source)
+        `Lint.Rule Tests`.`counter loop iteration fix Tests`.roundTrips(source)
     }
 
     /// Near-miss for #49: `rhs` carries an explicit `borrowing` modifier, but
@@ -480,11 +480,11 @@ extension Lint.Rule.`counter loop iteration fix Tests`.`Round Trip` {
                 return result
             }
             """
-        Lint.Rule.`counter loop iteration fix Tests`.roundTrips(source)
+        `Lint.Rule Tests`.`counter loop iteration fix Tests`.roundTrips(source)
     }
 }
 
-extension Lint.Rule.`counter loop iteration fix Tests`.`Not Fixable` {
+extension `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable` {
     /// #49 witness reproduction (swift-affine-geometry PR #5,
     /// head 499186f): a `borrowing` parameter referenced inside the loop
     /// body. The `forEach` translation would move the reference into a

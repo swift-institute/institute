@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Throws
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `do throws for typed catch with throw Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`do throws for typed catch with throw Tests` {
+extension `Lint.Rule Tests`.`do throws for typed catch with throw Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -38,7 +38,7 @@ extension Lint.Rule.`do throws for typed catch with throw Tests` {
     }
 }
 
-extension Lint.Rule.`do throws for typed catch with throw Tests`.Unit {
+extension `Lint.Rule Tests`.`do throws for typed catch with throw Tests`.Unit {
     @Test
     func `bare do throw catch is flagged`() {
         let source = """
@@ -50,7 +50,7 @@ extension Lint.Rule.`do throws for typed catch with throw Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch with throw Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch with throw Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "do throws for typed catch with throw")
@@ -71,7 +71,7 @@ extension Lint.Rule.`do throws for typed catch with throw Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch with throw Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch with throw Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -83,12 +83,12 @@ extension Lint.Rule.`do throws for typed catch with throw Tests`.Unit {
                 do { throw B.y } catch { handle(error) }
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch with throw Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch with throw Tests`.findings(in: source)
         #expect(findings.count == 2)
     }
 }
 
-extension Lint.Rule.`do throws for typed catch with throw Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`do throws for typed catch with throw Tests`.`Edge Case` {
     @Test
     func `typed do throw catch is NOT flagged`() {
         let source = """
@@ -100,7 +100,7 @@ extension Lint.Rule.`do throws for typed catch with throw Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch with throw Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch with throw Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -115,7 +115,7 @@ extension Lint.Rule.`do throws for typed catch with throw Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch with throw Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch with throw Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -131,7 +131,7 @@ extension Lint.Rule.`do throws for typed catch with throw Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch with throw Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch with throw Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -156,7 +156,7 @@ extension Lint.Rule.`do throws for typed catch with throw Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch with throw Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch with throw Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -169,7 +169,7 @@ extension Lint.Rule.`do throws for typed catch with throw Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch with throw Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch with throw Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -189,7 +189,7 @@ extension Lint.Rule.`do throws for typed catch with throw Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch with throw Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch with throw Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -204,7 +204,7 @@ extension Lint.Rule.`do throws for typed catch with throw Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch with throw Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch with throw Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -223,7 +223,7 @@ extension Lint.Rule.`do throws for typed catch with throw Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch with throw Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch with throw Tests`.findings(in: source)
         // Outer do has no direct throw; inner do has throw but already typed.
         // Neither should be flagged.
         #expect(findings.isEmpty)

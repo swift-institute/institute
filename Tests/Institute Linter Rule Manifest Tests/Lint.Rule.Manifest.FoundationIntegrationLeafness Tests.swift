@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Manifest
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `foundation integration leaf target Tests` {
         @Suite struct Unit {}
@@ -27,7 +27,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`foundation integration leaf target Tests` {
+extension `Lint.Rule Tests`.`foundation integration leaf target Tests` {
     static func findings(
         source: Swift::String,
         file: Swift::String = "Package.swift"
@@ -44,7 +44,7 @@ extension Lint.Rule.`foundation integration leaf target Tests` {
     }
 }
 
-extension Lint.Rule.`foundation integration leaf target Tests`.Negative {
+extension `Lint.Rule Tests`.`foundation integration leaf target Tests`.Negative {
     @Test
     func `sanctioned shape - own leaf product, no incoming edge - is NOT flagged`() {
         // Reference sanctioned shape: swift-structured-queries'
@@ -79,7 +79,7 @@ extension Lint.Rule.`foundation integration leaf target Tests`.Negative {
               ]
             )
             """
-        let findings = Lint.Rule.`foundation integration leaf target Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`foundation integration leaf target Tests`.findings(source: source)
         #expect(findings.isEmpty)
     }
 
@@ -104,7 +104,7 @@ extension Lint.Rule.`foundation integration leaf target Tests`.Negative {
               ]
             )
             """
-        let findings = Lint.Rule.`foundation integration leaf target Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`foundation integration leaf target Tests`.findings(source: source)
         #expect(findings.isEmpty)
     }
 
@@ -116,7 +116,7 @@ extension Lint.Rule.`foundation integration leaf target Tests`.Negative {
                 dependencies: []
             )
             """
-        let findings = Lint.Rule.`foundation integration leaf target Tests`.findings(
+        let findings = `Lint.Rule Tests`.`foundation integration leaf target Tests`.findings(
             source: source,
             file: "Sources/X/Notes.swift"
         )
@@ -137,18 +137,18 @@ extension Lint.Rule.`foundation integration leaf target Tests`.Negative {
               ]
             )
             """
-        let findings = Lint.Rule.`foundation integration leaf target Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`foundation integration leaf target Tests`.findings(source: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `empty file produces no findings`() {
-        let findings = Lint.Rule.`foundation integration leaf target Tests`.findings(source: "")
+        let findings = `Lint.Rule Tests`.`foundation integration leaf target Tests`.findings(source: "")
         #expect(findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`foundation integration leaf target Tests`.Unit {
+extension `Lint.Rule Tests`.`foundation integration leaf target Tests`.Unit {
     @Test
     func `Foundation Integration target folded into a shared product is flagged`() {
         // Condition (b) violated: not a leaf product of its own — bundled
@@ -168,7 +168,7 @@ extension Lint.Rule.`foundation integration leaf target Tests`.Unit {
               ]
             )
             """
-        let findings = Lint.Rule.`foundation integration leaf target Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`foundation integration leaf target Tests`.findings(source: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "foundation integration leaf target")
@@ -192,7 +192,7 @@ extension Lint.Rule.`foundation integration leaf target Tests`.Unit {
               ]
             )
             """
-        let findings = Lint.Rule.`foundation integration leaf target Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`foundation integration leaf target Tests`.findings(source: source)
         #expect(findings.count == 1)
     }
 
@@ -210,7 +210,7 @@ extension Lint.Rule.`foundation integration leaf target Tests`.Unit {
               ]
             )
             """
-        let findings = Lint.Rule.`foundation integration leaf target Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`foundation integration leaf target Tests`.findings(source: source)
         #expect(findings.count == 1)
     }
 
@@ -228,7 +228,7 @@ extension Lint.Rule.`foundation integration leaf target Tests`.Unit {
               ]
             )
             """
-        let findings = Lint.Rule.`foundation integration leaf target Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`foundation integration leaf target Tests`.findings(source: source)
         #expect(findings.count == 1)
     }
 
@@ -249,7 +249,7 @@ extension Lint.Rule.`foundation integration leaf target Tests`.Unit {
               ]
             )
             """
-        let findings = Lint.Rule.`foundation integration leaf target Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`foundation integration leaf target Tests`.findings(source: source)
         #expect(findings.count == 1)
     }
 
@@ -271,7 +271,7 @@ extension Lint.Rule.`foundation integration leaf target Tests`.Unit {
               ]
             )
             """
-        let findings = Lint.Rule.`foundation integration leaf target Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`foundation integration leaf target Tests`.findings(source: source)
         #expect(findings.count == 1)
     }
 
@@ -290,7 +290,7 @@ extension Lint.Rule.`foundation integration leaf target Tests`.Unit {
               ]
             )
             """
-        let findings = Lint.Rule.`foundation integration leaf target Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`foundation integration leaf target Tests`.findings(source: source)
         #expect(findings.count == 1)
     }
 
@@ -316,12 +316,12 @@ extension Lint.Rule.`foundation integration leaf target Tests`.Unit {
               ]
             )
             """
-        let findings = Lint.Rule.`foundation integration leaf target Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`foundation integration leaf target Tests`.findings(source: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`foundation integration leaf target Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`foundation integration leaf target Tests`.`Edge Case` {
     @Test
     func `computed product target list is unmeasured`() {
         let source = """
@@ -331,7 +331,7 @@ extension Lint.Rule.`foundation integration leaf target Tests`.`Edge Case` {
               targets: [.target(name: "X Foundation Integration")]
             )
             """
-        let observation = Lint.Rule.`foundation integration leaf target Tests`.observation(
+        let observation = `Lint.Rule Tests`.`foundation integration leaf target Tests`.observation(
             source: source
         )
         guard case .unmeasured = observation.coverage else {
@@ -354,7 +354,7 @@ extension Lint.Rule.`foundation integration leaf target Tests`.`Edge Case` {
               ]
             )
             """
-        let findings = Lint.Rule.`foundation integration leaf target Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`foundation integration leaf target Tests`.findings(source: source)
         #expect(findings.count == 1)
     }
 
@@ -379,7 +379,7 @@ extension Lint.Rule.`foundation integration leaf target Tests`.`Edge Case` {
               ]
             )
             """
-        let findings = Lint.Rule.`foundation integration leaf target Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`foundation integration leaf target Tests`.findings(source: source)
         #expect(findings.count == 1)
     }
 }

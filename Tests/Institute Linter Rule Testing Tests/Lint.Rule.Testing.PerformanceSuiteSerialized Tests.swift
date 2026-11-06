@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Testing
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `performance suite serialized Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`performance suite serialized Tests` {
+extension `Lint.Rule Tests`.`performance suite serialized Tests` {
     static func findings(
         in source: String,
         file: String = "Sources/X/Test.swift"
@@ -38,13 +38,13 @@ extension Lint.Rule.`performance suite serialized Tests` {
     }
 }
 
-extension Lint.Rule.`performance suite serialized Tests`.Unit {
+extension `Lint.Rule Tests`.`performance suite serialized Tests`.Unit {
     @Test
     func `Performance suite without serialized is flagged`() {
         let source = """
             @Suite struct Performance {}
             """
-        let findings = Lint.Rule.`performance suite serialized Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`performance suite serialized Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -53,7 +53,7 @@ extension Lint.Rule.`performance suite serialized Tests`.Unit {
         let source = """
             @Suite(.serialized) struct Performance {}
             """
-        let findings = Lint.Rule.`performance suite serialized Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`performance suite serialized Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -65,7 +65,7 @@ extension Lint.Rule.`performance suite serialized Tests`.Unit {
         let source = """
             @Suite(.notSerialized) struct Performance {}
             """
-        let findings = Lint.Rule.`performance suite serialized Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`performance suite serialized Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -74,7 +74,7 @@ extension Lint.Rule.`performance suite serialized Tests`.Unit {
         let source = """
             struct Performance {}
             """
-        let findings = Lint.Rule.`performance suite serialized Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`performance suite serialized Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -90,7 +90,7 @@ extension Lint.Rule.`performance suite serialized Tests`.Unit {
                 @Test func f() {}
             }
             """
-        let findings = Lint.Rule.`performance suite serialized Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`performance suite serialized Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -101,7 +101,7 @@ extension Lint.Rule.`performance suite serialized Tests`.Unit {
                 @Test static func f() {}
             }
             """
-        let findings = Lint.Rule.`performance suite serialized Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`performance suite serialized Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -112,7 +112,7 @@ extension Lint.Rule.`performance suite serialized Tests`.Unit {
                 @Test func f() {}
             }
             """
-        let findings = Lint.Rule.`performance suite serialized Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`performance suite serialized Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -123,7 +123,7 @@ extension Lint.Rule.`performance suite serialized Tests`.Unit {
                 @Test func f() {}
             }
             """
-        let findings = Lint.Rule.`performance suite serialized Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`performance suite serialized Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -132,7 +132,7 @@ extension Lint.Rule.`performance suite serialized Tests`.Unit {
         let source = """
             @Suite struct Unit {}
             """
-        let findings = Lint.Rule.`performance suite serialized Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`performance suite serialized Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -141,7 +141,7 @@ extension Lint.Rule.`performance suite serialized Tests`.Unit {
         let source = """
             @Suite(.tags(.benchmark), .serialized) struct Performance {}
             """
-        let findings = Lint.Rule.`performance suite serialized Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`performance suite serialized Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

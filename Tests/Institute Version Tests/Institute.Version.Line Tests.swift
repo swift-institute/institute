@@ -3,14 +3,16 @@ import Testing
 
 @testable import Institute_Version
 
-extension Institute.Version.Line {
+enum `Institute.Version.Line Tests` {}
+
+extension `Institute.Version.Line Tests` {
     @Suite struct Test {
         @Suite struct Unit {}
         @Suite struct `Edge Case` {}
     }
 }
 
-extension Institute.Version.Line.Test.Unit {
+extension `Institute.Version.Line Tests`.Test.Unit {
     @Test func `the development line starts at 0.0.100`() {
         let line = Institute.Version.Line.development
         #expect(line.stem == "0.0.")
@@ -36,7 +38,7 @@ extension Institute.Version.Line.Test.Unit {
     }
 }
 
-extension Institute.Version.Line.Test.`Edge Case` {
+extension `Institute.Version.Line Tests`.Test.`Edge Case` {
     @Test(arguments: [
         "ci-binaries", "0.0.", "0.0.0100", "v0.0.100", "0.0.100-dev.1", "0.0.100+build", "0.1.100", "0.0.1a",
     ])

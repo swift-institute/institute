@@ -4,7 +4,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Naming
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `associated type shadows namespace Tests` {
         @Suite struct Unit {}
@@ -12,7 +12,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`associated type shadows namespace Tests` {
+extension `Lint.Rule Tests`.`associated type shadows namespace Tests` {
     static func findings(_ source: Swift::String) -> [Diagnostic.Record] {
         Lint.Rule.`associated type shadows namespace`
             .observe(Lint.Source.parsed(from: source, file: "Sources/Fixture/Fixture.swift"), .warning)
@@ -20,10 +20,10 @@ extension Lint.Rule.`associated type shadows namespace Tests` {
     }
 }
 
-extension Lint.Rule.`associated type shadows namespace Tests`.Unit {
+extension `Lint.Rule Tests`.`associated type shadows namespace Tests`.Unit {
     @Test
     func `associated type matching the enclosing namespace is flagged`() {
-        let findings = Lint.Rule.`associated type shadows namespace Tests`.findings(
+        let findings = `Lint.Rule Tests`.`associated type shadows namespace Tests`.findings(
             "extension Coder { protocol Codable { associatedtype Coder } }"
         )
         #expect(findings.count == 1)
@@ -40,17 +40,17 @@ extension Lint.Rule.`associated type shadows namespace Tests`.Unit {
 
     @Test
     func `top-level protocol typealias is lawful`() {
-        let findings = Lint.Rule.`associated type shadows namespace Tests`.findings(
+        let findings = `Lint.Rule Tests`.`associated type shadows namespace Tests`.findings(
             "public typealias Coding = Coder.Protocol"
         )
         #expect(findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`associated type shadows namespace Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`associated type shadows namespace Tests`.`Edge Case` {
     @Test
     func `nested nominal type in qualified extension still fires`() {
-        let findings = Lint.Rule.`associated type shadows namespace Tests`.findings(
+        let findings = `Lint.Rule Tests`.`associated type shadows namespace Tests`.findings(
             "extension Coder.Codable { struct Coder {} }"
         )
         #expect(findings.count == 1)
@@ -58,7 +58,7 @@ extension Lint.Rule.`associated type shadows namespace Tests`.`Edge Case` {
 
     @Test
     func `different associated type name is lawful`() {
-        let findings = Lint.Rule.`associated type shadows namespace Tests`.findings(
+        let findings = `Lint.Rule Tests`.`associated type shadows namespace Tests`.findings(
             "extension Coder { protocol Codable { associatedtype Value } }"
         )
         #expect(findings.isEmpty)
@@ -66,7 +66,7 @@ extension Lint.Rule.`associated type shadows namespace Tests`.`Edge Case` {
 
     @Test
     func `same name inside an ordinary nested type is outside the predicate`() {
-        let findings = Lint.Rule.`associated type shadows namespace Tests`.findings(
+        let findings = `Lint.Rule Tests`.`associated type shadows namespace Tests`.findings(
             "extension Coder { struct Container { struct Coder {} } }"
         )
         #expect(findings.isEmpty)

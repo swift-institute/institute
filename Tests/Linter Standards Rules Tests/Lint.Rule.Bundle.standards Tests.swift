@@ -17,7 +17,9 @@ import Linter_Institute_Rules
 import Linter_Standards_Rules
 import Testing
 
-extension Lint.Rule.Bundle {
+enum `Lint.Rule.Bundle Tests` {}
+
+extension `Lint.Rule.Bundle Tests` {
     @Suite
     struct `standards Tests` {
         @Suite struct Unit {}
@@ -26,7 +28,7 @@ extension Lint.Rule.Bundle {
     }
 }
 
-extension Lint.Rule.Bundle.`standards Tests` {
+extension `Lint.Rule.Bundle Tests`.`standards Tests` {
     /// The standards bundle removes EXACTLY the two compound-naming rules
     /// and the two file-naming rules from the institute bundle — no more,
     /// no fewer.

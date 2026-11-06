@@ -4,7 +4,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Architecture
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `exported import Tests` {
         @Suite struct Unit {}
@@ -13,7 +13,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`exported import Tests` {
+extension `Lint.Rule Tests`.`exported import Tests` {
     static func findings(
         _ source: Swift::String,
         file: Swift::String = "Sources/Fixture/exports.swift"
@@ -24,10 +24,10 @@ extension Lint.Rule.`exported import Tests` {
     }
 }
 
-extension Lint.Rule.`exported import Tests`.Unit {
+extension `Lint.Rule Tests`.`exported import Tests`.Unit {
     @Test
     func `every exported import outside exports swift is flagged`() {
-        let findings = Lint.Rule.`exported import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`exported import Tests`.findings(
             """
             @_exported public import Owner
             @_exported import Other
@@ -41,17 +41,17 @@ extension Lint.Rule.`exported import Tests`.Unit {
 
     @Test
     func `plain imports are clean`() {
-        let findings = Lint.Rule.`exported import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`exported import Tests`.findings(
             "public import Owner\ninternal import Other"
         )
         #expect(findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`exported import Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`exported import Tests`.`Edge Case` {
     @Test
     func `a public whole-module re-export in a target's exports swift is exempt`() {
-        let findings = Lint.Rule.`exported import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`exported import Tests`.findings(
             """
             @_exported public import Owner
             @_exported public import Other_Module
@@ -62,7 +62,7 @@ extension Lint.Rule.`exported import Tests`.`Edge Case` {
 
     @Test
     func `the exemption holds for an absolute checkout path`() {
-        let findings = Lint.Rule.`exported import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`exported import Tests`.findings(
             "@_exported public import Owner",
             file: "/workspace/swift-fixture/Sources/Fixture Core/exports.swift"
         )
@@ -71,7 +71,7 @@ extension Lint.Rule.`exported import Tests`.`Edge Case` {
 
     @Test
     func `a non-public or scoped re-export in exports swift is still flagged`() {
-        let findings = Lint.Rule.`exported import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`exported import Tests`.findings(
             """
             @_exported import Owner
             @_exported package import Other
@@ -91,7 +91,7 @@ extension Lint.Rule.`exported import Tests`.`Edge Case` {
             "Sources/Fixture/Nested/exports.swift",
             "Sources/exports.swift",
         ] {
-            let findings = Lint.Rule.`exported import Tests`.findings(
+            let findings = `Lint.Rule Tests`.`exported import Tests`.findings(
                 "@_exported public import Owner",
                 file: file
             )
@@ -101,7 +101,7 @@ extension Lint.Rule.`exported import Tests`.`Edge Case` {
 
     @Test
     func `tests are out of scope`() {
-        let findings = Lint.Rule.`exported import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`exported import Tests`.findings(
             "@_exported import Owner",
             file: "Tests/Fixture Tests/exports.swift"
         )
@@ -110,17 +110,17 @@ extension Lint.Rule.`exported import Tests`.`Edge Case` {
 
     @Test
     func `a scoped exported import is flagged`() {
-        let findings = Lint.Rule.`exported import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`exported import Tests`.findings(
             "@_exported import struct Owner.Value"
         )
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`exported import Tests`.Integration {
+extension `Lint.Rule Tests`.`exported import Tests`.Integration {
     @Test
     func `an exported import behind a condition is flagged`() {
-        let findings = Lint.Rule.`exported import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`exported import Tests`.findings(
             """
             #if canImport(Owner)
             @_exported public import Owner
@@ -133,7 +133,7 @@ extension Lint.Rule.`exported import Tests`.Integration {
 
     @Test
     func `a conditional re-export in exports swift is exempt`() {
-        let findings = Lint.Rule.`exported import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`exported import Tests`.findings(
             """
             #if canImport(Owner)
             @_exported public import Owner

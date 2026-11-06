@@ -7,14 +7,16 @@ import Testing
 
 /// The controls of `verify-planner-pins-tests.sh`, case for case, against
 /// the Swift contract: the two must accept and refuse the same inputs.
-extension Institute.Planner.Contract {
+enum `Institute.Planner.Contract Tests` {}
+
+extension `Institute.Planner.Contract Tests` {
     @Suite struct Test {
         @Suite struct Unit {}
         @Suite struct `Edge Case` {}
     }
 }
 
-extension Institute.Planner.Contract.Test {
+extension `Institute.Planner.Contract Tests`.Test {
     static let old = String(repeating: "b", count: 40)
 
     /// A release holding one published planner per platform, a pin on it,
@@ -31,7 +33,7 @@ extension Institute.Planner.Contract.Test {
             ledger =
                 [
                     "# rows",
-                    "\(Institute.Planner.Contract.Test.old) linux-x86_64 \(String(repeating: "c", count: 64)) \(String(repeating: "d", count: 64))",
+                    "\(`Institute.Planner.Contract Tests`.Test.old) linux-x86_64 \(String(repeating: "c", count: 64)) \(String(repeating: "d", count: 64))",
                 ] + rows
         }
 
@@ -61,13 +63,13 @@ extension Institute.Planner.Contract.Test {
     }
 }
 
-extension Institute.Planner.Contract.Test.Unit {
+extension `Institute.Planner.Contract Tests`.Test.Unit {
     @Test func `published rows for both platforms pass`() {
-        #expect(Institute.Planner.Contract.Test.Scenario().verify() == nil)
+        #expect(`Institute.Planner.Contract Tests`.Test.Scenario().verify() == nil)
     }
 
     @Test func `a repeated published row passes`() {
-        var scenario = Institute.Planner.Contract.Test.Scenario()
+        var scenario = `Institute.Planner.Contract Tests`.Test.Scenario()
         scenario.ledger.append(scenario.row(.linux))
         #expect(scenario.verify() == nil)
     }
@@ -76,7 +78,7 @@ extension Institute.Planner.Contract.Test.Unit {
     /// scenario below, with its row published, passes every other check.
     /// The refusal there is therefore the publication check's alone.
     @Test func `the hand-typed-row scenario passes once its row is published`() {
-        var scenario = Institute.Planner.Contract.Test.Scenario()
+        var scenario = `Institute.Planner.Contract Tests`.Test.Scenario()
         scenario.unpublish(.macos)
         scenario.fixture.assets["PIN-\(Institute.Planner.Fixture.candidate)-201"] = [Byte](
             utf8: scenario.row(.macos) + "\n"
@@ -85,15 +87,15 @@ extension Institute.Planner.Contract.Test.Unit {
     }
 }
 
-extension Institute.Planner.Contract.Test.`Edge Case` {
+extension `Institute.Planner.Contract Tests`.Test.`Edge Case` {
     @Test func `a row typed by hand, never published, is refused`() {
-        var scenario = Institute.Planner.Contract.Test.Scenario()
+        var scenario = `Institute.Planner.Contract Tests`.Test.Scenario()
         scenario.unpublish(.macos)
         #expect(scenario.verify() == .unpublished(scenario.row(.macos)))
     }
 
     @Test func `the last row wins and naming a missing binary is refused`() {
-        var scenario = Institute.Planner.Contract.Test.Scenario()
+        var scenario = `Institute.Planner.Contract Tests`.Test.Scenario()
         let extra = "\(Institute.Planner.Fixture.candidate) linux-x86_64 \(String(repeating: "e", count: 64)) \(String(repeating: "f", count: 64))"
         scenario.ledger.append(extra)
         scenario.fixture.assets["PIN-\(Institute.Planner.Fixture.candidate)-201"] = [Byte](utf8: extra + "\n")
@@ -104,7 +106,7 @@ extension Institute.Planner.Contract.Test.`Edge Case` {
     }
 
     @Test func `a pinned revision without a macOS row is refused`() {
-        var scenario = Institute.Planner.Contract.Test.Scenario()
+        var scenario = `Institute.Planner.Contract Tests`.Test.Scenario()
         scenario.ledger.removeAll { $0.contains(" macos-arm64 ") }
         #expect(
             scenario.verify()
@@ -115,19 +117,19 @@ extension Institute.Planner.Contract.Test.`Edge Case` {
     /// The old revision keeps a Linux row, so — as in the shell contract,
     /// which checks Linux first — the refusal is that row being unpublished.
     @Test func `a pin naming a revision with no published rows is refused`() {
-        var scenario = Institute.Planner.Contract.Test.Scenario()
-        scenario.pin = "\(Institute.Planner.Contract.Test.old)\n"
+        var scenario = `Institute.Planner.Contract Tests`.Test.Scenario()
+        scenario.pin = "\(`Institute.Planner.Contract Tests`.Test.old)\n"
         #expect(scenario.verify() == .unpublished(scenario.ledger[1]))
         scenario.ledger.remove(at: 1)
         #expect(
             scenario.verify()
-                == .absent(revision: Institute.Planner.Contract.Test.old, platform: "linux-x86_64")
+                == .absent(revision: `Institute.Planner.Contract Tests`.Test.old, platform: "linux-x86_64")
         )
     }
 
     @Test func `two pin lines are refused`() {
-        var scenario = Institute.Planner.Contract.Test.Scenario()
-        scenario.pin = "\(Institute.Planner.Fixture.candidate)\n\(Institute.Planner.Contract.Test.old)\n"
+        var scenario = `Institute.Planner.Contract Tests`.Test.Scenario()
+        scenario.pin = "\(Institute.Planner.Fixture.candidate)\n\(`Institute.Planner.Contract Tests`.Test.old)\n"
         guard case .malformed = scenario.verify() else {
             Issue.record("expected malformed")
             return
@@ -135,7 +137,7 @@ extension Institute.Planner.Contract.Test.`Edge Case` {
     }
 
     @Test func `a pin that is not a revision is refused`() {
-        var scenario = Institute.Planner.Contract.Test.Scenario()
+        var scenario = `Institute.Planner.Contract Tests`.Test.Scenario()
         scenario.pin = "main\n"
         guard case .malformed = scenario.verify() else {
             Issue.record("expected malformed")
@@ -144,7 +146,7 @@ extension Institute.Planner.Contract.Test.`Edge Case` {
     }
 
     @Test func `a malformed digest is refused`() {
-        var scenario = Institute.Planner.Contract.Test.Scenario()
+        var scenario = `Institute.Planner.Contract Tests`.Test.Scenario()
         scenario.ledger.append("\(Institute.Planner.Fixture.candidate) linux-x86_64 short \(String(repeating: "d", count: 64))")
         guard case .malformed = scenario.verify() else {
             Issue.record("expected malformed")
@@ -153,13 +155,13 @@ extension Institute.Planner.Contract.Test.`Edge Case` {
     }
 
     @Test func `an unknown platform is refused`() {
-        var scenario = Institute.Planner.Contract.Test.Scenario()
+        var scenario = `Institute.Planner.Contract Tests`.Test.Scenario()
         scenario.ledger.append("\(Institute.Planner.Fixture.candidate) windows-x86_64 \(String(repeating: "c", count: 64)) \(String(repeating: "d", count: 64))")
         #expect(scenario.verify() == .platform("windows-x86_64"))
     }
 
     @Test func `a trailing field is refused`() {
-        var scenario = Institute.Planner.Contract.Test.Scenario()
+        var scenario = `Institute.Planner.Contract Tests`.Test.Scenario()
         scenario.ledger.append(scenario.row(.macos) + " extra")
         guard case .malformed = scenario.verify() else {
             Issue.record("expected malformed")
@@ -168,7 +170,7 @@ extension Institute.Planner.Contract.Test.`Edge Case` {
     }
 
     @Test func `a replaced binary is refused`() throws {
-        var scenario = Institute.Planner.Contract.Test.Scenario()
+        var scenario = `Institute.Planner.Contract Tests`.Test.Scenario()
         let row = try Institute.Planner.Row(line: scenario.row(.linux))
         scenario.fixture.assets["institute-linux-x86_64-\(row.binary.hex)"]?.append(contentsOf: [Byte](utf8: "tampered\n"))
         guard case .mismatch = scenario.verify() else {
@@ -178,7 +180,7 @@ extension Institute.Planner.Contract.Test.`Edge Case` {
     }
 
     @Test func `a missing graph is refused`() throws {
-        var scenario = Institute.Planner.Contract.Test.Scenario()
+        var scenario = `Institute.Planner.Contract Tests`.Test.Scenario()
         let row = try Institute.Planner.Row(line: scenario.row(.macos))
         scenario.fixture.assets["Package.resolved-macos-arm64-\(row.graph.hex)"] = nil
         #expect(scenario.verify() == .missing("release asset Package.resolved-macos-arm64-\(row.graph.hex)"))

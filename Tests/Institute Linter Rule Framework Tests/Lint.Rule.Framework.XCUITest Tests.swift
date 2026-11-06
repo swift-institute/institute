@@ -15,7 +15,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Framework
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `xcuitest reference Tests` {
         @Suite struct Unit {}
@@ -24,14 +24,14 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`xcuitest reference Tests` {
+extension `Lint.Rule Tests`.`xcuitest reference Tests` {
     static func findings(in source: String, file: String) -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`xcuitest reference`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`xcuitest reference Tests`.Unit {
+extension `Lint.Rule Tests`.`xcuitest reference Tests`.Unit {
     @Test
     func `XCUITest references in a UI test target are warnings`() {
         let source = """
@@ -39,7 +39,7 @@ extension Lint.Rule.`xcuitest reference Tests`.Unit {
             let element: XCUIElement
             let query: XCUIElementQuery
             """
-        let findings = Lint.Rule.`xcuitest reference Tests`.findings(
+        let findings = `Lint.Rule Tests`.`xcuitest reference Tests`.findings(
             in: source,
             file: "Tests/Example UI Tests/Launch Tests.swift"
         )
@@ -51,7 +51,7 @@ extension Lint.Rule.`xcuitest reference Tests`.Unit {
 
     @Test
     func `XCTest import in a UI test target is a warning`() {
-        let findings = Lint.Rule.`xcuitest reference Tests`.findings(
+        let findings = `Lint.Rule Tests`.`xcuitest reference Tests`.findings(
             in: "import XCTest",
             file: "Tests/Example UI Tests/Launch Tests.swift"
         )
@@ -59,7 +59,7 @@ extension Lint.Rule.`xcuitest reference Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`xcuitest reference Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`xcuitest reference Tests`.`Edge Case` {
     @Test
     func `lawful Swift Testing suite is clean`() {
         let source = """
@@ -69,7 +69,7 @@ extension Lint.Rule.`xcuitest reference Tests`.`Edge Case` {
                 @Test func starts() {}
             }
             """
-        let findings = Lint.Rule.`xcuitest reference Tests`.findings(
+        let findings = `Lint.Rule Tests`.`xcuitest reference Tests`.findings(
             in: source,
             file: "Tests/Example UI Tests/Launch Tests.swift"
         )
@@ -85,7 +85,7 @@ extension Lint.Rule.`xcuitest reference Tests`.`Edge Case` {
                 _ = XCUIApplication()
             }
             """
-        let findings = Lint.Rule.`xcuitest reference Tests`.findings(
+        let findings = `Lint.Rule Tests`.`xcuitest reference Tests`.findings(
             in: source,
             file: "Tests/Example UI Tests/Launch Tests.swift"
         )
@@ -94,7 +94,7 @@ extension Lint.Rule.`xcuitest reference Tests`.`Edge Case` {
 
     @Test
     func `same identifiers outside a UI test target are clean`() {
-        let findings = Lint.Rule.`xcuitest reference Tests`.findings(
+        let findings = `Lint.Rule Tests`.`xcuitest reference Tests`.findings(
             in: "let application = XCUIApplication()",
             file: "Tests/Example Tests/Launch Tests.swift"
         )

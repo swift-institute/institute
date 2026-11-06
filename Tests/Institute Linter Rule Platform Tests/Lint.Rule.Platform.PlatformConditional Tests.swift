@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Platform
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `canimport conditional Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`canimport conditional Tests` {
+extension `Lint.Rule Tests`.`canimport conditional Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -38,7 +38,7 @@ extension Lint.Rule.`canimport conditional Tests` {
     }
 }
 
-extension Lint.Rule.`canimport conditional Tests`.Unit {
+extension `Lint.Rule Tests`.`canimport conditional Tests`.Unit {
     @Test
     func `canImport Darwin Kernel Standard is flagged`() {
         let source = """
@@ -46,7 +46,7 @@ extension Lint.Rule.`canimport conditional Tests`.Unit {
             import Darwin_Kernel_Standard
             #endif
             """
-        let findings = Lint.Rule.`canimport conditional Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`canimport conditional Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "canimport conditional")
@@ -65,7 +65,7 @@ extension Lint.Rule.`canimport conditional Tests`.Unit {
             import Darwin
             #endif
             """
-        let findings = Lint.Rule.`canimport conditional Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`canimport conditional Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -76,7 +76,7 @@ extension Lint.Rule.`canimport conditional Tests`.Unit {
             import CInterop
             #endif
             """
-        let findings = Lint.Rule.`canimport conditional Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`canimport conditional Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -89,7 +89,7 @@ extension Lint.Rule.`canimport conditional Tests`.Unit {
             import Glibc
             #endif
             """
-        let findings = Lint.Rule.`canimport conditional Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`canimport conditional Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -100,7 +100,7 @@ extension Lint.Rule.`canimport conditional Tests`.Unit {
             import Linux_Kernel
             #endif
             """
-        let findings = Lint.Rule.`canimport conditional Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`canimport conditional Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -111,7 +111,7 @@ extension Lint.Rule.`canimport conditional Tests`.Unit {
             import Glibc
             #endif
             """
-        let findings = Lint.Rule.`canimport conditional Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`canimport conditional Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -122,7 +122,7 @@ extension Lint.Rule.`canimport conditional Tests`.Unit {
             import Glibc_Kernel_Standard
             #endif
             """
-        let findings = Lint.Rule.`canimport conditional Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`canimport conditional Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -136,7 +136,7 @@ extension Lint.Rule.`canimport conditional Tests`.Unit {
             import Android_Kernel_Standard
             #endif
             """
-        let findings = Lint.Rule.`canimport conditional Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`canimport conditional Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -147,7 +147,7 @@ extension Lint.Rule.`canimport conditional Tests`.Unit {
             import Android
             #endif
             """
-        let findings = Lint.Rule.`canimport conditional Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`canimport conditional Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -158,7 +158,7 @@ extension Lint.Rule.`canimport conditional Tests`.Unit {
             import WASI_System
             #endif
             """
-        let findings = Lint.Rule.`canimport conditional Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`canimport conditional Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -169,7 +169,7 @@ extension Lint.Rule.`canimport conditional Tests`.Unit {
             import FreeBSD_Kernel
             #endif
             """
-        let findings = Lint.Rule.`canimport conditional Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`canimport conditional Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -182,7 +182,7 @@ extension Lint.Rule.`canimport conditional Tests`.Unit {
             import Windows_Kernel
             #endif
             """
-        let findings = Lint.Rule.`canimport conditional Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`canimport conditional Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -195,7 +195,7 @@ extension Lint.Rule.`canimport conditional Tests`.Unit {
             import Fallback
             #endif
             """
-        let findings = Lint.Rule.`canimport conditional Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`canimport conditional Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -206,7 +206,7 @@ extension Lint.Rule.`canimport conditional Tests`.Unit {
             import Linux_Kernel
             #endif
             """
-        let findings = Lint.Rule.`canimport conditional Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`canimport conditional Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -220,12 +220,12 @@ extension Lint.Rule.`canimport conditional Tests`.Unit {
             import Darwin.POSIX
             #endif
             """
-        let findings = Lint.Rule.`canimport conditional Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`canimport conditional Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`canimport conditional Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`canimport conditional Tests`.`Edge Case` {
     @Test
     func `if os macOS is NOT flagged`() {
         let source = """
@@ -233,7 +233,7 @@ extension Lint.Rule.`canimport conditional Tests`.`Edge Case` {
             let x = 1
             #endif
             """
-        let findings = Lint.Rule.`canimport conditional Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`canimport conditional Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -244,7 +244,7 @@ extension Lint.Rule.`canimport conditional Tests`.`Edge Case` {
             import SwiftUI
             #endif
             """
-        let findings = Lint.Rule.`canimport conditional Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`canimport conditional Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -255,7 +255,7 @@ extension Lint.Rule.`canimport conditional Tests`.`Edge Case` {
             import Combine
             #endif
             """
-        let findings = Lint.Rule.`canimport conditional Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`canimport conditional Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -266,7 +266,7 @@ extension Lint.Rule.`canimport conditional Tests`.`Edge Case` {
             import Darwin_Kernel_Standard
             #endif
             """
-        let findings = Lint.Rule.`canimport conditional Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`canimport conditional Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -278,7 +278,7 @@ extension Lint.Rule.`canimport conditional Tests`.`Edge Case` {
             let x = 1
             #endif
             """
-        let findings = Lint.Rule.`canimport conditional Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`canimport conditional Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

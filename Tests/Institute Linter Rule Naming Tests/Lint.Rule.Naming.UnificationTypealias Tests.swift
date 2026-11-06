@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Naming
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `unification typealias Tests` {
         @Suite struct Unit {}
@@ -26,20 +26,20 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`unification typealias Tests` {
+extension `Lint.Rule Tests`.`unification typealias Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`unification typealias`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`unification typealias Tests`.Unit {
+extension `Lint.Rule Tests`.`unification typealias Tests`.Unit {
     @Test
     func `rename-bridge typealias is flagged`() {
         let source = """
             public typealias SourceLocation = Text.Location
             """
-        let findings = Lint.Rule.`unification typealias Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unification typealias Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "unification typealias")
@@ -47,7 +47,7 @@ extension Lint.Rule.`unification typealias Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`unification typealias Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`unification typealias Tests`.`Edge Case` {
     @Test(arguments: [
         ("sRGB", "SRGB"),
         ("SRGB", "sRGB"),
@@ -60,7 +60,7 @@ extension Lint.Rule.`unification typealias Tests`.`Edge Case` {
         ("sRGB", "`SRGB`"),
     ])
     func `case-only leaf spellings preserve the domain name`(alias: String, leaf: String) {
-        let findings = Lint.Rule.`unification typealias Tests`.findings(
+        let findings = `Lint.Rule Tests`.`unification typealias Tests`.findings(
             in: "public typealias \(alias) = Domain.Nested.\(leaf)"
         )
         #expect(findings.isEmpty)
@@ -74,7 +74,7 @@ extension Lint.Rule.`unification typealias Tests`.`Edge Case` {
         ("`sRGB`", "SRGBA"),
     ])
     func `different leaf names remain rename bridges`(alias: String, leaf: String) {
-        let findings = Lint.Rule.`unification typealias Tests`.findings(
+        let findings = `Lint.Rule Tests`.`unification typealias Tests`.findings(
             in: "public typealias \(alias) = Domain.Nested.\(leaf)"
         )
         #expect(findings.count == 1)
@@ -87,7 +87,7 @@ extension Lint.Rule.`unification typealias Tests`.`Edge Case` {
         let source = """
             public typealias Event = Kernel.Event
             """
-        let findings = Lint.Rule.`unification typealias Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unification typealias Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -96,7 +96,7 @@ extension Lint.Rule.`unification typealias Tests`.`Edge Case` {
         let source = """
             public typealias IntArray = Array<Int>
             """
-        let findings = Lint.Rule.`unification typealias Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unification typealias Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -105,7 +105,7 @@ extension Lint.Rule.`unification typealias Tests`.`Edge Case` {
         let source = """
             public typealias Counter = Int
             """
-        let findings = Lint.Rule.`unification typealias Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unification typealias Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -120,7 +120,7 @@ extension Lint.Rule.`unification typealias Tests`.`Edge Case` {
                 public typealias `Protocol` = Swift.Equatable
             }
             """
-        let findings = Lint.Rule.`unification typealias Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unification typealias Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -131,7 +131,7 @@ extension Lint.Rule.`unification typealias Tests`.`Edge Case` {
                 public typealias `Protocol` = Swift.Hashable
             }
             """
-        let findings = Lint.Rule.`unification typealias Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unification typealias Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -142,7 +142,7 @@ extension Lint.Rule.`unification typealias Tests`.`Edge Case` {
         let source = """
             public typealias SourceLocation = Text.Location
             """
-        let findings = Lint.Rule.`unification typealias Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unification typealias Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -157,7 +157,7 @@ extension Lint.Rule.`unification typealias Tests`.`Edge Case` {
                 public typealias Underlying = Unicode.Scalar
             }
             """
-        let findings = Lint.Rule.`unification typealias Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unification typealias Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -171,19 +171,19 @@ extension Lint.Rule.`unification typealias Tests`.`Edge Case` {
                 public typealias SourceLocation = Text.Location
             }
             """
-        let findings = Lint.Rule.`unification typealias Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unification typealias Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`unification typealias Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`unification typealias Tests`.`Edge Case` {
     @Test
     func `a typealias on a type conforming to a protocol declared elsewhere may be its witness`() {
         let source = """
             enum Key: Dependencies.Dependency.Key {}
             extension Key { typealias Value = Agent.Sessions }
             """
-        #expect(Lint.Rule.`unification typealias Tests`.findings(in: source).isEmpty)
+        #expect(`Lint.Rule Tests`.`unification typealias Tests`.findings(in: source).isEmpty)
     }
 
     @Test
@@ -192,7 +192,7 @@ extension Lint.Rule.`unification typealias Tests`.`Edge Case` {
             extension Agent.Sessions { enum Dependency: Dependencies::Dependency.Key {} }
             extension Agent.Sessions.Dependency { typealias Value = Agent.Sessions }
             """
-        #expect(Lint.Rule.`unification typealias Tests`.findings(in: source).isEmpty)
+        #expect(`Lint.Rule Tests`.`unification typealias Tests`.findings(in: source).isEmpty)
     }
 
     @Test
@@ -201,6 +201,6 @@ extension Lint.Rule.`unification typealias Tests`.`Edge Case` {
             struct Sample: Sendable, Equatable {}
             extension Sample { typealias Value = Agent.Sessions }
             """
-        #expect(Lint.Rule.`unification typealias Tests`.findings(in: source).count == 1)
+        #expect(`Lint.Rule Tests`.`unification typealias Tests`.findings(in: source).count == 1)
     }
 }

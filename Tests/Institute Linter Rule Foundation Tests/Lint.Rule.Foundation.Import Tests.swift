@@ -17,7 +17,9 @@ import Testing
 
 @testable import Institute_Linter_Rule_Foundation
 
-extension Lint.Rule {
+enum `Lint.Rule Tests` {}
+
+extension `Lint.Rule Tests` {
     @Suite
     struct `foundation import Tests` {
         @Suite struct Unit {}
@@ -26,7 +28,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`foundation import Tests` {
+extension `Lint.Rule Tests`.`foundation import Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`foundation import`.observe(parsed, .warning).findings
@@ -53,7 +55,7 @@ extension Lint.Rule.`foundation import Tests` {
 //
 // EVERY case here is a positive control: each MUST fire. A zero anywhere in
 // this suite is the finding.
-extension Lint.Rule.`foundation import Tests`.`House convention soundness` {
+extension `Lint.Rule Tests`.`foundation import Tests`.`House convention soundness` {
     @Test
     func `@_exported public import Foundation is flagged`() {
         // The combined form: attribute AND access modifier on one line. Neither
@@ -61,7 +63,7 @@ extension Lint.Rule.`foundation import Tests`.`House convention soundness` {
         // character-class pattern like `@[a-zA-Z]+` cannot match `@_exported`
         // at all — the underscore is outside the class.
         let source = "@_exported public import Foundation"
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -70,7 +72,7 @@ extension Lint.Rule.`foundation import Tests`.`House convention soundness` {
         for module in [
             "Foundation", "FoundationEssentials", "FoundationNetworking", "FoundationXML",
         ] {
-            let findings = Lint.Rule.`foundation import Tests`.findings(
+            let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(
                 in: "@_exported public import \(module)"
             )
             #expect(
@@ -91,7 +93,7 @@ extension Lint.Rule.`foundation import Tests`.`House convention soundness` {
             @_exported public import Time
             @_exported public import Binary
             """
-        let findings = Lint.Rule.`foundation import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(
             in: source,
             file: "Sources/Products Live/exports.swift"
         )
@@ -109,7 +111,7 @@ extension Lint.Rule.`foundation import Tests`.`House convention soundness` {
             "Sources/Stripe Balance Types/Model.swift",
             "Sources/Products Live/exports.swift",
         ] {
-            let findings = Lint.Rule.`foundation import Tests`.findings(in: source, file: path)
+            let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source, file: path)
             #expect(findings.count == 1, "expected a finding for \(path)")
         }
     }
@@ -121,7 +123,7 @@ extension Lint.Rule.`foundation import Tests`.`House convention soundness` {
             @_exported public import HTML_Foundation
             @_exported public import FoundationXML
             """
-        let findings = Lint.Rule.`foundation import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(
             in: source,
             file: "Sources/Products Live/exports.swift"
         )
@@ -129,11 +131,11 @@ extension Lint.Rule.`foundation import Tests`.`House convention soundness` {
     }
 }
 
-extension Lint.Rule.`foundation import Tests`.Unit {
+extension `Lint.Rule Tests`.`foundation import Tests`.Unit {
     @Test
     func `bare Foundation import is flagged`() {
         let source = "import Foundation"
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source)
         let count = findings.count
         #expect(count == 1)
         if count == 1 {
@@ -145,14 +147,14 @@ extension Lint.Rule.`foundation import Tests`.Unit {
     @Test
     func `FoundationEssentials import is flagged`() {
         let source = "import FoundationEssentials"
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `Foundation submodule import is flagged`() {
         let source = "import Foundation.NSURL"
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -163,14 +165,14 @@ extension Lint.Rule.`foundation import Tests`.Unit {
             import Foundation
             import Binary
             """
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `public import of Foundation is flagged`() {
         let source = "public import Foundation"
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -179,7 +181,7 @@ extension Lint.Rule.`foundation import Tests`.Unit {
         // FoundationNetworking is where URLSession lives on Linux. Omitting it
         // left the rule blind on exactly the axis it exists to guard.
         let source = "import FoundationNetworking"
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -189,7 +191,7 @@ extension Lint.Rule.`foundation import Tests`.Unit {
         // FoundationNetworking to every consumer while passing the rule clean.
         // Observed at swift-urlrequest-handler exports.swift:4 on 2026-07-24.
         let source = "@_exported import FoundationNetworking"
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -202,14 +204,14 @@ extension Lint.Rule.`foundation import Tests`.Unit {
                 import FoundationNetworking
             #endif
             """
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `FoundationXML import is flagged`() {
         let source = "import FoundationXML"
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -221,12 +223,12 @@ extension Lint.Rule.`foundation import Tests`.Unit {
             import FoundationNetworking
             import FoundationXML
             """
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source)
         #expect(findings.count == 4)
     }
 }
 
-extension Lint.Rule.`foundation import Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`foundation import Tests`.`Edge Case` {
     @Test
     func `institute primitives imports are NOT flagged`() {
         let source = """
@@ -234,7 +236,7 @@ extension Lint.Rule.`foundation import Tests`.`Edge Case` {
             import Binary
             import Cardinal
             """
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -244,7 +246,7 @@ extension Lint.Rule.`foundation import Tests`.`Edge Case` {
             import Swift
             import Synchronization
             """
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -254,14 +256,14 @@ extension Lint.Rule.`foundation import Tests`.`Edge Case` {
         // Html_Foundation — not the Apple Foundation framework. Only the
         // first path component is checked.
         let source = "import HTML_Foundation"
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `empty source produces no findings`() {
         let source = ""
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -273,7 +275,7 @@ extension Lint.Rule.`foundation import Tests`.`Edge Case` {
             import HTML_Foundation
             import Server_Foundation
             """
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -286,14 +288,14 @@ extension Lint.Rule.`foundation import Tests`.`Edge Case` {
             import FoundationNetworkingHelpers
             import FoundationalTypes
             """
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `FoundationNetworking submodule import is flagged`() {
         let source = "import FoundationNetworking.NSURLSession"
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
@@ -305,13 +307,13 @@ extension Lint.Rule.`foundation import Tests`.`Edge Case` {
 // dir names verified 2026-07-25: swift-json `JSON Foundation Integration`,
 // swift-structured-queries
 // `Structured Queries Foundation Integration`.
-extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out` {
+extension `Lint.Rule Tests`.`foundation import Tests`.`Foundation Integration carve-out` {
     // MARK: - Negative controls (inside an FI target → must NOT fire)
 
     @Test
     func `Foundation import inside an FI target is NOT flagged`() {
         let source = "import Foundation"
-        let findings = Lint.Rule.`foundation import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(
             in: source,
             file: "Sources/JSON Foundation Integration/JSON.Foundation.Coder.swift"
         )
@@ -326,7 +328,7 @@ extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out`
             @_exported import FoundationNetworking
             import FoundationXML
             """
-        let findings = Lint.Rule.`foundation import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(
             in: source,
             file: "Sources/Structured Queries Foundation Integration/Bridge.swift"
         )
@@ -338,7 +340,7 @@ extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out`
         // The carve-out keys on the directory segment, not on a `Sources/`
         // prefix, so a file located directly under the FI target dir is exempt.
         let source = "import Foundation"
-        let findings = Lint.Rule.`foundation import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(
             in: source,
             file: "JSON Foundation Integration/exports.swift"
         )
@@ -350,7 +352,7 @@ extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out`
     @Test
     func `Foundation import in a core target still fires`() {
         let source = "import Foundation"
-        let findings = Lint.Rule.`foundation import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(
             in: source,
             file: "Sources/JSON/JSON.Value.swift"
         )
@@ -367,7 +369,7 @@ extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out`
             @_exported import FoundationNetworking
             import FoundationXML
             """
-        let findings = Lint.Rule.`foundation import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(
             in: source,
             file: "Sources/JSON/Core.swift"
         )
@@ -379,7 +381,7 @@ extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out`
         // The default `file: "test.swift"` has no directory segment; the
         // carve-out must not swallow it, or every existing fixture goes blind.
         let source = "import Foundation"
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -390,7 +392,7 @@ extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out`
         // `HTML Foundation` is a core institute target, not an FI subtarget —
         // its dir does not end in ` Foundation Integration`, so it must fire.
         let source = "import Foundation"
-        let findings = Lint.Rule.`foundation import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(
             in: source,
             file: "Sources/HTML Foundation/Renderer.swift"
         )
@@ -402,7 +404,7 @@ extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out`
         // The required leading space means a segment without a real brand-token
         // boundary (`XFoundation Integration`) is not the sanctioned shape.
         let source = "import Foundation"
-        let findings = Lint.Rule.`foundation import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(
             in: source,
             file: "Sources/XFoundation Integration/File.swift"
         )
@@ -414,7 +416,7 @@ extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out`
         // Only DIRECTORY segments qualify; a source file whose name ends in
         // `… Foundation Integration.swift` inside a core target is not exempt.
         let source = "import Foundation"
-        let findings = Lint.Rule.`foundation import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(
             in: source,
             file: "Sources/JSON/My Foundation Integration.swift"
         )
@@ -426,13 +428,13 @@ extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out`
 // example sources ship to no consumer, so firing there was over-reporting.
 // Controlled in both directions: the exemption must not leak into `Sources/`
 // via a coincidental substring.
-extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out` {
+extension `Lint.Rule Tests`.`foundation import Tests`.`Foundation Integration carve-out` {
     // MARK: - Negative controls (non-main targets → must NOT fire)
 
     @Test
     func `Foundation import in a test target is NOT flagged`() {
         let source = "import Foundation"
-        let findings = Lint.Rule.`foundation import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(
             in: source,
             file: "Tests/JSON Tests/JSON.Value Tests.swift"
         )
@@ -445,7 +447,7 @@ extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out`
         // target is neither a main target nor a ` Foundation Integration`
         // directory segment, so only the main-target scoping exempts it.
         let source = "import Foundation"
-        let findings = Lint.Rule.`foundation import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(
             in: source,
             file: "Tests/JSON Foundation Integration Tests/JSON.Foundation.Coder Tests.swift"
         )
@@ -459,7 +461,7 @@ extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out`
             "Experiments/Spike/Probe.swift",
             "Examples/Demo/main.swift",
         ] {
-            let findings = Lint.Rule.`foundation import Tests`.findings(in: source, file: path)
+            let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source, file: path)
             #expect(findings.isEmpty, "expected no finding for \(path)")
         }
     }
@@ -474,7 +476,7 @@ extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out`
             @_exported import FoundationNetworking
             import FoundationXML
             """
-        let findings = Lint.Rule.`foundation import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(
             in: source,
             file: "Sources/JSON/Core.swift"
         )
@@ -494,7 +496,7 @@ extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out`
             "Sources/JSON/Examples.swift",
             "Sources/JSON/Tests.swift",
         ] {
-            let findings = Lint.Rule.`foundation import Tests`.findings(in: source, file: path)
+            let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source, file: path)
             #expect(findings.count == 1, "expected a finding for \(path)")
         }
     }
@@ -504,7 +506,7 @@ extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out`
         // Guards the whole pre-existing fixture suite: if the main-target gate
         // swallowed the bare `test.swift` default, every earlier test would go
         // silently green.
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: "import Foundation")
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: "import Foundation")
         #expect(findings.count == 1)
     }
 }
@@ -513,7 +515,7 @@ extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out`
 // and ships it to nobody, so it cannot impose Foundation on a consumer. This
 // gate is keyed on the FILENAME, unlike the two directory-segment gates, so
 // the over-skip guards below are about names rather than path position.
-extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out` {
+extension `Lint.Rule Tests`.`foundation import Tests`.`Foundation Integration carve-out` {
     // MARK: - Negative controls (manifests → must NOT fire)
 
     @Test
@@ -526,7 +528,7 @@ extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out`
             import Foundation
             import PackageDescription
             """
-        let findings = Lint.Rule.`foundation import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(
             in: source,
             file: "Package.swift"
         )
@@ -537,7 +539,7 @@ extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out`
     func `a version-specific manifest is NOT flagged`() {
         let source = "import Foundation"
         for path in ["Package@swift-6.0.swift", "Package@swift-5.9.swift"] {
-            let findings = Lint.Rule.`foundation import Tests`.findings(in: source, file: path)
+            let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source, file: path)
             #expect(findings.isEmpty, "expected no finding for \(path)")
         }
     }
@@ -546,7 +548,7 @@ extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out`
     func `a nested package's manifest is NOT flagged`() {
         // Keyed on filename precisely so a nested package root is covered; a
         // root-relative test would miss this one.
-        let findings = Lint.Rule.`foundation import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(
             in: "import Foundation",
             file: "Tests/Testing/Package.swift"
         )
@@ -566,7 +568,7 @@ extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out`
             "Sources/Package/Registry.swift",
             "Sources/JSON/Package.Description.swift",
         ] {
-            let findings = Lint.Rule.`foundation import Tests`.findings(in: source, file: path)
+            let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: source, file: path)
             #expect(findings.count == 1, "expected a finding for \(path)")
         }
     }
@@ -575,7 +577,7 @@ extension Lint.Rule.`foundation import Tests`.`Foundation Integration carve-out`
     func `the manifest gate does not swallow the no-directory default`() {
         // Third time this guard earns its place: each new gate is another chance
         // to blank the entire pre-existing suite without failing anything.
-        let findings = Lint.Rule.`foundation import Tests`.findings(in: "import Foundation")
+        let findings = `Lint.Rule Tests`.`foundation import Tests`.findings(in: "import Foundation")
         #expect(findings.count == 1)
     }
 }

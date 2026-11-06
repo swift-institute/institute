@@ -17,7 +17,9 @@ import Testing
 
 @testable import Institute_Linter_Rule_RawValue
 
-extension Lint.Rule {
+enum `Lint.Rule Tests` {}
+
+extension `Lint.Rule Tests` {
     @Suite
     struct `bitpattern rawvalue chain Tests` {
         @Suite struct Unit {}
@@ -28,7 +30,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`bitpattern rawvalue chain Tests` {
+extension `Lint.Rule Tests`.`bitpattern rawvalue chain Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -50,10 +52,10 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests` {
     }
 }
 
-extension Lint.Rule.`bitpattern rawvalue chain Tests`.Unit {
+extension `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.Unit {
     @Test
     func `Int(bitPattern: x.rawValue) is flagged`() {
-        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(
+        let findings = `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.findings(
             in: "let i = Int(bitPattern: x.rawValue)"
         )
         let count = findings.count
@@ -66,7 +68,7 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.Unit {
 
     @Test
     func `UInt(bitPattern: x.rawValue) is flagged`() {
-        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(
+        let findings = `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.findings(
             in: "let i = UInt(bitPattern: x.rawValue)"
         )
         #expect(findings.count == 1)
@@ -78,7 +80,7 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.Unit {
         // and the real space-separated rule id — not the SwiftLint-era
         // the SwiftLint `swiftlint` namespace with an underscored id, which the engine's
         // malformed-suppression rule does not recognize as a directive at all.
-        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(
+        let findings = `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.findings(
             in: "let i = Int(bitPattern: x.rawValue)"
         )
         #expect(findings.count == 1)
@@ -89,10 +91,10 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`bitpattern rawvalue chain Tests`.Evasion {
+extension `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.Evasion {
     @Test
     func `Int.init(bitPattern: x.rawValue) (typename-swap via .init) is flagged`() {
-        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(
+        let findings = `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.findings(
             in: "let i = Int.init(bitPattern: x.rawValue)"
         )
         #expect(findings.count == 1)
@@ -108,13 +110,13 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.Evasion {
                 init(bitPattern: Int) {}
             }
             """
-        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `Int8(bitPattern: x.rawValue) (sized integer typename-swap) is flagged`() {
-        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(
+        let findings = `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.findings(
             in: "let i = Int8(bitPattern: x.rawValue)"
         )
         #expect(findings.count == 1)
@@ -122,7 +124,7 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.Evasion {
 
     @Test
     func `Nested rawValue Int(bitPattern: foo.bar.rawValue) is flagged`() {
-        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(
+        let findings = `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.findings(
             in: "let i = Int(bitPattern: foo.bar.rawValue)"
         )
         #expect(findings.count == 1)
@@ -130,17 +132,17 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.Evasion {
 
     @Test
     func `Subscript Int(bitPattern: arr[i].rawValue) is flagged`() {
-        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(
+        let findings = `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.findings(
             in: "let i = Int(bitPattern: arr[i].rawValue)"
         )
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`bitpattern rawvalue chain Tests`.Negative {
+extension `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.Negative {
     @Test
     func `Int(bitPattern: typedValue) (no rawValue chain) is NOT flagged`() {
-        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(
+        let findings = `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.findings(
             in: "let i = Int(bitPattern: cardinal)"
         )
         #expect(findings.isEmpty)
@@ -148,7 +150,7 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.Negative {
 
     @Test
     func `Int(bitPattern: foo.bar) (non-rawValue member) is NOT flagged`() {
-        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(
+        let findings = `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.findings(
             in: "let i = Int(bitPattern: foo.bar)"
         )
         #expect(findings.isEmpty)
@@ -156,7 +158,7 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.Negative {
 
     @Test
     func `Int(other: x.rawValue) (different label) is NOT flagged`() {
-        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(
+        let findings = `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.findings(
             in: "let i = Int(other: x.rawValue)"
         )
         #expect(findings.isEmpty)
@@ -164,7 +166,7 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.Negative {
 
     @Test
     func `Int(x.rawValue) (no bitPattern label) is NOT flagged`() {
-        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(
+        let findings = `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.findings(
             in: "let i = Int(x.rawValue)"
         )
         #expect(findings.isEmpty)
@@ -176,13 +178,13 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.Negative {
             // Int(bitPattern: x.rawValue) is the canonical anti-pattern
             let y = 42
             """
-        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `String literal containing the pattern is NOT flagged`() {
-        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(
+        let findings = `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.findings(
             in: #"let s = "Int(bitPattern: x.rawValue)""#
         )
         #expect(findings.isEmpty)
@@ -190,12 +192,12 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.Negative {
 
     @Test
     func `Empty file produces no findings`() {
-        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(in: "")
+        let findings = `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.findings(in: "")
         #expect(findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`bitpattern rawvalue chain Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.`Edge Case` {
     @Test
     func `Multi-line Int(bitPattern: ... rawValue) is flagged`() {
         let source = """
@@ -203,7 +205,7 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.`Edge Case` {
                 bitPattern: x.rawValue
             )
             """
-        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -213,7 +215,7 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.`Edge Case` {
             let a = Int(bitPattern: x.rawValue)
             let b = UInt(bitPattern: y.rawValue)
             """
-        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.findings(in: source)
         #expect(findings.count == 2)
     }
 
@@ -230,7 +232,7 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.`Edge Case` {
 
     @Test
     func `Cardinal brand-owner run self-suppresses`() {
-        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(
+        let findings = `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.findings(
             in: "let i = Int(bitPattern: x.rawValue)",
             types: ["Cardinal"]
         )
@@ -239,7 +241,7 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.`Edge Case` {
 
     @Test
     func `a non-brand-owner consumer run still fires`() {
-        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(
+        let findings = `Lint.Rule Tests`.`bitpattern rawvalue chain Tests`.findings(
             in: "let i = Int(bitPattern: x.rawValue)",
             types: ["SomeConsumerType"]
         )

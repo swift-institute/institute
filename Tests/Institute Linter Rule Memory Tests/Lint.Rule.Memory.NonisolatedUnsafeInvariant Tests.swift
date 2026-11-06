@@ -17,7 +17,9 @@ import Testing
 
 @testable import Institute_Linter_Rule_Memory
 
-extension Lint.Rule {
+enum `Lint.Rule Tests` {}
+
+extension `Lint.Rule Tests` {
     @Suite
     struct `nonisolated unsafe without invariant Tests` {
         @Suite struct Unit {}
@@ -26,7 +28,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`nonisolated unsafe without invariant Tests` {
+extension `Lint.Rule Tests`.`nonisolated unsafe without invariant Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "Sources/X/Test.swift"
@@ -38,13 +40,13 @@ extension Lint.Rule.`nonisolated unsafe without invariant Tests` {
     }
 }
 
-extension Lint.Rule.`nonisolated unsafe without invariant Tests`.Unit {
+extension `Lint.Rule Tests`.`nonisolated unsafe without invariant Tests`.Unit {
     @Test
     func `nonisolated unsafe without comment is flagged`() {
         let source = """
             nonisolated(unsafe) let _sentinel: UnsafeMutableRawPointer = .allocate(capacity: 0)
             """
-        let findings = Lint.Rule.`nonisolated unsafe without invariant Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nonisolated unsafe without invariant Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -54,7 +56,7 @@ extension Lint.Rule.`nonisolated unsafe without invariant Tests`.Unit {
             // SAFETY: Allocated once at module init; pointee never mutated.
             nonisolated(unsafe) let _sentinel: UnsafeMutableRawPointer = .allocate(capacity: 0)
             """
-        let findings = Lint.Rule.`nonisolated unsafe without invariant Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nonisolated unsafe without invariant Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -64,7 +66,7 @@ extension Lint.Rule.`nonisolated unsafe without invariant Tests`.Unit {
             // WHY: Category D (SP-5) — UnsafeRawPointer blocks structural Sendable.
             nonisolated(unsafe) let _sentinel: UnsafeMutableRawPointer = .allocate(capacity: 0)
             """
-        let findings = Lint.Rule.`nonisolated unsafe without invariant Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nonisolated unsafe without invariant Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -76,7 +78,7 @@ extension Lint.Rule.`nonisolated unsafe without invariant Tests`.Unit {
             @usableFromInline
             nonisolated(unsafe) let _sentinel: UnsafeMutableRawPointer = .allocate(capacity: 0)
             """
-        let findings = Lint.Rule.`nonisolated unsafe without invariant Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nonisolated unsafe without invariant Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -87,7 +89,7 @@ extension Lint.Rule.`nonisolated unsafe without invariant Tests`.Unit {
             /// The buffer's sentinel value.
             nonisolated(unsafe) let _sentinel: UnsafeMutableRawPointer = .allocate(capacity: 0)
             """
-        let findings = Lint.Rule.`nonisolated unsafe without invariant Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nonisolated unsafe without invariant Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -98,7 +100,7 @@ extension Lint.Rule.`nonisolated unsafe without invariant Tests`.Unit {
 
             nonisolated(unsafe) let _sentinel: UnsafeMutableRawPointer = .allocate(capacity: 0)
             """
-        let findings = Lint.Rule.`nonisolated unsafe without invariant Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nonisolated unsafe without invariant Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -108,7 +110,7 @@ extension Lint.Rule.`nonisolated unsafe without invariant Tests`.Unit {
             // This is a sentinel value used by the empty buffer check.
             nonisolated(unsafe) let _sentinel: UnsafeMutableRawPointer = .allocate(capacity: 0)
             """
-        let findings = Lint.Rule.`nonisolated unsafe without invariant Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nonisolated unsafe without invariant Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -117,7 +119,7 @@ extension Lint.Rule.`nonisolated unsafe without invariant Tests`.Unit {
         let source = """
             nonisolated let value: Int = 0
             """
-        let findings = Lint.Rule.`nonisolated unsafe without invariant Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nonisolated unsafe without invariant Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -126,7 +128,7 @@ extension Lint.Rule.`nonisolated unsafe without invariant Tests`.Unit {
         let source = """
             let value: Int = 0
             """
-        let findings = Lint.Rule.`nonisolated unsafe without invariant Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nonisolated unsafe without invariant Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -135,7 +137,7 @@ extension Lint.Rule.`nonisolated unsafe without invariant Tests`.Unit {
         let source = """
             nonisolated(unsafe) var counter: Int = 0
             """
-        let findings = Lint.Rule.`nonisolated unsafe without invariant Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nonisolated unsafe without invariant Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -145,7 +147,7 @@ extension Lint.Rule.`nonisolated unsafe without invariant Tests`.Unit {
             // SAFETY: Mutated only on the main thread under MainActor isolation.
             nonisolated(unsafe) var counter: Int = 0
             """
-        let findings = Lint.Rule.`nonisolated unsafe without invariant Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nonisolated unsafe without invariant Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -157,7 +159,7 @@ extension Lint.Rule.`nonisolated unsafe without invariant Tests`.Unit {
             /// Module-level sentinel used by Memory.Buffer empty-state checks.
             nonisolated(unsafe) let _sentinel: UnsafeMutableRawPointer = .allocate(capacity: 0)
             """
-        let findings = Lint.Rule.`nonisolated unsafe without invariant Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nonisolated unsafe without invariant Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -172,7 +174,7 @@ extension Lint.Rule.`nonisolated unsafe without invariant Tests`.Unit {
             // region; downstream reads are serialized by the actor.
             nonisolated(unsafe) var counter: Int = 0
             """
-        let findings = Lint.Rule.`nonisolated unsafe without invariant Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nonisolated unsafe without invariant Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -184,7 +186,7 @@ extension Lint.Rule.`nonisolated unsafe without invariant Tests`.Unit {
             // because nonisolated(unsafe) is a declaration modifier.
             nonisolated(unsafe) let v = value
             """
-        let findings = Lint.Rule.`nonisolated unsafe without invariant Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nonisolated unsafe without invariant Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -198,7 +200,7 @@ extension Lint.Rule.`nonisolated unsafe without invariant Tests`.Unit {
             // swift-linter:disable:next intermediate binding then return
             nonisolated(unsafe) let v = value
             """
-        let findings = Lint.Rule.`nonisolated unsafe without invariant Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nonisolated unsafe without invariant Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -210,7 +212,7 @@ extension Lint.Rule.`nonisolated unsafe without invariant Tests`.Unit {
 
             nonisolated(unsafe) var counter: Int = 0
             """
-        let findings = Lint.Rule.`nonisolated unsafe without invariant Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nonisolated unsafe without invariant Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -222,7 +224,7 @@ extension Lint.Rule.`nonisolated unsafe without invariant Tests`.Unit {
         // triple-quoted literal so the CRLF sequence survives formatting.
         let source =
             "// SAFETY: Mutated only on the main thread under MainActor isolation.\r\n\r\nnonisolated(unsafe) var counter: Int = 0"
-        let findings = Lint.Rule.`nonisolated unsafe without invariant Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nonisolated unsafe without invariant Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }

@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Structure
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `minimal type body Tests` {
         @Suite struct Unit {}
@@ -26,14 +26,14 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`minimal type body Tests` {
+extension `Lint.Rule Tests`.`minimal type body Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`minimal type body`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`minimal type body Tests`.Unit {
+extension `Lint.Rule Tests`.`minimal type body Tests`.Unit {
     @Test
     func `method in type body is flagged`() {
         let source = """
@@ -42,7 +42,7 @@ extension Lint.Rule.`minimal type body Tests`.Unit {
                 func append(_ value: Int) {}
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "minimal type body")
@@ -58,7 +58,7 @@ extension Lint.Rule.`minimal type body Tests`.Unit {
                 var isEmpty: Bool { raw == 0 }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -70,7 +70,7 @@ extension Lint.Rule.`minimal type body Tests`.Unit {
                 static let shared = Foo(x: 0)
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -82,7 +82,7 @@ extension Lint.Rule.`minimal type body Tests`.Unit {
                 struct Inner {}
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -94,7 +94,7 @@ extension Lint.Rule.`minimal type body Tests`.Unit {
                 typealias Element = Int
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -110,7 +110,7 @@ extension Lint.Rule.`minimal type body Tests`.Unit {
                 subscript(index: Int) -> Int { index }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -122,7 +122,7 @@ extension Lint.Rule.`minimal type body Tests`.Unit {
                 class Inner {}
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -134,7 +134,7 @@ extension Lint.Rule.`minimal type body Tests`.Unit {
                 enum Inner { case a }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -146,7 +146,7 @@ extension Lint.Rule.`minimal type body Tests`.Unit {
                 actor Inner {}
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -158,7 +158,7 @@ extension Lint.Rule.`minimal type body Tests`.Unit {
                 protocol Inner {}
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -170,7 +170,7 @@ extension Lint.Rule.`minimal type body Tests`.Unit {
                 var doubled: Int { x * 2 }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -182,7 +182,7 @@ extension Lint.Rule.`minimal type body Tests`.Unit {
                 static let a = 1, b = 2
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -194,7 +194,7 @@ extension Lint.Rule.`minimal type body Tests`.Unit {
                 class var shared: Int { 0 }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -208,12 +208,12 @@ extension Lint.Rule.`minimal type body Tests`.Unit {
                 static let shared = 0
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 3)
     }
 }
 
-extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`minimal type body Tests`.`Edge Case` {
     @Test
     func `stored properties and init only - NOT flagged`() {
         let source = """
@@ -231,7 +231,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -244,7 +244,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 deinit {}
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -257,7 +257,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -270,7 +270,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -282,7 +282,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 case bar
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -294,7 +294,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 var name: String { get }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -309,7 +309,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 var doubled: Int { x * 2 }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -328,7 +328,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 static func buildExpression(_ x: Int) -> Int { x }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -346,7 +346,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -358,7 +358,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 static func make() -> PlainType { PlainType(x: 0) }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -376,7 +376,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 @Suite struct `Edge Case` {}
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -392,7 +392,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 struct `Inner Suite` {}
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -407,7 +407,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 struct Helper {}
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -424,7 +424,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 var isBlank: Bool { title.isEmpty }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -438,7 +438,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 var body: some Reducer<State, Action> { EmptyReducer() }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -451,7 +451,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 var isEmpty: Bool { count == 0 }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -464,7 +464,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 struct Counts { let all: Int }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -477,7 +477,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 func present() {}
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -490,7 +490,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 func read() -> Int { x }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -507,7 +507,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 typealias Protocol = _CarrierProtocol
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -518,7 +518,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 public typealias `Protocol` = Swift.Equatable
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -531,7 +531,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 typealias Underlying = SomeOtherType
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -558,7 +558,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 override func visitPost(_ node: StructDeclSyntax) {}
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -572,7 +572,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -587,7 +587,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -603,7 +603,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -618,7 +618,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 func visit() {}
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -635,7 +635,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 #endif
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -649,7 +649,7 @@ extension Lint.Rule.`minimal type body Tests`.`Edge Case` {
                 @Suite struct Unit {}
             }
             """
-        let findings = Lint.Rule.`minimal type body Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`minimal type body Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

@@ -18,7 +18,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Framework
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `suite categories fix Tests` {
         @Suite struct Unit {}
@@ -29,7 +29,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`suite categories fix Tests` {
+extension `Lint.Rule Tests`.`suite categories fix Tests` {
     static func fixed(_ source: String, file: String = "test.swift") -> String? {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`suite categories`.rewritten(parsed)
@@ -89,7 +89,7 @@ extension Lint.Rule.`suite categories fix Tests` {
     }
 }
 
-extension Lint.Rule.`suite categories fix Tests`.`Round Trip` {
+extension `Lint.Rule Tests`.`suite categories fix Tests`.`Round Trip` {
     @Test
     func `all three categories missing are all appended`() {
         // No direct `@Test` member and no other members at all — the plain
@@ -99,8 +99,8 @@ extension Lint.Rule.`suite categories fix Tests`.`Round Trip` {
             struct `Foo Tests` {
             }
             """
-        Lint.Rule.`suite categories fix Tests`.roundTrips(source)
-        let output = Lint.Rule.`suite categories fix Tests`.fixed(source)
+        `Lint.Rule Tests`.`suite categories fix Tests`.roundTrips(source)
+        let output = `Lint.Rule Tests`.`suite categories fix Tests`.fixed(source)
         #expect(output?.contains("@Suite struct Unit {}") == true)
         #expect(output?.contains("@Suite struct `Edge Case` {}") == true)
         #expect(output?.contains("@Suite struct Integration {}") == true)
@@ -115,13 +115,13 @@ extension Lint.Rule.`suite categories fix Tests`.`Round Trip` {
                 @Suite struct `Edge Case` {}
             }
             """
-        Lint.Rule.`suite categories fix Tests`.roundTrips(source)
-        let output = Lint.Rule.`suite categories fix Tests`.fixed(source)
+        `Lint.Rule Tests`.`suite categories fix Tests`.roundTrips(source)
+        let output = `Lint.Rule Tests`.`suite categories fix Tests`.fixed(source)
         #expect(output?.contains("@Suite struct Integration {}") == true)
         // The two already-declared categories are untouched, not duplicated:
         // exactly one occurrence of the Unit declaration in the output.
         let count = output.map {
-            Lint.Rule.`suite categories fix Tests`.occurrenceCount(
+            `Lint.Rule Tests`.`suite categories fix Tests`.occurrenceCount(
                 of: "@Suite struct Unit {}",
                 in: $0
             )
@@ -139,8 +139,8 @@ extension Lint.Rule.`suite categories fix Tests`.`Round Trip` {
                 @Suite(.serialized) struct Performance {}
             }
             """
-        Lint.Rule.`suite categories fix Tests`.roundTrips(source)
-        let output = Lint.Rule.`suite categories fix Tests`.fixed(source)
+        `Lint.Rule Tests`.`suite categories fix Tests`.roundTrips(source)
+        let output = `Lint.Rule Tests`.`suite categories fix Tests`.fixed(source)
         #expect(output?.contains("@Suite struct Integration {}") == true)
         #expect(output?.contains("@Suite(.serialized) struct Performance {}") == true)
     }
@@ -155,8 +155,8 @@ extension Lint.Rule.`suite categories fix Tests`.`Round Trip` {
                 }
             }
             """
-        Lint.Rule.`suite categories fix Tests`.roundTrips(source)
-        let output = Lint.Rule.`suite categories fix Tests`.fixed(source)
+        `Lint.Rule Tests`.`suite categories fix Tests`.roundTrips(source)
+        let output = `Lint.Rule Tests`.`suite categories fix Tests`.fixed(source)
         #expect(output?.contains("@Suite struct `Edge Case` {}") == true)
         #expect(output?.contains("@Suite struct Integration {}") == true)
     }
@@ -169,14 +169,14 @@ extension Lint.Rule.`suite categories fix Tests`.`Round Trip` {
                 @Suite struct Unit {}
             }
             """
-        Lint.Rule.`suite categories fix Tests`.roundTrips(source)
-        let output = Lint.Rule.`suite categories fix Tests`.fixed(source)
+        `Lint.Rule Tests`.`suite categories fix Tests`.roundTrips(source)
+        let output = `Lint.Rule Tests`.`suite categories fix Tests`.fixed(source)
         #expect(output?.contains("@Suite struct `Edge Case` {}") == true)
         #expect(output?.contains("@Suite struct Integration {}") == true)
     }
 }
 
-extension Lint.Rule.`suite categories fix Tests`.`Not Fixable` {
+extension `Lint.Rule Tests`.`suite categories fix Tests`.`Not Fixable` {
     @Test
     func `an already-compliant suite is not rewritten`() {
         let source = """
@@ -187,8 +187,8 @@ extension Lint.Rule.`suite categories fix Tests`.`Not Fixable` {
                 @Suite struct Integration {}
             }
             """
-        #expect(Lint.Rule.`suite categories fix Tests`.findings(in: source).isEmpty)
-        #expect(Lint.Rule.`suite categories fix Tests`.fixed(source) == nil)
+        #expect(`Lint.Rule Tests`.`suite categories fix Tests`.findings(in: source).isEmpty)
+        #expect(`Lint.Rule Tests`.`suite categories fix Tests`.fixed(source) == nil)
     }
 
     @Test
@@ -197,7 +197,7 @@ extension Lint.Rule.`suite categories fix Tests`.`Not Fixable` {
         // categories, so a category satisfying the missing set may already
         // exist inside the conditional this fix cannot see. Refuse outright
         // rather than risk a redeclaration in whichever arm is active.
-        Lint.Rule.`suite categories fix Tests`.declines(
+        `Lint.Rule Tests`.`suite categories fix Tests`.declines(
             """
             @Suite
             struct `Foo Tests` {
@@ -215,7 +215,7 @@ extension Lint.Rule.`suite categories fix Tests`.`Not Fixable` {
         // The refusal is unconditional on ANY `#if` presence in the member
         // block, not only one that plausibly collides — the fix does not
         // attempt to reason about which arm is active.
-        Lint.Rule.`suite categories fix Tests`.declines(
+        `Lint.Rule Tests`.`suite categories fix Tests`.declines(
             """
             @Suite
             struct `Foo Tests` {
@@ -233,7 +233,7 @@ extension Lint.Rule.`suite categories fix Tests`.`Not Fixable` {
         // The rule's own predicate counts only `@Suite struct` members, so
         // this enum leaves the rule firing while an unconditional insertion
         // of `@Suite struct Unit {}` would be a redeclaration error.
-        Lint.Rule.`suite categories fix Tests`.declines(
+        `Lint.Rule Tests`.`suite categories fix Tests`.declines(
             """
             @Suite
             struct `Foo Tests` {
@@ -245,7 +245,7 @@ extension Lint.Rule.`suite categories fix Tests`.`Not Fixable` {
 
     @Test
     func `a colliding stored property of the same name refuses`() {
-        Lint.Rule.`suite categories fix Tests`.declines(
+        `Lint.Rule Tests`.`suite categories fix Tests`.declines(
             """
             @Suite
             struct `Foo Tests` {
@@ -260,7 +260,7 @@ extension Lint.Rule.`suite categories fix Tests`.`Not Fixable` {
         // Inserting empty categories here would silence the finding while
         // leaving the test uncategorised — manufacturing compliance rather
         // than scaffolding it.
-        Lint.Rule.`suite categories fix Tests`.declines(
+        `Lint.Rule Tests`.`suite categories fix Tests`.declines(
             """
             @Suite
             struct `Foo Tests` {
@@ -287,8 +287,8 @@ extension Lint.Rule.`suite categories fix Tests`.`Not Fixable` {
                 @Suite struct Unit {}
             }
             """
-        #expect(Lint.Rule.`suite categories fix Tests`.findings(in: source).count == 2)
-        guard let output = Lint.Rule.`suite categories fix Tests`.fixed(source) else {
+        #expect(`Lint.Rule Tests`.`suite categories fix Tests`.findings(in: source).count == 2)
+        guard let output = `Lint.Rule Tests`.`suite categories fix Tests`.fixed(source) else {
             Issue.record("expected a partial rewrite")
             return
         }
@@ -296,7 +296,7 @@ extension Lint.Rule.`suite categories fix Tests`.`Not Fixable` {
         // `Fixed` gained its missing categories.
         #expect(output.contains("struct Fixed"))
         // `Skipped`'s finding still stands — its `#if` is untouched.
-        let remaining = Lint.Rule.`suite categories fix Tests`.findings(in: output)
+        let remaining = `Lint.Rule Tests`.`suite categories fix Tests`.findings(in: output)
         #expect(remaining.count == 1)
         if remaining.count == 1 {
             #expect(remaining[0].identifier == "suite categories")

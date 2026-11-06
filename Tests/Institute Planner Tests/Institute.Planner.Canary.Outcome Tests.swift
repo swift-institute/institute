@@ -7,14 +7,16 @@ import struct Swift.String
 
 @testable import Institute_Planner
 
-extension Institute.Planner.Canary.Outcome {
+enum `Institute.Planner.Canary.Outcome Tests` {}
+
+extension `Institute.Planner.Canary.Outcome Tests` {
     @Suite struct Test {
         @Suite struct Unit {}
         @Suite struct `Edge Case` {}
     }
 }
 
-extension Institute.Planner.Canary.Outcome.Test {
+extension `Institute.Planner.Canary.Outcome Tests`.Test {
     /// A real `Source.Report` that `Source.Report.Complete` accepts — one
     /// subject, one governed file, one engine with one rule and its
     /// transported control, one artifact predicate — varied one evidence
@@ -115,45 +117,45 @@ extension Institute.Planner.Canary.Outcome.Test {
     }
 }
 
-extension Institute.Planner.Canary.Outcome.Test.Unit {
+extension `Institute.Planner.Canary.Outcome Tests`.Test.Unit {
 
     @Test func `a clean report reads as clean with its control counted`() {
-        let outcome = Institute.Planner.Canary.Outcome(.init(code: 0, output: Institute.Planner.Canary.Outcome.Test.Report.output(Institute.Planner.Canary.Outcome.Test.Report.report())))
+        let outcome = Institute.Planner.Canary.Outcome(.init(code: 0, output: `Institute.Planner.Canary.Outcome Tests`.Test.Report.output(`Institute.Planner.Canary.Outcome Tests`.Test.Report.report())))
         #expect(outcome == .init(status: .clean, code: 0, controls: ["clean": 1]))
     }
 
     @Test func `error findings are counted per engine and rule and warnings are not`() {
-        let report = Institute.Planner.Canary.Outcome.Test.Report.report(findings: [
-            Institute.Planner.Canary.Outcome.Test.Report.finding(.error, line: 1),
-            Institute.Planner.Canary.Outcome.Test.Report.finding(.error, line: 2),
-            Institute.Planner.Canary.Outcome.Test.Report.finding(.warning, line: 3),
+        let report = `Institute.Planner.Canary.Outcome Tests`.Test.Report.report(findings: [
+            `Institute.Planner.Canary.Outcome Tests`.Test.Report.finding(.error, line: 1),
+            `Institute.Planner.Canary.Outcome Tests`.Test.Report.finding(.error, line: 2),
+            `Institute.Planner.Canary.Outcome Tests`.Test.Report.finding(.warning, line: 3),
         ])
-        let outcome = Institute.Planner.Canary.Outcome(.init(code: 1, output: Institute.Planner.Canary.Outcome.Test.Report.output(report)))
+        let outcome = Institute.Planner.Canary.Outcome(.init(code: 1, output: `Institute.Planner.Canary.Outcome Tests`.Test.Report.output(report)))
         #expect(outcome.status == .findings)
         #expect(outcome.errors == ["swift-format AlwaysUseLowerCamelCase": 2])
     }
 
     @Test func `unmeasured reasons and control verdicts are read`() {
-        let report = Institute.Planner.Canary.Outcome.Test.Report.report(
+        let report = `Institute.Planner.Canary.Outcome Tests`.Test.Report.report(
             controlFinding: true,
             unmeasured: [.init(code: "no-summary", detail: "the engine printed no summary")]
         )
-        let outcome = Institute.Planner.Canary.Outcome(.init(code: 2, output: "noise\n" + Institute.Planner.Canary.Outcome.Test.Report.output(report)))
+        let outcome = Institute.Planner.Canary.Outcome(.init(code: 2, output: "noise\n" + `Institute.Planner.Canary.Outcome Tests`.Test.Report.output(report)))
         #expect(outcome.status == .unmeasured)
         #expect(outcome.unmeasured.contains("swift-format: no-summary: the engine printed no summary"))
         #expect(outcome.controls == ["findings": 1])
     }
 }
 
-extension Institute.Planner.Canary.Outcome.Test.`Edge Case` {
+extension `Institute.Planner.Canary.Outcome Tests`.Test.`Edge Case` {
 
     @Test func `a run ended by a signal crashed`() {
-        let outcome = Institute.Planner.Canary.Outcome(.init(code: nil, output: Institute.Planner.Canary.Outcome.Test.Report.output(Institute.Planner.Canary.Outcome.Test.Report.report())))
+        let outcome = Institute.Planner.Canary.Outcome(.init(code: nil, output: `Institute.Planner.Canary.Outcome Tests`.Test.Report.output(`Institute.Planner.Canary.Outcome Tests`.Test.Report.report())))
         #expect(outcome.status == .crashed)
     }
 
     @Test func `an exit outside the source exit contract crashed`() {
-        let outcome = Institute.Planner.Canary.Outcome(.init(code: 64, output: Institute.Planner.Canary.Outcome.Test.Report.output(Institute.Planner.Canary.Outcome.Test.Report.report())))
+        let outcome = Institute.Planner.Canary.Outcome(.init(code: 64, output: `Institute.Planner.Canary.Outcome Tests`.Test.Report.output(`Institute.Planner.Canary.Outcome Tests`.Test.Report.report())))
         #expect(outcome.status == .crashed)
     }
 

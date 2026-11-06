@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Platform
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `platform layer import Tests` {
         @Suite struct Unit {}
@@ -28,7 +28,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`platform layer import Tests` {
+extension `Lint.Rule Tests`.`platform layer import Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`platform layer import`.observe(parsed, .warning).findings
@@ -48,11 +48,11 @@ extension Lint.Rule.`platform layer import Tests` {
     ]
 }
 
-extension Lint.Rule.`platform layer import Tests`.Unit {
+extension `Lint.Rule Tests`.`platform layer import Tests`.Unit {
     @Test
     func `every forbidden L2-spec and L3-policy module is flagged`() {
-        for module in Lint.Rule.`platform layer import Tests`.forbiddenModules {
-            let findings = Lint.Rule.`platform layer import Tests`.findings(
+        for module in `Lint.Rule Tests`.`platform layer import Tests`.forbiddenModules {
+            let findings = `Lint.Rule Tests`.`platform layer import Tests`.findings(
                 in: "import \(module)",
                 file: "Sources/Consumer/Client.swift"
             )
@@ -62,7 +62,7 @@ extension Lint.Rule.`platform layer import Tests`.Unit {
 
     @Test
     func `a bare forbidden import carries the rule identity and severity`() {
-        let findings = Lint.Rule.`platform layer import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`platform layer import Tests`.findings(
             in: "import POSIX_Kernel",
             file: "Sources/Consumer/Client.swift"
         )
@@ -82,7 +82,7 @@ extension Lint.Rule.`platform layer import Tests`.Unit {
             "@_exported public import Darwin_Kernel",
             "@_exported import Darwin_Kernel",
         ] {
-            let findings = Lint.Rule.`platform layer import Tests`.findings(
+            let findings = `Lint.Rule Tests`.`platform layer import Tests`.findings(
                 in: source,
                 file: "Sources/Consumer/Client.swift"
             )
@@ -94,7 +94,7 @@ extension Lint.Rule.`platform layer import Tests`.Unit {
     func `a submodule import of a forbidden module is flagged`() {
         // The first path component pulls in the module; the Python's regex
         // captures exactly that leading identifier.
-        let findings = Lint.Rule.`platform layer import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`platform layer import Tests`.findings(
             in: "import Darwin_Kernel_Standard.Something",
             file: "Sources/Consumer/Client.swift"
         )
@@ -109,7 +109,7 @@ extension Lint.Rule.`platform layer import Tests`.Unit {
             import Darwin_Kernel
             #endif
             """
-        let findings = Lint.Rule.`platform layer import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`platform layer import Tests`.findings(
             in: source,
             file: "Sources/Consumer/Client.swift"
         )
@@ -125,7 +125,7 @@ extension Lint.Rule.`platform layer import Tests`.Unit {
             import POSIX_Kernel
             #endif
             """
-        let findings = Lint.Rule.`platform layer import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`platform layer import Tests`.findings(
             in: source,
             file: "Sources/Consumer/Client.swift"
         )
@@ -139,7 +139,7 @@ extension Lint.Rule.`platform layer import Tests`.Unit {
             import Linux_Kernel
             import Windows_Kernel
             """
-        let findings = Lint.Rule.`platform layer import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`platform layer import Tests`.findings(
             in: source,
             file: "Sources/Consumer/Client.swift"
         )
@@ -147,7 +147,7 @@ extension Lint.Rule.`platform layer import Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`platform layer import Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`platform layer import Tests`.`Edge Case` {
     @Test
     func `the L3-unifier surface is NOT flagged`() {
         // This is the sanctioned consumer shape the rule exists to steer to.
@@ -156,7 +156,7 @@ extension Lint.Rule.`platform layer import Tests`.`Edge Case` {
             import IO
             import Paths
             """
-        let findings = Lint.Rule.`platform layer import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`platform layer import Tests`.findings(
             in: source,
             file: "Sources/Consumer/Client.swift"
         )
@@ -174,7 +174,7 @@ extension Lint.Rule.`platform layer import Tests`.`Edge Case` {
             import WinSDK
             import Swift
             """
-        let findings = Lint.Rule.`platform layer import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`platform layer import Tests`.findings(
             in: source,
             file: "Sources/Consumer/Client.swift"
         )
@@ -188,7 +188,7 @@ extension Lint.Rule.`platform layer import Tests`.`Edge Case` {
             import POSIX_Kernel_Helpers
             import Darwin_Kernel_StandardKit
             """
-        let findings = Lint.Rule.`platform layer import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`platform layer import Tests`.findings(
             in: source,
             file: "Sources/Consumer/Client.swift"
         )
@@ -197,7 +197,7 @@ extension Lint.Rule.`platform layer import Tests`.`Edge Case` {
 
     @Test
     func `empty source produces no findings`() {
-        let findings = Lint.Rule.`platform layer import Tests`.findings(in: "")
+        let findings = `Lint.Rule Tests`.`platform layer import Tests`.findings(in: "")
         #expect(findings.isEmpty)
     }
 
@@ -205,7 +205,7 @@ extension Lint.Rule.`platform layer import Tests`.`Edge Case` {
     func `the default no-directory path still fires`() {
         // `test.swift` has no directory segment; no gate may swallow it, or
         // an accidentally rootless run goes silently green.
-        let findings = Lint.Rule.`platform layer import Tests`.findings(in: "import POSIX_Kernel")
+        let findings = `Lint.Rule Tests`.`platform layer import Tests`.findings(in: "import POSIX_Kernel")
         #expect(findings.count == 1)
     }
 }
@@ -213,7 +213,7 @@ extension Lint.Rule.`platform layer import Tests`.`Edge Case` {
 // The platform stack itself is exempt — it exists precisely so the rest of
 // the ecosystem doesn't need these imports. Controlled in both directions:
 // an over-skip is as bad as a never-fire.
-extension Lint.Rule.`platform layer import Tests`.`Platform-stack carve-out` {
+extension `Lint.Rule Tests`.`platform layer import Tests`.`Platform-stack carve-out` {
     // MARK: - Negative controls (inside the stack → must NOT fire)
 
     @Test
@@ -233,7 +233,7 @@ extension Lint.Rule.`platform layer import Tests`.`Platform-stack carve-out` {
             // L3-domain
             "swift-file-system",
         ] {
-            let findings = Lint.Rule.`platform layer import Tests`.findings(
+            let findings = `Lint.Rule Tests`.`platform layer import Tests`.findings(
                 in: "import Darwin_Kernel_Standard",
                 file: "\(package)/Sources/Some Target/File.swift"
             )
@@ -243,7 +243,7 @@ extension Lint.Rule.`platform layer import Tests`.`Platform-stack carve-out` {
 
     @Test
     func `a deeper checkout prefix before the stack package is still exempt`() {
-        let findings = Lint.Rule.`platform layer import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`platform layer import Tests`.findings(
             in: "import POSIX_Kernel",
             file:
                 "checkouts/swift-institute/swift-compositions/swift-kernel/Sources/Kernel/File.swift"
@@ -262,7 +262,7 @@ extension Lint.Rule.`platform layer import Tests`.`Platform-stack carve-out` {
             "swift-posix-extras/Sources/Extras/File.swift",
             "my-swift-darwin/Sources/Lib/File.swift",
         ] {
-            let findings = Lint.Rule.`platform layer import Tests`.findings(
+            let findings = `Lint.Rule Tests`.`platform layer import Tests`.findings(
                 in: "import POSIX_Kernel",
                 file: path
             )
@@ -273,7 +273,7 @@ extension Lint.Rule.`platform layer import Tests`.`Platform-stack carve-out` {
     @Test
     func `a FILE named after a stack package is NOT exempted`() {
         // Only directory segments qualify; the trailing filename is dropped.
-        let findings = Lint.Rule.`platform layer import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`platform layer import Tests`.findings(
             in: "import POSIX_Kernel",
             file: "Sources/Consumer/swift-posix.swift"
         )
@@ -284,7 +284,7 @@ extension Lint.Rule.`platform layer import Tests`.`Platform-stack carve-out` {
 // The Python walks `Sources/` only; test/experiment/example trees, package
 // manifests and hidden directories are never inspected. Controlled in both
 // directions.
-extension Lint.Rule.`platform layer import Tests`.`Scope gates` {
+extension `Lint.Rule Tests`.`platform layer import Tests`.`Scope gates` {
     // MARK: - Negative controls (outside the Python's scan → must NOT fire)
 
     @Test
@@ -294,7 +294,7 @@ extension Lint.Rule.`platform layer import Tests`.`Scope gates` {
             "Experiments/Spike/Probe.swift",
             "Examples/Demo/main.swift",
         ] {
-            let findings = Lint.Rule.`platform layer import Tests`.findings(
+            let findings = `Lint.Rule Tests`.`platform layer import Tests`.findings(
                 in: "import Darwin_Kernel",
                 file: path
             )
@@ -305,7 +305,7 @@ extension Lint.Rule.`platform layer import Tests`.`Scope gates` {
     @Test
     func `a package manifest is NOT flagged`() {
         for path in ["Package.swift", "Package@swift-6.0.swift", "Nested/Package.swift"] {
-            let findings = Lint.Rule.`platform layer import Tests`.findings(
+            let findings = `Lint.Rule Tests`.`platform layer import Tests`.findings(
                 in: "import POSIX_Kernel",
                 file: path
             )
@@ -315,7 +315,7 @@ extension Lint.Rule.`platform layer import Tests`.`Scope gates` {
 
     @Test
     func `a hidden directory segment is NOT flagged`() {
-        let findings = Lint.Rule.`platform layer import Tests`.findings(
+        let findings = `Lint.Rule Tests`.`platform layer import Tests`.findings(
             in: "import POSIX_Kernel",
             file: ".build/checkouts/dep/Sources/Lib/File.swift"
         )
@@ -331,7 +331,7 @@ extension Lint.Rule.`platform layer import Tests`.`Scope gates` {
             "Sources/Consumer/Tests.swift",
             "Sources/Consumer/PackageInfo.swift",
         ] {
-            let findings = Lint.Rule.`platform layer import Tests`.findings(
+            let findings = `Lint.Rule Tests`.`platform layer import Tests`.findings(
                 in: "import POSIX_Kernel",
                 file: path
             )

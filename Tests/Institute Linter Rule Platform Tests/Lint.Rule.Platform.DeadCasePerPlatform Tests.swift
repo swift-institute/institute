@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Platform
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `dead case per platform Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`dead case per platform Tests` {
+extension `Lint.Rule Tests`.`dead case per platform Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -38,7 +38,7 @@ extension Lint.Rule.`dead case per platform Tests` {
     }
 }
 
-extension Lint.Rule.`dead case per platform Tests`.Unit {
+extension `Lint.Rule Tests`.`dead case per platform Tests`.Unit {
     @Test
     func `posix windows enum is flagged`() {
         let source = """
@@ -47,7 +47,7 @@ extension Lint.Rule.`dead case per platform Tests`.Unit {
                 case windows
             }
             """
-        let findings = Lint.Rule.`dead case per platform Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`dead case per platform Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "dead case per platform")
@@ -66,7 +66,7 @@ extension Lint.Rule.`dead case per platform Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`dead case per platform Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`dead case per platform Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -78,12 +78,12 @@ extension Lint.Rule.`dead case per platform Tests`.Unit {
                 case utf16
             }
             """
-        let findings = Lint.Rule.`dead case per platform Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`dead case per platform Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`dead case per platform Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`dead case per platform Tests`.`Edge Case` {
     @Test
     func `domain alternatives enum is NOT flagged`() {
         let source = """
@@ -93,7 +93,7 @@ extension Lint.Rule.`dead case per platform Tests`.`Edge Case` {
                 case ftp
             }
             """
-        let findings = Lint.Rule.`dead case per platform Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`dead case per platform Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -105,7 +105,7 @@ extension Lint.Rule.`dead case per platform Tests`.`Edge Case` {
                 case windows
             }
             """
-        let findings = Lint.Rule.`dead case per platform Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`dead case per platform Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -120,7 +120,7 @@ extension Lint.Rule.`dead case per platform Tests`.`Edge Case` {
                 case unknown
             }
             """
-        let findings = Lint.Rule.`dead case per platform Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`dead case per platform Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -132,7 +132,7 @@ extension Lint.Rule.`dead case per platform Tests`.`Edge Case` {
                 case linux
             }
             """
-        let findings = Lint.Rule.`dead case per platform Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`dead case per platform Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -144,7 +144,7 @@ extension Lint.Rule.`dead case per platform Tests`.`Edge Case` {
                 case windows
             }
             """
-        let findings = Lint.Rule.`dead case per platform Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`dead case per platform Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -161,7 +161,7 @@ extension Lint.Rule.`dead case per platform Tests`.`Edge Case` {
                 #endif
             }
             """
-        let findings = Lint.Rule.`dead case per platform Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`dead case per platform Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }

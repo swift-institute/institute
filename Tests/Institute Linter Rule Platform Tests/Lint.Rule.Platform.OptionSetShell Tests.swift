@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Platform
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `optionset shell pattern Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`optionset shell pattern Tests` {
+extension `Lint.Rule Tests`.`optionset shell pattern Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -38,7 +38,7 @@ extension Lint.Rule.`optionset shell pattern Tests` {
     }
 }
 
-extension Lint.Rule.`optionset shell pattern Tests`.Unit {
+extension `Lint.Rule Tests`.`optionset shell pattern Tests`.Unit {
     @Test
     func `OptionSet with static let Self rawValue in body is flagged`() {
         let source = """
@@ -48,7 +48,7 @@ extension Lint.Rule.`optionset shell pattern Tests`.Unit {
                 public static let create = Self(rawValue: O_CREAT)
             }
             """
-        let findings = Lint.Rule.`optionset shell pattern Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optionset shell pattern Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "optionset shell pattern")
@@ -67,7 +67,7 @@ extension Lint.Rule.`optionset shell pattern Tests`.Unit {
                 public static let exclusive = Self(rawValue: O_EXCL)
             }
             """
-        let findings = Lint.Rule.`optionset shell pattern Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optionset shell pattern Tests`.findings(in: source)
         #expect(findings.count == 3)
     }
 
@@ -80,12 +80,12 @@ extension Lint.Rule.`optionset shell pattern Tests`.Unit {
                 public static let bit = Self(rawValue: 1)
             }
             """
-        let findings = Lint.Rule.`optionset shell pattern Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optionset shell pattern Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`optionset shell pattern Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`optionset shell pattern Tests`.`Edge Case` {
     @Test
     func `clean shell with only rawValue and init is NOT flagged`() {
         let source = """
@@ -94,7 +94,7 @@ extension Lint.Rule.`optionset shell pattern Tests`.`Edge Case` {
                 init(rawValue: Int32) { self.rawValue = rawValue }
             }
             """
-        let findings = Lint.Rule.`optionset shell pattern Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optionset shell pattern Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -110,7 +110,7 @@ extension Lint.Rule.`optionset shell pattern Tests`.`Edge Case` {
                 public static let truncate = Self(rawValue: O_TRUNC)
             }
             """
-        let findings = Lint.Rule.`optionset shell pattern Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optionset shell pattern Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -122,7 +122,7 @@ extension Lint.Rule.`optionset shell pattern Tests`.`Edge Case` {
                 public static let foo = Self(rawValue: 0)
             }
             """
-        let findings = Lint.Rule.`optionset shell pattern Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optionset shell pattern Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -140,7 +140,7 @@ extension Lint.Rule.`optionset shell pattern Tests`.`Edge Case` {
                 public static let none = Options(rawValue: 0)
             }
             """
-        let findings = Lint.Rule.`optionset shell pattern Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optionset shell pattern Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -153,7 +153,7 @@ extension Lint.Rule.`optionset shell pattern Tests`.`Edge Case` {
                 public static let none = Other(rawValue: 0)
             }
             """
-        let findings = Lint.Rule.`optionset shell pattern Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optionset shell pattern Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -168,7 +168,7 @@ extension Lint.Rule.`optionset shell pattern Tests`.`Edge Case` {
                 public static let none = .init(rawValue: 0)
             }
             """
-        let findings = Lint.Rule.`optionset shell pattern Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optionset shell pattern Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -181,7 +181,7 @@ extension Lint.Rule.`optionset shell pattern Tests`.`Edge Case` {
                 public static let none = Self.init(rawValue: 0)
             }
             """
-        let findings = Lint.Rule.`optionset shell pattern Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optionset shell pattern Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -195,7 +195,7 @@ extension Lint.Rule.`optionset shell pattern Tests`.`Edge Case` {
             }
             """
         // `var` form, but same `Self(rawValue:)` shape — flagged.
-        let findings = Lint.Rule.`optionset shell pattern Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optionset shell pattern Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -212,7 +212,7 @@ extension Lint.Rule.`optionset shell pattern Tests`.`Edge Case` {
                 #endif
             }
             """
-        let findings = Lint.Rule.`optionset shell pattern Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optionset shell pattern Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }

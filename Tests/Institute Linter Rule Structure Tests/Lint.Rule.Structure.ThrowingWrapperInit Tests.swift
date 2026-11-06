@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Structure
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `throwing wrapper init Tests` {
         @Suite struct Unit {}
@@ -26,14 +26,14 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`throwing wrapper init Tests` {
+extension `Lint.Rule Tests`.`throwing wrapper init Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`throwing wrapper init`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`throwing wrapper init Tests`.Unit {
+extension `Lint.Rule Tests`.`throwing wrapper init Tests`.Unit {
     @Test
     func `throwing init with single let-binding try-only body is flagged`() {
         // Regression guard: `self.x = try Base(...)` fired but the
@@ -46,7 +46,7 @@ extension Lint.Rule.`throwing wrapper init Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`throwing wrapper init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`throwing wrapper init Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -59,7 +59,7 @@ extension Lint.Rule.`throwing wrapper init Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`throwing wrapper init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`throwing wrapper init Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "throwing wrapper init")
@@ -67,7 +67,7 @@ extension Lint.Rule.`throwing wrapper init Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`throwing wrapper init Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`throwing wrapper init Tests`.`Edge Case` {
     @Test
     func `throwing init with additional validation is NOT flagged`() {
         let source = """
@@ -78,7 +78,7 @@ extension Lint.Rule.`throwing wrapper init Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`throwing wrapper init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`throwing wrapper init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -97,7 +97,7 @@ extension Lint.Rule.`throwing wrapper init Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`throwing wrapper init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`throwing wrapper init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -110,7 +110,7 @@ extension Lint.Rule.`throwing wrapper init Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`throwing wrapper init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`throwing wrapper init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -123,7 +123,7 @@ extension Lint.Rule.`throwing wrapper init Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`throwing wrapper init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`throwing wrapper init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -136,7 +136,7 @@ extension Lint.Rule.`throwing wrapper init Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`throwing wrapper init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`throwing wrapper init Tests`.findings(in: source)
         // Int is the LAX type; the rule's "wrapper specializes stricter
         // invariant" premise is inverted when the enclosing type is the
         // lax primitive and the parameter is the stricter institute
@@ -157,7 +157,7 @@ extension Lint.Rule.`throwing wrapper init Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`throwing wrapper init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`throwing wrapper init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -170,7 +170,7 @@ extension Lint.Rule.`throwing wrapper init Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`throwing wrapper init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`throwing wrapper init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -183,7 +183,7 @@ extension Lint.Rule.`throwing wrapper init Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`throwing wrapper init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`throwing wrapper init Tests`.findings(in: source)
         // Institute wrapper struct (not on the lax allowlist) — the
         // rule's premise applies and the init should still fire.
         #expect(findings.count == 1)

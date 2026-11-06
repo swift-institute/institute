@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Naming
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `diagnostic message format Tests` {
         @Suite struct Unit {}
@@ -27,7 +27,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`diagnostic message format Tests` {
+extension `Lint.Rule Tests`.`diagnostic message format Tests` {
     /// The default fixture path is IN scope: a rule source under `Sources/`
     /// with a four-segment dotted basename.
     static func findings(
@@ -47,13 +47,13 @@ extension Lint.Rule.`diagnostic message format Tests` {
     }
 }
 
-extension Lint.Rule.`diagnostic message format Tests`.Unit {
+extension `Lint.Rule Tests`.`diagnostic message format Tests`.Unit {
     @Test
     func `a conforming message with a skill-ID citation is NOT flagged`() {
-        let source = Lint.Rule.`diagnostic message format Tests`.declaration(
+        let source = `Lint.Rule Tests`.`diagnostic message format Tests`.declaration(
             message: "[try_optional] [API-ERR-001]: prefer typed throws over try?"
         )
-        let findings = Lint.Rule.`diagnostic message format Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -69,8 +69,8 @@ extension Lint.Rule.`diagnostic message format Tests`.Unit {
             "[pattern-005b] [PATTERN-005b]/[MEM-SAFE-002]: description",
             "[typed_throws] typed-throws-rationale.md: description",
         ] {
-            let source = Lint.Rule.`diagnostic message format Tests`.declaration(message: message)
-            let findings = Lint.Rule.`diagnostic message format Tests`.findings(in: source)
+            let source = `Lint.Rule Tests`.`diagnostic message format Tests`.declaration(message: message)
+            let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(in: source)
             #expect(findings.isEmpty, "expected no finding for \(message)")
         }
     }
@@ -87,16 +87,16 @@ extension Lint.Rule.`diagnostic message format Tests`.Unit {
                 + " on a platform-prefixed module."
             }
             """
-        let findings = Lint.Rule.`diagnostic message format Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `a message without the leading rule-id bracket is flagged`() {
-        let source = Lint.Rule.`diagnostic message format Tests`.declaration(
+        let source = `Lint.Rule Tests`.`diagnostic message format Tests`.declaration(
             message: "prefer typed throws over try?"
         )
-        let findings = Lint.Rule.`diagnostic message format Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(in: source)
         let count = findings.count
         #expect(count == 1)
         if count == 1 {
@@ -107,10 +107,10 @@ extension Lint.Rule.`diagnostic message format Tests`.Unit {
 
     @Test
     func `a message without a citation separator colon is flagged`() {
-        let source = Lint.Rule.`diagnostic message format Tests`.declaration(
+        let source = `Lint.Rule Tests`.`diagnostic message format Tests`.declaration(
             message: "[try_optional] prefer typed throws over try?"
         )
-        let findings = Lint.Rule.`diagnostic message format Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -118,10 +118,10 @@ extension Lint.Rule.`diagnostic message format Tests`.Unit {
     func `a colon not followed by whitespace is flagged`() {
         // `:\s` — the separator is `: `, not a bare `:` glued to the
         // description.
-        let source = Lint.Rule.`diagnostic message format Tests`.declaration(
+        let source = `Lint.Rule Tests`.`diagnostic message format Tests`.declaration(
             message: "[try_optional] [API-ERR-001]:description"
         )
-        let findings = Lint.Rule.`diagnostic message format Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -133,8 +133,8 @@ extension Lint.Rule.`diagnostic message format Tests`.Unit {
             "[try_optional] : description",
             "[try_optional] ",
         ] {
-            let source = Lint.Rule.`diagnostic message format Tests`.declaration(message: message)
-            let findings = Lint.Rule.`diagnostic message format Tests`.findings(in: source)
+            let source = `Lint.Rule Tests`.`diagnostic message format Tests`.declaration(message: message)
+            let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(in: source)
             #expect(findings.count == 1, "expected a finding for \(message)")
         }
     }
@@ -151,28 +151,28 @@ extension Lint.Rule.`diagnostic message format Tests`.Unit {
             "[foundation import] [ARCH-LAYER-007]: description",
             "[] citation: description",
         ] {
-            let source = Lint.Rule.`diagnostic message format Tests`.declaration(message: message)
-            let findings = Lint.Rule.`diagnostic message format Tests`.findings(in: source)
+            let source = `Lint.Rule Tests`.`diagnostic message format Tests`.declaration(message: message)
+            let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(in: source)
             #expect(findings.count == 1, "expected a finding for \(message)")
         }
     }
 
     @Test
     func `no closing bracket is flagged`() {
-        let source = Lint.Rule.`diagnostic message format Tests`.declaration(
+        let source = `Lint.Rule Tests`.`diagnostic message format Tests`.declaration(
             message: "[try_optional citation: description"
         )
-        let findings = Lint.Rule.`diagnostic message format Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `no whitespace after the rule-id bracket is flagged`() {
         // `\]\s+` — at least one whitespace character must follow.
-        let source = Lint.Rule.`diagnostic message format Tests`.declaration(
+        let source = `Lint.Rule Tests`.`diagnostic message format Tests`.declaration(
             message: "[try_optional][API-ERR-001]: description"
         )
-        let findings = Lint.Rule.`diagnostic message format Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -185,12 +185,12 @@ extension Lint.Rule.`diagnostic message format Tests`.Unit {
                 + " over try? — see the throws pack."
             }
             """
-        let findings = Lint.Rule.`diagnostic message format Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`diagnostic message format Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`diagnostic message format Tests`.`Edge Case` {
     @Test
     func `a type annotation on the declaration is still matched`() {
         let source = """
@@ -198,7 +198,7 @@ extension Lint.Rule.`diagnostic message format Tests`.`Edge Case` {
               static let message: Swift.String = "no format here at all"
             }
             """
-        let findings = Lint.Rule.`diagnostic message format Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -210,7 +210,7 @@ extension Lint.Rule.`diagnostic message format Tests`.`Edge Case` {
                   \(modifier) static let message = "no format here"
                 }
                 """
-            let findings = Lint.Rule.`diagnostic message format Tests`.findings(in: source)
+            let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(in: source)
             #expect(findings.count == 1, "expected a finding for \(modifier)")
         }
     }
@@ -223,7 +223,7 @@ extension Lint.Rule.`diagnostic message format Tests`.`Edge Case` {
               let message = "no format here"
             }
             """
-        let findings = Lint.Rule.`diagnostic message format Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -234,7 +234,7 @@ extension Lint.Rule.`diagnostic message format Tests`.`Edge Case` {
               static var message = "no format here"
             }
             """
-        let findings = Lint.Rule.`diagnostic message format Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -245,7 +245,7 @@ extension Lint.Rule.`diagnostic message format Tests`.`Edge Case` {
               static let diagnosticText = "no format here"
             }
             """
-        let findings = Lint.Rule.`diagnostic message format Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -259,7 +259,7 @@ extension Lint.Rule.`diagnostic message format Tests`.`Edge Case` {
               static func compose() -> Swift.String { "" }
             }
             """
-        let findings = Lint.Rule.`diagnostic message format Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -273,7 +273,7 @@ extension Lint.Rule.`diagnostic message format Tests`.`Edge Case` {
               static let tail = ""
             }
             """
-        let findings = Lint.Rule.`diagnostic message format Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -285,13 +285,13 @@ extension Lint.Rule.`diagnostic message format Tests`.`Edge Case` {
               static let tail = ""
             }
             """
-        let findings = Lint.Rule.`diagnostic message format Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `empty source produces no findings`() {
-        let findings = Lint.Rule.`diagnostic message format Tests`.findings(in: "")
+        let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(in: "")
         #expect(findings.isEmpty)
     }
 }
@@ -299,8 +299,8 @@ extension Lint.Rule.`diagnostic message format Tests`.`Edge Case` {
 // The Python's detection scope is `Sources/**/Lint.Rule.*.*.swift` — the
 // institute's linter-rule authoring sites only. Controlled in both
 // directions.
-extension Lint.Rule.`diagnostic message format Tests`.`Detection scope` {
-    private static let malformed = Lint.Rule.`diagnostic message format Tests`.declaration(
+extension `Lint.Rule Tests`.`diagnostic message format Tests`.`Detection scope` {
+    private static let malformed = `Lint.Rule Tests`.`diagnostic message format Tests`.declaration(
         message: "no format here"
     )
 
@@ -313,7 +313,7 @@ extension Lint.Rule.`diagnostic message format Tests`.`Detection scope` {
             "Sources/Rules/Lint.Configuration.swift",
             "Sources/Rules/Rule.Demo.Example.swift",
         ] {
-            let findings = Lint.Rule.`diagnostic message format Tests`.findings(
+            let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(
                 in: Self.malformed,
                 file: path
             )
@@ -325,7 +325,7 @@ extension Lint.Rule.`diagnostic message format Tests`.`Detection scope` {
     func `the namespace placeholder file is NOT in scope`() {
         // `Lint.Rule.<Module>.swift` (three dotted segments) carries the
         // namespace declaration, not a rule body.
-        let findings = Lint.Rule.`diagnostic message format Tests`.findings(
+        let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(
             in: Self.malformed,
             file: "Sources/Rules/Lint.Rule.Demo.swift"
         )
@@ -339,7 +339,7 @@ extension Lint.Rule.`diagnostic message format Tests`.`Detection scope` {
             "Tests/Rules Tests/Lint.Rule.Demo.Example Tests.swift",
             "Experiments/Lint.Rule.Demo.Example.swift",
         ] {
-            let findings = Lint.Rule.`diagnostic message format Tests`.findings(
+            let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(
                 in: Self.malformed,
                 file: path
             )
@@ -349,7 +349,7 @@ extension Lint.Rule.`diagnostic message format Tests`.`Detection scope` {
 
     @Test
     func `a hidden directory segment is NOT in scope`() {
-        let findings = Lint.Rule.`diagnostic message format Tests`.findings(
+        let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(
             in: Self.malformed,
             file: ".build/checkouts/dep/Sources/Rules/Lint.Rule.Demo.Example.swift"
         )
@@ -362,7 +362,7 @@ extension Lint.Rule.`diagnostic message format Tests`.`Detection scope` {
     func `a rule file with MORE than four dotted segments is in scope`() {
         // `Lint.Rule.Demo.Example.Fix.swift` — companion files match the
         // Python's glob too.
-        let findings = Lint.Rule.`diagnostic message format Tests`.findings(
+        let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(
             in: Self.malformed,
             file: "Sources/Rules/Lint.Rule.Demo.Example.Fix.swift"
         )
@@ -371,7 +371,7 @@ extension Lint.Rule.`diagnostic message format Tests`.`Detection scope` {
 
     @Test
     func `a nested Sources tree is in scope`() {
-        let findings = Lint.Rule.`diagnostic message format Tests`.findings(
+        let findings = `Lint.Rule Tests`.`diagnostic message format Tests`.findings(
             in: Self.malformed,
             file: "checkouts/some-package/Sources/Rule Pack/Lint.Rule.Demo.Example.swift"
         )

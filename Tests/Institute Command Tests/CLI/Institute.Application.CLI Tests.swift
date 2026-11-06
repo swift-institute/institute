@@ -11,7 +11,9 @@ private func parse(
     try Command.parse(Institute.Application.CLI.self, from: argv, initial: .install(.init()))
 }
 
-extension Institute.Application.CLI {
+enum `Institute.Application.CLI Tests` {}
+
+extension `Institute.Application.CLI Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -19,7 +21,7 @@ extension Institute.Application.CLI {
     }
 }
 
-extension Institute.Application.CLI.Test.Unit {
+extension `Institute.Application.CLI Tests`.Test.Unit {
     @Test
     func `install selects the command bootstrap`() throws {
         let command = try parse(["install"])
@@ -31,7 +33,7 @@ extension Institute.Application.CLI.Test.Unit {
     }
 }
 
-extension Institute.Application.CLI.Test.`Edge Case` {
+extension `Institute.Application.CLI Tests`.Test.`Edge Case` {
     @Test
     func `install takes no mode`() {
         #expect(throws: Command.Error.self) {

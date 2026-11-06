@@ -17,7 +17,9 @@ import Testing
 
 @testable import Institute_Linter_Rule_Idiom
 
-extension Lint.Rule {
+enum `Lint.Rule Tests` {}
+
+extension `Lint.Rule Tests` {
     @Suite
     struct `bounded index static capacity Tests` {
         @Suite struct Unit {}
@@ -26,14 +28,14 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`bounded index static capacity Tests` {
+extension `Lint.Rule Tests`.`bounded index static capacity Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`bounded index static capacity`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`bounded index static capacity Tests`.Unit {
+extension `Lint.Rule Tests`.`bounded index static capacity Tests`.Unit {
     @Test
     func `Int subscript on value-generic struct is flagged`() {
         let source = """
@@ -41,7 +43,7 @@ extension Lint.Rule.`bounded index static capacity Tests`.Unit {
                 subscript(index: Int) -> Int { 0 }
             }
             """
-        let findings = Lint.Rule.`bounded index static capacity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`bounded index static capacity Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "bounded index static capacity")
@@ -56,7 +58,7 @@ extension Lint.Rule.`bounded index static capacity Tests`.Unit {
                 subscript(i: Swift.Int) -> Element { fatalError() }
             }
             """
-        let findings = Lint.Rule.`bounded index static capacity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`bounded index static capacity Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -67,7 +69,7 @@ extension Lint.Rule.`bounded index static capacity Tests`.Unit {
                 subscript(i: Int) -> Element { fatalError() }
             }
             """
-        let findings = Lint.Rule.`bounded index static capacity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`bounded index static capacity Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -78,7 +80,7 @@ extension Lint.Rule.`bounded index static capacity Tests`.Unit {
                 subscript(i: Int) -> Job { fatalError() }
             }
             """
-        let findings = Lint.Rule.`bounded index static capacity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`bounded index static capacity Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -93,7 +95,7 @@ extension Lint.Rule.`bounded index static capacity Tests`.Unit {
                 subscript(i: Int) -> Element { fatalError() }
             }
             """
-        let findings = Lint.Rule.`bounded index static capacity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`bounded index static capacity Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -105,12 +107,12 @@ extension Lint.Rule.`bounded index static capacity Tests`.Unit {
                 subscript(i: Int) -> Element { fatalError() }
             }
             """
-        let findings = Lint.Rule.`bounded index static capacity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`bounded index static capacity Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`bounded index static capacity Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`bounded index static capacity Tests`.`Edge Case` {
     @Test
     func `Bounded subscript on value-generic is NOT flagged`() {
         let source = """
@@ -118,7 +120,7 @@ extension Lint.Rule.`bounded index static capacity Tests`.`Edge Case` {
                 subscript(i: Index<Element>.Bounded<N>) -> Element { fatalError() }
             }
             """
-        let findings = Lint.Rule.`bounded index static capacity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`bounded index static capacity Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -129,7 +131,7 @@ extension Lint.Rule.`bounded index static capacity Tests`.`Edge Case` {
                 subscript(i: Int) -> Element { fatalError() }
             }
             """
-        let findings = Lint.Rule.`bounded index static capacity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`bounded index static capacity Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -140,7 +142,7 @@ extension Lint.Rule.`bounded index static capacity Tests`.`Edge Case` {
                 subscript(i: Int) -> Int { 0 }
             }
             """
-        let findings = Lint.Rule.`bounded index static capacity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`bounded index static capacity Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -153,7 +155,7 @@ extension Lint.Rule.`bounded index static capacity Tests`.`Edge Case` {
                 subscript(i: Int) -> Element { fatalError() }
             }
             """
-        let findings = Lint.Rule.`bounded index static capacity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`bounded index static capacity Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -166,13 +168,13 @@ extension Lint.Rule.`bounded index static capacity Tests`.`Edge Case` {
                 subscript(other: Int) -> Bool { false }
             }
             """
-        let findings = Lint.Rule.`bounded index static capacity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`bounded index static capacity Tests`.findings(in: source)
         // Two raw-Int subscripts flagged; the bounded one not.
         #expect(findings.count == 2)
     }
 }
 
-extension Lint.Rule.`bounded index static capacity Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`bounded index static capacity Tests`.`Edge Case` {
     @Test
     func `an extension in another file of a value-generic type is checked`() {
         let declaring = "public struct Inset<let N: Int> {}"

@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Throws
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `generic throws missing never Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`generic throws missing never Tests` {
+extension `Lint.Rule Tests`.`generic throws missing never Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -38,7 +38,7 @@ extension Lint.Rule.`generic throws missing never Tests` {
     }
 }
 
-extension Lint.Rule.`generic throws missing never Tests`.Unit {
+extension `Lint.Rule Tests`.`generic throws missing never Tests`.Unit {
     @Test
     func `public method on generic struct throwing G dot Failure is flagged`() {
         let source = """
@@ -46,7 +46,7 @@ extension Lint.Rule.`generic throws missing never Tests`.Unit {
                 public mutating func parse() throws(Sink.Failure) { }
             }
             """
-        let findings = Lint.Rule.`generic throws missing never Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`generic throws missing never Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "generic throws missing never")
@@ -68,7 +68,7 @@ extension Lint.Rule.`generic throws missing never Tests`.Unit {
                 func op<E: Handler>() throws(E.Failure) { }
             }
             """
-        let findings = Lint.Rule.`generic throws missing never Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`generic throws missing never Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -79,7 +79,7 @@ extension Lint.Rule.`generic throws missing never Tests`.Unit {
                 public init() throws(Source.Failure) { }
             }
             """
-        let findings = Lint.Rule.`generic throws missing never Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`generic throws missing never Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -88,12 +88,12 @@ extension Lint.Rule.`generic throws missing never Tests`.Unit {
         let source = """
             public func op<E: Handler>() throws(E.Failure) { }
             """
-        let findings = Lint.Rule.`generic throws missing never Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`generic throws missing never Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`generic throws missing never Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`generic throws missing never Tests`.`Edge Case` {
     @Test
     func `extension short-form generic-argument-shaped header is NOT flagged`() {
         // Regression guard: `extension Parser<Sink> { … }`'s generic
@@ -111,7 +111,7 @@ extension Lint.Rule.`generic throws missing never Tests`.`Edge Case` {
                 public func consume() throws(Sink.Failure) { }
             }
             """
-        let findings = Lint.Rule.`generic throws missing never Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`generic throws missing never Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -122,7 +122,7 @@ extension Lint.Rule.`generic throws missing never Tests`.`Edge Case` {
                 public mutating func parse() throws(MyError) { }
             }
             """
-        let findings = Lint.Rule.`generic throws missing never Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`generic throws missing never Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -133,7 +133,7 @@ extension Lint.Rule.`generic throws missing never Tests`.`Edge Case` {
                 public mutating func parse() throws { }
             }
             """
-        let findings = Lint.Rule.`generic throws missing never Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`generic throws missing never Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -145,7 +145,7 @@ extension Lint.Rule.`generic throws missing never Tests`.`Edge Case` {
                 func also() throws(Sink.Failure) { }
             }
             """
-        let findings = Lint.Rule.`generic throws missing never Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`generic throws missing never Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -159,7 +159,7 @@ extension Lint.Rule.`generic throws missing never Tests`.`Edge Case` {
                 public func consume() throws(Sink.Failure) { }
             }
             """
-        let findings = Lint.Rule.`generic throws missing never Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`generic throws missing never Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -170,7 +170,7 @@ extension Lint.Rule.`generic throws missing never Tests`.`Edge Case` {
                 public func parse() throws(MyError) { }
             }
             """
-        let findings = Lint.Rule.`generic throws missing never Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`generic throws missing never Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

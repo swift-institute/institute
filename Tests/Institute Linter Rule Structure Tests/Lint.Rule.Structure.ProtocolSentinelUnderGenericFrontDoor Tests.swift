@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Structure
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `protocol sentinel under generic front door Tests` {
         @Suite struct Unit {}
@@ -27,7 +27,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`protocol sentinel under generic front door Tests` {
+extension `Lint.Rule Tests`.`protocol sentinel under generic front door Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -39,7 +39,7 @@ extension Lint.Rule.`protocol sentinel under generic front door Tests` {
     }
 }
 
-extension Lint.Rule.`protocol sentinel under generic front door Tests`.Unit {
+extension `Lint.Rule Tests`.`protocol sentinel under generic front door Tests`.Unit {
     @Test
     func `backtick Protocol sentinel nested under a generic front-door carrier is flagged`() {
         // The retired swift-set shape: a public generic front
@@ -55,7 +55,7 @@ extension Lint.Rule.`protocol sentinel under generic front door Tests`.Unit {
                 public typealias `Protocol` = __SetProtocol
             }
             """
-        let findings = Lint.Rule.`protocol sentinel under generic front door Tests`.findings(
+        let findings = `Lint.Rule Tests`.`protocol sentinel under generic front door Tests`.findings(
             in: source
         )
         #expect(findings.count == 1)
@@ -75,7 +75,7 @@ extension Lint.Rule.`protocol sentinel under generic front door Tests`.Unit {
                 public typealias Protocol = __ArrayProtocol
             }
             """
-        let findings = Lint.Rule.`protocol sentinel under generic front door Tests`.findings(
+        let findings = `Lint.Rule Tests`.`protocol sentinel under generic front door Tests`.findings(
             in: source
         )
         #expect(findings.count == 1)
@@ -92,7 +92,7 @@ extension Lint.Rule.`protocol sentinel under generic front door Tests`.Unit {
                 public struct `Protocol` {}
             }
             """
-        let findings = Lint.Rule.`protocol sentinel under generic front door Tests`.findings(
+        let findings = `Lint.Rule Tests`.`protocol sentinel under generic front door Tests`.findings(
             in: source
         )
         #expect(findings.count == 1)
@@ -111,14 +111,14 @@ extension Lint.Rule.`protocol sentinel under generic front door Tests`.Unit {
             public typealias Set<Element> = __Set<Element>
             public struct __Set<Element> {}
             """
-        let findings = Lint.Rule.`protocol sentinel under generic front door Tests`.findings(
+        let findings = `Lint.Rule Tests`.`protocol sentinel under generic front door Tests`.findings(
             in: source
         )
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`protocol sentinel under generic front door Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`protocol sentinel under generic front door Tests`.`Edge Case` {
     @Test
     func `Protocol sentinel nested on the front-door alias name itself is NOT flagged`() {
         // No SEPARATE carrier is being extended here — this doesn't
@@ -130,7 +130,7 @@ extension Lint.Rule.`protocol sentinel under generic front door Tests`.`Edge Cas
                 public typealias `Protocol` = __SetProtocol
             }
             """
-        let findings = Lint.Rule.`protocol sentinel under generic front door Tests`.findings(
+        let findings = `Lint.Rule Tests`.`protocol sentinel under generic front door Tests`.findings(
             in: source
         )
         #expect(findings.isEmpty)
@@ -145,14 +145,14 @@ extension Lint.Rule.`protocol sentinel under generic front door Tests`.`Edge Cas
                 public typealias `Protocol` = UnderlyingProtocol
             }
             """
-        let findings = Lint.Rule.`protocol sentinel under generic front door Tests`.findings(
+        let findings = `Lint.Rule Tests`.`protocol sentinel under generic front door Tests`.findings(
             in: source
         )
         #expect(findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`protocol sentinel under generic front door Tests`.Negative {
+extension `Lint.Rule Tests`.`protocol sentinel under generic front door Tests`.Negative {
     @Test
     func
         `bare non-generic namespace with directly-nested Protocol is NOT flagged - Store precedent`()
@@ -168,7 +168,7 @@ extension Lint.Rule.`protocol sentinel under generic front door Tests`.Negative 
                 public typealias `Protocol` = __StoreProtocol
             }
             """
-        let findings = Lint.Rule.`protocol sentinel under generic front door Tests`.findings(
+        let findings = `Lint.Rule Tests`.`protocol sentinel under generic front door Tests`.findings(
             in: source
         )
         #expect(findings.isEmpty)
@@ -192,7 +192,7 @@ extension Lint.Rule.`protocol sentinel under generic front door Tests`.Negative 
                 public struct Contiguous<Element> {}
             }
             """
-        let findings = Lint.Rule.`protocol sentinel under generic front door Tests`.findings(
+        let findings = `Lint.Rule Tests`.`protocol sentinel under generic front door Tests`.findings(
             in: source
         )
         #expect(findings.isEmpty)
@@ -207,7 +207,7 @@ extension Lint.Rule.`protocol sentinel under generic front door Tests`.Negative 
                 public typealias `Protocol` = __CarrierProtocol
             }
             """
-        let findings = Lint.Rule.`protocol sentinel under generic front door Tests`.findings(
+        let findings = `Lint.Rule Tests`.`protocol sentinel under generic front door Tests`.findings(
             in: source
         )
         #expect(findings.isEmpty)
@@ -222,7 +222,7 @@ extension Lint.Rule.`protocol sentinel under generic front door Tests`.Negative 
                 public typealias Index = Int
             }
             """
-        let findings = Lint.Rule.`protocol sentinel under generic front door Tests`.findings(
+        let findings = `Lint.Rule Tests`.`protocol sentinel under generic front door Tests`.findings(
             in: source
         )
         #expect(findings.isEmpty)
@@ -230,7 +230,7 @@ extension Lint.Rule.`protocol sentinel under generic front door Tests`.Negative 
 
     @Test
     func `empty file produces no findings`() {
-        let findings = Lint.Rule.`protocol sentinel under generic front door Tests`.findings(in: "")
+        let findings = `Lint.Rule Tests`.`protocol sentinel under generic front door Tests`.findings(in: "")
         #expect(findings.isEmpty)
     }
 }

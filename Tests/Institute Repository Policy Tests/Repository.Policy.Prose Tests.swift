@@ -3,7 +3,9 @@ public import Institute_Model
 import Institute_Repository_Policy
 import Testing
 
-extension Institute.Repository.Policy.Prose {
+enum `Institute.Repository.Policy.Prose Tests` {}
+
+extension `Institute.Repository.Policy.Prose Tests` {
     @Suite
     struct Unit {
         @Test

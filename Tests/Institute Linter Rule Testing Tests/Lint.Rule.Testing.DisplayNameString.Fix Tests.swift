@@ -18,7 +18,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Testing
 
-extension Lint.Rule.`test display name string Tests` {
+extension `Lint.Rule Tests`.`test display name string Tests` {
     static func fixed(_ source: Swift::String) -> Swift::String? {
         let parsed = Lint.Source.parsed(from: source, file: "Tests/X/Thing Tests.swift")
         return Lint.Rule.`test display name string`.rewritten(parsed)
@@ -66,14 +66,14 @@ extension Lint.Rule.`test display name string Tests` {
     }
 }
 
-extension Lint.Rule.`test display name string Tests`.Unit {
+extension `Lint.Rule Tests`.`test display name string Tests`.Unit {
     @Test
     func `a duplicate Test display string is removed`() {
         let source = """
             @Test("init creates empty buffer")
             func `init creates empty buffer`() {}
             """
-        let output = Lint.Rule.`test display name string Tests`.verify(source)
+        let output = `Lint.Rule Tests`.`test display name string Tests`.verify(source)
         #expect(
             output
                 == """
@@ -89,7 +89,7 @@ extension Lint.Rule.`test display name string Tests`.Unit {
             @Suite("Domain Standard Tests", .serialized)
             struct `Domain Standard Tests` {}
             """
-        let output = Lint.Rule.`test display name string Tests`.verify(source)
+        let output = `Lint.Rule Tests`.`test display name string Tests`.verify(source)
         #expect(
             output
                 == """
@@ -105,7 +105,7 @@ extension Lint.Rule.`test display name string Tests`.Unit {
             @Testing.Test("round trips", .tags(.fast), arguments: [1, 2])
             func `round trips`(_ value: Int) {}
             """
-        let output = Lint.Rule.`test display name string Tests`.verify(source)
+        let output = `Lint.Rule Tests`.`test display name string Tests`.verify(source)
         #expect(
             output
                 == """
@@ -125,7 +125,7 @@ extension Lint.Rule.`test display name string Tests`.Unit {
             )
             struct `Parsing Tests` {}
             """
-        let output = Lint.Rule.`test display name string Tests`.verify(source)
+        let output = `Lint.Rule Tests`.`test display name string Tests`.verify(source)
         #expect(
             output
                 == """
@@ -146,11 +146,11 @@ extension Lint.Rule.`test display name string Tests`.Unit {
             )
             func `commented identity`() {}
             """
-        let output = Lint.Rule.`test display name string Tests`.verify(source)
+        let output = `Lint.Rule Tests`.`test display name string Tests`.verify(source)
         #expect(output?.contains("/* display prefix */") == true)
         #expect(output?.contains("/* display suffix */") == true)
         #expect(
-            Lint.Rule.`test display name string Tests`.name(ofFirstFunctionIn: output ?? "")
+            `Lint.Rule Tests`.`test display name string Tests`.name(ofFirstFunctionIn: output ?? "")
                 == "`commented identity`"
         )
     }
@@ -164,7 +164,7 @@ extension Lint.Rule.`test display name string Tests`.Unit {
             @Suite("class") final class `class` {}
             @Suite("actor") actor `actor` {}
             """
-        let output = Lint.Rule.`test display name string Tests`.verify(source)
+        let output = `Lint.Rule Tests`.`test display name string Tests`.verify(source)
         #expect(output?.contains("@Test func `function`()") == true)
         #expect(output?.contains("@Suite struct `structure`") == true)
         #expect(output?.contains("@Suite enum `enumeration`") == true)
@@ -173,7 +173,7 @@ extension Lint.Rule.`test display name string Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`test display name string Tests`.Integration {
+extension `Lint.Rule Tests`.`test display name string Tests`.Integration {
     @Test
     func `the declaration identity token and references never change`() {
         let source = """
@@ -184,10 +184,10 @@ extension Lint.Rule.`test display name string Tests`.Integration {
 
             let reference = `semantic identity`
             """
-        let before = Lint.Rule.`test display name string Tests`.name(ofFirstFunctionIn: source)
-        let output = Lint.Rule.`test display name string Tests`.verify(source)
+        let before = `Lint.Rule Tests`.`test display name string Tests`.name(ofFirstFunctionIn: source)
+        let output = `Lint.Rule Tests`.`test display name string Tests`.verify(source)
         let after = output.flatMap {
-            Lint.Rule.`test display name string Tests`.name(ofFirstFunctionIn: $0)
+            `Lint.Rule Tests`.`test display name string Tests`.name(ofFirstFunctionIn: $0)
         }
         #expect(before == "`semantic identity`")
         #expect(after == before)
@@ -197,18 +197,18 @@ extension Lint.Rule.`test display name string Tests`.Integration {
 
 }
 
-extension Lint.Rule.`test display name string Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`test display name string Tests`.`Edge Case` {
     @Test
     func `a different declaration name is routed as rename required and refused`() {
         let source = """
             @Test("init creates empty buffer")
             func `construction from UInt`() {}
             """
-        let findings = Lint.Rule.`test display name string Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`test display name string Tests`.findings(in: source)
         #expect(findings.count == 1)
         #expect(findings.first?.message == testingDisplayNameStringMessage)
         #expect(findings.first?.message.contains("Rename required; autofix refused") == true)
-        #expect(Lint.Rule.`test display name string Tests`.fixed(source) == nil)
+        #expect(`Lint.Rule Tests`.`test display name string Tests`.fixed(source) == nil)
     }
 
     @Test
@@ -217,8 +217,8 @@ extension Lint.Rule.`test display name string Tests`.`Edge Case` {
             @Test("example")
             func example() {}
             """
-        #expect(Lint.Rule.`test display name string Tests`.findings(in: source).count == 1)
-        #expect(Lint.Rule.`test display name string Tests`.fixed(source) == nil)
+        #expect(`Lint.Rule Tests`.`test display name string Tests`.findings(in: source).count == 1)
+        #expect(`Lint.Rule Tests`.`test display name string Tests`.fixed(source) == nil)
     }
 
     @Test
@@ -233,13 +233,13 @@ extension Lint.Rule.`test display name string Tests`.`Edge Case` {
             @Test("case \(index)")
             func `interpolated display`() {}
             """#
-        #expect(Lint.Rule.`test display name string Tests`.findings(in: source).isEmpty)
-        #expect(Lint.Rule.`test display name string Tests`.fixed(source) == nil)
+        #expect(`Lint.Rule Tests`.`test display name string Tests`.findings(in: source).isEmpty)
+        #expect(`Lint.Rule Tests`.`test display name string Tests`.fixed(source) == nil)
     }
 
 }
 
-extension Lint.Rule.`test display name string Tests`.Integration {
+extension `Lint.Rule Tests`.`test display name string Tests`.Integration {
     @Test
     func `the rule suite's duplicate shape self-round-trips`() {
         let source = """
@@ -250,7 +250,7 @@ extension Lint.Rule.`test display name string Tests`.Integration {
               }
             }
             """
-        let output = Lint.Rule.`test display name string Tests`.verify(source)
+        let output = `Lint.Rule Tests`.`test display name string Tests`.verify(source)
         #expect(output?.contains("@Suite\n  struct `test display name string Tests`") == true)
     }
 }

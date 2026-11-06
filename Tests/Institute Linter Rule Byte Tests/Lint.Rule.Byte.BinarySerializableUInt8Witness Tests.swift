@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Byte
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `binary serializable uint8 witness Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`binary serializable uint8 witness Tests` {
+extension `Lint.Rule Tests`.`binary serializable uint8 witness Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -38,7 +38,7 @@ extension Lint.Rule.`binary serializable uint8 witness Tests` {
     }
 }
 
-extension Lint.Rule.`binary serializable uint8 witness Tests`.Unit {
+extension `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.Unit {
     @Test
     func `serialize where Buffer Element equals UInt8 is flagged`() {
         let source = """
@@ -48,7 +48,7 @@ extension Lint.Rule.`binary serializable uint8 witness Tests`.Unit {
                 ) where Buffer.Element == UInt8 {}
             }
             """
-        let result = Lint.Rule.`binary serializable uint8 witness Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -61,7 +61,7 @@ extension Lint.Rule.`binary serializable uint8 witness Tests`.Unit {
                 ) -> Self where Source.Element == UInt8 { fatalError() }
             }
             """
-        let result = Lint.Rule.`binary serializable uint8 witness Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -79,7 +79,7 @@ extension Lint.Rule.`binary serializable uint8 witness Tests`.Unit {
                 ) where Buffer.Element == UInt8 {}
             }
             """
-        let result = Lint.Rule.`binary serializable uint8 witness Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -92,7 +92,7 @@ extension Lint.Rule.`binary serializable uint8 witness Tests`.Unit {
                 ) -> Self where Source.Element == UInt8 { fatalError() }
             }
             """
-        let result = Lint.Rule.`binary serializable uint8 witness Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -108,7 +108,7 @@ extension Lint.Rule.`binary serializable uint8 witness Tests`.Unit {
                 ) where Buffer.Element == UInt8 {}
             }
             """
-        let result = Lint.Rule.`binary serializable uint8 witness Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -123,7 +123,7 @@ extension Lint.Rule.`binary serializable uint8 witness Tests`.Unit {
                 public init<Source: Collection>(parsing s: Source) where Source.Element == UInt8 {}
             }
             """
-        let result = Lint.Rule.`binary serializable uint8 witness Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -139,12 +139,12 @@ extension Lint.Rule.`binary serializable uint8 witness Tests`.Unit {
                 ) where Buffer.Element == UInt8 {}
             }
             """
-        let result = Lint.Rule.`binary serializable uint8 witness Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 }
 
-extension Lint.Rule.`binary serializable uint8 witness Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.`Edge Case` {
     @Test
     func `initializer witness where Source Element equals Byte is NOT flagged`() {
         let source = """
@@ -152,7 +152,7 @@ extension Lint.Rule.`binary serializable uint8 witness Tests`.`Edge Case` {
                 public init<Source: Collection>(parsing s: Source) where Source.Element == Byte {}
             }
             """
-        let result = Lint.Rule.`binary serializable uint8 witness Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 
@@ -164,12 +164,12 @@ extension Lint.Rule.`binary serializable uint8 witness Tests`.`Edge Case` {
                 public init<Source: Collection>(parsing s: Source) where Source.Element == UInt8 {}
             }
             """
-        let result = Lint.Rule.`binary serializable uint8 witness Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 }
 
-extension Lint.Rule.`binary serializable uint8 witness Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.`Edge Case` {
     @Test
     func `serialize where Buffer Element equals Byte is NOT flagged`() {
         let source = """
@@ -179,7 +179,7 @@ extension Lint.Rule.`binary serializable uint8 witness Tests`.`Edge Case` {
                 ) where Buffer.Element == Byte {}
             }
             """
-        let result = Lint.Rule.`binary serializable uint8 witness Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 
@@ -193,7 +193,7 @@ extension Lint.Rule.`binary serializable uint8 witness Tests`.`Edge Case` {
                 ) where Buffer.Element == UInt8 {}
             }
             """
-        let result = Lint.Rule.`binary serializable uint8 witness Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 
@@ -204,7 +204,7 @@ extension Lint.Rule.`binary serializable uint8 witness Tests`.`Edge Case` {
                 public static func serialize(_ x: Self) where Buffer.Element == UInt8 {}
             }
             """
-        let result = Lint.Rule.`binary serializable uint8 witness Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 
@@ -219,7 +219,7 @@ extension Lint.Rule.`binary serializable uint8 witness Tests`.`Edge Case` {
                 ) where Buffer.Element == Byte {}
             }
             """
-        let result = Lint.Rule.`binary serializable uint8 witness Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 
@@ -233,7 +233,7 @@ extension Lint.Rule.`binary serializable uint8 witness Tests`.`Edge Case` {
                 ) where Buffer.Element == UInt8 {}
             }
             """
-        let result = Lint.Rule.`binary serializable uint8 witness Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 
@@ -246,12 +246,12 @@ extension Lint.Rule.`binary serializable uint8 witness Tests`.`Edge Case` {
                 ) -> Self where Source.Element == Byte { fatalError() }
             }
             """
-        let result = Lint.Rule.`binary serializable uint8 witness Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 }
 
-extension Lint.Rule.`binary serializable uint8 witness Tests`.Integration {
+extension `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.Integration {
     @Test
     func `module-qualified Binary Serializable conformance is recognized`() {
         let source = """
@@ -261,14 +261,14 @@ extension Lint.Rule.`binary serializable uint8 witness Tests`.Integration {
                 ) where Buffer.Element == UInt8 {}
             }
             """
-        let result = Lint.Rule.`binary serializable uint8 witness Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
     @Test
     func `non-Binary-Serializable extensions yield no findings`() {
         let source = String(repeating: "extension Foo: Sendable {}\n", count: 200)
-        let result = Lint.Rule.`binary serializable uint8 witness Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable uint8 witness Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 }

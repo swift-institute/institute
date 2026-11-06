@@ -4,7 +4,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Manifest
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `platform floor Tests` {
         @Suite struct Unit {}
@@ -13,7 +13,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`platform floor Tests` {
+extension `Lint.Rule Tests`.`platform floor Tests` {
     static func observation(
         _ source: Swift::String,
         file: Swift::String = "Package.swift"
@@ -22,10 +22,10 @@ extension Lint.Rule.`platform floor Tests` {
     }
 }
 
-extension Lint.Rule.`platform floor Tests`.Unit {
+extension `Lint.Rule Tests`.`platform floor Tests`.Unit {
     @Test
     func `five platforms at 27 are clean`() {
-        let observation = Lint.Rule.`platform floor Tests`.observation(
+        let observation = `Lint.Rule Tests`.`platform floor Tests`.observation(
             """
             let package = Package(
                 name: "Fixture",
@@ -45,7 +45,7 @@ extension Lint.Rule.`platform floor Tests`.Unit {
 
     @Test
     func `each missing or lower platform is flagged`() {
-        let observation = Lint.Rule.`platform floor Tests`.observation(
+        let observation = `Lint.Rule Tests`.`platform floor Tests`.observation(
             """
             let package = Package(
                 name: "Fixture",
@@ -59,10 +59,10 @@ extension Lint.Rule.`platform floor Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`platform floor Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`platform floor Tests`.`Edge Case` {
     @Test
     func `a package without platforms is flagged once`() {
-        let observation = Lint.Rule.`platform floor Tests`.observation(
+        let observation = `Lint.Rule Tests`.`platform floor Tests`.observation(
             "let package = Package(name: \"Fixture\")"
         )
         #expect(observation.findings.count == 1)
@@ -70,7 +70,7 @@ extension Lint.Rule.`platform floor Tests`.`Edge Case` {
 
     @Test
     func `computed platforms are unmeasured`() {
-        let observation = Lint.Rule.`platform floor Tests`.observation(
+        let observation = `Lint.Rule Tests`.`platform floor Tests`.observation(
             "let platforms: [SupportedPlatform] = []\nlet package = Package(name: \"Fixture\", platforms: platforms)"
         )
         #expect(observation.coverage != .measured)
@@ -79,7 +79,7 @@ extension Lint.Rule.`platform floor Tests`.`Edge Case` {
 
     @Test
     func `non-manifest files are inapplicable`() {
-        let observation = Lint.Rule.`platform floor Tests`.observation(
+        let observation = `Lint.Rule Tests`.`platform floor Tests`.observation(
             "let package = Package(name: \"Fixture\")",
             file: "Sources/Fixture/Fixture.swift"
         )
@@ -87,10 +87,10 @@ extension Lint.Rule.`platform floor Tests`.`Edge Case` {
     }
 }
 
-extension Lint.Rule.`platform floor Tests`.Integration {
+extension `Lint.Rule Tests`.`platform floor Tests`.Integration {
     @Test
     func `a versioned manifest is checked`() {
-        let observation = Lint.Rule.`platform floor Tests`.observation(
+        let observation = `Lint.Rule Tests`.`platform floor Tests`.observation(
             "let package = Package(name: \"Fixture\", platforms: [.macOS(.v27), .iOS(.v27), .tvOS(.v27), .watchOS(.v27)])",
             file: "Package@swift-6.4.swift"
         )
@@ -99,7 +99,7 @@ extension Lint.Rule.`platform floor Tests`.Integration {
     }
 }
 
-extension Lint.Rule.`platform floor Tests`.Integration {
+extension `Lint.Rule Tests`.`platform floor Tests`.Integration {
     static func repaired(_ source: Swift::String) -> Swift::String? {
         let proposal = Lint.Rule.`platform floor`.repair(Lint.Source.parsed(from: source, file: "Package.swift"))
         guard case .edits(let edits) = proposal, case .rewrite(_, let contents) = edits.first else {
@@ -127,7 +127,7 @@ extension Lint.Rule.`platform floor Tests`.Integration {
             repaired
                 == "let package = Package(\n    name: \"Fixture\",\n    platforms: \(Self.canonical),\n    products: []\n)"
         )
-        #expect(repaired.map { Lint.Rule.`platform floor Tests`.observation($0).findings.isEmpty } == true)
+        #expect(repaired.map { `Lint.Rule Tests`.`platform floor Tests`.observation($0).findings.isEmpty } == true)
     }
 
     @Test
@@ -151,7 +151,7 @@ extension Lint.Rule.`platform floor Tests`.Integration {
     }
 }
 
-extension Lint.Rule.`platform floor Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`platform floor Tests`.`Edge Case` {
     @Test
     func `repair leaves non-manifest files unchanged`() {
         let proposal = Lint.Rule.`platform floor`.repair(

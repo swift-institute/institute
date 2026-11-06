@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Memory
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `unsafe assignment granularity Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`unsafe assignment granularity Tests` {
+extension `Lint.Rule Tests`.`unsafe assignment granularity Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -38,7 +38,7 @@ extension Lint.Rule.`unsafe assignment granularity Tests` {
     }
 }
 
-extension Lint.Rule.`unsafe assignment granularity Tests`.Unit {
+extension `Lint.Rule Tests`.`unsafe assignment granularity Tests`.Unit {
     @Test
     func `pointee-destination assignment with RHS-only unsafe is flagged`() {
         let source = """
@@ -46,7 +46,7 @@ extension Lint.Rule.`unsafe assignment granularity Tests`.Unit {
                 self.raw.pointee = unsafe Unmanaged.passRetained(x).toOpaque()
             }
             """
-        let findings = Lint.Rule.`unsafe assignment granularity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unsafe assignment granularity Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "unsafe assignment granularity")
@@ -63,7 +63,7 @@ extension Lint.Rule.`unsafe assignment granularity Tests`.Unit {
                 pointer.pointee = unsafe other.pointee
             }
             """
-        let findings = Lint.Rule.`unsafe assignment granularity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unsafe assignment granularity Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -74,7 +74,7 @@ extension Lint.Rule.`unsafe assignment granularity Tests`.Unit {
                 pointer[i] = unsafe other.pointee
             }
             """
-        let findings = Lint.Rule.`unsafe assignment granularity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unsafe assignment granularity Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -86,12 +86,12 @@ extension Lint.Rule.`unsafe assignment granularity Tests`.Unit {
                 pointer[0].pointee = unsafe y.deref()
             }
             """
-        let findings = Lint.Rule.`unsafe assignment granularity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unsafe assignment granularity Tests`.findings(in: source)
         #expect(findings.count == 2)
     }
 }
 
-extension Lint.Rule.`unsafe assignment granularity Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`unsafe assignment granularity Tests`.`Edge Case` {
     @Test
     func `unsafe wrapping entire assignment is NOT flagged`() {
         let source = """
@@ -99,7 +99,7 @@ extension Lint.Rule.`unsafe assignment granularity Tests`.`Edge Case` {
                 unsafe (self.raw.pointee = Unmanaged.passRetained(x).toOpaque())
             }
             """
-        let findings = Lint.Rule.`unsafe assignment granularity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unsafe assignment granularity Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -114,7 +114,7 @@ extension Lint.Rule.`unsafe assignment granularity Tests`.`Edge Case` {
                 count = unsafe pointer.pointee
             }
             """
-        let findings = Lint.Rule.`unsafe assignment granularity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unsafe assignment granularity Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -129,7 +129,7 @@ extension Lint.Rule.`unsafe assignment granularity Tests`.`Edge Case` {
                 buffer[i] = unsafe pointer.pointee
             }
             """
-        let findings = Lint.Rule.`unsafe assignment granularity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unsafe assignment granularity Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -145,7 +145,7 @@ extension Lint.Rule.`unsafe assignment granularity Tests`.`Edge Case` {
                 unsafe pointer.pointee = unsafe other.pointee
             }
             """
-        let findings = Lint.Rule.`unsafe assignment granularity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unsafe assignment granularity Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -158,7 +158,7 @@ extension Lint.Rule.`unsafe assignment granularity Tests`.`Edge Case` {
                 let x = unsafe pointer.pointee
             }
             """
-        let findings = Lint.Rule.`unsafe assignment granularity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unsafe assignment granularity Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -169,7 +169,7 @@ extension Lint.Rule.`unsafe assignment granularity Tests`.`Edge Case` {
                 unsafe pointer.pointee
             }
             """
-        let findings = Lint.Rule.`unsafe assignment granularity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unsafe assignment granularity Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -181,7 +181,7 @@ extension Lint.Rule.`unsafe assignment granularity Tests`.`Edge Case` {
                 self.b = compute()
             }
             """
-        let findings = Lint.Rule.`unsafe assignment granularity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unsafe assignment granularity Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -193,7 +193,7 @@ extension Lint.Rule.`unsafe assignment granularity Tests`.`Edge Case` {
                 x = 0
             }
             """
-        let findings = Lint.Rule.`unsafe assignment granularity Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unsafe assignment granularity Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

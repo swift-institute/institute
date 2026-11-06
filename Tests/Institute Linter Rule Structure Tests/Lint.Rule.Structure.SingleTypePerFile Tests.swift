@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Structure
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `single type per file Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`single type per file Tests` {
+extension `Lint.Rule Tests`.`single type per file Tests` {
     static func findings(
         in source: String,
         file: String = "Sources/X/Test.swift"
@@ -38,35 +38,35 @@ extension Lint.Rule.`single type per file Tests` {
     }
 }
 
-extension Lint.Rule.`single type per file Tests`.Unit {
+extension `Lint.Rule Tests`.`single type per file Tests`.Unit {
     @Test
     func `single struct is permitted`() {
         let source = "struct Foo {}"
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `single class is permitted`() {
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: "class Foo {}")
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: "class Foo {}")
         #expect(findings.isEmpty)
     }
 
     @Test
     func `single enum is permitted`() {
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: "enum Foo {}")
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: "enum Foo {}")
         #expect(findings.isEmpty)
     }
 
     @Test
     func `single actor is permitted`() {
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: "actor Foo {}")
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: "actor Foo {}")
         #expect(findings.isEmpty)
     }
 
     @Test
     func `single protocol is permitted`() {
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: "protocol Foo {}")
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: "protocol Foo {}")
         #expect(findings.isEmpty)
     }
 
@@ -76,7 +76,7 @@ extension Lint.Rule.`single type per file Tests`.Unit {
             struct Foo {}
             struct Bar {}
             """
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "single type per file")
@@ -91,7 +91,7 @@ extension Lint.Rule.`single type per file Tests`.Unit {
             enum Bar {}
             class Baz {}
             """
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: source)
         #expect(findings.count == 2)
     }
 
@@ -101,7 +101,7 @@ extension Lint.Rule.`single type per file Tests`.Unit {
             protocol P {}
             actor A {}
             """
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -119,7 +119,7 @@ extension Lint.Rule.`single type per file Tests`.Unit {
                 public struct Header {}
             }
             """
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "single type per file")
@@ -127,7 +127,7 @@ extension Lint.Rule.`single type per file Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`single type per file Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`single type per file Tests`.`Edge Case` {
     @Test
     func `extension declarations are permitted alongside one type`() {
         let source = """
@@ -139,7 +139,7 @@ extension Lint.Rule.`single type per file Tests`.`Edge Case` {
             }
             extension Foo: Sendable {}
             """
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -153,7 +153,7 @@ extension Lint.Rule.`single type per file Tests`.`Edge Case` {
             }
             extension Buffer.Linear: Sendable {}
             """
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -168,7 +168,7 @@ extension Lint.Rule.`single type per file Tests`.`Edge Case` {
                 class Qux {}
             }
             """
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -178,7 +178,7 @@ extension Lint.Rule.`single type per file Tests`.`Edge Case` {
             struct A {}
             struct B {}
             """
-        let findings = Lint.Rule.`single type per file Tests`.findings(
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(
             in: source,
             file: "Tests/Foo Tests/Test Fixtures.swift"
         )
@@ -191,7 +191,7 @@ extension Lint.Rule.`single type per file Tests`.`Edge Case` {
             enum X {}
             enum Y {}
             """
-        let findings = Lint.Rule.`single type per file Tests`.findings(
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(
             in: source,
             file: "Experiments/Foo/main.swift"
         )
@@ -204,7 +204,7 @@ extension Lint.Rule.`single type per file Tests`.`Edge Case` {
             struct A {}
             struct B {}
             """
-        let findings = Lint.Rule.`single type per file Tests`.findings(
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(
             in: source,
             file: "Examples/Demo/Main.swift"
         )
@@ -223,13 +223,13 @@ extension Lint.Rule.`single type per file Tests`.`Edge Case` {
                 struct Bar {}
             }
             """
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `empty file produces no findings`() {
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: "")
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: "")
         #expect(findings.isEmpty)
     }
 
@@ -243,7 +243,7 @@ extension Lint.Rule.`single type per file Tests`.`Edge Case` {
                 var twice: Int { self * 2 }
             }
             """
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -263,7 +263,7 @@ extension Lint.Rule.`single type per file Tests`.`Edge Case` {
             }
             #endif
             """
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -277,7 +277,7 @@ extension Lint.Rule.`single type per file Tests`.`Edge Case` {
             struct Bar {}
             #endif
             """
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -292,7 +292,7 @@ extension Lint.Rule.`single type per file Tests`.`Edge Case` {
             struct A {}
             func f() { struct B {} }
             """
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -304,7 +304,7 @@ extension Lint.Rule.`single type per file Tests`.`Edge Case` {
             extension P { struct A {} }
             extension P { struct B {} }
             """
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -318,7 +318,7 @@ extension Lint.Rule.`single type per file Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -330,7 +330,7 @@ extension Lint.Rule.`single type per file Tests`.`Edge Case` {
                 struct Local {}
             }
             """
-        let findings = Lint.Rule.`single type per file Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`single type per file Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

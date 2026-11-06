@@ -4,7 +4,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Manifest
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `default trait Tests` {
         @Suite struct Unit {}
@@ -13,7 +13,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`default trait Tests` {
+extension `Lint.Rule Tests`.`default trait Tests` {
     static func observation(
         _ source: Swift::String,
         file: Swift::String = "Package.swift"
@@ -22,10 +22,10 @@ extension Lint.Rule.`default trait Tests` {
     }
 }
 
-extension Lint.Rule.`default trait Tests`.Unit {
+extension `Lint.Rule Tests`.`default trait Tests`.Unit {
     @Test
     func `a default trait declaration is flagged`() {
-        let observation = Lint.Rule.`default trait Tests`.observation(
+        let observation = `Lint.Rule Tests`.`default trait Tests`.observation(
             """
             let package = Package(
                 name: "Fixture",
@@ -43,17 +43,17 @@ extension Lint.Rule.`default trait Tests`.Unit {
 
     @Test
     func `traits without a default are clean`() {
-        let observation = Lint.Rule.`default trait Tests`.observation(
+        let observation = `Lint.Rule Tests`.`default trait Tests`.observation(
             "let package = Package(name: \"Fixture\", traits: [.trait(name: \"Parser\")])"
         )
         #expect(observation.findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`default trait Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`default trait Tests`.`Edge Case` {
     @Test
     func `requesting a dependency's defaults is not a declaration`() {
-        let observation = Lint.Rule.`default trait Tests`.observation(
+        let observation = `Lint.Rule Tests`.`default trait Tests`.observation(
             """
             let package = Package(
                 name: "Fixture",
@@ -68,7 +68,7 @@ extension Lint.Rule.`default trait Tests`.`Edge Case` {
 
     @Test
     func `non-manifest files are inapplicable`() {
-        let observation = Lint.Rule.`default trait Tests`.observation(
+        let observation = `Lint.Rule Tests`.`default trait Tests`.observation(
             "let trait = Trait.default(enabledTraits: [\"Parser\"])",
             file: "Sources/Fixture/Fixture.swift"
         )
@@ -77,10 +77,10 @@ extension Lint.Rule.`default trait Tests`.`Edge Case` {
     }
 }
 
-extension Lint.Rule.`default trait Tests`.Integration {
+extension `Lint.Rule Tests`.`default trait Tests`.Integration {
     @Test
     func `a default trait in a versioned manifest is flagged`() {
-        let observation = Lint.Rule.`default trait Tests`.observation(
+        let observation = `Lint.Rule Tests`.`default trait Tests`.observation(
             "let traits: Set<Trait> = [.default(enabledTraits: [])]",
             file: "Package@swift-6.4.swift"
         )

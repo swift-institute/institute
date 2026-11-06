@@ -4,7 +4,9 @@ import Testing
 
 @testable import Institute_Linter_Rule_Structure
 
-extension Lint.Rule {
+enum `Lint.Rule Tests` {}
+
+extension `Lint.Rule Tests` {
     @Suite
     struct `comment in source Tests` {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`comment in source Tests` {
+extension `Lint.Rule Tests`.`comment in source Tests` {
     static func findings(
         _ source: Swift::String,
         file: Swift::String = "Sources/Fixture/Fixture.swift"
@@ -24,10 +26,10 @@ extension Lint.Rule.`comment in source Tests` {
     }
 }
 
-extension Lint.Rule.`comment in source Tests`.Unit {
+extension `Lint.Rule Tests`.`comment in source Tests`.Unit {
     @Test
     func `line and block comments are each flagged and documentation comments are not`() {
-        let findings = Lint.Rule.`comment in source Tests`.findings(
+        let findings = `Lint.Rule Tests`.`comment in source Tests`.findings(
             """
             // Note
             /// A value.
@@ -45,7 +47,7 @@ extension Lint.Rule.`comment in source Tests`.Unit {
 
     @Test
     func `the disclosure markers the skills require are admitted`() {
-        let findings = Lint.Rule.`comment in source Tests`.findings(
+        let findings = `Lint.Rule Tests`.`comment in source Tests`.findings(
             """
             // SAFETY: Allocated once and never mutated.
             nonisolated(unsafe) let sentinel = 0
@@ -66,7 +68,7 @@ extension Lint.Rule.`comment in source Tests`.Unit {
 
     @Test
     func `a marker's continuation lines are admitted`() {
-        let findings = Lint.Rule.`comment in source Tests`.findings(
+        let findings = `Lint.Rule Tests`.`comment in source Tests`.findings(
             """
             // SAFETY: The pointer is allocated once
             //   and freed only in deinit.
@@ -78,17 +80,17 @@ extension Lint.Rule.`comment in source Tests`.Unit {
 
     @Test
     func `code without comments is clean`() {
-        let findings = Lint.Rule.`comment in source Tests`.findings(
+        let findings = `Lint.Rule Tests`.`comment in source Tests`.findings(
             "struct Value {\n    let count = 1\n}"
         )
         #expect(findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`comment in source Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`comment in source Tests`.`Edge Case` {
     @Test
     func `swift-linter directives are admitted`() {
-        let findings = Lint.Rule.`comment in source Tests`.findings(
+        let findings = `Lint.Rule Tests`.`comment in source Tests`.findings(
             """
             // swift-linter:disable:next comment in source
             let value = 1 // swift-linter:disable:this some rule
@@ -99,7 +101,7 @@ extension Lint.Rule.`comment in source Tests`.`Edge Case` {
 
     @Test
     func `comment markers inside string literals are not comments`() {
-        let findings = Lint.Rule.`comment in source Tests`.findings(
+        let findings = `Lint.Rule Tests`.`comment in source Tests`.findings(
             """
             let a = "// not a comment"
             let b = \"\"\"
@@ -112,7 +114,7 @@ extension Lint.Rule.`comment in source Tests`.`Edge Case` {
 
     @Test
     func `near misses of the markers are still flagged`() {
-        let findings = Lint.Rule.`comment in source Tests`.findings(
+        let findings = `Lint.Rule Tests`.`comment in source Tests`.findings(
             """
             // Safety: lower case is not the marker
             // NOTE: not a marker
@@ -126,7 +128,7 @@ extension Lint.Rule.`comment in source Tests`.`Edge Case` {
 
     @Test
     func `a comment after a blank line is not a continuation`() {
-        let findings = Lint.Rule.`comment in source Tests`.findings(
+        let findings = `Lint.Rule Tests`.`comment in source Tests`.findings(
             """
             // SAFETY: Allocated once.
 
@@ -139,7 +141,7 @@ extension Lint.Rule.`comment in source Tests`.`Edge Case` {
 
     @Test
     func `tests are out of scope`() {
-        let findings = Lint.Rule.`comment in source Tests`.findings(
+        let findings = `Lint.Rule Tests`.`comment in source Tests`.findings(
             "// note\nstruct Value {}",
             file: "Tests/Fixture Tests/Fixture Tests.swift"
         )
@@ -147,10 +149,10 @@ extension Lint.Rule.`comment in source Tests`.`Edge Case` {
     }
 }
 
-extension Lint.Rule.`comment in source Tests`.Integration {
+extension `Lint.Rule Tests`.`comment in source Tests`.Integration {
     @Test
     func `a license header is flagged line by line`() {
-        let findings = Lint.Rule.`comment in source Tests`.findings(
+        let findings = `Lint.Rule Tests`.`comment in source Tests`.findings(
             """
             // Copyright (c) 2026 Example
             // Licensed under Apache License v2.0
@@ -163,7 +165,7 @@ extension Lint.Rule.`comment in source Tests`.Integration {
     }
 }
 
-extension Lint.Rule.`comment in source Tests`.Integration {
+extension `Lint.Rule Tests`.`comment in source Tests`.Integration {
     static func repaired(_ source: Swift::String) -> Swift::String? {
         let proposal = Lint.Rule.`comment in source`.repair(
             Lint.Source.parsed(from: source, file: "Sources/Fixture/Fixture.swift")
@@ -217,11 +219,11 @@ extension Lint.Rule.`comment in source Tests`.Integration {
     @Test
     func `repaired source is clean`() {
         let repaired = Self.repaired("/// Doc\nfunc f() {} // note\n")
-        #expect(repaired.map { Lint.Rule.`comment in source Tests`.findings($0).isEmpty } == true)
+        #expect(repaired.map { `Lint.Rule Tests`.`comment in source Tests`.findings($0).isEmpty } == true)
     }
 }
 
-extension Lint.Rule.`comment in source Tests`.Integration {
+extension `Lint.Rule Tests`.`comment in source Tests`.Integration {
     @Test
     func `repair keeps the reason line of a suppression directive`() {
         let repaired = Self.repaired(

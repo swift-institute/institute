@@ -18,7 +18,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Structure
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `minimal type body fix Tests` {
         @Suite struct Unit {}
@@ -29,7 +29,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`minimal type body fix Tests` {
+extension `Lint.Rule Tests`.`minimal type body fix Tests` {
     static func fixed(_ source: String, file: String = "test.swift") -> String? {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`minimal type body`.rewritten(parsed)
@@ -78,7 +78,7 @@ extension Lint.Rule.`minimal type body fix Tests` {
     }
 }
 
-extension Lint.Rule.`minimal type body fix Tests`.`Round Trip` {
+extension `Lint.Rule Tests`.`minimal type body fix Tests`.`Round Trip` {
     @Test
     func `a method moves to a same-file extension`() {
         let source = """
@@ -87,8 +87,8 @@ extension Lint.Rule.`minimal type body fix Tests`.`Round Trip` {
                 func append(_ value: Int) {}
             }
             """
-        Lint.Rule.`minimal type body fix Tests`.roundTrips(source)
-        let output = Lint.Rule.`minimal type body fix Tests`.fixed(source)
+        `Lint.Rule Tests`.`minimal type body fix Tests`.roundTrips(source)
+        let output = `Lint.Rule Tests`.`minimal type body fix Tests`.fixed(source)
         #expect(output?.contains("extension Buffer") == true)
         #expect(output?.contains("func append(_ value: Int) {}") == true)
     }
@@ -112,8 +112,8 @@ extension Lint.Rule.`minimal type body fix Tests`.`Round Trip` {
                 }
             }
             """
-        Lint.Rule.`minimal type body fix Tests`.roundTrips(source)
-        let output = Lint.Rule.`minimal type body fix Tests`.fixed(source)
+        `Lint.Rule Tests`.`minimal type body fix Tests`.roundTrips(source)
+        let output = `Lint.Rule Tests`.`minimal type body fix Tests`.fixed(source)
         #expect(output?.contains("private var storage: Int") == true)
         #expect(output?.contains("extension Box") == true)
         #expect(output?.contains("func doubled() -> Int") == true)
@@ -129,8 +129,8 @@ extension Lint.Rule.`minimal type body fix Tests`.`Round Trip` {
                 static let `default` = State.idle
             }
             """
-        Lint.Rule.`minimal type body fix Tests`.roundTrips(source)
-        let output = Lint.Rule.`minimal type body fix Tests`.fixed(source)
+        `Lint.Rule Tests`.`minimal type body fix Tests`.roundTrips(source)
+        let output = `Lint.Rule Tests`.`minimal type body fix Tests`.fixed(source)
         #expect(output?.contains("extension State") == true)
         #expect(output?.contains("case idle") == true)
         #expect(output?.contains("var isIdle: Bool") == true)
@@ -148,8 +148,8 @@ extension Lint.Rule.`minimal type body fix Tests`.`Round Trip` {
                 }
             }
             """
-        Lint.Rule.`minimal type body fix Tests`.roundTrips(source)
-        let output = Lint.Rule.`minimal type body fix Tests`.fixed(source)
+        `Lint.Rule Tests`.`minimal type body fix Tests`.roundTrips(source)
+        let output = `Lint.Rule Tests`.`minimal type body fix Tests`.fixed(source)
         #expect(output?.contains("extension Outer") == true)
         #expect(output?.contains("struct Inner") == true)
     }
@@ -168,8 +168,8 @@ extension Lint.Rule.`minimal type body fix Tests`.`Round Trip` {
                 protocol Requirement { var q: Int { get } }
             }
             """
-        Lint.Rule.`minimal type body fix Tests`.roundTrips(source)
-        let output = Lint.Rule.`minimal type body fix Tests`.fixed(source)
+        `Lint.Rule Tests`.`minimal type body fix Tests`.roundTrips(source)
+        let output = `Lint.Rule Tests`.`minimal type body fix Tests`.fixed(source)
         #expect(output?.contains("extension Kitchen") == true)
         #expect(output?.contains("func f() {}") == true)
         #expect(output?.contains("var computed: Int { x }") == true)
@@ -190,8 +190,8 @@ extension Lint.Rule.`minimal type body fix Tests`.`Round Trip` {
                 }
             }
             """
-        Lint.Rule.`minimal type body fix Tests`.roundTrips(source)
-        let output = Lint.Rule.`minimal type body fix Tests`.fixed(source)
+        `Lint.Rule Tests`.`minimal type body fix Tests`.roundTrips(source)
+        let output = `Lint.Rule Tests`.`minimal type body fix Tests`.fixed(source)
         #expect(output?.contains("extension Lint.Rule.`Foo Tests`") == true)
         #expect(output?.contains("func run() {}") == true)
     }
@@ -204,19 +204,19 @@ extension Lint.Rule.`minimal type body fix Tests`.`Round Trip` {
                 init(x: Int) { self.x = x }
             }
             """
-        #expect(Lint.Rule.`minimal type body fix Tests`.findings(in: source).isEmpty)
-        #expect(Lint.Rule.`minimal type body fix Tests`.fixed(source) == nil)
+        #expect(`Lint.Rule Tests`.`minimal type body fix Tests`.findings(in: source).isEmpty)
+        #expect(`Lint.Rule Tests`.`minimal type body fix Tests`.fixed(source) == nil)
     }
 }
 
-extension Lint.Rule.`minimal type body fix Tests`.`Not Fixable` {
+extension `Lint.Rule Tests`.`minimal type body fix Tests`.`Not Fixable` {
     @Test
     func `a class is never rewritten - dispatch semantics refusal`() {
         // [API-IMPL-008] fix precondition: a method in a class body is
         // dynamically dispatched; the same method in an extension is not.
         // The finding stands; the fix refuses outright, with no partial
         // application.
-        Lint.Rule.`minimal type body fix Tests`.declines(
+        `Lint.Rule Tests`.`minimal type body fix Tests`.declines(
             """
             class Box {
                 var x: Int = 0
@@ -228,7 +228,7 @@ extension Lint.Rule.`minimal type body fix Tests`.`Not Fixable` {
 
     @Test
     func `an actor is never rewritten - dispatch semantics refusal`() {
-        Lint.Rule.`minimal type body fix Tests`.declines(
+        `Lint.Rule Tests`.`minimal type body fix Tests`.declines(
             """
             actor Box {
                 var x: Int = 0
@@ -255,8 +255,8 @@ extension Lint.Rule.`minimal type body fix Tests`.`Not Fixable` {
                 func tripled() -> Int { y * 3 }
             }
             """
-        #expect(Lint.Rule.`minimal type body fix Tests`.findings(in: source).count == 2)
-        guard let output = Lint.Rule.`minimal type body fix Tests`.fixed(source) else {
+        #expect(`Lint.Rule Tests`.`minimal type body fix Tests`.findings(in: source).count == 2)
+        guard let output = `Lint.Rule Tests`.`minimal type body fix Tests`.fixed(source) else {
             Issue.record("expected a partial rewrite")
             return
         }
@@ -265,7 +265,7 @@ extension Lint.Rule.`minimal type body fix Tests`.`Not Fixable` {
         #expect(output.contains("func tripled() -> Int { y * 3 }"))
         // The class's own method is untouched — still inside `class Skipped`,
         // not moved to an extension — and its finding still fires.
-        let remaining = Lint.Rule.`minimal type body fix Tests`.findings(in: output)
+        let remaining = `Lint.Rule Tests`.`minimal type body fix Tests`.findings(in: output)
         #expect(remaining.count == 1)
         if remaining.count == 1 {
             #expect(remaining[0].identifier == "minimal type body")
@@ -279,7 +279,7 @@ extension Lint.Rule.`minimal type body fix Tests`.`Not Fixable` {
         // `extension` ancestor. A struct nested inside a class body (a
         // genuine nominal-type ancestor, not an extension) is left as a
         // standing finding rather than guessed at.
-        Lint.Rule.`minimal type body fix Tests`.declines(
+        `Lint.Rule Tests`.`minimal type body fix Tests`.declines(
             """
             class Outer {
                 struct Inner {
@@ -293,7 +293,7 @@ extension Lint.Rule.`minimal type body fix Tests`.`Not Fixable` {
 
     @Test
     func `a struct nested inside another struct is out of this fix's narrower scope`() {
-        Lint.Rule.`minimal type body fix Tests`.declines(
+        `Lint.Rule Tests`.`minimal type body fix Tests`.declines(
             """
             struct Outer {
                 struct Inner {
@@ -311,7 +311,7 @@ extension Lint.Rule.`minimal type body fix Tests`.`Not Fixable` {
         // them, but moving only the inner declaration out from under its
         // `#if` guard would silently drop the conditional-compilation
         // boundary the author wrote. The fix leaves it exactly as found.
-        Lint.Rule.`minimal type body fix Tests`.declines(
+        `Lint.Rule Tests`.`minimal type body fix Tests`.declines(
             """
             struct Foo {
                 var x: Int
@@ -337,8 +337,8 @@ extension Lint.Rule.`minimal type body fix Tests`.`Not Fixable` {
                 #endif
             }
             """
-        #expect(Lint.Rule.`minimal type body fix Tests`.findings(in: source).count == 2)
-        guard let output = Lint.Rule.`minimal type body fix Tests`.fixed(source) else {
+        #expect(`Lint.Rule Tests`.`minimal type body fix Tests`.findings(in: source).count == 2)
+        guard let output = `Lint.Rule Tests`.`minimal type body fix Tests`.fixed(source) else {
             Issue.record("expected a partial rewrite")
             return
         }
@@ -347,7 +347,7 @@ extension Lint.Rule.`minimal type body fix Tests`.`Not Fixable` {
         #expect(output.contains("func plain() {}"))
         #expect(output.contains("#if os(Linux)"))
         #expect(output.contains("func guarded() {}"))
-        let remaining = Lint.Rule.`minimal type body fix Tests`.findings(in: output)
+        let remaining = `Lint.Rule Tests`.`minimal type body fix Tests`.findings(in: output)
         #expect(remaining.count == 1)
     }
 
@@ -359,8 +359,8 @@ extension Lint.Rule.`minimal type body fix Tests`.`Not Fixable` {
                 static func buildBlock(_ x: Int) -> Int { x }
             }
             """
-        #expect(Lint.Rule.`minimal type body fix Tests`.findings(in: source).isEmpty)
-        #expect(Lint.Rule.`minimal type body fix Tests`.fixed(source) == nil)
+        #expect(`Lint.Rule Tests`.`minimal type body fix Tests`.findings(in: source).isEmpty)
+        #expect(`Lint.Rule Tests`.`minimal type body fix Tests`.fixed(source) == nil)
     }
 
     @Test
@@ -371,8 +371,8 @@ extension Lint.Rule.`minimal type body fix Tests`.`Not Fixable` {
                 @Suite struct Unit {}
             }
             """
-        #expect(Lint.Rule.`minimal type body fix Tests`.findings(in: source).isEmpty)
-        #expect(Lint.Rule.`minimal type body fix Tests`.fixed(source) == nil)
+        #expect(`Lint.Rule Tests`.`minimal type body fix Tests`.findings(in: source).isEmpty)
+        #expect(`Lint.Rule Tests`.`minimal type body fix Tests`.fixed(source) == nil)
     }
 
     @Test
@@ -382,7 +382,7 @@ extension Lint.Rule.`minimal type body fix Tests`.`Not Fixable` {
         // Widget` fails to compile: 'Widget' is only available in macOS 15
         // or newer. Refusal, not attribute propagation — see the class/actor
         // refusal for the same asymmetry argument.
-        Lint.Rule.`minimal type body fix Tests`.declines(
+        `Lint.Rule Tests`.`minimal type body fix Tests`.declines(
             """
             @available(macOS 15, *)
             struct Widget {
@@ -401,7 +401,7 @@ extension Lint.Rule.`minimal type body fix Tests`.`Not Fixable` {
         // would miss this; the enclosing extension ancestor this fix already
         // climbs must be checked too, or `extension Parent.Inner { ... }`
         // would compile-fail identically to the direct-attribute case.
-        Lint.Rule.`minimal type body fix Tests`.declines(
+        `Lint.Rule Tests`.`minimal type body fix Tests`.declines(
             """
             @available(macOS 15, *)
             extension Parent {
@@ -432,8 +432,8 @@ extension Lint.Rule.`minimal type body fix Tests`.`Not Fixable` {
                 func tripled() -> Int { y * 3 }
             }
             """
-        #expect(Lint.Rule.`minimal type body fix Tests`.findings(in: source).count == 2)
-        guard let output = Lint.Rule.`minimal type body fix Tests`.fixed(source) else {
+        #expect(`Lint.Rule Tests`.`minimal type body fix Tests`.findings(in: source).count == 2)
+        guard let output = `Lint.Rule Tests`.`minimal type body fix Tests`.fixed(source) else {
             Issue.record("expected a partial rewrite")
             return
         }
@@ -442,7 +442,7 @@ extension Lint.Rule.`minimal type body fix Tests`.`Not Fixable` {
         #expect(output.contains("func tripled() -> Int { y * 3 }"))
         // The @available struct's own method is untouched, and its finding
         // still fires.
-        let remaining = Lint.Rule.`minimal type body fix Tests`.findings(in: output)
+        let remaining = `Lint.Rule Tests`.`minimal type body fix Tests`.findings(in: output)
         #expect(remaining.count == 1)
         if remaining.count == 1 {
             #expect(remaining[0].identifier == "minimal type body")

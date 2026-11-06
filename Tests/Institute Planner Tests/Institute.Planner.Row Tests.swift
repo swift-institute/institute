@@ -5,14 +5,16 @@ import Testing
 
 @testable import Institute_Planner
 
-extension Institute.Planner.Row {
+enum `Institute.Planner.Row Tests` {}
+
+extension `Institute.Planner.Row Tests` {
     @Suite struct Test {
         @Suite struct Unit {}
         @Suite struct `Edge Case` {}
     }
 }
 
-extension Institute.Planner.Row.Test {
+extension `Institute.Planner.Row Tests`.Test {
     static let revision = String(repeating: "a", count: 40)
     static let binary = String(repeating: "c", count: 64)
     static let graph = String(repeating: "d", count: 64)
@@ -27,64 +29,64 @@ extension Institute.Planner.Row.Test {
     }
 }
 
-extension Institute.Planner.Row.Test.Unit {
+extension `Institute.Planner.Row Tests`.Test.Unit {
 
     @Test func `a published row reads its four fields and keeps its line`() throws {
-        let line = "\(Institute.Planner.Row.Test.revision) macos-arm64 \(Institute.Planner.Row.Test.binary) \(Institute.Planner.Row.Test.graph)"
+        let line = "\(`Institute.Planner.Row Tests`.Test.revision) macos-arm64 \(`Institute.Planner.Row Tests`.Test.binary) \(`Institute.Planner.Row Tests`.Test.graph)"
         let row = try Institute.Planner.Row(line: line)
-        #expect(row.revision.description == Institute.Planner.Row.Test.revision)
+        #expect(row.revision.description == `Institute.Planner.Row Tests`.Test.revision)
         #expect(row.platform == .macos)
-        #expect(row.binary.hex == Institute.Planner.Row.Test.binary)
-        #expect(row.graph.hex == Institute.Planner.Row.Test.graph)
+        #expect(row.binary.hex == `Institute.Planner.Row Tests`.Test.binary)
+        #expect(row.graph.hex == `Institute.Planner.Row Tests`.Test.graph)
         #expect(row.line == line)
     }
 
     @Test func `rows skip comments and blank lines and keep order`() throws {
         let text = """
             # header
-            \(Institute.Planner.Row.Test.revision) linux-x86_64 \(Institute.Planner.Row.Test.binary) \(Institute.Planner.Row.Test.graph)
+            \(`Institute.Planner.Row Tests`.Test.revision) linux-x86_64 \(`Institute.Planner.Row Tests`.Test.binary) \(`Institute.Planner.Row Tests`.Test.graph)
 
               # indented comment
-            \(Institute.Planner.Row.Test.revision) macos-arm64 \(Institute.Planner.Row.Test.binary) \(Institute.Planner.Row.Test.graph)
+            \(`Institute.Planner.Row Tests`.Test.revision) macos-arm64 \(`Institute.Planner.Row Tests`.Test.binary) \(`Institute.Planner.Row Tests`.Test.graph)
             """
         let rows = try Institute.Planner.Row.rows(in: text)
         #expect(rows.map(\.platform) == [.linux, .macos])
     }
 
     @Test func `a checksum line reads its digest and asset name`() throws {
-        let checksum = try Institute.Planner.Checksum(line: "\(Institute.Planner.Row.Test.binary)  institute-macos-arm64-\(Institute.Planner.Row.Test.binary)")
-        #expect(checksum.digest.hex == Institute.Planner.Row.Test.binary)
-        #expect(checksum.name == "institute-macos-arm64-\(Institute.Planner.Row.Test.binary)")
-        let binary = try Institute.Planner.Checksum(line: "\(Institute.Planner.Row.Test.graph) *Package.resolved-linux-x86_64-\(Institute.Planner.Row.Test.graph)")
-        #expect(binary.name == "Package.resolved-linux-x86_64-\(Institute.Planner.Row.Test.graph)")
+        let checksum = try Institute.Planner.Checksum(line: "\(`Institute.Planner.Row Tests`.Test.binary)  institute-macos-arm64-\(`Institute.Planner.Row Tests`.Test.binary)")
+        #expect(checksum.digest.hex == `Institute.Planner.Row Tests`.Test.binary)
+        #expect(checksum.name == "institute-macos-arm64-\(`Institute.Planner.Row Tests`.Test.binary)")
+        let binary = try Institute.Planner.Checksum(line: "\(`Institute.Planner.Row Tests`.Test.graph) *Package.resolved-linux-x86_64-\(`Institute.Planner.Row Tests`.Test.graph)")
+        #expect(binary.name == "Package.resolved-linux-x86_64-\(`Institute.Planner.Row Tests`.Test.graph)")
     }
 
     @Test func `a pin reads its one revision under comments`() throws {
-        let pin = try Institute.Planner.Pin(text: "# comment\n\n\(Institute.Planner.Row.Test.revision)\n")
-        #expect(pin.revision.description == Institute.Planner.Row.Test.revision)
+        let pin = try Institute.Planner.Pin(text: "# comment\n\n\(`Institute.Planner.Row Tests`.Test.revision)\n")
+        #expect(pin.revision.description == `Institute.Planner.Row Tests`.Test.revision)
     }
 }
 
-extension Institute.Planner.Row.Test.`Edge Case` {
+extension `Institute.Planner.Row Tests`.Test.`Edge Case` {
 
     @Test func `a row with a trailing field is malformed`() {
-        let line = "\(Institute.Planner.Row.Test.revision) macos-arm64 \(Institute.Planner.Row.Test.binary) \(Institute.Planner.Row.Test.graph) extra"
-        guard case .malformed = Institute.Planner.Row.Test.refusal(line) else {
-            Issue.record("expected malformed, got \(String(describing: Institute.Planner.Row.Test.refusal(line)))")
+        let line = "\(`Institute.Planner.Row Tests`.Test.revision) macos-arm64 \(`Institute.Planner.Row Tests`.Test.binary) \(`Institute.Planner.Row Tests`.Test.graph) extra"
+        guard case .malformed = `Institute.Planner.Row Tests`.Test.refusal(line) else {
+            Issue.record("expected malformed, got \(String(describing: `Institute.Planner.Row Tests`.Test.refusal(line)))")
             return
         }
     }
 
     @Test func `a row with a missing field is malformed`() {
-        guard case .malformed = Institute.Planner.Row.Test.refusal("\(Institute.Planner.Row.Test.revision) macos-arm64 \(Institute.Planner.Row.Test.binary)") else {
+        guard case .malformed = `Institute.Planner.Row Tests`.Test.refusal("\(`Institute.Planner.Row Tests`.Test.revision) macos-arm64 \(`Institute.Planner.Row Tests`.Test.binary)") else {
             Issue.record("expected malformed")
             return
         }
     }
 
     @Test func `a row naming an unknown platform is refused by platform`() {
-        let line = "\(Institute.Planner.Row.Test.revision) windows-x86_64 \(Institute.Planner.Row.Test.binary) \(Institute.Planner.Row.Test.graph)"
-        #expect(Institute.Planner.Row.Test.refusal(line) == .platform("windows-x86_64"))
+        let line = "\(`Institute.Planner.Row Tests`.Test.revision) windows-x86_64 \(`Institute.Planner.Row Tests`.Test.binary) \(`Institute.Planner.Row Tests`.Test.graph)"
+        #expect(`Institute.Planner.Row Tests`.Test.refusal(line) == .platform("windows-x86_64"))
     }
 
     @Test(arguments: [
@@ -95,8 +97,8 @@ extension Institute.Planner.Row.Test.`Edge Case` {
         String(repeating: "g", count: 64),
     ])
     func `a row with a malformed digest is malformed`(digest: String) {
-        let line = "\(Institute.Planner.Row.Test.revision) linux-x86_64 \(digest) \(Institute.Planner.Row.Test.graph)"
-        guard case .malformed = Institute.Planner.Row.Test.refusal(line) else {
+        let line = "\(`Institute.Planner.Row Tests`.Test.revision) linux-x86_64 \(digest) \(`Institute.Planner.Row Tests`.Test.graph)"
+        guard case .malformed = `Institute.Planner.Row Tests`.Test.refusal(line) else {
             Issue.record("expected malformed for digest \(digest)")
             return
         }
@@ -104,8 +106,8 @@ extension Institute.Planner.Row.Test.`Edge Case` {
 
     @Test(arguments: ["main", String(repeating: "A", count: 40), String(repeating: "a", count: 39)])
     func `a row with a malformed revision is malformed`(revision: String) {
-        let line = "\(revision) linux-x86_64 \(Institute.Planner.Row.Test.binary) \(Institute.Planner.Row.Test.graph)"
-        guard case .malformed = Institute.Planner.Row.Test.refusal(line) else {
+        let line = "\(revision) linux-x86_64 \(`Institute.Planner.Row Tests`.Test.binary) \(`Institute.Planner.Row Tests`.Test.graph)"
+        guard case .malformed = `Institute.Planner.Row Tests`.Test.refusal(line) else {
             Issue.record("expected malformed for revision \(revision)")
             return
         }
@@ -125,7 +127,7 @@ extension Institute.Planner.Row.Test.`Edge Case` {
     }
 
     @Test func `a checksum list naming one asset twice is ambiguous`() {
-        let line = "\(Institute.Planner.Row.Test.binary)  institute-macos-arm64"
+        let line = "\(`Institute.Planner.Row Tests`.Test.binary)  institute-macos-arm64"
         #expect(throws: Institute.Planner.Error.ambiguous("checksum for institute-macos-arm64")) {
             _ = try Institute.Planner.Checksum.checksums(in: line + "\n" + line + "\n")
         }
@@ -144,7 +146,7 @@ extension Institute.Planner.Row.Test.`Edge Case` {
     }
 
     @Test func `publication asset names read their revision and run`() throws {
-        let revision = try Institute.Planner.Revision(Institute.Planner.Row.Test.revision)
+        let revision = try Institute.Planner.Revision(`Institute.Planner.Row Tests`.Test.revision)
         #expect(
             Institute.Planner.Asset(publication: "ANCESTORS-\(revision)-1234")
                 == .ancestry(revision, run: "1234")

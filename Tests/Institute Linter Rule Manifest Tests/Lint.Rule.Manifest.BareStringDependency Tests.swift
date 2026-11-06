@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Manifest
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `bare string dependency Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`bare string dependency Tests` {
+extension `Lint.Rule Tests`.`bare string dependency Tests` {
     static func findings(
         source: Swift::String,
         file: Swift::String = "Package.swift"
@@ -44,7 +44,7 @@ extension Lint.Rule.`bare string dependency Tests` {
     }
 }
 
-extension Lint.Rule.`bare string dependency Tests`.Unit {
+extension `Lint.Rule Tests`.`bare string dependency Tests`.Unit {
     @Test
     func `bare string in a target dependencies array is flagged`() {
         let source = """
@@ -57,7 +57,7 @@ extension Lint.Rule.`bare string dependency Tests`.Unit {
               ]
             )
             """
-        let findings = Lint.Rule.`bare string dependency Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`bare string dependency Tests`.findings(source: source)
         #expect(findings.count == 1)
         #expect(findings.first?.identifier == "bare string dependency")
         #expect(findings.first?.severity == .warning)
@@ -78,7 +78,7 @@ extension Lint.Rule.`bare string dependency Tests`.Unit {
               ]
             )
             """
-        let findings = Lint.Rule.`bare string dependency Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`bare string dependency Tests`.findings(source: source)
         #expect(findings.isEmpty)
     }
 
@@ -95,7 +95,7 @@ extension Lint.Rule.`bare string dependency Tests`.Unit {
               ]
             )
             """
-        let findings = Lint.Rule.`bare string dependency Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`bare string dependency Tests`.findings(source: source)
         #expect(findings.count == 1)
     }
 
@@ -109,7 +109,7 @@ extension Lint.Rule.`bare string dependency Tests`.Unit {
               ]
             )
             """
-        let findings = Lint.Rule.`bare string dependency Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`bare string dependency Tests`.findings(source: source)
         #expect(findings.count == 1)
     }
 
@@ -124,7 +124,7 @@ extension Lint.Rule.`bare string dependency Tests`.Unit {
               ]
             )
             """
-        let findings = Lint.Rule.`bare string dependency Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`bare string dependency Tests`.findings(source: source)
         #expect(findings.count == 2)
     }
 
@@ -137,7 +137,7 @@ extension Lint.Rule.`bare string dependency Tests`.Unit {
               ]
             )
             """
-        let observation = Lint.Rule.`bare string dependency Tests`.observation(source: source)
+        let observation = `Lint.Rule Tests`.`bare string dependency Tests`.observation(source: source)
         #expect(observation.findings.isEmpty)
         guard case .unmeasured = observation.coverage else {
             Issue.record("computed dependency array was accepted as measured")
@@ -158,12 +158,12 @@ extension Lint.Rule.`bare string dependency Tests`.Unit {
               ]
             )
             """
-        let findings = Lint.Rule.`bare string dependency Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`bare string dependency Tests`.findings(source: source)
         #expect(findings.count == 6)
     }
 }
 
-extension Lint.Rule.`bare string dependency Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`bare string dependency Tests`.`Edge Case` {
     @Test
     func `string literal inside a path argument does not fire`() {
         let source = """
@@ -177,7 +177,7 @@ extension Lint.Rule.`bare string dependency Tests`.`Edge Case` {
               ]
             )
             """
-        let findings = Lint.Rule.`bare string dependency Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`bare string dependency Tests`.findings(source: source)
         #expect(findings.isEmpty)
     }
 
@@ -198,7 +198,7 @@ extension Lint.Rule.`bare string dependency Tests`.`Edge Case` {
               ]
             )
             """
-        let findings = Lint.Rule.`bare string dependency Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`bare string dependency Tests`.findings(source: source)
         #expect(findings.count == 1)
     }
 
@@ -212,7 +212,7 @@ extension Lint.Rule.`bare string dependency Tests`.`Edge Case` {
               ]
             )
             """
-        let findings = Lint.Rule.`bare string dependency Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`bare string dependency Tests`.findings(source: source)
         #expect(findings.isEmpty)
     }
 
@@ -223,7 +223,7 @@ extension Lint.Rule.`bare string dependency Tests`.`Edge Case` {
               targets: [.target(name: "A", dependencies: ["B"])]
             )
             """
-        let findings = Lint.Rule.`bare string dependency Tests`.findings(
+        let findings = `Lint.Rule Tests`.`bare string dependency Tests`.findings(
             source: source,
             file: "Package@swift-6.0.swift"
         )
@@ -231,14 +231,14 @@ extension Lint.Rule.`bare string dependency Tests`.`Edge Case` {
     }
 }
 
-extension Lint.Rule.`bare string dependency Tests`.Integration {
+extension `Lint.Rule Tests`.`bare string dependency Tests`.Integration {
     @Test
     func `non-manifest files are out of scope entirely`() {
         let source = """
             let list = build(dependencies: ["Owner"])
             let target = Target.target(name: "A", dependencies: ["B"])
             """
-        let findings = Lint.Rule.`bare string dependency Tests`.findings(
+        let findings = `Lint.Rule Tests`.`bare string dependency Tests`.findings(
             source: source,
             file: "Sources/Consumer/Graph.swift"
         )
@@ -254,7 +254,7 @@ extension Lint.Rule.`bare string dependency Tests`.Integration {
               targets: [.testTarget(name: "Snapshot Tests", dependencies: ["Module"])]
             )
             """
-        let findings = Lint.Rule.`bare string dependency Tests`.findings(
+        let findings = `Lint.Rule Tests`.`bare string dependency Tests`.findings(
             source: source,
             file: "Tests/Package.swift"
         )
@@ -272,15 +272,15 @@ extension Lint.Rule.`bare string dependency Tests`.Integration {
               ]
             )
             """
-        let findings = Lint.Rule.`bare string dependency Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`bare string dependency Tests`.findings(source: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`bare string dependency Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`bare string dependency Tests`.`Edge Case` {
     @Test
     func `a manifest that does not parse is unmeasured, not clean`() {
-        let observation = Lint.Rule.`bare string dependency Tests`.observation(
+        let observation = `Lint.Rule Tests`.`bare string dependency Tests`.observation(
             source: """
                 let package = Package(name: "A", targets: [.target(name: "A")])
                 let package = Package(
@@ -292,7 +292,7 @@ extension Lint.Rule.`bare string dependency Tests`.`Edge Case` {
 
     @Test
     func `two Package initializers are unmeasured`() {
-        let observation = Lint.Rule.`bare string dependency Tests`.observation(
+        let observation = `Lint.Rule Tests`.`bare string dependency Tests`.observation(
             source: """
                 let package = Package(name: "A", targets: [.target(name: "A", dependencies: ["B"])])
                 let other = Package(name: "B")
@@ -307,14 +307,14 @@ extension Lint.Rule.`bare string dependency Tests`.`Edge Case` {
 
     @Test
     func `a valid manifest with one Package initializer is still measured`() {
-        let violating = Lint.Rule.`bare string dependency Tests`.observation(
+        let violating = `Lint.Rule Tests`.`bare string dependency Tests`.observation(
             source: """
                 let package = Package(name: "A", targets: [.target(name: "A", dependencies: ["B"])])
                 """
         )
         #expect(violating.coverage == .measured)
         #expect(violating.findings.count == 1)
-        let clean = Lint.Rule.`bare string dependency Tests`.observation(
+        let clean = `Lint.Rule Tests`.`bare string dependency Tests`.observation(
             source: """
                 let package = Package(name: "A", targets: [.target(name: "A", dependencies: [.target(name: "B")])])
                 """

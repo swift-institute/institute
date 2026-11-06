@@ -7,7 +7,7 @@ import Text
 
 @testable import Institute_Linter_Rule_Throws
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     /// A declaration that hands its body to a callee taking an untyped-throwing closure cannot name a typed error, so
     /// the author suppresses the site with a reason. The rule sanctions exactly that directive, as
     /// `do throws for typed catch` does (#238; swift-molecules/swift-lint#2: a violation, an exempt and a near-miss

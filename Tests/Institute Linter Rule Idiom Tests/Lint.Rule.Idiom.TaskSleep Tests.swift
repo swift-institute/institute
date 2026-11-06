@@ -4,7 +4,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Idiom
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite struct `task sleep Tests` {
         static func findings(_ source: Swift.String, file: Swift.String = "Sources/Poller/Poll.swift") -> Int {
             Lint.Rule.`task sleep`.observe(Lint.Source.parsed(from: source, file: file), .warning).findings.count

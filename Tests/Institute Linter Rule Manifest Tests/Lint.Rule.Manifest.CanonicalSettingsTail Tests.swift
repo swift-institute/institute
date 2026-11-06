@@ -4,7 +4,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Manifest
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `canonical settings tail Tests` {
         @Suite struct Unit {}
@@ -13,7 +13,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`canonical settings tail Tests` {
+extension `Lint.Rule Tests`.`canonical settings tail Tests` {
     static func observation(
         _ source: Swift::String,
         file: Swift::String = "Package.swift"
@@ -22,10 +22,10 @@ extension Lint.Rule.`canonical settings tail Tests` {
     }
 }
 
-extension Lint.Rule.`canonical settings tail Tests`.Unit {
+extension `Lint.Rule Tests`.`canonical settings tail Tests`.Unit {
     @Test
     func `the canonical tail is clean`() {
-        let observation = Lint.Rule.`canonical settings tail Tests`.observation(
+        let observation = `Lint.Rule Tests`.`canonical settings tail Tests`.observation(
             "let package = Package(name: \"Fixture\")\n\n" + manifestCanonicalSettingsTail
         )
         #expect(observation.findings.isEmpty)
@@ -33,7 +33,7 @@ extension Lint.Rule.`canonical settings tail Tests`.Unit {
 
     @Test
     func `a manifest without a tail is flagged`() {
-        let observation = Lint.Rule.`canonical settings tail Tests`.observation(
+        let observation = `Lint.Rule Tests`.`canonical settings tail Tests`.observation(
             "let package = Package(name: \"Fixture\")\n"
         )
         #expect(observation.findings.count == 1)
@@ -42,11 +42,11 @@ extension Lint.Rule.`canonical settings tail Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`canonical settings tail Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`canonical settings tail Tests`.`Edge Case` {
     @Test
     func `indentation differences are not drift`() {
         let reindented = manifestCanonicalSettingsTail.replacing("    ", with: "  ")
-        let observation = Lint.Rule.`canonical settings tail Tests`.observation(
+        let observation = `Lint.Rule Tests`.`canonical settings tail Tests`.observation(
             "let package = Package(name: \"Fixture\")\n" + reindented
         )
         #expect(observation.findings.isEmpty)
@@ -55,17 +55,17 @@ extension Lint.Rule.`canonical settings tail Tests`.`Edge Case` {
     @Test
     func `a tail missing warnings as errors is drift`() {
         let drifted = manifestCanonicalSettingsTail.replacing("        .treatAllWarnings(as: .error),\n", with: "")
-        let observation = Lint.Rule.`canonical settings tail Tests`.observation(
+        let observation = `Lint.Rule Tests`.`canonical settings tail Tests`.observation(
             "let package = Package(name: \"Fixture\")\n\n" + drifted
         )
         #expect(observation.findings.count == 1)
     }
 }
 
-extension Lint.Rule.`canonical settings tail Tests`.Integration {
+extension `Lint.Rule Tests`.`canonical settings tail Tests`.Integration {
     @Test
     func `code after the tail is drift`() {
-        let observation = Lint.Rule.`canonical settings tail Tests`.observation(
+        let observation = `Lint.Rule Tests`.`canonical settings tail Tests`.observation(
             "let package = Package(name: \"Fixture\")\n" + manifestCanonicalSettingsTail + "let extra = 1\n",
             file: "Package@swift-6.4.swift"
         )
@@ -73,7 +73,7 @@ extension Lint.Rule.`canonical settings tail Tests`.Integration {
     }
 }
 
-extension Lint.Rule.`canonical settings tail Tests`.Integration {
+extension `Lint.Rule Tests`.`canonical settings tail Tests`.Integration {
     static func repair(_ source: Swift::String) -> Lint.Rule.Repair.Proposal {
         Lint.Rule.`canonical settings tail`.repair(Lint.Source.parsed(from: source, file: "Package.swift"))
     }
@@ -88,7 +88,7 @@ extension Lint.Rule.`canonical settings tail Tests`.Integration {
             return
         }
         #expect(contents == "let package = Package(name: \"Fixture\")\n\n" + manifestCanonicalSettingsTail)
-        #expect(Lint.Rule.`canonical settings tail Tests`.observation(contents).findings.isEmpty)
+        #expect(`Lint.Rule Tests`.`canonical settings tail Tests`.observation(contents).findings.isEmpty)
     }
 
     @Test
@@ -118,7 +118,7 @@ extension Lint.Rule.`canonical settings tail Tests`.Integration {
     }
 }
 
-extension Lint.Rule.`canonical settings tail Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`canonical settings tail Tests`.`Edge Case` {
     @Test
     func `repair leaves non-manifest files unchanged`() {
         let proposal = Lint.Rule.`canonical settings tail`.repair(

@@ -6,7 +6,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Manifest
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `upward layer edge Tests` {
         @Suite struct Unit {}
@@ -15,7 +15,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`upward layer edge Tests` {
+extension `Lint.Rule Tests`.`upward layer edge Tests` {
     static func observation(
         _ source: Swift::String,
         repository: Swift::String?,
@@ -32,11 +32,11 @@ extension Lint.Rule.`upward layer edge Tests` {
     }
 }
 
-extension Lint.Rule.`upward layer edge Tests`.Unit {
+extension `Lint.Rule Tests`.`upward layer edge Tests`.Unit {
     @Test
     func `an atoms package depending on higher layers is flagged per edge`() {
-        let observation = Lint.Rule.`upward layer edge Tests`.observation(
-            Lint.Rule.`upward layer edge Tests`.manifest(
+        let observation = `Lint.Rule Tests`.`upward layer edge Tests`.observation(
+            `Lint.Rule Tests`.`upward layer edge Tests`.manifest(
                 "https://github.com/swift-atoms/swift-byte.git",
                 "https://github.com/swift-molecules/swift-buffer.git",
                 "https://github.com/swift-iso/swift-iso-9899.git",
@@ -51,8 +51,8 @@ extension Lint.Rule.`upward layer edge Tests`.Unit {
 
     @Test
     func `a standards package may depend on atoms molecules and standards`() {
-        let observation = Lint.Rule.`upward layer edge Tests`.observation(
-            Lint.Rule.`upward layer edge Tests`.manifest(
+        let observation = `Lint.Rule Tests`.`upward layer edge Tests`.observation(
+            `Lint.Rule Tests`.`upward layer edge Tests`.manifest(
                 "https://github.com/swift-atoms/swift-byte.git",
                 "https://github.com/swift-molecules/swift-buffer.git",
                 "https://github.com/swift-standards/swift-uri-standard.git",
@@ -64,11 +64,11 @@ extension Lint.Rule.`upward layer edge Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`upward layer edge Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`upward layer edge Tests`.`Edge Case` {
     @Test
     func `third-party organisations are not layered`() {
-        let observation = Lint.Rule.`upward layer edge Tests`.observation(
-            Lint.Rule.`upward layer edge Tests`.manifest(
+        let observation = `Lint.Rule Tests`.`upward layer edge Tests`.observation(
+            `Lint.Rule Tests`.`upward layer edge Tests`.manifest(
                 "https://github.com/swiftlang/swift-syntax.git",
                 "https://github.com/apple/swift-argument-parser.git"
             ),
@@ -79,8 +79,8 @@ extension Lint.Rule.`upward layer edge Tests`.`Edge Case` {
 
     @Test
     func `a manifest outside the layered organisations is inapplicable`() {
-        let observation = Lint.Rule.`upward layer edge Tests`.observation(
-            Lint.Rule.`upward layer edge Tests`.manifest("https://github.com/swift-compositions/swift-json.git"),
+        let observation = `Lint.Rule Tests`.`upward layer edge Tests`.observation(
+            `Lint.Rule Tests`.`upward layer edge Tests`.manifest("https://github.com/swift-compositions/swift-json.git"),
             repository: nil,
             file: "Package.swift"
         )
@@ -89,11 +89,11 @@ extension Lint.Rule.`upward layer edge Tests`.`Edge Case` {
     }
 }
 
-extension Lint.Rule.`upward layer edge Tests`.Integration {
+extension `Lint.Rule Tests`.`upward layer edge Tests`.Integration {
     @Test
     func `a molecules package on standards is flagged`() {
-        let observation = Lint.Rule.`upward layer edge Tests`.observation(
-            Lint.Rule.`upward layer edge Tests`.manifest("https://github.com/swift-standards/swift-uri-standard.git"),
+        let observation = `Lint.Rule Tests`.`upward layer edge Tests`.observation(
+            `Lint.Rule Tests`.`upward layer edge Tests`.manifest("https://github.com/swift-standards/swift-uri-standard.git"),
             repository: "swift-molecules/swift-owner",
             file: "/home/runner/work/swift-owner/swift-owner/Package@swift-6.4.swift"
         )
@@ -102,11 +102,11 @@ extension Lint.Rule.`upward layer edge Tests`.Integration {
     }
 }
 
-extension Lint.Rule.`upward layer edge Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`upward layer edge Tests`.`Edge Case` {
     @Test
     func `the layer comes from the owner, not the checkout folder`() {
-        let observation = Lint.Rule.`upward layer edge Tests`.observation(
-            Lint.Rule.`upward layer edge Tests`.manifest("https://github.com/swift-compositions/swift-json.git"),
+        let observation = `Lint.Rule Tests`.`upward layer edge Tests`.observation(
+            `Lint.Rule Tests`.`upward layer edge Tests`.manifest("https://github.com/swift-compositions/swift-json.git"),
             repository: "swift-atoms/swift-owner",
             file: "/workspace/swift-compositions/swift-owner/Package.swift"
         )
@@ -115,8 +115,8 @@ extension Lint.Rule.`upward layer edge Tests`.`Edge Case` {
 
     @Test
     func `a repository outside the Institute is inapplicable`() {
-        let observation = Lint.Rule.`upward layer edge Tests`.observation(
-            Lint.Rule.`upward layer edge Tests`.manifest("https://github.com/swift-compositions/swift-json.git"),
+        let observation = `Lint.Rule Tests`.`upward layer edge Tests`.observation(
+            `Lint.Rule Tests`.`upward layer edge Tests`.manifest("https://github.com/swift-compositions/swift-json.git"),
             repository: "apple/swift-owner",
             file: "/workspace/swift-atoms/swift-owner/Package.swift"
         )

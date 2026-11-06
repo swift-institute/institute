@@ -4,7 +4,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Naming
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `module selector spelling Tests` {
         @Suite struct Unit {}
@@ -13,7 +13,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`module selector spelling Tests` {
+extension `Lint.Rule Tests`.`module selector spelling Tests` {
     static func findings(
         _ source: Swift::String,
         file: Swift::String = "Sources/Fixture/Fixture.swift"
@@ -24,10 +24,10 @@ extension Lint.Rule.`module selector spelling Tests` {
     }
 }
 
-extension Lint.Rule.`module selector spelling Tests`.Unit {
+extension `Lint.Rule Tests`.`module selector spelling Tests`.Unit {
     @Test
     func `standard library member qualification is clean in types and expressions`() {
-        let findings = Lint.Rule.`module selector spelling Tests`.findings(
+        let findings = `Lint.Rule Tests`.`module selector spelling Tests`.findings(
             """
             struct Failure: Swift.Error {}
             func f(_ value: Swift.Int) -> Swift.String where Self: Swift.Sequence {
@@ -41,7 +41,7 @@ extension Lint.Rule.`module selector spelling Tests`.Unit {
 
     @Test
     func `imported target module member qualification is flagged`() {
-        let findings = Lint.Rule.`module selector spelling Tests`.findings(
+        let findings = `Lint.Rule Tests`.`module selector spelling Tests`.findings(
             "import Institute_Fixture_Core\nlet value: Institute_Fixture_Core.Value? = nil"
         )
         #expect(findings.count == 1)
@@ -50,17 +50,17 @@ extension Lint.Rule.`module selector spelling Tests`.Unit {
 
     @Test
     func `module selectors are clean`() {
-        let findings = Lint.Rule.`module selector spelling Tests`.findings(
+        let findings = `Lint.Rule Tests`.`module selector spelling Tests`.findings(
             "func f(_ value: Swift::Int) -> Swift::String { \"\" }"
         )
         #expect(findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`module selector spelling Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`module selector spelling Tests`.`Edge Case` {
     @Test
     func `a namespace type sharing its module's name is not flagged`() {
-        let findings = Lint.Rule.`module selector spelling Tests`.findings(
+        let findings = `Lint.Rule Tests`.`module selector spelling Tests`.findings(
             "import Lint\nlet rule: Lint.Rule? = nil\nlet other = Lint.Rule.self"
         )
         #expect(findings.isEmpty)
@@ -68,7 +68,7 @@ extension Lint.Rule.`module selector spelling Tests`.`Edge Case` {
 
     @Test
     func `nested qualification is flagged once`() {
-        let findings = Lint.Rule.`module selector spelling Tests`.findings(
+        let findings = `Lint.Rule Tests`.`module selector spelling Tests`.findings(
             "import Institute_Fixture_Core\nlet index: Institute_Fixture_Core.Value.Index? = nil"
         )
         #expect(findings.count == 1)
@@ -76,7 +76,7 @@ extension Lint.Rule.`module selector spelling Tests`.`Edge Case` {
 
     @Test
     func `a namespace qualified by its module selector is clean`() {
-        let findings = Lint.Rule.`module selector spelling Tests`.findings(
+        let findings = `Lint.Rule Tests`.`module selector spelling Tests`.findings(
             """
             import W3C_XML
             let element: W3C_XML::W3C_XML.Element? = nil
@@ -89,7 +89,7 @@ extension Lint.Rule.`module selector spelling Tests`.`Edge Case` {
 
     @Test
     func `an unnumbered namespace without its selector is still flagged`() {
-        let findings = Lint.Rule.`module selector spelling Tests`.findings(
+        let findings = `Lint.Rule Tests`.`module selector spelling Tests`.findings(
             """
             import W3C_XML
             let element: W3C_XML.Element? = nil
@@ -100,10 +100,10 @@ extension Lint.Rule.`module selector spelling Tests`.`Edge Case` {
     }
 }
 
-extension Lint.Rule.`module selector spelling Tests`.Integration {
+extension `Lint.Rule Tests`.`module selector spelling Tests`.Integration {
     @Test
     func `imported target modules count as modules`() {
-        let findings = Lint.Rule.`module selector spelling Tests`.findings(
+        let findings = `Lint.Rule Tests`.`module selector spelling Tests`.findings(
             """
             internal import Institute_Fixture_Core
             let value = Institute_Fixture_Core.Value()
@@ -114,7 +114,7 @@ extension Lint.Rule.`module selector spelling Tests`.Integration {
     }
 }
 
-extension Lint.Rule.`module selector spelling Tests`.Integration {
+extension `Lint.Rule Tests`.`module selector spelling Tests`.Integration {
     static func repaired(_ source: Swift::String) -> Swift::String? {
         let proposal = Lint.Rule.`module selector spelling`.repair(
             Lint.Source.parsed(from: source, file: "Sources/Fixture/Fixture.swift")
@@ -145,7 +145,7 @@ extension Lint.Rule.`module selector spelling Tests`.Integration {
                 }
                 """
         )
-        #expect(repaired.map { Lint.Rule.`module selector spelling Tests`.findings($0).isEmpty } == true)
+        #expect(repaired.map { `Lint.Rule Tests`.`module selector spelling Tests`.findings($0).isEmpty } == true)
     }
 
     @Test
@@ -157,7 +157,7 @@ extension Lint.Rule.`module selector spelling Tests`.Integration {
     }
 }
 
-extension Lint.Rule.`module selector spelling Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`module selector spelling Tests`.`Edge Case` {
     @Test
     func `a module whose namespace type the package declares is not flagged`() {
         let findings = Lint.Rule.`module selector spelling`
@@ -175,7 +175,7 @@ extension Lint.Rule.`module selector spelling Tests`.`Edge Case` {
 
     @Test
     func `a specification namespace module is not flagged`() {
-        let findings = Lint.Rule.`module selector spelling Tests`.findings(
+        let findings = `Lint.Rule Tests`.`module selector spelling Tests`.findings(
             """
             import RFC_6265
             import ISO_8824
@@ -190,7 +190,7 @@ extension Lint.Rule.`module selector spelling Tests`.`Edge Case` {
 
     @Test
     func `a module without a numbered or declared namespace is still flagged`() {
-        let findings = Lint.Rule.`module selector spelling Tests`.findings(
+        let findings = `Lint.Rule Tests`.`module selector spelling Tests`.findings(
             """
             import CSS_Standard
             import RFC_6265_Coder

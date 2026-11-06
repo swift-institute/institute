@@ -7,7 +7,7 @@ import Text
 
 @testable import Institute_Linter_Rule_Try
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     /// A callee that throws untyped errors leaves no construct that satisfies every rule, so the rule's message tells
     /// the author to suppress the site with a reason. The rule sanctions exactly that directive
     /// (swift-molecules/swift-lint#2: a violation, an exempt and a near-miss fixture).

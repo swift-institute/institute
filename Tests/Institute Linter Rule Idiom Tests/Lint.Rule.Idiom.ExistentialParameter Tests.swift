@@ -4,7 +4,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Idiom
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `existential parameter Tests` {
         @Suite struct Unit {}
@@ -13,7 +13,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`existential parameter Tests` {
+extension `Lint.Rule Tests`.`existential parameter Tests` {
     static func findings(
         _ source: Swift::String,
         file: Swift::String = "Sources/Fixture/Fixture.swift"
@@ -24,10 +24,10 @@ extension Lint.Rule.`existential parameter Tests` {
     }
 }
 
-extension Lint.Rule.`existential parameter Tests`.Unit {
+extension `Lint.Rule Tests`.`existential parameter Tests`.Unit {
     @Test
     func `existential parameters are flagged`() {
-        let findings = Lint.Rule.`existential parameter Tests`.findings(
+        let findings = `Lint.Rule Tests`.`existential parameter Tests`.findings(
             """
             func render(_ view: any View, into sink: [any Sink], fallback: (any View)?) {}
             init(source: any Source) {}
@@ -40,17 +40,17 @@ extension Lint.Rule.`existential parameter Tests`.Unit {
 
     @Test
     func `generic and opaque parameters are clean`() {
-        let findings = Lint.Rule.`existential parameter Tests`.findings(
+        let findings = `Lint.Rule Tests`.`existential parameter Tests`.findings(
             "func render<V: View>(_ view: V, other: some View) {}"
         )
         #expect(findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`existential parameter Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`existential parameter Tests`.`Edge Case` {
     @Test
     func `any Error is admitted`() {
-        let findings = Lint.Rule.`existential parameter Tests`.findings(
+        let findings = `Lint.Rule Tests`.`existential parameter Tests`.findings(
             "func report(_ error: any Error, other: any Swift.Error) {}"
         )
         #expect(findings.isEmpty)
@@ -58,7 +58,7 @@ extension Lint.Rule.`existential parameter Tests`.`Edge Case` {
 
     @Test
     func `closure parameter types are left to the closure`() {
-        let findings = Lint.Rule.`existential parameter Tests`.findings(
+        let findings = `Lint.Rule Tests`.`existential parameter Tests`.findings(
             "func each(_ body: (any View) -> Void) {}"
         )
         #expect(findings.isEmpty)
@@ -66,7 +66,7 @@ extension Lint.Rule.`existential parameter Tests`.`Edge Case` {
 
     @Test
     func `tests are out of scope`() {
-        let findings = Lint.Rule.`existential parameter Tests`.findings(
+        let findings = `Lint.Rule Tests`.`existential parameter Tests`.findings(
             "func render(_ view: any View) {}",
             file: "Tests/Fixture Tests/Fixture Tests.swift"
         )
@@ -74,10 +74,10 @@ extension Lint.Rule.`existential parameter Tests`.`Edge Case` {
     }
 }
 
-extension Lint.Rule.`existential parameter Tests`.Integration {
+extension `Lint.Rule Tests`.`existential parameter Tests`.Integration {
     @Test
     func `stored existential properties are not parameters`() {
-        let findings = Lint.Rule.`existential parameter Tests`.findings(
+        let findings = `Lint.Rule Tests`.`existential parameter Tests`.findings(
             "struct Box { let value: any View }",
             file: "/workspace/swift-fixture/Sources/Fixture/Box.swift"
         )
@@ -85,10 +85,10 @@ extension Lint.Rule.`existential parameter Tests`.Integration {
     }
 }
 
-extension Lint.Rule.`existential parameter Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`existential parameter Tests`.`Edge Case` {
     @Test
     func `Codable requirement witnesses are admitted`() {
-        let findings = Lint.Rule.`existential parameter Tests`.findings(
+        let findings = `Lint.Rule Tests`.`existential parameter Tests`.findings(
             """
             extension Box: Encodable {
               public func encode(to encoder: any Encoder) throws(any Error) {}
@@ -103,7 +103,7 @@ extension Lint.Rule.`existential parameter Tests`.`Edge Case` {
 
     @Test
     func `Encoder and Decoder outside the Codable witnesses are still flagged`() {
-        let findings = Lint.Rule.`existential parameter Tests`.findings(
+        let findings = `Lint.Rule Tests`.`existential parameter Tests`.findings(
             """
             func log(_ encoder: any Encoder) {}
             func encode(to sink: any Sink) {}
@@ -118,7 +118,7 @@ extension Lint.Rule.`existential parameter Tests`.`Edge Case` {
 
     @Test
     func `witness shapes are flagged without a Codable conformance on the enclosing declaration`() {
-        let findings = Lint.Rule.`existential parameter Tests`.findings(
+        let findings = `Lint.Rule Tests`.`existential parameter Tests`.findings(
             """
             extension Box {
               func encode(to encoder: any Encoder) throws {}
@@ -137,7 +137,7 @@ extension Lint.Rule.`existential parameter Tests`.`Edge Case` {
 
     @Test
     func `nested CodingKeys do not hide the enclosing conformance`() {
-        let findings = Lint.Rule.`existential parameter Tests`.findings(
+        let findings = `Lint.Rule Tests`.`existential parameter Tests`.findings(
             """
             extension Box: Swift.Codable {
               private enum CodingKeys: String, CodingKey { case value }
@@ -150,10 +150,10 @@ extension Lint.Rule.`existential parameter Tests`.`Edge Case` {
     }
 }
 
-extension Lint.Rule.`existential parameter Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`existential parameter Tests`.`Edge Case` {
     @Test
     func `a collection of existentials names the heterogeneous alternatives`() {
-        let findings = Lint.Rule.`existential parameter Tests`.findings(
+        let findings = `Lint.Rule Tests`.`existential parameter Tests`.findings(
             """
             func render(_ view: any View, fallback: (any View)?, into sinks: [any Sink]) {}
             """

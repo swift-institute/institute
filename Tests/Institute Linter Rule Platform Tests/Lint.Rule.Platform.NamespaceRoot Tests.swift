@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Platform
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `compound platform namespace root Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`compound platform namespace root Tests` {
+extension `Lint.Rule Tests`.`compound platform namespace root Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -38,13 +38,13 @@ extension Lint.Rule.`compound platform namespace root Tests` {
     }
 }
 
-extension Lint.Rule.`compound platform namespace root Tests`.Unit {
+extension `Lint.Rule Tests`.`compound platform namespace root Tests`.Unit {
     @Test
     func `LinuxKernel compound name is flagged`() {
         let source = """
             public enum LinuxKernel {}
             """
-        let findings = Lint.Rule.`compound platform namespace root Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound platform namespace root Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "compound platform namespace root")
@@ -56,18 +56,18 @@ extension Lint.Rule.`compound platform namespace root Tests`.Unit {
         let source = """
             public enum KqueueEventNotification {}
             """
-        let findings = Lint.Rule.`compound platform namespace root Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound platform namespace root Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`compound platform namespace root Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`compound platform namespace root Tests`.`Edge Case` {
     @Test
     func `Kernel namespace alone is NOT flagged`() {
         let source = """
             public enum Kernel {}
             """
-        let findings = Lint.Rule.`compound platform namespace root Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound platform namespace root Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -78,7 +78,7 @@ extension Lint.Rule.`compound platform namespace root Tests`.`Edge Case` {
                 public enum Uring {}
             }
             """
-        let findings = Lint.Rule.`compound platform namespace root Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound platform namespace root Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -89,7 +89,7 @@ extension Lint.Rule.`compound platform namespace root Tests`.`Edge Case` {
                 public enum LinuxKernel {}
             }
             """
-        let findings = Lint.Rule.`compound platform namespace root Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound platform namespace root Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -101,7 +101,7 @@ extension Lint.Rule.`compound platform namespace root Tests`.`Edge Case` {
         let source = """
             actor LinuxKernel {}
             """
-        let findings = Lint.Rule.`compound platform namespace root Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound platform namespace root Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -112,7 +112,7 @@ extension Lint.Rule.`compound platform namespace root Tests`.`Edge Case` {
                 struct LinuxKernelState {}
             }
             """
-        let findings = Lint.Rule.`compound platform namespace root Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound platform namespace root Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -123,7 +123,7 @@ extension Lint.Rule.`compound platform namespace root Tests`.`Edge Case` {
                 enum LinuxKernel {}
             }
             """
-        let findings = Lint.Rule.`compound platform namespace root Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound platform namespace root Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -132,7 +132,7 @@ extension Lint.Rule.`compound platform namespace root Tests`.`Edge Case` {
         let source = """
             enum AndroidKernel {}
             """
-        let findings = Lint.Rule.`compound platform namespace root Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound platform namespace root Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }

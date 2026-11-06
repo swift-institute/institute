@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Naming
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `int public parameter Tests` {
         @Suite struct Unit {}
@@ -26,18 +26,18 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`int public parameter Tests` {
+extension `Lint.Rule Tests`.`int public parameter Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`int public parameter`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`int public parameter Tests`.Unit {
+extension `Lint.Rule Tests`.`int public parameter Tests`.Unit {
     @Test
     func `public func with Int parameter is flagged`() {
         let source = "public func read(count: Int) {}"
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         let count = findings.count
         #expect(count == 1)
         if count == 1 {
@@ -52,21 +52,21 @@ extension Lint.Rule.`int public parameter Tests`.Unit {
         // the `public` keyword itself — the rule must walk up to the
         // extension's access level, not just the declaration's own.
         let source = "public extension Walker { func read(count: Int) {} }"
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `public func with Int return type is flagged`() {
         let source = "public func size() -> Int { 0 }"
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `public func with Int param and Int return has two findings`() {
         let source = "public func foo(n: Int) -> Int { n }"
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.count == 2)
     }
 
@@ -77,21 +77,21 @@ extension Lint.Rule.`int public parameter Tests`.Unit {
                 public init(count: Int) {}
             }
             """
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `optional Int parameter is flagged`() {
         let source = "public func read(count: Int?) {}"
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `Swift-qualified Int is flagged`() {
         let source = "public func tag(value: Swift.Int) {}"
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -102,7 +102,7 @@ extension Lint.Rule.`int public parameter Tests`.Unit {
                 open func size() -> Int { 0 }
             }
             """
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -113,7 +113,7 @@ extension Lint.Rule.`int public parameter Tests`.Unit {
             public func b() -> Int { 0 }
             public func c(s: String) -> String { s }
             """
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.count == 2)
     }
 
@@ -126,7 +126,7 @@ extension Lint.Rule.`int public parameter Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -139,7 +139,7 @@ extension Lint.Rule.`int public parameter Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -152,44 +152,44 @@ extension Lint.Rule.`int public parameter Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.count == 2)
     }
 }
 
-extension Lint.Rule.`int public parameter Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`int public parameter Tests`.`Edge Case` {
     @Test
     func `internal func with Int parameter is NOT flagged`() {
         let source = "func read(count: Int) {}"
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `private func with Int return is NOT flagged`() {
         let source = "private func size() -> Int { 0 }"
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `package func with Int parameter is NOT flagged`() {
         let source = "package func read(count: Int) {}"
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `Cardinal typed parameter is NOT flagged`() {
         let source = "public func read(count: Cardinal) {}"
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `Index parameter is NOT flagged`() {
         let source = "public func at(index: Index<UInt8>) {}"
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -198,14 +198,14 @@ extension Lint.Rule.`int public parameter Tests`.`Edge Case` {
         // Sized integers (Int8/16/32/64, UInt*, ...) are valid domain types
         // (e.g., Int32 for fd, UInt8 for byte). Rule scopes to bare `Int`.
         let source = "public func tag(fd: Int32) {}"
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `sized integer UInt8 is NOT flagged`() {
         let source = "public func encode(_ b: UInt8) {}"
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -213,14 +213,14 @@ extension Lint.Rule.`int public parameter Tests`.`Edge Case` {
     func `closure with internal Int parameter is NOT flagged`() {
         // The Int is inside a closure type, not the outer signature.
         let source = "public func op(_ body: (Int) -> Void) {}"
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `tuple with Int member is NOT flagged`() {
         let source = "public func tag(values: (Int, String)) {}"
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -231,14 +231,14 @@ extension Lint.Rule.`int public parameter Tests`.`Edge Case` {
                 public func read(count: Int) {}
             }
             """
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `String return is NOT flagged`() {
         let source = "public func describe() -> String { \"\" }"
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -252,7 +252,7 @@ extension Lint.Rule.`int public parameter Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -267,7 +267,7 @@ extension Lint.Rule.`int public parameter Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -278,7 +278,7 @@ extension Lint.Rule.`int public parameter Tests`.`Edge Case` {
                 public static func buildExpression(_ expression: String) -> Int { 0 }
             }
             """
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -290,7 +290,7 @@ extension Lint.Rule.`int public parameter Tests`.`Edge Case` {
                 public static func helper(_ x: Int) -> Int { x }
             }
             """
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.count == 2)
     }
 
@@ -303,7 +303,7 @@ extension Lint.Rule.`int public parameter Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -314,7 +314,7 @@ extension Lint.Rule.`int public parameter Tests`.`Edge Case` {
                 private subscript(key: String) -> Int { 0 }
             }
             """
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -327,7 +327,7 @@ extension Lint.Rule.`int public parameter Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`int public parameter Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`int public parameter Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

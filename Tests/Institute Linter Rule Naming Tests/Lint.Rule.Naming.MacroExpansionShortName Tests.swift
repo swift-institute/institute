@@ -15,7 +15,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Naming
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `macro expansion short name Tests` {
         @Suite struct Unit {}
@@ -24,14 +24,14 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`macro expansion short name Tests` {
+extension `Lint.Rule Tests`.`macro expansion short name Tests` {
     static func findings(in source: Swift::String) -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: "Sources/Value Macros/ValueMacro.swift")
         return Lint.Rule.`macro expansion short name`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`macro expansion short name Tests`.Unit {
+extension `Lint.Rule Tests`.`macro expansion short name Tests`.Unit {
     @Test
     func `unqualified extension target is flagged`() {
         let source = """
@@ -41,7 +41,7 @@ extension Lint.Rule.`macro expansion short name Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`macro expansion short name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`macro expansion short name Tests`.findings(in: source)
         let count = findings.count
         #expect(count == 1)
         if count == 1 {
@@ -52,7 +52,7 @@ extension Lint.Rule.`macro expansion short name Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`macro expansion short name Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`macro expansion short name Tests`.`Edge Case` {
     @Test
     func `fully qualified extension target and inherited type are lawful`() {
         let source = """
@@ -62,7 +62,7 @@ extension Lint.Rule.`macro expansion short name Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`macro expansion short name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`macro expansion short name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -75,7 +75,7 @@ extension Lint.Rule.`macro expansion short name Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`macro expansion short name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`macro expansion short name Tests`.findings(in: source)
         let count = findings.count
         #expect(count == 1)
         if count == 1 {
@@ -92,7 +92,7 @@ extension Lint.Rule.`macro expansion short name Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`macro expansion short name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`macro expansion short name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

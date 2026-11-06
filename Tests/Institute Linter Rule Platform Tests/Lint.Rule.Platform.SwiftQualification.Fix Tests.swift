@@ -18,7 +18,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Platform
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `swift protocol qualification fix Tests` {
         @Suite struct Unit {}
@@ -29,7 +29,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`swift protocol qualification fix Tests` {
+extension `Lint.Rule Tests`.`swift protocol qualification fix Tests` {
     static func fixed(_ source: String, file: String = "test.swift") -> String? {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`swift protocol qualification`.rewritten(parsed)
@@ -68,14 +68,14 @@ extension Lint.Rule.`swift protocol qualification fix Tests` {
     }
 }
 
-extension Lint.Rule.`swift protocol qualification fix Tests`.`Round Trip` {
+extension `Lint.Rule Tests`.`swift protocol qualification fix Tests`.`Round Trip` {
     @Test
     func `a generic parameter constraint is qualified`() {
         let source = """
             func op<E: Error>(_ error: E) {}
             """
-        Lint.Rule.`swift protocol qualification fix Tests`.roundTrips(source)
-        let output = Lint.Rule.`swift protocol qualification fix Tests`.fixed(source)
+        `Lint.Rule Tests`.`swift protocol qualification fix Tests`.roundTrips(source)
+        let output = `Lint.Rule Tests`.`swift protocol qualification fix Tests`.fixed(source)
         #expect(output?.contains("<E: Swift.Error>") == true)
     }
 
@@ -84,9 +84,9 @@ extension Lint.Rule.`swift protocol qualification fix Tests`.`Round Trip` {
         let source = """
             func op(_ bytes: some Sequence<UInt8>) {}
             """
-        Lint.Rule.`swift protocol qualification fix Tests`.roundTrips(source)
+        `Lint.Rule Tests`.`swift protocol qualification fix Tests`.roundTrips(source)
         #expect(
-            Lint.Rule.`swift protocol qualification fix Tests`
+            `Lint.Rule Tests`.`swift protocol qualification fix Tests`
                 .fixed(source)?.contains("some Swift.Sequence<UInt8>") == true
         )
     }
@@ -96,8 +96,8 @@ extension Lint.Rule.`swift protocol qualification fix Tests`.`Round Trip` {
         let source = """
             struct Bag: Collection {}
             """
-        Lint.Rule.`swift protocol qualification fix Tests`.roundTrips(source)
-        let output = Lint.Rule.`swift protocol qualification fix Tests`.fixed(source)
+        `Lint.Rule Tests`.`swift protocol qualification fix Tests`.roundTrips(source)
+        let output = `Lint.Rule Tests`.`swift protocol qualification fix Tests`.fixed(source)
         #expect(output?.contains(": Swift.Collection") == true)
     }
 
@@ -106,7 +106,7 @@ extension Lint.Rule.`swift protocol qualification fix Tests`.`Round Trip` {
         let source = """
             func op<T>(_ value: T) where T: Sequence {}
             """
-        Lint.Rule.`swift protocol qualification fix Tests`.roundTrips(source)
+        `Lint.Rule Tests`.`swift protocol qualification fix Tests`.roundTrips(source)
     }
 
     @Test
@@ -114,8 +114,8 @@ extension Lint.Rule.`swift protocol qualification fix Tests`.`Round Trip` {
         let source = """
             func op<T: Sequence & Collection>(_ value: T) {}
             """
-        Lint.Rule.`swift protocol qualification fix Tests`.roundTrips(source)
-        let output = Lint.Rule.`swift protocol qualification fix Tests`.fixed(source)
+        `Lint.Rule Tests`.`swift protocol qualification fix Tests`.roundTrips(source)
+        let output = `Lint.Rule Tests`.`swift protocol qualification fix Tests`.fixed(source)
         #expect(output?.contains("Swift.Sequence & Swift.Collection") == true)
     }
 
@@ -127,20 +127,20 @@ extension Lint.Rule.`swift protocol qualification fix Tests`.`Round Trip` {
                 return true
             }
             """
-        let output = Lint.Rule.`swift protocol qualification fix Tests`.fixed(source)
+        let output = `Lint.Rule Tests`.`swift protocol qualification fix Tests`.fixed(source)
         #expect(output?.contains("/// Doc comment.\n") == true)
         #expect(output?.contains("    return true\n") == true)
     }
 }
 
-extension Lint.Rule.`swift protocol qualification fix Tests`.`Not Fixable` {
+extension `Lint.Rule Tests`.`swift protocol qualification fix Tests`.`Not Fixable` {
     @Test
     func `an already-qualified reference is not rewritten`() {
         let source = """
             func op<E: Swift.Error>(_ error: E) {}
             """
-        #expect(Lint.Rule.`swift protocol qualification fix Tests`.findings(in: source).isEmpty)
-        #expect(Lint.Rule.`swift protocol qualification fix Tests`.fixed(source) == nil)
+        #expect(`Lint.Rule Tests`.`swift protocol qualification fix Tests`.findings(in: source).isEmpty)
+        #expect(`Lint.Rule Tests`.`swift protocol qualification fix Tests`.fixed(source) == nil)
     }
 
     @Test
@@ -154,12 +154,12 @@ extension Lint.Rule.`swift protocol qualification fix Tests`.`Not Fixable` {
                 func op<E: Error>(_ error: E) {}
             }
             """
-        #expect(Lint.Rule.`swift protocol qualification fix Tests`.findings(in: source).isEmpty)
-        #expect(Lint.Rule.`swift protocol qualification fix Tests`.fixed(source) == nil)
+        #expect(`Lint.Rule Tests`.`swift protocol qualification fix Tests`.findings(in: source).isEmpty)
+        #expect(`Lint.Rule Tests`.`swift protocol qualification fix Tests`.fixed(source) == nil)
     }
 }
 
-extension Lint.Rule.`swift protocol qualification fix Tests`.`Not Fixable` {
+extension `Lint.Rule Tests`.`swift protocol qualification fix Tests`.`Not Fixable` {
     /// Asserts the rule still fires but declines to rewrite — the finding
     /// stands for a person, who is the only one who knows which `Error` the
     /// file meant.
@@ -168,11 +168,11 @@ extension Lint.Rule.`swift protocol qualification fix Tests`.`Not Fixable` {
         sourceLocation: Testing.SourceLocation = #_sourceLocation
     ) {
         #expect(
-            !Lint.Rule.`swift protocol qualification fix Tests`.findings(in: source).isEmpty,
+            !`Lint.Rule Tests`.`swift protocol qualification fix Tests`.findings(in: source).isEmpty,
             sourceLocation: sourceLocation
         )
         #expect(
-            Lint.Rule.`swift protocol qualification fix Tests`.fixed(source) == nil,
+            `Lint.Rule Tests`.`swift protocol qualification fix Tests`.fixed(source) == nil,
             sourceLocation: sourceLocation
         )
     }
@@ -262,7 +262,7 @@ extension Lint.Rule.`swift protocol qualification fix Tests`.`Not Fixable` {
             func op<T: Sequence>(_ value: T) {}
             func handle(_ e: any Error) {}
             """
-        let output = Lint.Rule.`swift protocol qualification fix Tests`.fixed(source)
+        let output = `Lint.Rule Tests`.`swift protocol qualification fix Tests`.fixed(source)
         #expect(output?.contains("<T: Swift.Sequence>") == true)
         #expect(output?.contains("any Error") == true)
         #expect(output?.contains("Swift.Error") == false)

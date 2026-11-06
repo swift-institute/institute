@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Structure
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `raw value access Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`raw value access Tests` {
+extension `Lint.Rule Tests`.`raw value access Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`raw value access`.observe(parsed, .warning).findings
@@ -42,12 +42,12 @@ extension Lint.Rule.`raw value access Tests` {
     }
 }
 
-extension Lint.Rule.`raw value access Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`raw value access Tests`.`Edge Case` {
     @Test
     func `brand-owner run self-suppresses raw value access (§A)`() {
         // The run's own sources declare `Cardinal` (∈ numeric vocabulary), so
         // same-package `.rawValue` boundary access is legitimate — zero findings.
-        let findings = Lint.Rule.`raw value access Tests`.findings(
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(
             in: "func op(tag: MyTag) { let raw = tag.rawValue; use(raw) }",
             types: ["Cardinal"]
         )
@@ -58,7 +58,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
     func `consumer run still fires raw value access (§A)`() {
         // The run declares no brand from the vocabulary — cross-package firing
         // is preserved by construction.
-        let findings = Lint.Rule.`raw value access Tests`.findings(
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(
             in: "func op(tag: MyTag) { let raw = tag.rawValue; use(raw) }",
             types: ["SomeConsumerType"]
         )
@@ -66,7 +66,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
     }
 }
 
-extension Lint.Rule.`raw value access Tests`.Unit {
+extension `Lint.Rule Tests`.`raw value access Tests`.Unit {
     @Test
     func `rawValue access inside function body is flagged`() {
         let source = """
@@ -75,7 +75,7 @@ extension Lint.Rule.`raw value access Tests`.Unit {
                 use(raw)
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "raw value access")
@@ -90,12 +90,12 @@ extension Lint.Rule.`raw value access Tests`.Unit {
                 use(p)
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`raw value access Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`raw value access Tests`.`Edge Case` {
     @Test
     func `rawValue at top-level type scope is NOT flagged`() {
         // `bodyDepth == 0`: the access sits directly in a stored-property
@@ -106,7 +106,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 static let max = MyTag.rawValue
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -121,7 +121,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 var stripped: Int32 { tag.rawValue }
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -132,7 +132,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 subscript(index: Int) -> Int32 { tags[index].rawValue }
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -144,7 +144,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 use(n)
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -162,7 +162,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 use(s)
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -174,7 +174,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 use(s)
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -187,7 +187,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 use(r)
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -202,7 +202,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
@@ -211,7 +211,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
 // initializer-boundary reserve. The rule's message reserves the flagged
 // accessors for "extension initializers (the brand-newtype's own
 // boundary)"; the implementation now honors that reserve.
-extension Lint.Rule.`raw value access Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`raw value access Tests`.`Edge Case` {
     @Test
     func `self rawValue assignment inside declaring init is NOT flagged`() {
         // The swift-iso-9945 `ISO 9945.Kernel.Process.ID` shape.
@@ -223,7 +223,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -240,7 +240,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -255,7 +255,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -267,7 +267,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 transmit(tag.rawValue)
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -285,7 +285,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -298,7 +298,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
@@ -308,7 +308,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
 // implementations; this is the second clause, for the one shape with a
 // stable syntactic property — the receiver is the enclosing type's own
 // instance.
-extension Lint.Rule.`raw value access Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`raw value access Tests`.`Edge Case` {
     @Test
     func `Self-typed operator parameters are NOT flagged`() {
         // The brand's own arithmetic — the high-volume same-package shape.
@@ -319,7 +319,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -332,7 +332,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -345,7 +345,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -358,7 +358,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -373,7 +373,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -388,7 +388,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -400,12 +400,12 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 tag.rawValue
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`raw value access Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`raw value access Tests`.`Edge Case` {
     @Test
     func `rawValue remains governed beside ordinary position vocabulary`() {
         let source = """
@@ -416,7 +416,7 @@ extension Lint.Rule.`raw value access Tests`.`Edge Case` {
                 use(tag.rawValue)
             }
             """
-        let findings = Lint.Rule.`raw value access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`raw value access Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }

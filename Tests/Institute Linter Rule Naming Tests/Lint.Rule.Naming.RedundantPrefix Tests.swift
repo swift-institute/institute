@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Naming
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `redundant prefix Tests` {
         @Suite struct Unit {}
@@ -26,14 +26,14 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`redundant prefix Tests` {
+extension `Lint.Rule Tests`.`redundant prefix Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`redundant prefix`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`redundant prefix Tests`.Unit {
+extension `Lint.Rule Tests`.`redundant prefix Tests`.Unit {
     @Test
     func `Walk-WalkOptions inside Walk is flagged`() {
         let source = """
@@ -41,7 +41,7 @@ extension Lint.Rule.`redundant prefix Tests`.Unit {
                 struct WalkOptions {}
             }
             """
-        let findings = Lint.Rule.`redundant prefix Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`redundant prefix Tests`.findings(in: source)
         let count = findings.count
         #expect(count == 1)
         if count == 1 {
@@ -57,7 +57,7 @@ extension Lint.Rule.`redundant prefix Tests`.Unit {
                 enum FileError {}
             }
             """
-        let findings = Lint.Rule.`redundant prefix Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`redundant prefix Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -68,7 +68,7 @@ extension Lint.Rule.`redundant prefix Tests`.Unit {
                 struct ManifestEntry {}
             }
             """
-        let findings = Lint.Rule.`redundant prefix Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`redundant prefix Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -80,7 +80,7 @@ extension Lint.Rule.`redundant prefix Tests`.Unit {
                 struct CFoo {}
             }
             """
-        let findings = Lint.Rule.`redundant prefix Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`redundant prefix Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -91,7 +91,7 @@ extension Lint.Rule.`redundant prefix Tests`.Unit {
                 class FooBar {}
             }
             """
-        let findings = Lint.Rule.`redundant prefix Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`redundant prefix Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -102,7 +102,7 @@ extension Lint.Rule.`redundant prefix Tests`.Unit {
                 struct ServiceState {}
             }
             """
-        let findings = Lint.Rule.`redundant prefix Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`redundant prefix Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -115,12 +115,12 @@ extension Lint.Rule.`redundant prefix Tests`.Unit {
                 enum WalkError {}
             }
             """
-        let findings = Lint.Rule.`redundant prefix Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`redundant prefix Tests`.findings(in: source)
         #expect(findings.count == 3)
     }
 }
 
-extension Lint.Rule.`redundant prefix Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`redundant prefix Tests`.`Edge Case` {
     @Test
     func `bare Options inside Walk is NOT flagged`() {
         let source = """
@@ -128,14 +128,14 @@ extension Lint.Rule.`redundant prefix Tests`.`Edge Case` {
                 struct Options {}
             }
             """
-        let findings = Lint.Rule.`redundant prefix Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`redundant prefix Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `top-level Walk has no enclosing - NOT flagged`() {
         let source = "enum Walk {}"
-        let findings = Lint.Rule.`redundant prefix Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`redundant prefix Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -143,7 +143,7 @@ extension Lint.Rule.`redundant prefix Tests`.`Edge Case` {
     func `top-level WalkOptions outside Walk is NOT flagged`() {
         // No enclosing namespace; CompoundType (API-NAME-001) handles this case.
         let source = "struct WalkOptions {}"
-        let findings = Lint.Rule.`redundant prefix Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`redundant prefix Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -154,7 +154,7 @@ extension Lint.Rule.`redundant prefix Tests`.`Edge Case` {
                 struct Bar {}
             }
             """
-        let findings = Lint.Rule.`redundant prefix Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`redundant prefix Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -167,7 +167,7 @@ extension Lint.Rule.`redundant prefix Tests`.`Edge Case` {
                 struct Foobar {}
             }
             """
-        let findings = Lint.Rule.`redundant prefix Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`redundant prefix Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -179,7 +179,7 @@ extension Lint.Rule.`redundant prefix Tests`.`Edge Case` {
                 struct Foo {}
             }
             """
-        let findings = Lint.Rule.`redundant prefix Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`redundant prefix Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -192,7 +192,7 @@ extension Lint.Rule.`redundant prefix Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`redundant prefix Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`redundant prefix Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -206,7 +206,7 @@ extension Lint.Rule.`redundant prefix Tests`.`Edge Case` {
                 struct View {}
             }
             """
-        let findings = Lint.Rule.`redundant prefix Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`redundant prefix Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -217,7 +217,7 @@ extension Lint.Rule.`redundant prefix Tests`.`Edge Case` {
                 struct View {}
             }
             """
-        let findings = Lint.Rule.`redundant prefix Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`redundant prefix Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -231,7 +231,7 @@ extension Lint.Rule.`redundant prefix Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`redundant prefix Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`redundant prefix Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }

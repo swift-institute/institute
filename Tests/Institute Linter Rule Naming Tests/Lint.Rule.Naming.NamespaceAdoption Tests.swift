@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Naming
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `namespace adoption typealias Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`namespace adoption typealias Tests` {
+extension `Lint.Rule Tests`.`namespace adoption typealias Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         let rule = Lint.Rule.`namespace adoption typealias`
@@ -34,7 +34,7 @@ extension Lint.Rule.`namespace adoption typealias Tests` {
     }
 }
 
-extension Lint.Rule.`namespace adoption typealias Tests`.Unit {
+extension `Lint.Rule Tests`.`namespace adoption typealias Tests`.Unit {
     @Test
     func `same-leaf typealias is flagged for review`() {
         let source = """
@@ -42,7 +42,7 @@ extension Lint.Rule.`namespace adoption typealias Tests`.Unit {
             """
         let rule = Lint.Rule.`namespace adoption typealias`
         #expect(rule.severity.default == .note)
-        let findings = Lint.Rule.`namespace adoption typealias Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`namespace adoption typealias Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "namespace adoption typealias")
@@ -55,7 +55,7 @@ extension Lint.Rule.`namespace adoption typealias Tests`.Unit {
         let source = """
             public typealias Channel = Kernel.IO.Channel
             """
-        let findings = Lint.Rule.`namespace adoption typealias Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`namespace adoption typealias Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -68,18 +68,18 @@ extension Lint.Rule.`namespace adoption typealias Tests`.Unit {
                 public typealias Array<T> = Swift.Array<T>
             }
             """
-        let findings = Lint.Rule.`namespace adoption typealias Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`namespace adoption typealias Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`namespace adoption typealias Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`namespace adoption typealias Tests`.`Edge Case` {
     @Test
     func `different-leaf typealias is NOT flagged`() {
         let source = """
             public typealias SourceLocation = Text.Location
             """
-        let findings = Lint.Rule.`namespace adoption typealias Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`namespace adoption typealias Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -88,7 +88,7 @@ extension Lint.Rule.`namespace adoption typealias Tests`.`Edge Case` {
         let source = """
             public typealias Foo = Int
             """
-        let findings = Lint.Rule.`namespace adoption typealias Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`namespace adoption typealias Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -102,7 +102,7 @@ extension Lint.Rule.`namespace adoption typealias Tests`.`Edge Case` {
                 public typealias Index = Underlying.Index
             }
             """
-        let findings = Lint.Rule.`namespace adoption typealias Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`namespace adoption typealias Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -113,7 +113,7 @@ extension Lint.Rule.`namespace adoption typealias Tests`.`Edge Case` {
                 public typealias Index = Int
             }
             """
-        let findings = Lint.Rule.`namespace adoption typealias Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`namespace adoption typealias Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -127,7 +127,7 @@ extension Lint.Rule.`namespace adoption typealias Tests`.`Edge Case` {
                 public typealias Event = Kernel.Event
             }
             """
-        let findings = Lint.Rule.`namespace adoption typealias Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`namespace adoption typealias Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -143,7 +143,7 @@ extension Lint.Rule.`namespace adoption typealias Tests`.`Edge Case` {
                     Property.Property<Tag, Stack<Element>>
             }
             """
-        let findings = Lint.Rule.`namespace adoption typealias Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`namespace adoption typealias Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -157,7 +157,7 @@ extension Lint.Rule.`namespace adoption typealias Tests`.`Edge Case` {
                     Property.Property<Tag, Int>
             }
             """
-        let findings = Lint.Rule.`namespace adoption typealias Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`namespace adoption typealias Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

@@ -5,7 +5,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Manifest
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `trait consistency Tests` {
         @Suite struct Unit {}
@@ -14,7 +14,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`trait consistency Tests` {
+extension `Lint.Rule Tests`.`trait consistency Tests` {
     static let manifest = """
         let package = Package(
             name: "swift-owner",
@@ -51,17 +51,17 @@ extension Lint.Rule.`trait consistency Tests` {
     }
 }
 
-extension Lint.Rule.`trait consistency Tests`.Unit {
+extension `Lint.Rule Tests`.`trait consistency Tests`.Unit {
     @Test
     func `guarded imports want the union of their guards, and the repair adds it`() throws {
         let files = [
             "Sources/Owner/A.swift": "#if Coder\nimport Checkpoint\n#endif",
             "Sources/Owner/B.swift": "#if Parser && os(Linux)\nimport Checkpoint\n#endif",
         ]
-        let observation = Lint.Rule.`trait consistency`.observe(Lint.Rule.`trait consistency Tests`.parsed(files), .warning)
+        let observation = Lint.Rule.`trait consistency`.observe(`Lint.Rule Tests`.`trait consistency Tests`.parsed(files), .warning)
         #expect(observation.findings.count == 1)
         #expect(observation.findings[0].message.contains("condition: .when(traits: [\"Coder\", \"Parser\"])"))
-        guard case .edits(let edits) = Lint.Rule.`trait consistency`.repair(Lint.Rule.`trait consistency Tests`.parsed(files)),
+        guard case .edits(let edits) = Lint.Rule.`trait consistency`.repair(`Lint.Rule Tests`.`trait consistency Tests`.parsed(files)),
             case .rewrite(_, let contents) = edits.first
         else {
             Issue.record("expected a rewrite")
@@ -71,7 +71,7 @@ extension Lint.Rule.`trait consistency Tests`.Unit {
             ".product(name: \"Checkpoint\", package: \"swift-checkpoint\", condition: .when(traits: [\"Coder\", \"Parser\"]))"
         #expect(contents.contains(expected))
         let repaired = Lint.Rule.`trait consistency`.observe(
-            Lint.Rule.`trait consistency Tests`.parsed(files, manifest: contents),
+            `Lint.Rule Tests`.`trait consistency Tests`.parsed(files, manifest: contents),
             .warning
         )
         #expect(repaired.findings.isEmpty)
@@ -80,32 +80,32 @@ extension Lint.Rule.`trait consistency Tests`.Unit {
     @Test
     func `a conditioned dependency imported outside its guard is flagged and not repaired`() {
         let files = ["Sources/Owner/A.swift": "#if Serializer\nimport Serializer\n#endif"]
-        let parsed = Lint.Rule.`trait consistency Tests`.parsed(files)
+        let parsed = `Lint.Rule Tests`.`trait consistency Tests`.parsed(files)
         let observation = Lint.Rule.`trait consistency`.observe(parsed, .warning)
         #expect(observation.findings.count == 1)
         #expect(observation.findings[0].message.contains("Sources/Owner/A.swift:2"))
-        #expect(Lint.Rule.`trait consistency`.repair(Lint.Rule.`trait consistency Tests`.parsed(files)) == .refused(.repairUnavailable))
+        #expect(Lint.Rule.`trait consistency`.repair(`Lint.Rule Tests`.`trait consistency Tests`.parsed(files)) == .refused(.repairUnavailable))
     }
 }
 
-extension Lint.Rule.`trait consistency Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`trait consistency Tests`.`Edge Case` {
     @Test
     func `a guard implying the condition through enabled traits is enough`() {
         let files = ["Sources/Owner/A.swift": "#if Coder\nimport Serializer\n#endif"]
-        let observation = Lint.Rule.`trait consistency`.observe(Lint.Rule.`trait consistency Tests`.parsed(files), .warning)
+        let observation = Lint.Rule.`trait consistency`.observe(`Lint.Rule Tests`.`trait consistency Tests`.parsed(files), .warning)
         #expect(observation.findings.isEmpty)
     }
 
     @Test
     func `an import in another target is not this target's`() {
         let files = ["Sources/Other/A.swift": "#if Parser\nimport Parser\n#endif"]
-        let observation = Lint.Rule.`trait consistency`.observe(Lint.Rule.`trait consistency Tests`.parsed(files), .warning)
+        let observation = Lint.Rule.`trait consistency`.observe(`Lint.Rule Tests`.`trait consistency Tests`.parsed(files), .warning)
         #expect(observation.findings.isEmpty)
     }
 
     @Test
     func `an unused dependency is left to the unused-dependency warning`() {
-        let observation = Lint.Rule.`trait consistency`.observe(Lint.Rule.`trait consistency Tests`.parsed([:]), .warning)
+        let observation = Lint.Rule.`trait consistency`.observe(`Lint.Rule Tests`.`trait consistency Tests`.parsed([:]), .warning)
         #expect(observation.findings.isEmpty)
     }
 }

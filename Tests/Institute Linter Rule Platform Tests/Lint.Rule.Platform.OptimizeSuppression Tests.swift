@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Platform
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `optimize suppression attribute Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`optimize suppression attribute Tests` {
+extension `Lint.Rule Tests`.`optimize suppression attribute Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -38,13 +38,13 @@ extension Lint.Rule.`optimize suppression attribute Tests` {
     }
 }
 
-extension Lint.Rule.`optimize suppression attribute Tests`.Unit {
+extension `Lint.Rule Tests`.`optimize suppression attribute Tests`.Unit {
     @Test
     func `optimize none on a function is flagged`() {
         let source = """
             @_optimize(none) func f() {}
             """
-        let findings = Lint.Rule.`optimize suppression attribute Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optimize suppression attribute Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "optimize suppression attribute")
@@ -61,7 +61,7 @@ extension Lint.Rule.`optimize suppression attribute Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`optimize suppression attribute Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optimize suppression attribute Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -70,7 +70,7 @@ extension Lint.Rule.`optimize suppression attribute Tests`.Unit {
         let source = """
             @_optimize(size) func g() {}
             """
-        let findings = Lint.Rule.`optimize suppression attribute Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optimize suppression attribute Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -79,18 +79,18 @@ extension Lint.Rule.`optimize suppression attribute Tests`.Unit {
         let source = """
             @_semantics("optimize.no.crossmodule") func h() {}
             """
-        let findings = Lint.Rule.`optimize suppression attribute Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optimize suppression attribute Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`optimize suppression attribute Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`optimize suppression attribute Tests`.`Edge Case` {
     @Test
     func `plain function is NOT flagged`() {
         let source = """
             func f() {}
             """
-        let findings = Lint.Rule.`optimize suppression attribute Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optimize suppression attribute Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -99,7 +99,7 @@ extension Lint.Rule.`optimize suppression attribute Tests`.`Edge Case` {
         let source = """
             @inline(never) func f() {}
             """
-        let findings = Lint.Rule.`optimize suppression attribute Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optimize suppression attribute Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -108,7 +108,7 @@ extension Lint.Rule.`optimize suppression attribute Tests`.`Edge Case` {
         let source = """
             @_semantics("array.check_subscript") func f() {}
             """
-        let findings = Lint.Rule.`optimize suppression attribute Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optimize suppression attribute Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -122,7 +122,7 @@ extension Lint.Rule.`optimize suppression attribute Tests`.`Edge Case` {
         let source = """
             @_semantics("optimize.nothing_like_this") func f() {}
             """
-        let findings = Lint.Rule.`optimize suppression attribute Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optimize suppression attribute Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -131,7 +131,7 @@ extension Lint.Rule.`optimize suppression attribute Tests`.`Edge Case` {
         let source = """
             let s = "@_optimize(none) func f() {}"
             """
-        let findings = Lint.Rule.`optimize suppression attribute Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optimize suppression attribute Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -141,7 +141,7 @@ extension Lint.Rule.`optimize suppression attribute Tests`.`Edge Case` {
             // @_optimize(none) func f() {}
             func f() {}
             """
-        let findings = Lint.Rule.`optimize suppression attribute Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`optimize suppression attribute Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

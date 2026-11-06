@@ -6,7 +6,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Structure
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
 
     @Suite
     struct `forbidden license header Tests` {

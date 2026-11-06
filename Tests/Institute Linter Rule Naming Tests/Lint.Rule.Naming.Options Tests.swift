@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Naming
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `property named flags Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`property named flags Tests` {
+extension `Lint.Rule Tests`.`property named flags Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`property named flags`.observe(parsed, .warning).findings
@@ -37,7 +37,7 @@ extension Lint.Rule.`property named flags Tests` {
 // REASON: this suite's fixture sources deliberately embed .Flags-suffixed OptionSet names as
 // string literals under test
 // (self-referential fixture shape, rule-exemptions skill); re-enabled at end of file.
-extension Lint.Rule.`property named flags Tests`.Unit {
+extension `Lint.Rule Tests`.`property named flags Tests`.Unit {
     @Test
     func `OptionSet struct ending in Flags is flagged`() {
         let source = """
@@ -45,7 +45,7 @@ extension Lint.Rule.`property named flags Tests`.Unit {
                 let rawValue: Int
             }
             """
-        let findings = Lint.Rule.`property named flags Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`property named flags Tests`.findings(in: source)
         let count = findings.count
         #expect(count == 1)
         if count == 1 {
@@ -61,7 +61,7 @@ extension Lint.Rule.`property named flags Tests`.Unit {
                 let rawValue: Int
             }
             """
-        let findings = Lint.Rule.`property named flags Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`property named flags Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -72,7 +72,7 @@ extension Lint.Rule.`property named flags Tests`.Unit {
                 let rawValue: Int
             }
             """
-        let findings = Lint.Rule.`property named flags Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`property named flags Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -83,7 +83,7 @@ extension Lint.Rule.`property named flags Tests`.Unit {
             struct BFlags: OptionSet { let rawValue: Int }
             struct CFlags: OptionSet { let rawValue: Int }
             """
-        let findings = Lint.Rule.`property named flags Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`property named flags Tests`.findings(in: source)
         #expect(findings.count == 3)
     }
 
@@ -96,12 +96,12 @@ extension Lint.Rule.`property named flags Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`property named flags Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`property named flags Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`property named flags Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`property named flags Tests`.`Edge Case` {
     @Test
     func `OptionSet struct named Options is NOT flagged`() {
         let source = """
@@ -109,7 +109,7 @@ extension Lint.Rule.`property named flags Tests`.`Edge Case` {
                 let rawValue: Int
             }
             """
-        let findings = Lint.Rule.`property named flags Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`property named flags Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -120,7 +120,7 @@ extension Lint.Rule.`property named flags Tests`.`Edge Case` {
                 var verbose: Bool
             }
             """
-        let findings = Lint.Rule.`property named flags Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`property named flags Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -131,7 +131,7 @@ extension Lint.Rule.`property named flags Tests`.`Edge Case` {
                 var verbose: Bool
             }
             """
-        let findings = Lint.Rule.`property named flags Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`property named flags Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -144,7 +144,7 @@ extension Lint.Rule.`property named flags Tests`.`Edge Case` {
                 let rawValue: Int
             }
             """
-        let findings = Lint.Rule.`property named flags Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`property named flags Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -159,7 +159,7 @@ extension Lint.Rule.`property named flags Tests`.`Edge Case` {
                 var rawValue: Int = 0
             }
             """
-        let findings = Lint.Rule.`property named flags Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`property named flags Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

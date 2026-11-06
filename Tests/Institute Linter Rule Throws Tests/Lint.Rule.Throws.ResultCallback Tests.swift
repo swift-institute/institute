@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Throws
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `callback result over throws thunk Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`callback result over throws thunk Tests` {
+extension `Lint.Rule Tests`.`callback result over throws thunk Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -38,7 +38,7 @@ extension Lint.Rule.`callback result over throws thunk Tests` {
     }
 }
 
-extension Lint.Rule.`callback result over throws thunk Tests`.Unit {
+extension `Lint.Rule Tests`.`callback result over throws thunk Tests`.Unit {
     @Test
     func `closure parameter taking Result is flagged`() {
         let source = """
@@ -46,7 +46,7 @@ extension Lint.Rule.`callback result over throws thunk Tests`.Unit {
                 public init(callback: (Result<Int, MyError>) -> Void) {}
             }
             """
-        let findings = Lint.Rule.`callback result over throws thunk Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`callback result over throws thunk Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "callback result over throws thunk")
@@ -59,7 +59,7 @@ extension Lint.Rule.`callback result over throws thunk Tests`.Unit {
         let source = """
             func register(_ callback: @escaping (Result<Data, IOError>) -> Bool) {}
             """
-        let findings = Lint.Rule.`callback result over throws thunk Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`callback result over throws thunk Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -70,7 +70,7 @@ extension Lint.Rule.`callback result over throws thunk Tests`.Unit {
                 let onTick: (Result<Int, Error>) -> Void
             }
             """
-        let findings = Lint.Rule.`callback result over throws thunk Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`callback result over throws thunk Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -79,12 +79,12 @@ extension Lint.Rule.`callback result over throws thunk Tests`.Unit {
         let source = """
             func op(callback: (Swift.Result<Int, MyError>) -> Void) {}
             """
-        let findings = Lint.Rule.`callback result over throws thunk Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`callback result over throws thunk Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`callback result over throws thunk Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`callback result over throws thunk Tests`.`Edge Case` {
     @Test
     func `function returning Result is NOT flagged`() {
         let source = """
@@ -92,7 +92,7 @@ extension Lint.Rule.`callback result over throws thunk Tests`.`Edge Case` {
                 .success(0)
             }
             """
-        let findings = Lint.Rule.`callback result over throws thunk Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`callback result over throws thunk Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -103,7 +103,7 @@ extension Lint.Rule.`callback result over throws thunk Tests`.`Edge Case` {
                 let cached: Result<Int, MyError>
             }
             """
-        let findings = Lint.Rule.`callback result over throws thunk Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`callback result over throws thunk Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -112,7 +112,7 @@ extension Lint.Rule.`callback result over throws thunk Tests`.`Edge Case` {
         let source = """
             func process(_ outcome: Result<Int, MyError>) {}
             """
-        let findings = Lint.Rule.`callback result over throws thunk Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`callback result over throws thunk Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -121,7 +121,7 @@ extension Lint.Rule.`callback result over throws thunk Tests`.`Edge Case` {
         let source = """
             func op(_ wait: () throws(MyError) -> Int) {}
             """
-        let findings = Lint.Rule.`callback result over throws thunk Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`callback result over throws thunk Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -130,7 +130,7 @@ extension Lint.Rule.`callback result over throws thunk Tests`.`Edge Case` {
         let source = """
             let f: ((Result<Int, MyError>) -> Void) -> Void = { _ in }
             """
-        let findings = Lint.Rule.`callback result over throws thunk Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`callback result over throws thunk Tests`.findings(in: source)
         // The inner closure (Result<...>) -> Void is one flag; the outer
         // takes a closure (not Result) so no second flag.
         #expect(findings.count == 1)
@@ -143,7 +143,7 @@ extension Lint.Rule.`callback result over throws thunk Tests`.`Edge Case` {
                 let onTick: ((Result<Int, Error>) -> Void)?
             }
             """
-        let findings = Lint.Rule.`callback result over throws thunk Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`callback result over throws thunk Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -155,7 +155,7 @@ extension Lint.Rule.`callback result over throws thunk Tests`.`Edge Case` {
             enum Result { case ok, failed }
             func register(_ callback: @escaping (Result) -> Void) {}
             """
-        let findings = Lint.Rule.`callback result over throws thunk Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`callback result over throws thunk Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -164,7 +164,7 @@ extension Lint.Rule.`callback result over throws thunk Tests`.`Edge Case` {
         let source = """
             func register(_ callback: @escaping ([Result<Int, MyError>]) -> Void) {}
             """
-        let findings = Lint.Rule.`callback result over throws thunk Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`callback result over throws thunk Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -173,7 +173,7 @@ extension Lint.Rule.`callback result over throws thunk Tests`.`Edge Case` {
         let source = """
             func register(_ callback: @escaping ((Result<Int, MyError>, Int)) -> Void) {}
             """
-        let findings = Lint.Rule.`callback result over throws thunk Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`callback result over throws thunk Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -182,7 +182,7 @@ extension Lint.Rule.`callback result over throws thunk Tests`.`Edge Case` {
         let source = """
             func register(_ callback: @escaping ([String: Result<Int, MyError>]) -> Void) {}
             """
-        let findings = Lint.Rule.`callback result over throws thunk Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`callback result over throws thunk Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }

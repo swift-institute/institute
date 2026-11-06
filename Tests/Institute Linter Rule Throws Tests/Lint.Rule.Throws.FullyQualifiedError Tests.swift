@@ -15,12 +15,12 @@ import Testing
 
 @testable import Institute_Linter_Rule_Throws
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `fully qualified error in typed throws Tests` {}
 }
 
-extension Lint.Rule.`fully qualified error in typed throws Tests` {
+extension `Lint.Rule Tests`.`fully qualified error in typed throws Tests` {
     static func findings(in source: Swift::String) -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: "test.swift")
         return Lint.Rule.`fully qualified error in typed throws`

@@ -5,7 +5,9 @@ import Testing
 
 @testable import Institute_Version
 
-extension Institute.Version.Gate {
+enum `Institute.Version.Gate Tests` {}
+
+extension `Institute.Version.Gate Tests` {
     @Suite struct Test {
         @Suite struct Unit {}
         @Suite struct `Edge Case` {}
@@ -13,7 +15,7 @@ extension Institute.Version.Gate {
     }
 }
 
-extension Institute.Version.Gate.Test {
+extension `Institute.Version.Gate Tests`.Test {
     typealias Gate = Institute.Version.Gate
 
     static func run(
@@ -31,8 +33,8 @@ extension Institute.Version.Gate.Test {
     }
 }
 
-extension Institute.Version.Gate.Test.Unit {
-    typealias T = Institute.Version.Gate.Test
+extension `Institute.Version.Gate Tests`.Test.Unit {
+    typealias T = `Institute.Version.Gate Tests`.Test
 
     @Test func `a successful ci-ok of a push to main passes`() {
         #expect(T.Gate(runs: [T.run(1)], checks: [T.check(1, "success")]) == .passed)
@@ -56,8 +58,8 @@ extension Institute.Version.Gate.Test.Unit {
     }
 }
 
-extension Institute.Version.Gate.Test.`Edge Case` {
-    typealias T = Institute.Version.Gate.Test
+extension `Institute.Version.Gate Tests`.Test.`Edge Case` {
+    typealias T = `Institute.Version.Gate Tests`.Test
 
     @Test func `a pull request's ci-ok on the same commit does not count`() {
         let runs = [T.run(1, event: "pull_request", branch: "feature")]
@@ -87,7 +89,7 @@ extension Institute.Version.Gate.Test.`Edge Case` {
     }
 }
 
-extension Institute.Version.Gate.Test.Integration {
+extension `Institute.Version.Gate Tests`.Test.Integration {
     /// The gate names the check by the job name the generated caller
     /// gives its one reusable call; renaming that job must fail here.
     @Test func `the gate's check is the generated caller's ci-ok`() throws {

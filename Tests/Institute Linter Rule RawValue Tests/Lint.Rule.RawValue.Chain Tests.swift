@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_RawValue
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `chained rawvalue access Tests` {
         @Suite struct Unit {}
@@ -28,7 +28,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`chained rawvalue access Tests` {
+extension `Lint.Rule Tests`.`chained rawvalue access Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -50,10 +50,10 @@ extension Lint.Rule.`chained rawvalue access Tests` {
     }
 }
 
-extension Lint.Rule.`chained rawvalue access Tests`.Unit {
+extension `Lint.Rule Tests`.`chained rawvalue access Tests`.Unit {
     @Test
     func `x.rawValue.foo is flagged`() {
-        let findings = Lint.Rule.`chained rawvalue access Tests`.findings(
+        let findings = `Lint.Rule Tests`.`chained rawvalue access Tests`.findings(
             in: "let n = x.rawValue.foo"
         )
         let count = findings.count
@@ -66,7 +66,7 @@ extension Lint.Rule.`chained rawvalue access Tests`.Unit {
 
     @Test
     func `x.rawValue.foo() is flagged`() {
-        let findings = Lint.Rule.`chained rawvalue access Tests`.findings(
+        let findings = `Lint.Rule Tests`.`chained rawvalue access Tests`.findings(
             in: "let n = x.rawValue.foo()"
         )
         #expect(findings.count == 1)
@@ -78,7 +78,7 @@ extension Lint.Rule.`chained rawvalue access Tests`.Unit {
         // and the real space-separated rule id — not the SwiftLint-era
         // the SwiftLint `swiftlint` namespace with an underscored id, which the engine's
         // malformed-suppression rule does not recognize as a directive at all.
-        let findings = Lint.Rule.`chained rawvalue access Tests`.findings(
+        let findings = `Lint.Rule Tests`.`chained rawvalue access Tests`.findings(
             in: "let n = x.rawValue.foo"
         )
         #expect(findings.count == 1)
@@ -89,10 +89,10 @@ extension Lint.Rule.`chained rawvalue access Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`chained rawvalue access Tests`.Evasion {
+extension `Lint.Rule Tests`.`chained rawvalue access Tests`.Evasion {
     @Test
     func `Paren-wrapped (x.rawValue).foo is flagged`() {
-        let findings = Lint.Rule.`chained rawvalue access Tests`.findings(
+        let findings = `Lint.Rule Tests`.`chained rawvalue access Tests`.findings(
             in: "let n = (x.rawValue).foo"
         )
         #expect(findings.count == 1)
@@ -100,7 +100,7 @@ extension Lint.Rule.`chained rawvalue access Tests`.Evasion {
 
     @Test
     func `Double-paren ((x.rawValue)).foo is flagged`() {
-        let findings = Lint.Rule.`chained rawvalue access Tests`.findings(
+        let findings = `Lint.Rule Tests`.`chained rawvalue access Tests`.findings(
             in: "let n = ((x.rawValue)).foo"
         )
         #expect(findings.count == 1)
@@ -111,7 +111,7 @@ extension Lint.Rule.`chained rawvalue access Tests`.Evasion {
         // `?` optional chaining is as semantically transparent to this
         // predicate as parenthesization — both wrap the same
         // `MemberAccessExprSyntax(base: x, name: rawValue)` shape.
-        let findings = Lint.Rule.`chained rawvalue access Tests`.findings(
+        let findings = `Lint.Rule Tests`.`chained rawvalue access Tests`.findings(
             in: "let n = x.rawValue?.foo"
         )
         #expect(findings.count == 1)
@@ -119,7 +119,7 @@ extension Lint.Rule.`chained rawvalue access Tests`.Evasion {
 
     @Test
     func `Force-unwrapped x-rawValue-bang-dot-foo is flagged`() {
-        let findings = Lint.Rule.`chained rawvalue access Tests`.findings(
+        let findings = `Lint.Rule Tests`.`chained rawvalue access Tests`.findings(
             in: "let n = x.rawValue!.foo"
         )
         #expect(findings.count == 1)
@@ -127,23 +127,23 @@ extension Lint.Rule.`chained rawvalue access Tests`.Evasion {
 
     @Test
     func `Paren-wrapped optional-chained (x-rawValue)-question-mark-dot-foo is flagged`() {
-        let findings = Lint.Rule.`chained rawvalue access Tests`.findings(
+        let findings = `Lint.Rule Tests`.`chained rawvalue access Tests`.findings(
             in: "let n = (x.rawValue)?.foo"
         )
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`chained rawvalue access Tests`.Negative {
+extension `Lint.Rule Tests`.`chained rawvalue access Tests`.Negative {
     @Test
     func `Bare x.rawValue (terminal access) is NOT flagged`() {
-        let findings = Lint.Rule.`chained rawvalue access Tests`.findings(in: "let n = x.rawValue")
+        let findings = `Lint.Rule Tests`.`chained rawvalue access Tests`.findings(in: "let n = x.rawValue")
         #expect(findings.isEmpty)
     }
 
     @Test
     func `x.rawValue inside string literal is NOT flagged`() {
-        let findings = Lint.Rule.`chained rawvalue access Tests`.findings(
+        let findings = `Lint.Rule Tests`.`chained rawvalue access Tests`.findings(
             in: #"let s = "x.rawValue.foo""#
         )
         #expect(findings.isEmpty)
@@ -151,7 +151,7 @@ extension Lint.Rule.`chained rawvalue access Tests`.Negative {
 
     @Test
     func `x.foo.rawValue (rawValue at end of chain) is NOT flagged`() {
-        let findings = Lint.Rule.`chained rawvalue access Tests`.findings(
+        let findings = `Lint.Rule Tests`.`chained rawvalue access Tests`.findings(
             in: "let n = x.foo.rawValue"
         )
         #expect(findings.isEmpty)
@@ -159,25 +159,25 @@ extension Lint.Rule.`chained rawvalue access Tests`.Negative {
 
     @Test
     func `Empty file produces no findings`() {
-        let findings = Lint.Rule.`chained rawvalue access Tests`.findings(in: "")
+        let findings = `Lint.Rule Tests`.`chained rawvalue access Tests`.findings(in: "")
         #expect(findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`chained rawvalue access Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`chained rawvalue access Tests`.`Edge Case` {
     @Test
     func `x.rawValue in comment is NOT flagged`() {
         let source = """
             // x.rawValue.foo is the canonical anti-pattern
             let y = 42
             """
-        let findings = Lint.Rule.`chained rawvalue access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`chained rawvalue access Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `Nested chain a.b.rawValue.c is flagged`() {
-        let findings = Lint.Rule.`chained rawvalue access Tests`.findings(
+        let findings = `Lint.Rule Tests`.`chained rawvalue access Tests`.findings(
             in: "let n = a.b.rawValue.c"
         )
         #expect(findings.count == 1)
@@ -189,7 +189,7 @@ extension Lint.Rule.`chained rawvalue access Tests`.`Edge Case` {
             let a = x.rawValue.foo
             let b = y.rawValue.bar
             """
-        let findings = Lint.Rule.`chained rawvalue access Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`chained rawvalue access Tests`.findings(in: source)
         #expect(findings.count == 2)
     }
 
@@ -206,7 +206,7 @@ extension Lint.Rule.`chained rawvalue access Tests`.`Edge Case` {
 
     @Test
     func `Cardinal brand-owner run self-suppresses`() {
-        let findings = Lint.Rule.`chained rawvalue access Tests`.findings(
+        let findings = `Lint.Rule Tests`.`chained rawvalue access Tests`.findings(
             in: "let n = x.rawValue.foo",
             types: ["Cardinal"]
         )
@@ -215,7 +215,7 @@ extension Lint.Rule.`chained rawvalue access Tests`.`Edge Case` {
 
     @Test
     func `a non-brand-owner consumer run still fires`() {
-        let findings = Lint.Rule.`chained rawvalue access Tests`.findings(
+        let findings = `Lint.Rule Tests`.`chained rawvalue access Tests`.findings(
             in: "let n = x.rawValue.foo",
             types: ["SomeConsumerType"]
         )

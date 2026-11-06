@@ -4,7 +4,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Manifest
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `declarative manifest Tests` {
         @Suite struct Unit {}
@@ -13,7 +13,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`declarative manifest Tests` {
+extension `Lint.Rule Tests`.`declarative manifest Tests` {
     static func observation(
         _ source: Swift::String,
         file: Swift::String = "Package.swift"
@@ -36,22 +36,22 @@ extension Lint.Rule.`declarative manifest Tests` {
         """
 }
 
-extension Lint.Rule.`declarative manifest Tests`.Unit {
+extension `Lint.Rule Tests`.`declarative manifest Tests`.Unit {
     @Test
     func `a literal manifest is clean`() {
-        #expect(Lint.Rule.`declarative manifest Tests`.observation(Lint.Rule.`declarative manifest Tests`.package).findings.isEmpty)
+        #expect(`Lint.Rule Tests`.`declarative manifest Tests`.observation(`Lint.Rule Tests`.`declarative manifest Tests`.package).findings.isEmpty)
     }
 
     @Test
     func `products mapped from their names are flagged at the closure`() {
         let source =
-            Lint.Rule.`declarative manifest Tests`.package + """
+            `Lint.Rule Tests`.`declarative manifest Tests`.package + """
                 package.products += [
                     "Core WebKit",
                 ].map { .library(name: $0, targets: [$0]) }
 
                 """
-        let findings = Lint.Rule.`declarative manifest Tests`.observation(source).findings
+        let findings = `Lint.Rule Tests`.`declarative manifest Tests`.observation(source).findings
         #expect(findings.count == 1)
         #expect(findings.first?.message.hasPrefix("[declarative manifest]: a closure") == true)
     }
@@ -59,63 +59,63 @@ extension Lint.Rule.`declarative manifest Tests`.Unit {
     @Test
     func `a top-level loop other than the settings tail is flagged`() {
         let source =
-            Lint.Rule.`declarative manifest Tests`.package + """
+            `Lint.Rule Tests`.`declarative manifest Tests`.package + """
                 for target in extraTargets {
                     target.swiftSettings = shared
                 }
 
                 """
-        #expect(Lint.Rule.`declarative manifest Tests`.observation(source).findings.count == 1)
+        #expect(`Lint.Rule Tests`.`declarative manifest Tests`.observation(source).findings.count == 1)
     }
 
     @Test
     func `a var is flagged`() {
         let source = "import PackageDescription\n\nvar names = [\"Core\"]\n\nlet package = Package(name: \"Fixture\")\n"
-        #expect(Lint.Rule.`declarative manifest Tests`.observation(source).findings.count == 1)
+        #expect(`Lint.Rule Tests`.`declarative manifest Tests`.observation(source).findings.count == 1)
     }
 
     @Test
     func `top-level control flow is flagged`() {
         let source = "import PackageDescription\n\nlet package = Package(name: \"Fixture\")\n\nif true {\n    package.targets = []\n}\n"
-        #expect(Lint.Rule.`declarative manifest Tests`.observation(source).findings.count == 1)
+        #expect(`Lint.Rule Tests`.`declarative manifest Tests`.observation(source).findings.count == 1)
     }
 }
 
-extension Lint.Rule.`declarative manifest Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`declarative manifest Tests`.`Edge Case` {
     @Test
     func `the canonical settings tail is exempt`() {
-        let source = Lint.Rule.`declarative manifest Tests`.package + manifestCanonicalSettingsTail
-        #expect(Lint.Rule.`declarative manifest Tests`.observation(source).findings.isEmpty)
+        let source = `Lint.Rule Tests`.`declarative manifest Tests`.package + manifestCanonicalSettingsTail
+        #expect(`Lint.Rule Tests`.`declarative manifest Tests`.observation(source).findings.isEmpty)
     }
 
     @Test
     func `appends and #if blocks the parser reads are clean`() {
         let source =
-            Lint.Rule.`declarative manifest Tests`.package + """
+            `Lint.Rule Tests`.`declarative manifest Tests`.package + """
                 #if canImport(Darwin)
                 package.products += [.library(name: "Core WebKit", targets: ["Core WebKit"])]
                 package.targets.append(.target(name: "Core WebKit"))
                 #endif
 
                 """
-        #expect(Lint.Rule.`declarative manifest Tests`.observation(source).findings.isEmpty)
+        #expect(`Lint.Rule Tests`.`declarative manifest Tests`.observation(source).findings.isEmpty)
     }
 
     @Test
     func `a closure inside an #if block is flagged`() {
         let source =
-            Lint.Rule.`declarative manifest Tests`.package + """
+            `Lint.Rule Tests`.`declarative manifest Tests`.package + """
                 #if os(macOS)
                 package.targets += ["A"].map { .target(name: $0) }
                 #endif
 
                 """
-        #expect(Lint.Rule.`declarative manifest Tests`.observation(source).findings.count == 1)
+        #expect(`Lint.Rule Tests`.`declarative manifest Tests`.observation(source).findings.count == 1)
     }
 
     @Test
     func `a file that is not a manifest is not applicable`() {
-        let observation = Lint.Rule.`declarative manifest Tests`.observation(
+        let observation = `Lint.Rule Tests`.`declarative manifest Tests`.observation(
             "let names = [\"A\"].map { $0 }",
             file: "Sources/Core/Names.swift"
         )
@@ -124,7 +124,7 @@ extension Lint.Rule.`declarative manifest Tests`.`Edge Case` {
     }
 }
 
-extension Lint.Rule.`declarative manifest Tests`.Integration {
+extension `Lint.Rule Tests`.`declarative manifest Tests`.Integration {
     @Test
     func `the rule's controls hold`() {
         for outcome in Lint.Rule.`declarative manifest`.outcomes() { #expect(outcome.holds, "\(outcome)") }

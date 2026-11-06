@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Byte
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `uint8 ascii extension Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`uint8 ascii extension Tests` {
+extension `Lint.Rule Tests`.`uint8 ascii extension Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -38,7 +38,7 @@ extension Lint.Rule.`uint8 ascii extension Tests` {
     }
 }
 
-extension Lint.Rule.`uint8 ascii extension Tests`.Unit {
+extension `Lint.Rule Tests`.`uint8 ascii extension Tests`.Unit {
     @Test
     func `extension UInt8 dot ASCII is flagged`() {
         let source = """
@@ -46,7 +46,7 @@ extension Lint.Rule.`uint8 ascii extension Tests`.Unit {
                 public static let lf: UInt8 = 0x0A
             }
             """
-        let result = Lint.Rule.`uint8 ascii extension Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 ascii extension Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -57,7 +57,7 @@ extension Lint.Rule.`uint8 ascii extension Tests`.Unit {
                 public static var ascii: Self { 0 }
             }
             """
-        let result = Lint.Rule.`uint8 ascii extension Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 ascii extension Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -70,7 +70,7 @@ extension Lint.Rule.`uint8 ascii extension Tests`.Unit {
                 }
             }
             """
-        let result = Lint.Rule.`uint8 ascii extension Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 ascii extension Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -83,7 +83,7 @@ extension Lint.Rule.`uint8 ascii extension Tests`.Unit {
                 public class ASCII {}
             }
             """
-        let result = Lint.Rule.`uint8 ascii extension Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 ascii extension Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -94,7 +94,7 @@ extension Lint.Rule.`uint8 ascii extension Tests`.Unit {
                 actor ASCII {}
             }
             """
-        let result = Lint.Rule.`uint8 ascii extension Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 ascii extension Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -105,7 +105,7 @@ extension Lint.Rule.`uint8 ascii extension Tests`.Unit {
                 typealias ASCII = ASCIINamespace
             }
             """
-        let result = Lint.Rule.`uint8 ascii extension Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 ascii extension Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -117,12 +117,12 @@ extension Lint.Rule.`uint8 ascii extension Tests`.Unit {
                 static var ascii: Int { 0 }
             }
             """
-        let result = Lint.Rule.`uint8 ascii extension Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 ascii extension Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 }
 
-extension Lint.Rule.`uint8 ascii extension Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`uint8 ascii extension Tests`.`Edge Case` {
     @Test
     func `extension ASCII Code is NOT flagged`() {
         let source = """
@@ -130,7 +130,7 @@ extension Lint.Rule.`uint8 ascii extension Tests`.`Edge Case` {
                 public static let lf: ASCII.Code = 0x0A
             }
             """
-        let result = Lint.Rule.`uint8 ascii extension Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 ascii extension Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 
@@ -141,7 +141,7 @@ extension Lint.Rule.`uint8 ascii extension Tests`.`Edge Case` {
                 public static var max: UInt8 { 0xFF }
             }
             """
-        let result = Lint.Rule.`uint8 ascii extension Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 ascii extension Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 
@@ -150,25 +150,25 @@ extension Lint.Rule.`uint8 ascii extension Tests`.`Edge Case` {
         let source = """
             extension Byte.ASCII {}
             """
-        let result = Lint.Rule.`uint8 ascii extension Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 ascii extension Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 }
 
-extension Lint.Rule.`uint8 ascii extension Tests`.Integration {
+extension `Lint.Rule Tests`.`uint8 ascii extension Tests`.Integration {
     @Test
     func `module-qualified Swift dot UInt8 dot ASCII is flagged`() {
         let source = """
             extension Swift.UInt8.ASCII {}
             """
-        let result = Lint.Rule.`uint8 ascii extension Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 ascii extension Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
     @Test
     func `large file without UInt8 ascii extensions yields no findings`() {
         let source = String(repeating: "extension Foo: Sendable {}\n", count: 200)
-        let result = Lint.Rule.`uint8 ascii extension Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 ascii extension Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 }

@@ -17,7 +17,9 @@ import Testing
 
 @testable import Institute_Linter_Rule_Platform
 
-extension Lint.Rule {
+enum `Lint.Rule Tests` {}
+
+extension `Lint.Rule Tests` {
     @Suite
     struct `c type in public api Tests` {
         @Suite struct Unit {}
@@ -26,7 +28,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`c type in public api Tests` {
+extension `Lint.Rule Tests`.`c type in public api Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -38,13 +40,13 @@ extension Lint.Rule.`c type in public api Tests` {
     }
 }
 
-extension Lint.Rule.`c type in public api Tests`.Unit {
+extension `Lint.Rule Tests`.`c type in public api Tests`.Unit {
     @Test
     func `public func with kevent parameter is flagged`() {
         let source = """
             public func register(events: [kevent]) -> Int { 0 }
             """
-        let findings = Lint.Rule.`c type in public api Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`c type in public api Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "c type in public api")
@@ -62,7 +64,7 @@ extension Lint.Rule.`c type in public api Tests`.Unit {
                 func register(events: [kevent]) {}
             }
             """
-        let findings = Lint.Rule.`c type in public api Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`c type in public api Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -71,7 +73,7 @@ extension Lint.Rule.`c type in public api Tests`.Unit {
         let source = """
             public func open() -> HANDLE { fatalError() }
             """
-        let findings = Lint.Rule.`c type in public api Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`c type in public api Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -82,7 +84,7 @@ extension Lint.Rule.`c type in public api Tests`.Unit {
                 public init(event: epoll_event) {}
             }
             """
-        let findings = Lint.Rule.`c type in public api Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`c type in public api Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -93,7 +95,7 @@ extension Lint.Rule.`c type in public api Tests`.Unit {
         let source = """
             public func register(pointer: Swift.UnsafePointer<kevent>) {}
             """
-        let findings = Lint.Rule.`c type in public api Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`c type in public api Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -102,7 +104,7 @@ extension Lint.Rule.`c type in public api Tests`.Unit {
         let source = """
             public func onEvent(_ handler: (kevent) -> Void) {}
             """
-        let findings = Lint.Rule.`c type in public api Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`c type in public api Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -111,7 +113,7 @@ extension Lint.Rule.`c type in public api Tests`.Unit {
         let source = """
             public func makeHandler() -> () -> kevent { fatalError() }
             """
-        let findings = Lint.Rule.`c type in public api Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`c type in public api Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -120,7 +122,7 @@ extension Lint.Rule.`c type in public api Tests`.Unit {
         let source = """
             public func poll() -> (Int, kevent) { fatalError() }
             """
-        let findings = Lint.Rule.`c type in public api Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`c type in public api Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -129,7 +131,7 @@ extension Lint.Rule.`c type in public api Tests`.Unit {
         let source = """
             public func register(events: [kevent]) {}
             """
-        let findings = Lint.Rule.`c type in public api Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`c type in public api Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -138,7 +140,7 @@ extension Lint.Rule.`c type in public api Tests`.Unit {
         let source = """
             public func register(table: [kevent: Int]) {}
             """
-        let findings = Lint.Rule.`c type in public api Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`c type in public api Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -147,7 +149,7 @@ extension Lint.Rule.`c type in public api Tests`.Unit {
         let source = """
             public func register(table: [Int: kevent]) {}
             """
-        let findings = Lint.Rule.`c type in public api Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`c type in public api Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -156,7 +158,7 @@ extension Lint.Rule.`c type in public api Tests`.Unit {
         let source = """
             public func register(type: kevent.Type) {}
             """
-        let findings = Lint.Rule.`c type in public api Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`c type in public api Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -165,7 +167,7 @@ extension Lint.Rule.`c type in public api Tests`.Unit {
         let source = """
             public func register(event: kevent!) {}
             """
-        let findings = Lint.Rule.`c type in public api Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`c type in public api Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -174,18 +176,18 @@ extension Lint.Rule.`c type in public api Tests`.Unit {
         let source = """
             public func register(event: any kevent) {}
             """
-        let findings = Lint.Rule.`c type in public api Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`c type in public api Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`c type in public api Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`c type in public api Tests`.`Edge Case` {
     @Test
     func `internal func with C type is NOT flagged`() {
         let source = """
             internal func raw(event: kevent) {}
             """
-        let findings = Lint.Rule.`c type in public api Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`c type in public api Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -194,7 +196,7 @@ extension Lint.Rule.`c type in public api Tests`.`Edge Case` {
         let source = """
             public func register(events: [Kernel.Kqueue.Event]) {}
             """
-        let findings = Lint.Rule.`c type in public api Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`c type in public api Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

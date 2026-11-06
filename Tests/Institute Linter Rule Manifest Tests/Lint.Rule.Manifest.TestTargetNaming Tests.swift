@@ -4,7 +4,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Manifest
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `test target naming Tests` {
         @Suite struct Unit {}
@@ -13,7 +13,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`test target naming Tests` {
+extension `Lint.Rule Tests`.`test target naming Tests` {
     static func observation(
         _ source: Swift::String,
         file: Swift::String = "Package.swift"
@@ -22,10 +22,10 @@ extension Lint.Rule.`test target naming Tests` {
     }
 }
 
-extension Lint.Rule.`test target naming Tests`.Unit {
+extension `Lint.Rule Tests`.`test target naming Tests`.Unit {
     @Test
     func `one test target per target named after it is clean`() {
-        let observation = Lint.Rule.`test target naming Tests`.observation(
+        let observation = `Lint.Rule Tests`.`test target naming Tests`.observation(
             """
             let package = Package(
                 name: "Fixture",
@@ -44,7 +44,7 @@ extension Lint.Rule.`test target naming Tests`.Unit {
 
     @Test
     func `a test target without the spaced suffix is flagged`() {
-        let observation = Lint.Rule.`test target naming Tests`.observation(
+        let observation = `Lint.Rule Tests`.`test target naming Tests`.observation(
             """
             let package = Package(
                 name: "Fixture",
@@ -61,7 +61,7 @@ extension Lint.Rule.`test target naming Tests`.Unit {
 
     @Test
     func `a package-wide test target is flagged`() {
-        let observation = Lint.Rule.`test target naming Tests`.observation(
+        let observation = `Lint.Rule Tests`.`test target naming Tests`.observation(
             """
             let package = Package(
                 name: "Fixture",
@@ -78,10 +78,10 @@ extension Lint.Rule.`test target naming Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`test target naming Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`test target naming Tests`.`Edge Case` {
     @Test
     func `a duplicated test target is flagged once`() {
-        let observation = Lint.Rule.`test target naming Tests`.observation(
+        let observation = `Lint.Rule Tests`.`test target naming Tests`.observation(
             """
             let package = Package(
                 name: "Fixture",
@@ -99,7 +99,7 @@ extension Lint.Rule.`test target naming Tests`.`Edge Case` {
 
     @Test
     func `a computed test target name is unmeasured`() {
-        let observation = Lint.Rule.`test target naming Tests`.observation(
+        let observation = `Lint.Rule Tests`.`test target naming Tests`.observation(
             """
             let name = "Fixture Core"
             let package = Package(
@@ -116,7 +116,7 @@ extension Lint.Rule.`test target naming Tests`.`Edge Case` {
 
     @Test
     func `a test target named through a String accessor is unmeasured, not resolved`() {
-        let observation = Lint.Rule.`test target naming Tests`.observation(
+        let observation = `Lint.Rule Tests`.`test target naming Tests`.observation(
             """
             extension String {
                 static let products: Self = "Products"
@@ -136,7 +136,7 @@ extension Lint.Rule.`test target naming Tests`.`Edge Case` {
 
     @Test
     func `the literal spelling of the same manifest is measured and clean`() {
-        let observation = Lint.Rule.`test target naming Tests`.observation(
+        let observation = `Lint.Rule Tests`.`test target naming Tests`.observation(
             """
             let package = Package(
                 name: "swift-products",
@@ -154,7 +154,7 @@ extension Lint.Rule.`test target naming Tests`.`Edge Case` {
 
     @Test
     func `non-manifest files are inapplicable`() {
-        let observation = Lint.Rule.`test target naming Tests`.observation(
+        let observation = `Lint.Rule Tests`.`test target naming Tests`.observation(
             "let target = Target.testTarget(name: \"FixtureTests\")",
             file: "Sources/Fixture/Fixture.swift"
         )
@@ -163,10 +163,10 @@ extension Lint.Rule.`test target naming Tests`.`Edge Case` {
     }
 }
 
-extension Lint.Rule.`test target naming Tests`.Integration {
+extension `Lint.Rule Tests`.`test target naming Tests`.Integration {
     @Test
     func `a versioned manifest is checked`() {
-        let observation = Lint.Rule.`test target naming Tests`.observation(
+        let observation = `Lint.Rule Tests`.`test target naming Tests`.observation(
             "let targets: [Target] = [.target(name: \"Fixture\"), .testTarget(name: \"FixtureTests\")]",
             file: "Package@swift-6.4.swift"
         )

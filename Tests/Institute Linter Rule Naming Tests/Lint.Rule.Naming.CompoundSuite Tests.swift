@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Naming
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `compound suite name Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`compound suite name Tests` {
+extension `Lint.Rule Tests`.`compound suite name Tests` {
     static func findings(
         in source: String,
         file: String = "Sources/X/Test.swift"
@@ -38,13 +38,13 @@ extension Lint.Rule.`compound suite name Tests` {
     }
 }
 
-extension Lint.Rule.`compound suite name Tests`.Unit {
+extension `Lint.Rule Tests`.`compound suite name Tests`.Unit {
     @Test
     func `Suite with compound name FooTests is flagged`() {
         let source = """
             @Suite struct MemoryBufferTests {}
             """
-        let findings = Lint.Rule.`compound suite name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound suite name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -53,7 +53,7 @@ extension Lint.Rule.`compound suite name Tests`.Unit {
         let source = """
             @Suite final class MemoryBufferTests {}
             """
-        let findings = Lint.Rule.`compound suite name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound suite name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -62,7 +62,7 @@ extension Lint.Rule.`compound suite name Tests`.Unit {
         let source = """
             @Suite actor MemoryBufferTests {}
             """
-        let findings = Lint.Rule.`compound suite name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound suite name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -71,7 +71,7 @@ extension Lint.Rule.`compound suite name Tests`.Unit {
         let source = """
             @Suite enum MemoryBufferTests {}
             """
-        let findings = Lint.Rule.`compound suite name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound suite name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -80,7 +80,7 @@ extension Lint.Rule.`compound suite name Tests`.Unit {
         let source = """
             extension MemoryBuffer { @Suite struct Test {} }
             """
-        let findings = Lint.Rule.`compound suite name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound suite name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -89,7 +89,7 @@ extension Lint.Rule.`compound suite name Tests`.Unit {
         let source = """
             @Suite struct Performance {}
             """
-        let findings = Lint.Rule.`compound suite name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound suite name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -98,7 +98,7 @@ extension Lint.Rule.`compound suite name Tests`.Unit {
         let source = """
             @Suite struct Unit {}
             """
-        let findings = Lint.Rule.`compound suite name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound suite name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -107,7 +107,7 @@ extension Lint.Rule.`compound suite name Tests`.Unit {
         let source = """
             struct MemoryBufferTests {}
             """
-        let findings = Lint.Rule.`compound suite name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound suite name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -116,7 +116,7 @@ extension Lint.Rule.`compound suite name Tests`.Unit {
         let source = """
             @Suite struct Integration {}
             """
-        let findings = Lint.Rule.`compound suite name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound suite name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -125,20 +125,20 @@ extension Lint.Rule.`compound suite name Tests`.Unit {
         let source = """
             @Suite struct MyAPIChecks {}
             """
-        let findings = Lint.Rule.`compound suite name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound suite name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
 // MARK: - Non-Test suite names
 
-extension Lint.Rule.`compound suite name Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`compound suite name Tests`.`Edge Case` {
     @Test
     func `backticked narrative Suite name is flagged`() {
         let source = """
             @Suite struct `compound identifier Tests` {}
             """
-        let findings = Lint.Rule.`compound suite name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound suite name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -147,7 +147,7 @@ extension Lint.Rule.`compound suite name Tests`.`Edge Case` {
         let source = """
             @Suite struct `Sequence FlatMap Tests` {}
             """
-        let findings = Lint.Rule.`compound suite name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound suite name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -158,20 +158,20 @@ extension Lint.Rule.`compound suite name Tests`.`Edge Case` {
         let source = """
             @Suite struct MemoryBufferTests {}
             """
-        let findings = Lint.Rule.`compound suite name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound suite name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `top-level Test without a domain is flagged`() {
-        let findings = Lint.Rule.`compound suite name Tests`.findings(
+        let findings = `Lint.Rule Tests`.`compound suite name Tests`.findings(
             in: "@Suite struct Test {}"
         )
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`compound suite name Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`compound suite name Tests`.`Edge Case` {
     @Test
     func `the domain template with its categories is clean`() {
         let source = """
@@ -183,11 +183,11 @@ extension Lint.Rule.`compound suite name Tests`.`Edge Case` {
                 }
             }
             """
-        #expect(Lint.Rule.`compound suite name Tests`.findings(in: source).isEmpty)
+        #expect(`Lint.Rule Tests`.`compound suite name Tests`.findings(in: source).isEmpty)
     }
 }
 
-extension Lint.Rule.`compound suite name Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`compound suite name Tests`.`Edge Case` {
     @Test
     func `the testing skill's shape with a named subdomain is clean`() {
         let source = """
@@ -207,7 +207,7 @@ extension Lint.Rule.`compound suite name Tests`.`Edge Case` {
                 }
             }
             """
-        #expect(Lint.Rule.`compound suite name Tests`.findings(in: source, file: "Tests/X Tests/Parser Tests.swift").isEmpty)
+        #expect(`Lint.Rule Tests`.`compound suite name Tests`.findings(in: source, file: "Tests/X Tests/Parser Tests.swift").isEmpty)
     }
 
     @Test
@@ -217,7 +217,7 @@ extension Lint.Rule.`compound suite name Tests`.`Edge Case` {
                 @Suite struct `Edge Case` {}
             }
             """
-        #expect(Lint.Rule.`compound suite name Tests`.findings(in: source).isEmpty)
+        #expect(`Lint.Rule Tests`.`compound suite name Tests`.findings(in: source).isEmpty)
     }
 
     @Test
@@ -229,7 +229,7 @@ extension Lint.Rule.`compound suite name Tests`.`Edge Case` {
                 @Suite struct Integration {}
             }
             """
-        #expect(Lint.Rule.`compound suite name Tests`.findings(in: source).isEmpty)
+        #expect(`Lint.Rule Tests`.`compound suite name Tests`.findings(in: source).isEmpty)
     }
 
     @Test
@@ -242,7 +242,7 @@ extension Lint.Rule.`compound suite name Tests`.`Edge Case` {
                 }
             }
             """
-        #expect(Lint.Rule.`compound suite name Tests`.findings(in: source).count == 2)
+        #expect(`Lint.Rule Tests`.`compound suite name Tests`.findings(in: source).count == 2)
     }
 
     @Test
@@ -252,7 +252,7 @@ extension Lint.Rule.`compound suite name Tests`.`Edge Case` {
                 @Suite struct ParserTests {}
             }
             """
-        #expect(Lint.Rule.`compound suite name Tests`.findings(in: source).count == 1)
+        #expect(`Lint.Rule Tests`.`compound suite name Tests`.findings(in: source).count == 1)
     }
 
     @Test
@@ -262,13 +262,13 @@ extension Lint.Rule.`compound suite name Tests`.`Edge Case` {
                 @Suite struct Unit {}
             }
             """
-        #expect(Lint.Rule.`compound suite name Tests`.findings(in: source).count == 1)
+        #expect(`Lint.Rule Tests`.`compound suite name Tests`.findings(in: source).count == 1)
     }
 
     @Test
     func `a multi-word or lower-case top-level backticked suite is still flagged`() {
         for name in ["`Memory Buffer Tests`", "`compound Tests`", "`Tests`", "`Index Checks`"] {
-            let findings = Lint.Rule.`compound suite name Tests`.findings(in: "@Suite struct \(name) {}")
+            let findings = `Lint.Rule Tests`.`compound suite name Tests`.findings(in: "@Suite struct \(name) {}")
             #expect(findings.count == 1, "\(name)")
         }
     }

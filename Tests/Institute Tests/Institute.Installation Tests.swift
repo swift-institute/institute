@@ -4,7 +4,9 @@ import Testing
 @testable import Institute_Installation
 @testable import Institute_Model
 
-extension Institute.Installation {
+enum `Institute.Installation Tests` {}
+
+extension `Institute.Installation Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension Institute.Installation {
     }
 }
 
-extension Institute.Installation.Test {
+extension `Institute.Installation Tests`.Test {
     struct Fixture {
         let base: Swift.String
         let home: File.Directory
@@ -82,12 +84,12 @@ extension Institute.Installation.Test {
     }
 }
 
-extension Institute.Installation.Test.Unit {
+extension `Institute.Installation Tests`.Test.Unit {
     /// The positive control: a clean account root gains a command whose bytes
     /// live outside SwiftPM's generated build directory.
     @Test
     func `install exposes a durable executable through the account command directory`() throws {
-        let fixture = try Institute.Installation.Test.Fixture()
+        let fixture = try `Institute.Installation Tests`.Test.Fixture()
         defer { fixture.remove() }
         let installation = try fixture.installation
 
@@ -113,7 +115,7 @@ extension Institute.Installation.Test.Unit {
 
     @Test
     func `install records the identity it installed`() throws {
-        let fixture = try Institute.Installation.Test.Fixture()
+        let fixture = try `Institute.Installation Tests`.Test.Fixture()
         defer { fixture.remove() }
         let installation = try fixture.installation
 
@@ -126,7 +128,7 @@ extension Institute.Installation.Test.Unit {
 
     @Test
     func `install refreshes an installation carrying its receipt`() throws {
-        let fixture = try Institute.Installation.Test.Fixture()
+        let fixture = try `Institute.Installation Tests`.Test.Fixture()
         defer { fixture.remove() }
         let installation = try fixture.installation
         try installation.install(recording: "fixture identity")
@@ -146,7 +148,7 @@ extension Institute.Installation.Test.Unit {
 
     @Test
     func `install verifies paths beneath a symbolic ancestor`() throws {
-        let fixture = try Institute.Installation.Test.Fixture()
+        let fixture = try `Institute.Installation Tests`.Test.Fixture()
         defer { fixture.remove() }
         let alias = MainFixtureFiles.join(fixture.base, "alias")
         try MainFixtureFiles.createSymbolicLink(alias, toURLOf: fixture.base)
@@ -156,7 +158,7 @@ extension Institute.Installation.Test.Unit {
             source: fixture.source,
             home: home,
             environmentPath: [commandDirectory.description, "/usr/bin", "/bin"]
-                .joined(separator: Institute.Installation.Test.Fixture.pathSeparator)
+                .joined(separator: `Institute.Installation Tests`.Test.Fixture.pathSeparator)
         )
 
         try installation.install(recording: "fixture identity")
@@ -168,10 +170,10 @@ extension Institute.Installation.Test.Unit {
     }
 }
 
-extension Institute.Installation.Test.`Edge Case` {
+extension `Institute.Installation Tests`.Test.`Edge Case` {
     @Test
     func `install refuses an unmanaged executable before creating managed state`() throws {
-        let fixture = try Institute.Installation.Test.Fixture()
+        let fixture = try `Institute.Installation Tests`.Test.Fixture()
         defer { fixture.remove() }
         let commandDirectory = fixture.home[directory: ".local"][directory: "bin"]
         try commandDirectory.create.recursive()
@@ -187,7 +189,7 @@ extension Institute.Installation.Test.`Edge Case` {
 
     @Test
     func `install refuses an unmanaged symbolic link before creating managed state`() throws {
-        let fixture = try Institute.Installation.Test.Fixture()
+        let fixture = try `Institute.Installation Tests`.Test.Fixture()
         defer { fixture.remove() }
         let foreignDirectory = fixture.home[directory: "elsewhere"]
         let foreign = foreignDirectory[file: "institute"]
@@ -210,7 +212,7 @@ extension Institute.Installation.Test.`Edge Case` {
 
     @Test
     func `install refuses to adopt an unreceipted installation directory`() throws {
-        let fixture = try Institute.Installation.Test.Fixture()
+        let fixture = try `Institute.Installation Tests`.Test.Fixture()
         defer { fixture.remove() }
         try fixture.root.create.recursive()
         try fixture.root[file: "local-state"].write.atomic("mine")
@@ -225,7 +227,7 @@ extension Institute.Installation.Test.`Edge Case` {
 
     @Test
     func `install refuses a command directory that the shell cannot discover`() throws {
-        let fixture = try Institute.Installation.Test.Fixture(exposesCommand: false)
+        let fixture = try `Institute.Installation Tests`.Test.Fixture(exposesCommand: false)
         defer { fixture.remove() }
         let installation = try fixture.installation
 

@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Idiom
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `string utf8 scanning Tests` {
         @Suite struct Unit {}
@@ -26,14 +26,14 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`string utf8 scanning Tests` {
+extension `Lint.Rule Tests`.`string utf8 scanning Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`string utf8 scanning`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`string utf8 scanning Tests`.Unit {
+extension `Lint.Rule Tests`.`string utf8 scanning Tests`.Unit {
     @Test
     func `unicodeScalars firstIndex is flagged`() {
         let source = """
@@ -41,7 +41,7 @@ extension Lint.Rule.`string utf8 scanning Tests`.Unit {
                 content.unicodeScalars.firstIndex(of: "\\n")
             }
             """
-        let findings = Lint.Rule.`string utf8 scanning Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`string utf8 scanning Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "string utf8 scanning")
@@ -58,7 +58,7 @@ extension Lint.Rule.`string utf8 scanning Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`string utf8 scanning Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`string utf8 scanning Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -69,12 +69,12 @@ extension Lint.Rule.`string utf8 scanning Tests`.Unit {
                 a.unicodeScalars.count == b.unicodeScalars.count
             }
             """
-        let findings = Lint.Rule.`string utf8 scanning Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`string utf8 scanning Tests`.findings(in: source)
         #expect(findings.count == 2)
     }
 }
 
-extension Lint.Rule.`string utf8 scanning Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`string utf8 scanning Tests`.`Edge Case` {
     @Test
     func `utf8 access is NOT flagged`() {
         let source = """
@@ -82,7 +82,7 @@ extension Lint.Rule.`string utf8 scanning Tests`.`Edge Case` {
                 content.utf8.firstIndex(of: 0x0A)
             }
             """
-        let findings = Lint.Rule.`string utf8 scanning Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`string utf8 scanning Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -93,7 +93,7 @@ extension Lint.Rule.`string utf8 scanning Tests`.`Edge Case` {
                 content.first
             }
             """
-        let findings = Lint.Rule.`string utf8 scanning Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`string utf8 scanning Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -105,7 +105,7 @@ extension Lint.Rule.`string utf8 scanning Tests`.`Edge Case` {
                 content.utf16
             }
             """
-        let findings = Lint.Rule.`string utf8 scanning Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`string utf8 scanning Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -122,7 +122,7 @@ extension Lint.Rule.`string utf8 scanning Tests`.`Edge Case` {
             }
             let x = Custom().unicodeScalars
             """
-        let findings = Lint.Rule.`string utf8 scanning Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`string utf8 scanning Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].message.contains("swift-linter:disable:next string utf8 scanning"))
@@ -143,7 +143,7 @@ extension Lint.Rule.`string utf8 scanning Tests`.`Edge Case` {
                 content.unicodeScalars.firstIndex(of: "\\n")
             }
             """
-        let findings = Lint.Rule.`string utf8 scanning Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`string utf8 scanning Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -156,7 +156,7 @@ extension Lint.Rule.`string utf8 scanning Tests`.`Edge Case` {
                 content.unicodeScalars.firstIndex(of: "\\n")
             }
             """
-        let findings = Lint.Rule.`string utf8 scanning Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`string utf8 scanning Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -169,7 +169,7 @@ extension Lint.Rule.`string utf8 scanning Tests`.`Edge Case` {
                 content.unicodeScalars.firstIndex(of: "\\n")
             }
             """
-        let findings = Lint.Rule.`string utf8 scanning Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`string utf8 scanning Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }

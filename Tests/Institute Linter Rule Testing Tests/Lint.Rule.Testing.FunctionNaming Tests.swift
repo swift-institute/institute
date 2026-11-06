@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Testing
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `test function naming Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`test function naming Tests` {
+extension `Lint.Rule Tests`.`test function naming Tests` {
     static func findings(
         in source: String,
         file: String = "Sources/X/Test.swift"
@@ -38,14 +38,14 @@ extension Lint.Rule.`test function naming Tests` {
     }
 }
 
-extension Lint.Rule.`test function naming Tests`.Unit {
+extension `Lint.Rule Tests`.`test function naming Tests`.Unit {
     @Test
     func `Test func with backticked descriptive name is permitted`() {
         let source = """
             @Test
             func `init creates empty buffer`() {}
             """
-        let findings = Lint.Rule.`test function naming Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`test function naming Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -55,7 +55,7 @@ extension Lint.Rule.`test function naming Tests`.Unit {
             @Test
             func testInitCreatesEmptyBuffer() {}
             """
-        let findings = Lint.Rule.`test function naming Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`test function naming Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -64,7 +64,7 @@ extension Lint.Rule.`test function naming Tests`.Unit {
         let source = """
             func helperFunction() {}
             """
-        let findings = Lint.Rule.`test function naming Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`test function naming Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -74,7 +74,7 @@ extension Lint.Rule.`test function naming Tests`.Unit {
             @Testing.Test
             func testInitCreatesEmptyBuffer() {}
             """
-        let findings = Lint.Rule.`test function naming Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`test function naming Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -84,7 +84,7 @@ extension Lint.Rule.`test function naming Tests`.Unit {
             @Test
             func `Memory.Address from UnsafeRawPointer preserves identity`() {}
             """
-        let findings = Lint.Rule.`test function naming Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`test function naming Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -94,7 +94,7 @@ extension Lint.Rule.`test function naming Tests`.Unit {
             @Test(.tags(.fast))
             func runStuff() {}
             """
-        let findings = Lint.Rule.`test function naming Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`test function naming Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -109,7 +109,7 @@ extension Lint.Rule.`test function naming Tests`.Unit {
             @Test
             func `comparison`() {}
             """
-        let findings = Lint.Rule.`test function naming Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`test function naming Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -119,7 +119,7 @@ extension Lint.Rule.`test function naming Tests`.Unit {
             @Test(.tags(.fast))
             func `equality`() {}
             """
-        let findings = Lint.Rule.`test function naming Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`test function naming Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -135,7 +135,7 @@ extension Lint.Rule.`test function naming Tests`.Unit {
             @Test
             func comparison() {}
             """
-        let findings = Lint.Rule.`test function naming Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`test function naming Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -147,7 +147,7 @@ extension Lint.Rule.`test function naming Tests`.Unit {
             @Test
             func equality() {}
             """
-        let findings = Lint.Rule.`test function naming Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`test function naming Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

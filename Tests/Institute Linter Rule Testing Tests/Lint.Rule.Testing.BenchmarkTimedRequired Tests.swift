@@ -17,7 +17,9 @@ import Testing
 
 @testable import Institute_Linter_Rule_Testing
 
-extension Lint.Rule {
+enum `Lint.Rule Tests` {}
+
+extension `Lint.Rule Tests` {
     @Suite
     struct `benchmark timed required Tests` {
         @Suite struct Unit {}
@@ -26,7 +28,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`benchmark timed required Tests` {
+extension `Lint.Rule Tests`.`benchmark timed required Tests` {
     static func findings(
         in source: String,
         file: String = "Sources/X/Test.swift"
@@ -38,7 +40,7 @@ extension Lint.Rule.`benchmark timed required Tests` {
     }
 }
 
-extension Lint.Rule.`benchmark timed required Tests`.Unit {
+extension `Lint.Rule Tests`.`benchmark timed required Tests`.Unit {
     @Test
     func `Test inside Performance suite without timed is flagged`() {
         let source = """
@@ -47,7 +49,7 @@ extension Lint.Rule.`benchmark timed required Tests`.Unit {
                 func `runs fast`() {}
             }
             """
-        let findings = Lint.Rule.`benchmark timed required Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`benchmark timed required Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -59,7 +61,7 @@ extension Lint.Rule.`benchmark timed required Tests`.Unit {
                 func `runs fast`() {}
             }
             """
-        let findings = Lint.Rule.`benchmark timed required Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`benchmark timed required Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -71,7 +73,7 @@ extension Lint.Rule.`benchmark timed required Tests`.Unit {
                 func `runs fast`() {}
             }
             """
-        let findings = Lint.Rule.`benchmark timed required Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`benchmark timed required Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -83,7 +85,7 @@ extension Lint.Rule.`benchmark timed required Tests`.Unit {
                 func `something`() {}
             }
             """
-        let findings = Lint.Rule.`benchmark timed required Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`benchmark timed required Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -95,7 +97,7 @@ extension Lint.Rule.`benchmark timed required Tests`.Unit {
                 func `runs fast`() {}
             }
             """
-        let findings = Lint.Rule.`benchmark timed required Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`benchmark timed required Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -107,7 +109,7 @@ extension Lint.Rule.`benchmark timed required Tests`.Unit {
                 func `meets budget`() {}
             }
             """
-        let findings = Lint.Rule.`benchmark timed required Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`benchmark timed required Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -122,14 +124,14 @@ extension Lint.Rule.`benchmark timed required Tests`.Unit {
                 func `meets budget`() {}
             }
             """
-        let findings = Lint.Rule.`benchmark timed required Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`benchmark timed required Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
 // MARK: - The [BENCH-003] executable-variant citation carve (Round M ζ pilot 3)
 
-extension Lint.Rule.`benchmark timed required Tests` {
+extension `Lint.Rule Tests`.`benchmark timed required Tests` {
     @Suite struct `Variant Exemption` {
         @Suite struct Unit {}
         @Suite struct `Edge Case` {}
@@ -137,10 +139,10 @@ extension Lint.Rule.`benchmark timed required Tests` {
     }
 }
 
-extension Lint.Rule.`benchmark timed required Tests`.`Variant Exemption` {
+extension `Lint.Rule Tests`.`benchmark timed required Tests`.`Variant Exemption` {
     @Test
     func `suite-level variant citation exempts every contained test`() {
-        let findings = Lint.Rule.`benchmark timed required Tests`.findings(
+        let findings = `Lint.Rule Tests`.`benchmark timed required Tests`.findings(
             in: """
                 // Load-scale gates; measurement lives in Benchmarks/ ([BENCH-003] executable variant).
                 struct Performance {
@@ -154,7 +156,7 @@ extension Lint.Rule.`benchmark timed required Tests`.`Variant Exemption` {
 
     @Test
     func `function-level variant citation exempts that test only`() {
-        let findings = Lint.Rule.`benchmark timed required Tests`.findings(
+        let findings = `Lint.Rule Tests`.`benchmark timed required Tests`.findings(
             in: """
                 struct Performance {
                     // [BENCH-003] executable variant: measured in Benchmarks/.
@@ -168,7 +170,7 @@ extension Lint.Rule.`benchmark timed required Tests`.`Variant Exemption` {
 
     @Test
     func `a later suite without the citation still fires (depth stays balanced)`() {
-        let findings = Lint.Rule.`benchmark timed required Tests`.findings(
+        let findings = `Lint.Rule Tests`.`benchmark timed required Tests`.findings(
             in: """
                 // [BENCH-003] variant.
                 struct Performance {

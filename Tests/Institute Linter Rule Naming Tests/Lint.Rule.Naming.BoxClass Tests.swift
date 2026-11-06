@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Naming
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `ad hoc box class Tests` {
         @Suite struct Unit {}
@@ -26,14 +26,14 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`ad hoc box class Tests` {
+extension `Lint.Rule Tests`.`ad hoc box class Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`ad hoc box class`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`ad hoc box class Tests`.Unit {
+extension `Lint.Rule Tests`.`ad hoc box class Tests`.Unit {
     @Test
     func `_Box class is flagged`() {
         let source = """
@@ -42,7 +42,7 @@ extension Lint.Rule.`ad hoc box class Tests`.Unit {
                 init(_ value: T) { self.value = value }
             }
             """
-        let findings = Lint.Rule.`ad hoc box class Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`ad hoc box class Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "ad hoc box class")
@@ -56,18 +56,18 @@ extension Lint.Rule.`ad hoc box class Tests`.Unit {
                 var buffer: [Int] = []
             }
             """
-        let findings = Lint.Rule.`ad hoc box class Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`ad hoc box class Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`ad hoc box class Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`ad hoc box class Tests`.`Edge Case` {
     @Test
     func `class with inheritance is NOT flagged`() {
         let source = """
             final class _Storage: ManagedBuffer<Int, Element> { }
             """
-        let findings = Lint.Rule.`ad hoc box class Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`ad hoc box class Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -78,7 +78,7 @@ extension Lint.Rule.`ad hoc box class Tests`.`Edge Case` {
                 var items: [Int] = []
             }
             """
-        let findings = Lint.Rule.`ad hoc box class Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`ad hoc box class Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -93,7 +93,7 @@ extension Lint.Rule.`ad hoc box class Tests`.`Edge Case` {
                 init(_ value: Int) { self.value = value }
             }
             """
-        let findings = Lint.Rule.`ad hoc box class Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`ad hoc box class Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -108,7 +108,7 @@ extension Lint.Rule.`ad hoc box class Tests`.`Edge Case` {
                 init(_ value: T) { self.value = value }
             }
             """
-        let findings = Lint.Rule.`ad hoc box class Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`ad hoc box class Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -119,7 +119,7 @@ extension Lint.Rule.`ad hoc box class Tests`.`Edge Case` {
                 var value: Int = 0
             }
             """
-        let findings = Lint.Rule.`ad hoc box class Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`ad hoc box class Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -132,7 +132,7 @@ extension Lint.Rule.`ad hoc box class Tests`.`Edge Case` {
                 var value: Int = 0
             }
             """
-        let findings = Lint.Rule.`ad hoc box class Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`ad hoc box class Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }

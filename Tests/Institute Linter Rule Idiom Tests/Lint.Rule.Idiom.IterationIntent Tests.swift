@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Idiom
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `counter loop iteration Tests` {
         @Suite struct Unit {}
@@ -26,14 +26,14 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`counter loop iteration Tests` {
+extension `Lint.Rule Tests`.`counter loop iteration Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`counter loop iteration`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`counter loop iteration Tests`.Unit {
+extension `Lint.Rule Tests`.`counter loop iteration Tests`.Unit {
     @Test
     func `counter loop with 0 to n is flagged`() {
         let source = """
@@ -43,7 +43,7 @@ extension Lint.Rule.`counter loop iteration Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`counter loop iteration Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`counter loop iteration Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "counter loop iteration")
@@ -60,7 +60,7 @@ extension Lint.Rule.`counter loop iteration Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`counter loop iteration Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`counter loop iteration Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -73,7 +73,7 @@ extension Lint.Rule.`counter loop iteration Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`counter loop iteration Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`counter loop iteration Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -85,7 +85,7 @@ extension Lint.Rule.`counter loop iteration Tests`.Unit {
                 for j in 0..<20 { use(j) }
             }
             """
-        let findings = Lint.Rule.`counter loop iteration Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`counter loop iteration Tests`.findings(in: source)
         #expect(findings.count == 2)
     }
 
@@ -100,7 +100,7 @@ extension Lint.Rule.`counter loop iteration Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`counter loop iteration Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`counter loop iteration Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -113,7 +113,7 @@ extension Lint.Rule.`counter loop iteration Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`counter loop iteration Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`counter loop iteration Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -130,7 +130,7 @@ extension Lint.Rule.`counter loop iteration Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`counter loop iteration Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`counter loop iteration Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(!findings[0].message.contains("counter is mechanism"))
@@ -138,7 +138,7 @@ extension Lint.Rule.`counter loop iteration Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`counter loop iteration Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`counter loop iteration Tests`.`Edge Case` {
     @Test
     func `direct iteration over collection is NOT flagged`() {
         let source = """
@@ -148,7 +148,7 @@ extension Lint.Rule.`counter loop iteration Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`counter loop iteration Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`counter loop iteration Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -161,7 +161,7 @@ extension Lint.Rule.`counter loop iteration Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`counter loop iteration Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`counter loop iteration Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -174,7 +174,7 @@ extension Lint.Rule.`counter loop iteration Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`counter loop iteration Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`counter loop iteration Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -185,7 +185,7 @@ extension Lint.Rule.`counter loop iteration Tests`.`Edge Case` {
                 items.forEach { handle($0) }
             }
             """
-        let findings = Lint.Rule.`counter loop iteration Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`counter loop iteration Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -198,7 +198,7 @@ extension Lint.Rule.`counter loop iteration Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`counter loop iteration Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`counter loop iteration Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -212,7 +212,7 @@ extension Lint.Rule.`counter loop iteration Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`counter loop iteration Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`counter loop iteration Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }
@@ -222,7 +222,7 @@ extension Lint.Rule.`counter loop iteration Tests`.`Edge Case` {
 // comment 5150595934, W1-E entry). `Sequence.forEach(_:)` is `rethrows`
 // and erases `throws(E)`, so a counter loop whose body performs a `try`
 // inside a `throws(E)` function is the lawful spelling.
-extension Lint.Rule.`counter loop iteration Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`counter loop iteration Tests`.`Edge Case` {
     @Test
     func `typed-throws function with throwing loop body is NOT flagged`() {
         let source = """
@@ -232,7 +232,7 @@ extension Lint.Rule.`counter loop iteration Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`counter loop iteration Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`counter loop iteration Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -247,7 +247,7 @@ extension Lint.Rule.`counter loop iteration Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`counter loop iteration Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`counter loop iteration Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -263,7 +263,7 @@ extension Lint.Rule.`counter loop iteration Tests`.`Edge Case` {
                 try finish()
             }
             """
-        let findings = Lint.Rule.`counter loop iteration Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`counter loop iteration Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -278,7 +278,7 @@ extension Lint.Rule.`counter loop iteration Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`counter loop iteration Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`counter loop iteration Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -293,7 +293,7 @@ extension Lint.Rule.`counter loop iteration Tests`.`Edge Case` {
                 try finish()
             }
             """
-        let findings = Lint.Rule.`counter loop iteration Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`counter loop iteration Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -311,7 +311,7 @@ extension Lint.Rule.`counter loop iteration Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`counter loop iteration Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`counter loop iteration Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -326,7 +326,7 @@ extension Lint.Rule.`counter loop iteration Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`counter loop iteration Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`counter loop iteration Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

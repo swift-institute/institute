@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Architecture
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `architecture import boundary Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`architecture import boundary Tests` {
+extension `Lint.Rule Tests`.`architecture import boundary Tests` {
     static func findings(
         in source: String,
         file: String = "Sources/Model Core/Model.swift"

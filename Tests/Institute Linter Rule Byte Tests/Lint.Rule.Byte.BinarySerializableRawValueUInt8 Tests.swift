@@ -17,7 +17,9 @@ import Testing
 
 @testable import Institute_Linter_Rule_Byte
 
-extension Lint.Rule {
+enum `Lint.Rule Tests` {}
+
+extension `Lint.Rule Tests` {
     @Suite
     struct `binary serializable rawvalue uint8 Tests` {
         @Suite struct Unit {}
@@ -26,7 +28,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`binary serializable rawvalue uint8 Tests` {
+extension `Lint.Rule Tests`.`binary serializable rawvalue uint8 Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -38,7 +40,7 @@ extension Lint.Rule.`binary serializable rawvalue uint8 Tests` {
     }
 }
 
-extension Lint.Rule.`binary serializable rawvalue uint8 Tests`.Unit {
+extension `Lint.Rule Tests`.`binary serializable rawvalue uint8 Tests`.Unit {
     @Test
     func `struct with rawValue UInt8 conforming on header is flagged`() {
         let source = """
@@ -46,7 +48,7 @@ extension Lint.Rule.`binary serializable rawvalue uint8 Tests`.Unit {
                 public let rawValue: UInt8
             }
             """
-        let result = Lint.Rule.`binary serializable rawvalue uint8 Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable rawvalue uint8 Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -58,7 +60,7 @@ extension Lint.Rule.`binary serializable rawvalue uint8 Tests`.Unit {
             }
             extension TypeOfService: Binary.Serializable {}
             """
-        let result = Lint.Rule.`binary serializable rawvalue uint8 Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable rawvalue uint8 Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -69,12 +71,12 @@ extension Lint.Rule.`binary serializable rawvalue uint8 Tests`.Unit {
                 public var rawValue: UInt8 { 0 }
             }
             """
-        let result = Lint.Rule.`binary serializable rawvalue uint8 Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable rawvalue uint8 Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 }
 
-extension Lint.Rule.`binary serializable rawvalue uint8 Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`binary serializable rawvalue uint8 Tests`.`Edge Case` {
     @Test
     func `rawValue Byte is NOT flagged`() {
         let source = """
@@ -82,7 +84,7 @@ extension Lint.Rule.`binary serializable rawvalue uint8 Tests`.`Edge Case` {
                 public let rawValue: Byte
             }
             """
-        let result = Lint.Rule.`binary serializable rawvalue uint8 Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable rawvalue uint8 Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 
@@ -93,7 +95,7 @@ extension Lint.Rule.`binary serializable rawvalue uint8 Tests`.`Edge Case` {
                 public let rawValue: UInt16
             }
             """
-        let result = Lint.Rule.`binary serializable rawvalue uint8 Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable rawvalue uint8 Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 
@@ -104,12 +106,12 @@ extension Lint.Rule.`binary serializable rawvalue uint8 Tests`.`Edge Case` {
                 public let rawValue: UInt8
             }
             """
-        let result = Lint.Rule.`binary serializable rawvalue uint8 Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable rawvalue uint8 Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 }
 
-extension Lint.Rule.`binary serializable rawvalue uint8 Tests`.Integration {
+extension `Lint.Rule Tests`.`binary serializable rawvalue uint8 Tests`.Integration {
     @Test
     func `multiple conformers in one file all flagged`() {
         let source = """
@@ -117,14 +119,14 @@ extension Lint.Rule.`binary serializable rawvalue uint8 Tests`.Integration {
             public struct B: Binary.Serializable { public let rawValue: UInt8 }
             public struct C: Binary.Serializable { public let rawValue: Byte }
             """
-        let result = Lint.Rule.`binary serializable rawvalue uint8 Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable rawvalue uint8 Tests`.findings(in: source)
         #expect(result.count == 2)
     }
 
     @Test
     func `large file with no Binary conformers yields no findings`() {
         let source = String(repeating: "public struct X { let x: UInt8 = 0 }\n", count: 200)
-        let result = Lint.Rule.`binary serializable rawvalue uint8 Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`binary serializable rawvalue uint8 Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 }

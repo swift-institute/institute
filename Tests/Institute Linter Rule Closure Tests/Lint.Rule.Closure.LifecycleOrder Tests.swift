@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Closure
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `lifecycle order Tests` {
         @Suite struct Unit {}
@@ -26,20 +26,20 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`lifecycle order Tests` {
+extension `Lint.Rule Tests`.`lifecycle order Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`lifecycle order`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`lifecycle order Tests`.Unit {
+extension `Lint.Rule Tests`.`lifecycle order Tests`.Unit {
     @Test
     func `completion before unlabelled body is flagged`() {
         let source = """
             func perform(completion: @escaping (Result) -> Void, _ body: @escaping () -> Void) {}
             """
-        let findings = Lint.Rule.`lifecycle order Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`lifecycle order Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "lifecycle order")
@@ -52,7 +52,7 @@ extension Lint.Rule.`lifecycle order Tests`.Unit {
         let source = """
             func op(onError: () -> Void, _ body: () -> Void) {}
             """
-        let findings = Lint.Rule.`lifecycle order Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`lifecycle order Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -61,7 +61,7 @@ extension Lint.Rule.`lifecycle order Tests`.Unit {
         let source = """
             func op(cleanup: () -> Void, body: () -> Void) {}
             """
-        let findings = Lint.Rule.`lifecycle order Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`lifecycle order Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -70,7 +70,7 @@ extension Lint.Rule.`lifecycle order Tests`.Unit {
         let source = """
             func op(onError: () -> Void, cleanup: () -> Void, _ body: () -> Void) {}
             """
-        let findings = Lint.Rule.`lifecycle order Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`lifecycle order Tests`.findings(in: source)
         #expect(findings.count == 2)
     }
 
@@ -82,7 +82,7 @@ extension Lint.Rule.`lifecycle order Tests`.Unit {
         let source = """
             func op(_ body: () -> Void, setup: () -> Void) {}
             """
-        let findings = Lint.Rule.`lifecycle order Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`lifecycle order Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -91,7 +91,7 @@ extension Lint.Rule.`lifecycle order Tests`.Unit {
         let source = """
             func op(completion: () -> Void, setup: () -> Void) {}
             """
-        let findings = Lint.Rule.`lifecycle order Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`lifecycle order Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -103,7 +103,7 @@ extension Lint.Rule.`lifecycle order Tests`.Unit {
         let source = """
             func run(_ completion: () -> Void, body: () -> Void) {}
             """
-        let findings = Lint.Rule.`lifecycle order Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`lifecycle order Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -117,18 +117,18 @@ extension Lint.Rule.`lifecycle order Tests`.Unit {
         let source = """
             func run(to completion: () -> Void, _ body: () -> Void) {}
             """
-        let findings = Lint.Rule.`lifecycle order Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`lifecycle order Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`lifecycle order Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`lifecycle order Tests`.`Edge Case` {
     @Test
     func `body before completion is NOT flagged`() {
         let source = """
             func perform(_ body: () -> Void, completion: (Result) -> Void) {}
             """
-        let findings = Lint.Rule.`lifecycle order Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`lifecycle order Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -137,7 +137,7 @@ extension Lint.Rule.`lifecycle order Tests`.`Edge Case` {
         let source = """
             func op(setup: () -> Void, _ body: () -> Void, completion: (Result) -> Void) {}
             """
-        let findings = Lint.Rule.`lifecycle order Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`lifecycle order Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -148,7 +148,7 @@ extension Lint.Rule.`lifecycle order Tests`.`Edge Case` {
         let source = """
             func op(progress: () -> Void, metric: () -> Void) {}
             """
-        let findings = Lint.Rule.`lifecycle order Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`lifecycle order Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -157,7 +157,7 @@ extension Lint.Rule.`lifecycle order Tests`.`Edge Case` {
         let source = """
             func op(_ body: () -> Void) {}
             """
-        let findings = Lint.Rule.`lifecycle order Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`lifecycle order Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -166,7 +166,7 @@ extension Lint.Rule.`lifecycle order Tests`.`Edge Case` {
         let source = """
             func op(completion: () -> Void, cleanup: () -> Void) {}
             """
-        let findings = Lint.Rule.`lifecycle order Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`lifecycle order Tests`.findings(in: source)
         // No body-tier anchor — completion-tier closures alone are
         // out of scope here (could be intentional, e.g., a tear-down API).
         #expect(findings.isEmpty)
@@ -177,7 +177,7 @@ extension Lint.Rule.`lifecycle order Tests`.`Edge Case` {
         let source = """
             func op(completion: () -> Void, count: Int, _ body: () -> Void) {}
             """
-        let findings = Lint.Rule.`lifecycle order Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`lifecycle order Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }

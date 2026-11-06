@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Architecture
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `architecture foundation type Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`architecture foundation type Tests` {
+extension `Lint.Rule Tests`.`architecture foundation type Tests` {
     static func findings(
         in source: String,
         file: String = "Sources/Model Core/Model.swift"
@@ -132,29 +132,29 @@ extension Lint.Rule.`architecture foundation type Tests` {
     }
 }
 
-extension Lint.Rule.`architecture foundation type Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`architecture foundation type Tests`.`Edge Case` {
     @Test
     func `an NS class is Foundation's even in a file that imports AppKit`() {
         let source = "import AppKit\n\nfinal class Bridge: NSView {\n    var window: NSWindow?\n}"
-        #expect(Lint.Rule.`architecture foundation type Tests`.findings(in: source, file: "Sources/Model AppKit/Bridge.swift").count == 2)
+        #expect(`Lint.Rule Tests`.`architecture foundation type Tests`.findings(in: source, file: "Sources/Model AppKit/Bridge.swift").count == 2)
     }
 
     @Test
     func `an NSObject delegate base is Foundation's`() {
         let source = "fileprivate final class Bridge: NSObject, Delegate {}"
-        #expect(Lint.Rule.`architecture foundation type Tests`.findings(in: source).count == 1)
+        #expect(`Lint.Rule Tests`.`architecture foundation type Tests`.findings(in: source).count == 1)
     }
 
     @Test
     func `an NS class without an interface framework is still Foundation's`() {
         let source = "import Foundation\n\npublic var count: NSNumber"
-        #expect(Lint.Rule.`architecture foundation type Tests`.findings(in: source).count == 1)
+        #expect(`Lint.Rule Tests`.`architecture foundation type Tests`.findings(in: source).count == 1)
     }
 
     @Test
     func `a module-qualified Foundation type is flagged even beside AppKit`() {
         let source = "import AppKit\n\npublic var payload: Foundation.Data"
-        #expect(Lint.Rule.`architecture foundation type Tests`.findings(in: source, file: "Sources/Model AppKit/Payload.swift").count == 1)
+        #expect(`Lint.Rule Tests`.`architecture foundation type Tests`.findings(in: source, file: "Sources/Model AppKit/Payload.swift").count == 1)
     }
 
     @Test

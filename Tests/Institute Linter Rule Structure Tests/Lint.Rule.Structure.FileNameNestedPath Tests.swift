@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Structure
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `file name nested path Tests` {
         @Suite struct Unit {}
@@ -32,7 +32,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`file name nested path Tests` {
+extension `Lint.Rule Tests`.`file name nested path Tests` {
     static func findings(in source: String, file: String) -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`file name nested path`.observe(parsed, .warning).findings
@@ -41,10 +41,10 @@ extension Lint.Rule.`file name nested path Tests` {
 
 // MARK: - Positive (mismatched basename)
 
-extension Lint.Rule.`file name nested path Tests`.Positive {
+extension `Lint.Rule Tests`.`file name nested path Tests`.Positive {
     @Test
     func `top-level struct with mismatched basename fires`() {
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: "public struct Iterator {}",
             file: "Sources/X/Wrong.swift"
         )
@@ -67,7 +67,7 @@ extension Lint.Rule.`file name nested path Tests`.Positive {
             public struct Iterator {}
             #endif
             """
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Wrong.swift"
         )
@@ -81,7 +81,7 @@ extension Lint.Rule.`file name nested path Tests`.Positive {
                 public struct Iterator {}
             }
             """
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Array.Dynamic.Wrong.swift"
         )
@@ -94,10 +94,10 @@ extension Lint.Rule.`file name nested path Tests`.Positive {
 
 // MARK: - Negative (exact match)
 
-extension Lint.Rule.`file name nested path Tests`.Negative {
+extension `Lint.Rule Tests`.`file name nested path Tests`.Negative {
     @Test
     func `top-level struct with exact match is permitted`() {
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: "public struct Iterator {}",
             file: "Sources/X/Iterator.swift"
         )
@@ -111,7 +111,7 @@ extension Lint.Rule.`file name nested path Tests`.Negative {
                 public struct Iterator {}
             }
             """
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Array.Dynamic.Iterator.swift"
         )
@@ -124,7 +124,7 @@ extension Lint.Rule.`file name nested path Tests`.Negative {
             public struct Iterator {}
             extension Iterator: Sendable {}
             """
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Iterator.swift"
         )
@@ -134,7 +134,7 @@ extension Lint.Rule.`file name nested path Tests`.Negative {
 
 // MARK: - Edge (namespace shell; hoisted-Protocol typealias)
 
-extension Lint.Rule.`file name nested path Tests`.Edge {
+extension `Lint.Rule Tests`.`file name nested path Tests`.Edge {
     @Test
     func `namespace-enum shell with one nested type resolves to the nested type's path`() {
         let source = """
@@ -144,13 +144,13 @@ extension Lint.Rule.`file name nested path Tests`.Edge {
                 }
             }
             """
-        let matching = Lint.Rule.`file name nested path Tests`.findings(
+        let matching = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Array.Dynamic.Iterator.swift"
         )
         #expect(matching.isEmpty)
 
-        let mismatched = Lint.Rule.`file name nested path Tests`.findings(
+        let mismatched = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Array.swift"
         )
@@ -168,13 +168,13 @@ extension Lint.Rule.`file name nested path Tests`.Edge {
                 public typealias `Protocol` = __ArrayProtocol
             }
             """
-        let matching = Lint.Rule.`file name nested path Tests`.findings(
+        let matching = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Array.Protocol.swift"
         )
         #expect(matching.isEmpty)
 
-        let hoistedSpellingBasename = Lint.Rule.`file name nested path Tests`.findings(
+        let hoistedSpellingBasename = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/__ArrayProtocol.swift"
         )
@@ -191,7 +191,7 @@ extension Lint.Rule.`file name nested path Tests`.Edge {
             extension Iterator: Iterating {}
             extension Iterator where Iterator: Equatable {}
             """
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Wrong.swift"
         )
@@ -205,7 +205,7 @@ extension Lint.Rule.`file name nested path Tests`.Edge {
             extension Iterator: Iterating {}
             extension Iterator: Cursoring {}
             """
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Wrong.swift"
         )
@@ -219,7 +219,7 @@ extension Lint.Rule.`file name nested path Tests`.Edge {
             extension Iterator where Element: Comparable {}
             extension Iterator where Element: Hashable {}
             """
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Wrong.swift"
         )
@@ -232,7 +232,7 @@ extension Lint.Rule.`file name nested path Tests`.Edge {
             public struct Iterator<Element> {}
             extension Iterator: Equatable where Element: Equatable {}
             """
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Wrong.swift"
         )
@@ -245,7 +245,7 @@ extension Lint.Rule.`file name nested path Tests`.Edge {
             public struct Iterator {}
             extension Iterator: Sendable, Iterating {}
             """
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Wrong.swift"
         )
@@ -260,7 +260,7 @@ extension Lint.Rule.`file name nested path Tests`.Edge {
             }
             extension Array.Iterator: Iterating {}
             """
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Wrong.swift"
         )
@@ -270,13 +270,13 @@ extension Lint.Rule.`file name nested path Tests`.Edge {
 
 // MARK: - Exemption (007-shaped basenames not firing)
 
-extension Lint.Rule.`file name nested path Tests`.Exemption {
+extension `Lint.Rule Tests`.`file name nested path Tests`.Exemption {
     @Test
     func `file outside Sources is out of scope`() {
         // The rule's stated surface is a source file under `Sources/`; a
         // Benchmarks/ (or Plugins/, Snippets/, package-root) file must not be
         // judged even though it isn't Tests/Experiments/Examples either.
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: "public struct Iterator {}",
             file: "Benchmarks/X/Wrong.swift"
         )
@@ -285,7 +285,7 @@ extension Lint.Rule.`file name nested path Tests`.Exemption {
 
     @Test
     func `plus-conformance basename is 007's surface, not fired here`() {
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: "public struct Iterator {}",
             file: "Sources/X/Iterator+Sendable.swift"
         )
@@ -294,7 +294,7 @@ extension Lint.Rule.`file name nested path Tests`.Exemption {
 
     @Test
     func `where-clause basename is 007's surface, not fired here`() {
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: "public struct Iterator {}",
             file: "Sources/X/Iterator where Element Comparable.swift"
         )
@@ -308,7 +308,7 @@ extension Lint.Rule.`file name nested path Tests`.Exemption {
                 var doubled: String { self + self }
             }
             """
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Wrong.swift"
         )
@@ -331,7 +331,7 @@ extension Lint.Rule.`file name nested path Tests`.Exemption {
             internal final class TryOptionalVisitor: SyntaxVisitor {
             }
             """
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/Institute Linter Rule Try/Lint.Rule.Try.swift"
         )
@@ -343,7 +343,7 @@ extension Lint.Rule.`file name nested path Tests`.Exemption {
         // Regression guard: [RULE-EXEMPT-7] must not blanket-exempt every
         // top-level class — only ones that subclass the SwiftSyntax visitor
         // family.
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: "public final class Iterator {}",
             file: "Sources/X/Wrong.swift"
         )
@@ -356,7 +356,7 @@ extension Lint.Rule.`file name nested path Tests`.Exemption {
             struct Foo {}
             struct Bar {}
             """
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Wrong.swift"
         )
@@ -366,7 +366,7 @@ extension Lint.Rule.`file name nested path Tests`.Exemption {
 
 // MARK: - Near-miss for every exemption
 
-extension Lint.Rule.`file name nested path Tests`.`Near Miss` {
+extension `Lint.Rule Tests`.`file name nested path Tests`.`Near Miss` {
     @Test
     func `a bare member-only extension among conformance extensions still fires`() {
         let source = """
@@ -376,7 +376,7 @@ extension Lint.Rule.`file name nested path Tests`.`Near Miss` {
                 func helper() {}
             }
             """
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Wrong.swift"
         )
@@ -393,7 +393,7 @@ extension Lint.Rule.`file name nested path Tests`.`Near Miss` {
             extension Iterator: Sendable {}
             extension Iterator: Iterating {}
             """
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Wrong.swift"
         )
@@ -410,7 +410,7 @@ extension Lint.Rule.`file name nested path Tests`.`Near Miss` {
                 func helper() {}
             }
             """
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Wrong.swift"
         )
@@ -429,7 +429,7 @@ extension Lint.Rule.`file name nested path Tests`.`Near Miss` {
         // 007's shape) this is excluded here too — recorded as a
         // near-miss control confirming the exclusion is by basename
         // content, not by position.
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: "public struct Iterator {}",
             file: "Sources/X/Wrong+Iterator.swift"
         )
@@ -446,7 +446,7 @@ extension Lint.Rule.`file name nested path Tests`.`Near Miss` {
                 static let tag = 1
             }
             """
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Array.Dynamic.Iterator.swift"
         )
@@ -466,7 +466,7 @@ extension Lint.Rule.`file name nested path Tests`.`Near Miss` {
                 }
             }
             """
-        let findings = Lint.Rule.`file name nested path Tests`.findings(
+        let findings = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Array.Dynamic.Iterator.swift"
         )
@@ -476,7 +476,7 @@ extension Lint.Rule.`file name nested path Tests`.`Near Miss` {
 
 // MARK: - Self-firing
 
-extension Lint.Rule.`file name nested path Tests`.`Self Firing` {
+extension `Lint.Rule Tests`.`file name nested path Tests`.`Self Firing` {
     @Test
     // swiftlint:disable:next function_name_whitespace
     func
@@ -487,13 +487,13 @@ extension Lint.Rule.`file name nested path Tests`.`Self Firing` {
                 struct Rule {}
             }
             """
-        let mismatched = Lint.Rule.`file name nested path Tests`.findings(
+        let mismatched = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Wrong.swift"
         )
         #expect(mismatched.count == 1)
 
-        let corrected = Lint.Rule.`file name nested path Tests`.findings(
+        let corrected = `Lint.Rule Tests`.`file name nested path Tests`.findings(
             in: source,
             file: "Sources/X/Institute.Rule.swift"
         )

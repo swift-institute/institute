@@ -5,14 +5,16 @@ import Testing
 
 @testable import Institute_Planner
 
-extension Institute.Planner.Release {
+enum `Institute.Planner.Release Tests` {}
+
+extension `Institute.Planner.Release Tests` {
     @Suite struct Test {
         @Suite struct Unit {}
         @Suite struct `Edge Case` {}
     }
 }
 
-extension Institute.Planner.Release.Test {
+extension `Institute.Planner.Release Tests`.Test {
     static func refusal(
         _ body: () throws(Institute.Planner.Error) -> Void
     ) -> Institute.Planner.Error? {
@@ -25,7 +27,7 @@ extension Institute.Planner.Release.Test {
     }
 }
 
-extension Institute.Planner.Release.Test.Unit {
+extension `Institute.Planner.Release Tests`.Test.Unit {
     @Test func `a publish run's macOS planner verifies against its PIN and SHA256SUMS`() throws {
         var fixture = Institute.Planner.Fixture()
         let rows = fixture.publish(Institute.Planner.Fixture.candidate, run: "200")
@@ -55,11 +57,11 @@ extension Institute.Planner.Release.Test.Unit {
     }
 }
 
-extension Institute.Planner.Release.Test.`Edge Case` {
+extension `Institute.Planner.Release Tests`.Test.`Edge Case` {
     @Test func `a run with no PIN asset is refused as missing`() {
         var fixture = Institute.Planner.Fixture()
         fixture.publish(Institute.Planner.Fixture.candidate, run: "200")
-        let refusal = Institute.Planner.Release.Test.refusal { () throws(Institute.Planner.Error) in
+        let refusal = `Institute.Planner.Release Tests`.Test.refusal { () throws(Institute.Planner.Error) in
             _ = try fixture.release.publication(run: "201")
         }
         #expect(refusal == .missing("PIN asset for publish run 201"))
@@ -69,7 +71,7 @@ extension Institute.Planner.Release.Test.`Edge Case` {
         var fixture = Institute.Planner.Fixture()
         fixture.publish(Institute.Planner.Fixture.candidate, run: "200")
         fixture.assets["SHA256SUMS-\(Institute.Planner.Fixture.candidate)-200"] = nil
-        let refusal = Institute.Planner.Release.Test.refusal { () throws(Institute.Planner.Error) in
+        let refusal = `Institute.Planner.Release Tests`.Test.refusal { () throws(Institute.Planner.Error) in
             _ = try fixture.release.publication(run: "200")
         }
         #expect(refusal == .missing("SHA256SUMS-\(Institute.Planner.Fixture.candidate)-200"))
@@ -83,7 +85,7 @@ extension Institute.Planner.Release.Test.`Edge Case` {
         fixture.assets[name]?.append(contentsOf: [Byte](utf8: "tampered"))
         let release = fixture.release
         let publication = try release.publication(run: "200")
-        let refusal = Institute.Planner.Release.Test.refusal { () throws(Institute.Planner.Error) in
+        let refusal = `Institute.Planner.Release Tests`.Test.refusal { () throws(Institute.Planner.Error) in
             _ = try release.executable(.macos, of: publication)
         }
         guard case .mismatch(let asset, let expected, _) = refusal else {
@@ -107,7 +109,7 @@ extension Institute.Planner.Release.Test.`Edge Case` {
         fixture.assets[sums] = [Byte](utf8: text)
         let release = fixture.release
         let publication = try release.publication(run: "200")
-        let refusal = Institute.Planner.Release.Test.refusal { () throws(Institute.Planner.Error) in
+        let refusal = `Institute.Planner.Release Tests`.Test.refusal { () throws(Institute.Planner.Error) in
             _ = try release.executable(.macos, of: publication)
         }
         guard case .mismatch(let asset, _, _) = refusal else {
@@ -125,7 +127,7 @@ extension Institute.Planner.Release.Test.`Edge Case` {
         fixture.assets[name] = nil
         let release = fixture.release
         let publication = try release.publication(run: "200")
-        let refusal = Institute.Planner.Release.Test.refusal { () throws(Institute.Planner.Error) in
+        let refusal = `Institute.Planner.Release Tests`.Test.refusal { () throws(Institute.Planner.Error) in
             _ = try release.executable(.macos, of: publication)
         }
         #expect(refusal == .missing("release asset \(name)"))
@@ -138,7 +140,7 @@ extension Institute.Planner.Release.Test.`Edge Case` {
         fixture.assets["PIN-\(Institute.Planner.Fixture.candidate)-200"] = [Byte](
             utf8: ([foreign] + rows).joined(separator: "\n")
         )
-        let refusal = Institute.Planner.Release.Test.refusal { () throws(Institute.Planner.Error) in
+        let refusal = `Institute.Planner.Release Tests`.Test.refusal { () throws(Institute.Planner.Error) in
             _ = try fixture.release.publication(run: "200")
         }
         guard case .malformed = refusal else {
@@ -153,14 +155,14 @@ extension Institute.Planner.Release.Test.`Edge Case` {
         let typed = "\(Institute.Planner.Fixture.current) macos-arm64 \(String(repeating: "c", count: 64)) \(String(repeating: "d", count: 64))"
         fixture.adopt(Institute.Planner.Fixture.current, rows: rows + [typed])
         let row = try fixture.consumer.current(.macos)
-        let refusal = Institute.Planner.Release.Test.refusal { () throws(Institute.Planner.Error) in
+        let refusal = `Institute.Planner.Release Tests`.Test.refusal { () throws(Institute.Planner.Error) in
             _ = try fixture.release.publication(carrying: row)
         }
         #expect(refusal == .unpublished(typed))
     }
 }
 
-extension Institute.Planner.Release.Test.`Edge Case` {
+extension `Institute.Planner.Release Tests`.Test.`Edge Case` {
     @Test func `a renamed publisher's listing still names its assets`() throws {
         let listing = """
             <a href="/swift-institute/institute/releases/download/ci-binaries/PIN-abc-1">PIN</a>
@@ -175,7 +177,7 @@ extension Institute.Planner.Release.Test.`Edge Case` {
     }
 
     @Test func `a listing without release links is refused`() {
-        let refusal = Institute.Planner.Release.Test.refusal { () throws(Institute.Planner.Error) in
+        let refusal = `Institute.Planner.Release Tests`.Test.refusal { () throws(Institute.Planner.Error) in
             _ = try Institute.Planner.Release.assets(
                 listing: "<a href=\"/swift-institute/institute/releases/tag/ci-binaries\">tag</a>",
                 tag: "ci-binaries"

@@ -9,13 +9,15 @@ import Testing
 
 @testable import Institute_Planner
 
-extension Institute.Planner.Canary {
+enum `Institute.Planner.Canary Tests` {}
+
+extension `Institute.Planner.Canary Tests` {
     @Suite struct Test {
         @Suite struct Integration {}
     }
 }
 
-extension Institute.Planner.Canary.Test {
+extension `Institute.Planner.Canary Tests`.Test {
     /// Every clone and run the fake runner was asked for, in order.
     final class Calls: Sendable {
         private let lines = Mutex<[Swift.String]>([])
@@ -64,27 +66,27 @@ extension Institute.Planner.Canary.Test {
     }
 }
 
-extension Institute.Planner.Canary.Test.Integration {
+extension `Institute.Planner.Canary Tests`.Test.Integration {
     @Test func `identical planners make the publish run adoptable`() throws {
-        let fixture = Institute.Planner.Canary.Test.scenario()
-        let work = try Institute.Planner.Canary.Test.work()
+        let fixture = `Institute.Planner.Canary Tests`.Test.scenario()
+        let work = try `Institute.Planner.Canary Tests`.Test.work()
         defer {
             // swift-linter:disable:next try optional
             // REASON: fixture cleanup; residue in the temporary directory must not mask the test's outcome.
             try? File.System.Delete.delete(at: File.Path(work), recursive: true)
         }
-        let report = Institute.Planner.Canary.Outcome.Test.Report.output(
-            Institute.Planner.Canary.Outcome.Test.Report.report()
+        let report = `Institute.Planner.Canary.Outcome Tests`.Test.Report.output(
+            `Institute.Planner.Canary.Outcome Tests`.Test.Report.report()
         )
-        let calls = Institute.Planner.Canary.Test.Calls()
+        let calls = `Institute.Planner.Canary Tests`.Test.Calls()
         let evidence = Institute.Planner.Canary.evidence(
             run: "200",
-            repositories: [Institute.Planner.Canary.Test.repository],
+            repositories: [`Institute.Planner.Canary Tests`.Test.repository],
             work: work,
             xcode: "/Applications/Xcode.app",
             release: fixture.release,
             consumer: fixture.consumer,
-            runner: Institute.Planner.Canary.Test.runner(current: report, candidate: report, calls: calls)
+            runner: `Institute.Planner.Canary Tests`.Test.runner(current: report, candidate: report, calls: calls)
         )
 
         #expect(evidence.verdict == .adoptable, "\(evidence.refusal)")
@@ -95,9 +97,9 @@ extension Institute.Planner.Canary.Test.Integration {
         #expect(
             calls.all == [
                 "clone https://github.com/swift-atoms/swift-addition.git \(subject)",
-                "run \(work)/planner/institute-current ci -- source --exit-policy strict --repository swift-atoms/swift-addition --revision \(Institute.Planner.Canary.Test.revision) --root \(subject) --xcode-application /Applications/Xcode.app",
+                "run \(work)/planner/institute-current ci -- source --exit-policy strict --repository swift-atoms/swift-addition --revision \(`Institute.Planner.Canary Tests`.Test.revision) --root \(subject) --xcode-application /Applications/Xcode.app",
                 "clone file://\(work)/swift-atoms/swift-addition/current \(subject)",
-                "run \(work)/planner/institute-candidate ci -- source --exit-policy strict --repository swift-atoms/swift-addition --revision \(Institute.Planner.Canary.Test.revision) --root \(subject) --xcode-application /Applications/Xcode.app",
+                "run \(work)/planner/institute-candidate ci -- source --exit-policy strict --repository swift-atoms/swift-addition --revision \(`Institute.Planner.Canary Tests`.Test.revision) --root \(subject) --xcode-application /Applications/Xcode.app",
             ]
         )
         let installed = try Institute.Planner.read(Institute.Planner.path("\(work)/planner/institute-candidate"))
@@ -105,22 +107,22 @@ extension Institute.Planner.Canary.Test.Integration {
     }
 
     @Test func `a candidate that gains an error differs`() throws {
-        let fixture = Institute.Planner.Canary.Test.scenario()
-        let work = try Institute.Planner.Canary.Test.work()
+        let fixture = `Institute.Planner.Canary Tests`.Test.scenario()
+        let work = try `Institute.Planner.Canary Tests`.Test.work()
         defer {
             // swift-linter:disable:next try optional
             // REASON: fixture cleanup; residue in the temporary directory must not mask the test's outcome.
             try? File.System.Delete.delete(at: File.Path(work), recursive: true)
         }
-        let report = Institute.Planner.Canary.Outcome.Test.Report.self
+        let report = `Institute.Planner.Canary.Outcome Tests`.Test.Report.self
         let evidence = Institute.Planner.Canary.evidence(
             run: "200",
-            repositories: [Institute.Planner.Canary.Test.repository],
+            repositories: [`Institute.Planner.Canary Tests`.Test.repository],
             work: work,
             xcode: "/Applications/Xcode.app",
             release: fixture.release,
             consumer: fixture.consumer,
-            runner: Institute.Planner.Canary.Test.runner(
+            runner: `Institute.Planner.Canary Tests`.Test.runner(
                 current: report.output(report.report()),
                 candidate: report.output(report.report(findings: [report.finding(.error)])),
                 calls: .init()
@@ -131,18 +133,18 @@ extension Institute.Planner.Canary.Test.Integration {
     }
 
     @Test func `a tampered candidate binary refuses before anything runs`() throws {
-        var fixture = Institute.Planner.Canary.Test.scenario()
+        var fixture = `Institute.Planner.Canary Tests`.Test.scenario()
         let row = try fixture.release.publication(run: "200").row(for: .macos)
         fixture.assets["institute-macos-arm64-\(row.binary.hex)"]?.append(contentsOf: [Byte](utf8: "tampered"))
-        let calls = Institute.Planner.Canary.Test.Calls()
+        let calls = `Institute.Planner.Canary Tests`.Test.Calls()
         let evidence = Institute.Planner.Canary.evidence(
             run: "200",
-            repositories: [Institute.Planner.Canary.Test.repository],
-            work: try Institute.Planner.Canary.Test.work(),
+            repositories: [`Institute.Planner.Canary Tests`.Test.repository],
+            work: try `Institute.Planner.Canary Tests`.Test.work(),
             xcode: "/Applications/Xcode.app",
             release: fixture.release,
             consumer: fixture.consumer,
-            runner: Institute.Planner.Canary.Test.runner(current: "", candidate: "", calls: calls)
+            runner: `Institute.Planner.Canary Tests`.Test.runner(current: "", candidate: "", calls: calls)
         )
         #expect(evidence.verdict == .refused)
         #expect(evidence.verdict.code == 2)

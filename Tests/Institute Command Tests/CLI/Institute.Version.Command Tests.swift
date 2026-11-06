@@ -13,14 +13,16 @@ private func parse(
     try Command.parse(Institute.Application.CLI.self, from: argv, initial: .install(.init()))
 }
 
-extension Institute.Version.Command {
+enum `Institute.Version.Command Tests` {}
+
+extension `Institute.Version.Command Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
     }
 }
 
-extension Institute.Version.Command.Test.Unit {
+extension `Institute.Version.Command Tests`.Test.Unit {
     @Test
     func `organizations parses its layer`() throws {
         guard case .organizations(let command) = try parse(["organizations", "--layer", "standards"]) else {

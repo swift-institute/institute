@@ -17,7 +17,9 @@ import Testing
 
 @testable import Institute_Linter_Rule_Unchecked
 
-extension Lint.Rule {
+enum `Lint.Rule Tests` {}
+
+extension `Lint.Rule Tests` {
     @Suite
     struct `unchecked call site Tests` {
         @Suite struct Unit {}
@@ -26,7 +28,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`unchecked call site Tests` {
+extension `Lint.Rule Tests`.`unchecked call site Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -48,11 +50,11 @@ extension Lint.Rule.`unchecked call site Tests` {
     }
 }
 
-extension Lint.Rule.`unchecked call site Tests`.Unit {
+extension `Lint.Rule Tests`.`unchecked call site Tests`.Unit {
     @Test
     func `Call site with __unchecked label is flagged`() {
         let source = "let x = Foo(__unchecked: ())"
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(in: source)
         let count = findings.count
         #expect(count == 1)
         if count == 1 {
@@ -68,14 +70,14 @@ extension Lint.Rule.`unchecked call site Tests`.Unit {
                 init(__unchecked _: ()) {}
             }
             """
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `Other argument labels are NOT flagged`() {
         let source = "let x = Foo(name: 42, value: \"abc\")"
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -86,7 +88,7 @@ extension Lint.Rule.`unchecked call site Tests`.Unit {
             let b = Bar(other: 2, __unchecked: ())
             let c = Baz(__unchecked: ())
             """
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(in: source)
         #expect(findings.count == 3)
     }
 
@@ -99,7 +101,7 @@ extension Lint.Rule.`unchecked call site Tests`.Unit {
 
             let x = Foo(__unchecked: ())
             """
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -116,18 +118,18 @@ extension Lint.Rule.`unchecked call site Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`unchecked call site Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`unchecked call site Tests`.`Edge Case` {
     @Test
     func `Nested call site with __unchecked is flagged`() {
         let source = "let x = outer(inner: Foo(__unchecked: ()))"
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `Generic call site with __unchecked is flagged`() {
         let source = "let x = Foo<Int>(__unchecked: ())"
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -138,21 +140,21 @@ extension Lint.Rule.`unchecked call site Tests`.`Edge Case` {
                 value + 1
             }
             """
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `__unchecked as part of a larger label is NOT flagged`() {
         let source = "let x = Foo(__unchecked_extra: ())"
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `Static method call site with __unchecked is flagged`() {
         let source = "let x = Foo.make(__unchecked: ())"
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -166,13 +168,13 @@ extension Lint.Rule.`unchecked call site Tests`.`Edge Case` {
                 init(__unchecked _: ()) {}
             }
             """
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `Empty file produces no findings`() {
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(in: "")
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(in: "")
         #expect(findings.isEmpty)
     }
 
@@ -181,14 +183,14 @@ extension Lint.Rule.`unchecked call site Tests`.`Edge Case` {
     @Test
     func `__unchecked as a tuple element label is NOT flagged`() {
         let source = "let t = (__unchecked: value)"
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `__unchecked as a call argument label is still flagged`() {
         let source = "let x = Cardinal(__unchecked: value)"
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -196,7 +198,7 @@ extension Lint.Rule.`unchecked call site Tests`.`Edge Case` {
 
     @Test
     func `Cardinal brand-owner run self-suppresses`() {
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(
             in: "let x = Foo(__unchecked: ())",
             types: ["Cardinal"]
         )
@@ -214,7 +216,7 @@ extension Lint.Rule.`unchecked call site Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -227,7 +229,7 @@ extension Lint.Rule.`unchecked call site Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -242,7 +244,7 @@ extension Lint.Rule.`unchecked call site Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -256,7 +258,7 @@ extension Lint.Rule.`unchecked call site Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -270,13 +272,13 @@ extension Lint.Rule.`unchecked call site Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `a non-brand-owner consumer run still fires`() {
-        let findings = Lint.Rule.`unchecked call site Tests`.findings(
+        let findings = `Lint.Rule Tests`.`unchecked call site Tests`.findings(
             in: "let x = Foo(__unchecked: ())",
             types: ["SomeConsumerType"]
         )

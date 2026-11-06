@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Throws
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `do throws for typed catch Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`do throws for typed catch Tests` {
+extension `Lint.Rule Tests`.`do throws for typed catch Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "Sources/X/Test.swift"
@@ -38,7 +38,7 @@ extension Lint.Rule.`do throws for typed catch Tests` {
     }
 }
 
-extension Lint.Rule.`do throws for typed catch Tests`.Unit {
+extension `Lint.Rule Tests`.`do throws for typed catch Tests`.Unit {
     @Test
     func `bare do try catch is flagged`() {
         let source = """
@@ -50,7 +50,7 @@ extension Lint.Rule.`do throws for typed catch Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -65,7 +65,7 @@ extension Lint.Rule.`do throws for typed catch Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -79,7 +79,7 @@ extension Lint.Rule.`do throws for typed catch Tests`.Unit {
                 } catch {}
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -92,7 +92,7 @@ extension Lint.Rule.`do throws for typed catch Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -112,12 +112,12 @@ extension Lint.Rule.`do throws for typed catch Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`do throws for typed catch Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`do throws for typed catch Tests`.`Edge Case` {
     @Test
     func `nested do-catch tracked independently`() {
         // Outer do has no direct `try` (the inner do scopes its own try),
@@ -135,7 +135,7 @@ extension Lint.Rule.`do throws for typed catch Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -151,7 +151,7 @@ extension Lint.Rule.`do throws for typed catch Tests`.`Edge Case` {
                 } catch {}
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -169,7 +169,7 @@ extension Lint.Rule.`do throws for typed catch Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -185,7 +185,7 @@ extension Lint.Rule.`do throws for typed catch Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -201,7 +201,7 @@ extension Lint.Rule.`do throws for typed catch Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`do throws for typed catch Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -212,7 +212,7 @@ extension Lint.Rule.`do throws for typed catch Tests`.`Edge Case` {
                 try x()
             } catch {}
             """
-        let findings = Lint.Rule.`do throws for typed catch Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`do throws for typed catch Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }

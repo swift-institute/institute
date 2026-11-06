@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_RawValue
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `tagged unchecked with typed alternative Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`tagged unchecked with typed alternative Tests` {
+extension `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -36,11 +36,11 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests` {
     }
 }
 
-extension Lint.Rule.`tagged unchecked with typed alternative Tests`.Unit {
+extension `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests`.Unit {
     @Test
     func `Tagged generic-specialized with _unchecked is flagged`() {
         let source = "let x = Tagged<Tag, Int>(_unchecked: 42)"
-        let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(
+        let findings = `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests`.findings(
             in: source
         )
         let count = findings.count
@@ -57,7 +57,7 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.Unit {
             let value: Tagged<Tag, Int> = Tagged(_unchecked: 7)
             _ = value
             """
-        let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(
+        let findings = `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests`.findings(
             in: source
         )
         #expect(findings.count == 1)
@@ -66,7 +66,7 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.Unit {
     @Test
     func `module-qualified Tagged with _unchecked is flagged`() {
         let source = "let id = Tagged.Tagged(_unchecked: 0)"
-        let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(
+        let findings = `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests`.findings(
             in: source
         )
         #expect(findings.count == 1)
@@ -78,7 +78,7 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.Unit {
         // `Tagged` as the *base* — a distinct spelling from the bare-call
         // form `Tagged(_unchecked:)` covered above.
         let source = "let id = Tagged.init(_unchecked: 0)"
-        let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(
+        let findings = `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests`.findings(
             in: source
         )
         #expect(findings.count == 1)
@@ -87,7 +87,7 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.Unit {
     @Test
     func `Tagged generic-specialized dot init explicit callee with _unchecked is flagged`() {
         let source = "let id = Tagged<Tag, Int>.init(_unchecked: 0)"
-        let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(
+        let findings = `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests`.findings(
             in: source
         )
         #expect(findings.count == 1)
@@ -100,7 +100,7 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.Unit {
             let b = Tagged<TagB, Int>(_unchecked: 2)
             let c = Tagged<TagC, Int>(_unchecked: 3)
             """
-        let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(
+        let findings = `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests`.findings(
             in: source
         )
         #expect(findings.count == 3)
@@ -114,18 +114,18 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.Unit {
                 _ = x
             }
             """
-        let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(
+        let findings = `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests`.findings(
             in: source
         )
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`tagged unchecked with typed alternative Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests`.`Edge Case` {
     @Test
     func `Tagged without _unchecked is NOT flagged`() {
         let source = "let x: Tagged<Tag, Int> = 42"
-        let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(
+        let findings = `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests`.findings(
             in: source
         )
         #expect(findings.isEmpty)
@@ -134,7 +134,7 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.`Edge Case` 
     @Test
     func `non-Tagged callee with _unchecked is NOT flagged`() {
         let source = "let x = OtherWrapper(_unchecked: 0)"
-        let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(
+        let findings = `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests`.findings(
             in: source
         )
         #expect(findings.isEmpty)
@@ -149,7 +149,7 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.`Edge Case` 
                 }
             }
             """
-        let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(
+        let findings = `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests`.findings(
             in: source
         )
         #expect(findings.isEmpty)
@@ -158,7 +158,7 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.`Edge Case` 
     @Test
     func `Tagged with double-underscore __unchecked is NOT flagged`() {
         let source = "let x = Tagged<Tag, Int>(__unchecked: 42)"
-        let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(
+        let findings = `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests`.findings(
             in: source
         )
         #expect(findings.isEmpty)
@@ -166,14 +166,14 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.`Edge Case` 
 
     @Test
     func `empty file produces no findings`() {
-        let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(in: "")
+        let findings = `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests`.findings(in: "")
         #expect(findings.isEmpty)
     }
 
     @Test
     func `_unchecked in a string literal is NOT flagged`() {
         let source = "let s = \"Tagged<X, Y>(_unchecked: 0)\""
-        let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(
+        let findings = `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests`.findings(
             in: source
         )
         #expect(findings.isEmpty)
@@ -193,7 +193,7 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.`Edge Case` 
             /// ```
             public struct Marker {}
             """
-        let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(
+        let findings = `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests`.findings(
             in: source
         )
         #expect(findings.isEmpty)
@@ -211,7 +211,7 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.`Edge Case` 
                 }
             }
             """
-        let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(
+        let findings = `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests`.findings(
             in: source
         )
         #expect(findings.isEmpty)
@@ -229,7 +229,7 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.`Edge Case` 
                 }
             }
             """
-        let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(
+        let findings = `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests`.findings(
             in: source
         )
         #expect(findings.isEmpty)
@@ -244,7 +244,7 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.`Edge Case` 
                 _ = x
             }
             """
-        let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(
+        let findings = `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests`.findings(
             in: source
         )
         #expect(findings.isEmpty)
@@ -259,7 +259,7 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.`Edge Case` 
                 _ = x
             }
             """
-        let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(
+        let findings = `Lint.Rule Tests`.`tagged unchecked with typed alternative Tests`.findings(
             in: source
         )
         #expect(findings.isEmpty)

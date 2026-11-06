@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Naming
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `path name grammar Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`path name grammar Tests` {
+extension `Lint.Rule Tests`.`path name grammar Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String
@@ -36,13 +36,13 @@ extension Lint.Rule.`path name grammar Tests` {
     }
 }
 
-extension Lint.Rule.`path name grammar Tests`.Unit {
+extension `Lint.Rule Tests`.`path name grammar Tests`.Unit {
     // Positive control — the known real instance class: pre-split
     // institute-application's concatenated `InstituteArchitecture*`
     // directories (#65's cited fixture pair).
     @Test
     func `concatenated directory under Sources is flagged`() {
-        let findings = Lint.Rule.`path name grammar Tests`.findings(
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
             in: "struct Command {}",
             file: "Sources/InstituteArchitectureCLI/Command.swift"
         )
@@ -53,7 +53,7 @@ extension Lint.Rule.`path name grammar Tests`.Unit {
 
     @Test
     func `concatenated directory under Tests is flagged`() {
-        let findings = Lint.Rule.`path name grammar Tests`.findings(
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
             in: "struct Probe {}",
             file: "Tests/InstituteApplicationTests/Probe.swift"
         )
@@ -65,7 +65,7 @@ extension Lint.Rule.`path name grammar Tests`.Unit {
         // Passes [API-IMPL-006] (basename matches the nested path) and
         // never reaches [API-NAME-001] here (the compound outer type is
         // declared in another file) — this rule's residual class.
-        let findings = Lint.Rule.`path name grammar Tests`.findings(
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
             in: "extension InstituteArchitectureCLI { struct Command {} }",
             file: "Sources/Institute Application/InstituteArchitectureCLI.Command.swift"
         )
@@ -75,7 +75,7 @@ extension Lint.Rule.`path name grammar Tests`.Unit {
 
     @Test
     func `a repeated compound segment is reported once`() {
-        let findings = Lint.Rule.`path name grammar Tests`.findings(
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
             in: "extension PaymentMethods { struct PaymentMethods {} }",
             file: "Sources/Payments/PaymentMethods.PaymentMethods.swift"
         )
@@ -85,7 +85,7 @@ extension Lint.Rule.`path name grammar Tests`.Unit {
     // Negative controls — current correct spellings.
     @Test
     func `spaced directory and dotted basename are permitted`() {
-        let findings = Lint.Rule.`path name grammar Tests`.findings(
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
             in: "extension Institute { struct Application {} }",
             file: "Sources/Institute Application/Institute.Application.swift"
         )
@@ -94,7 +94,7 @@ extension Lint.Rule.`path name grammar Tests`.Unit {
 
     @Test
     func `spaced test target directory with Tests suffix is permitted`() {
-        let findings = Lint.Rule.`path name grammar Tests`.findings(
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
             in: "struct Probe {}",
             file: "Tests/Institute Linter Rule Naming Tests/Probe.swift"
         )
@@ -103,7 +103,7 @@ extension Lint.Rule.`path name grammar Tests`.Unit {
 
     @Test
     func `multi word spaced directory is permitted`() {
-        let findings = Lint.Rule.`path name grammar Tests`.findings(
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
             in: "struct CLI {}",
             file: "Sources/Institute Architecture CLI/CLI.swift"
         )
@@ -111,10 +111,10 @@ extension Lint.Rule.`path name grammar Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`path name grammar Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`path name grammar Tests`.`Edge Case` {
     @Test
     func `bare filename without a directory is out of surface`() {
-        let findings = Lint.Rule.`path name grammar Tests`.findings(
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
             in: "struct Fixture {}",
             file: "Fixture.swift"
         )
@@ -123,7 +123,7 @@ extension Lint.Rule.`path name grammar Tests`.`Edge Case` {
 
     @Test
     func `docc catalogue directory is exempt`() {
-        let findings = Lint.Rule.`path name grammar Tests`.findings(
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
             in: "struct Snippet {}",
             file: "Sources/Institute Application/InstituteApplication.docc/Snippet.swift"
         )
@@ -132,7 +132,7 @@ extension Lint.Rule.`path name grammar Tests`.`Edge Case` {
 
     @Test
     func `canonical dot snapshots directory is exempt`() {
-        let findings = Lint.Rule.`path name grammar Tests`.findings(
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
             in: "struct Fixture {}",
             file: "Tests/Institute Application Snapshot Tests/.snapshots/Fixture.swift"
         )
@@ -141,7 +141,7 @@ extension Lint.Rule.`path name grammar Tests`.`Edge Case` {
 
     @Test
     func `legacy snapshots directory is flagged`() {
-        let findings = Lint.Rule.`path name grammar Tests`.findings(
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
             in: "struct Fixture {}",
             file: "Tests/Institute Application Snapshot Tests/__Snapshots__/Fixture.swift"
         )
@@ -152,7 +152,7 @@ extension Lint.Rule.`path name grammar Tests`.`Edge Case` {
 
     @Test
     func `snapshot directory case near miss is flagged`() {
-        let findings = Lint.Rule.`path name grammar Tests`.findings(
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
             in: "struct Fixture {}",
             file: "Tests/Institute Application Snapshot Tests/.Snapshots/Fixture.swift"
         )
@@ -164,7 +164,7 @@ extension Lint.Rule.`path name grammar Tests`.`Edge Case` {
     func `nested test package path is covered after its Tests root`() {
         // Nested test packages live under Tests/ with their own manifest;
         // their target directories bind to the same grammar.
-        let findings = Lint.Rule.`path name grammar Tests`.findings(
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
             in: "struct Probe {}",
             file: "swift-example/Tests/ExampleSnapshotTests/Probe.swift"
         )
@@ -173,7 +173,7 @@ extension Lint.Rule.`path name grammar Tests`.`Edge Case` {
 
     @Test
     func `file outside Sources and Tests is out of surface`() {
-        let findings = Lint.Rule.`path name grammar Tests`.findings(
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
             in: "struct FooBar {}",
             file: "Plugins/BadPluginName/Plugin.swift"
         )
@@ -191,7 +191,7 @@ extension Lint.Rule.`path name grammar Tests`.`Edge Case` {
             }
             internal final class NamingExampleVisitor: SyntaxVisitor {}
             """
-        let findings = Lint.Rule.`path name grammar Tests`.findings(
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
             in: source,
             file: "Sources/Institute Linter Rule Naming/Lint.Rule.Naming.CompoundType.swift"
         )
@@ -202,7 +202,7 @@ extension Lint.Rule.`path name grammar Tests`.`Edge Case` {
     func `conformance suffix after plus is not policed`() {
         // The `+` suffix is [API-IMPL-007]'s surface; only the prefix
         // segments bind here.
-        let findings = Lint.Rule.`path name grammar Tests`.findings(
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
             in: "extension Array { struct Dynamic {} }",
             file: "Sources/Collections/Array.Dynamic+CustomStringConvertible.swift"
         )
@@ -211,7 +211,7 @@ extension Lint.Rule.`path name grammar Tests`.`Edge Case` {
 
     @Test
     func `brand token directory is exempt through the shared predicate`() {
-        let findings = Lint.Rule.`path name grammar Tests`.findings(
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
             in: "struct Client {}",
             file: "Sources/GitHub Client/Client.swift"
         )
@@ -223,7 +223,7 @@ extension Lint.Rule.`path name grammar Tests`.`Edge Case` {
     // basename's own segments are grammatical, so this rule stays silent.
     @Test
     func `mismatched but grammatical basename is 006's surface not this rule's`() {
-        let findings = Lint.Rule.`path name grammar Tests`.findings(
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
             in: "struct Right {}",
             file: "Sources/Institute Application/Wrong.swift"
         )
@@ -231,7 +231,7 @@ extension Lint.Rule.`path name grammar Tests`.`Edge Case` {
     }
 }
 
-extension Lint.Rule.`path name grammar Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`path name grammar Tests`.`Edge Case` {
     @Test
     func `a framework name is concatenated unless the rule is given it`() {
         let parsed = Lint.Source.parsed(from: "struct A {}", file: "Sources/Reader SwiftUI/A.swift")

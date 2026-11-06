@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Memory
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `safe attribute undocumented Tests` {
         @Suite struct Unit {}
@@ -31,7 +31,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`safe attribute undocumented Tests` {
+extension `Lint.Rule Tests`.`safe attribute undocumented Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "Sources/X/Test.swift"
@@ -50,7 +50,7 @@ extension Lint.Rule.`safe attribute undocumented Tests` {
 // is present. The disclosure can be a `// SAFETY:` / `// WHY:` line
 // block OR a `## Safety Invariant` doc-comment section.
 
-extension Lint.Rule.`safe attribute undocumented Tests`.`Admit with disclosure` {
+extension `Lint.Rule Tests`.`safe attribute undocumented Tests`.`Admit with disclosure` {
 
     @Test
     func `safe struct with WHY Category line is admitted`() {
@@ -63,7 +63,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Admit with disclosure` 
                 private let lock = Lock()
             }
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -81,7 +81,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Admit with disclosure` 
                 private let inner: Int
             }
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -100,7 +100,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Admit with disclosure` 
                 let buffer: UnsafePointer<UInt8>
             }
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -120,7 +120,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Admit with disclosure` 
                 private let _count: Int
             }
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -139,7 +139,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Admit with disclosure` 
                 private let inner: Int
             }
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -157,7 +157,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Admit with disclosure` 
                 private let storage: Int
             }
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -174,7 +174,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Admit with disclosure` 
                 private let raw: Int
             }
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -189,14 +189,14 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Admit with disclosure` 
                 private let raw: Int
             }
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }
 
 // MARK: - Fire without disclosure (finding emitted)
 
-extension Lint.Rule.`safe attribute undocumented Tests`.`Fire without disclosure` {
+extension `Lint.Rule Tests`.`safe attribute undocumented Tests`.`Fire without disclosure` {
 
     @Test
     func `safe struct with no comment fires`() {
@@ -206,7 +206,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Fire without disclosure
             @safe
             public struct Padded {}
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -222,7 +222,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Fire without disclosure
                 private let raw: Int
             }
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -237,7 +237,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Fire without disclosure
         // the whitespace-only line survives formatting.
         let source =
             "// SAFETY: Allocated once at init.\n  \n@safe\npublic struct Far {\n    private let raw: Int\n}"
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -252,7 +252,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Fire without disclosure
                 private let raw: Int
             }
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -269,7 +269,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Fire without disclosure
                 private let raw: Int
             }
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -283,7 +283,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Fire without disclosure
             @safe
             public struct B {}
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.count == 2)
     }
 }
@@ -294,7 +294,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Fire without disclosure
 // every declaration form SE-0458 permits, not just type declarations.
 // These tests confirm the inverted rule treats all decl kinds uniformly.
 
-extension Lint.Rule.`safe attribute undocumented Tests`.`Decl kinds` {
+extension `Lint.Rule Tests`.`safe attribute undocumented Tests`.`Decl kinds` {
 
     @Test
     func `safe class with disclosure is admitted`() {
@@ -303,7 +303,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Decl kinds` {
             @safe
             final class _Storage {}
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -314,7 +314,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Decl kinds` {
             @safe
             public actor Coordinator {}
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -328,7 +328,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Decl kinds` {
                 case empty
             }
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -342,7 +342,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Decl kinds` {
             @safe
             extension MyType: @unchecked Sendable {}
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -354,7 +354,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Decl kinds` {
             @safe
             func doWork() {}
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -366,7 +366,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Decl kinds` {
             @safe @usableFromInline
             nonisolated(unsafe) let _sentinel: Int = 0
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -381,7 +381,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Decl kinds` {
                 init() {}
             }
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -395,7 +395,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Decl kinds` {
                 subscript(index: Int) -> Int { 0 }
             }
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -407,7 +407,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Decl kinds` {
             @safe
             func doWork() {}
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -417,7 +417,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Decl kinds` {
             @safe @usableFromInline
             nonisolated(unsafe) let _sentinel: Int = 0
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -431,7 +431,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Decl kinds` {
             @safe
             public protocol Coordinating {}
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -441,7 +441,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Decl kinds` {
             @safe
             public protocol Coordinating {}
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -454,7 +454,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Decl kinds` {
                 deinit {}
             }
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -466,7 +466,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Decl kinds` {
                 deinit {}
             }
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -477,7 +477,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Decl kinds` {
             @safe
             public typealias RawToken = Int
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -487,7 +487,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Decl kinds` {
             @safe
             public typealias RawToken = Int
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -500,7 +500,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Decl kinds` {
                 associatedtype Token
             }
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -512,14 +512,14 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Decl kinds` {
                 associatedtype Token
             }
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
 // MARK: - Adjacency edge cases (trivia walker behavior)
 
-extension Lint.Rule.`safe attribute undocumented Tests`.`Adjacency edges` {
+extension `Lint.Rule Tests`.`safe attribute undocumented Tests`.`Adjacency edges` {
 
     @Test
     func `no safe attribute is not flagged`() {
@@ -529,7 +529,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Adjacency edges` {
             final class _Storage {}
             nonisolated(unsafe) let _sentinel: Int = 0
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -541,7 +541,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Adjacency edges` {
             @unsafe
             public func raw() -> Int { 0 }
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -558,12 +558,12 @@ extension Lint.Rule.`safe attribute undocumented Tests`.`Adjacency edges` {
                 private let raw: Int
             }
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`safe attribute undocumented Tests`.Scope {
+extension `Lint.Rule Tests`.`safe attribute undocumented Tests`.Scope {
     @Test
     func `safe struct with no disclosure outside Sources is NOT flagged`() {
         // The header doc and the message both assert this rule applies to
@@ -573,7 +573,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.Scope {
             @safe
             public struct Padded {}
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(
             in: source,
             file: "Tests/X/Fixture.swift"
         )
@@ -586,7 +586,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.Scope {
             @safe
             public struct Padded {}
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(
             in: source,
             file: "Packages/Foo/Sources/Foo/Padded.swift"
         )
@@ -599,7 +599,7 @@ extension Lint.Rule.`safe attribute undocumented Tests`.Scope {
             @safe
             public struct Padded {}
             """
-        let findings = Lint.Rule.`safe attribute undocumented Tests`.findings(
+        let findings = `Lint.Rule Tests`.`safe attribute undocumented Tests`.findings(
             in: source,
             file: "script.swift"
         )

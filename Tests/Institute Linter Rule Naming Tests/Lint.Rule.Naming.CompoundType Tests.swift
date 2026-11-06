@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Naming
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `compound type name Tests` {
         @Suite struct Unit {}
@@ -26,18 +26,18 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`compound type name Tests` {
+extension `Lint.Rule Tests`.`compound type name Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`compound type name`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`compound type name Tests`.Unit {
+extension `Lint.Rule Tests`.`compound type name Tests`.Unit {
     @Test
     func `struct FooBar is flagged`() {
         let source = "struct FooBar {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         let count = findings.count
         #expect(count == 1)
         if count == 1 {
@@ -53,7 +53,7 @@ extension Lint.Rule.`compound type name Tests`.Unit {
                 enum MalformedRule {}
             }
             """
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.count == 1)
         #expect(findings.first?.identifier == "compound type name")
     }
@@ -61,28 +61,28 @@ extension Lint.Rule.`compound type name Tests`.Unit {
     @Test
     func `enum FileDirectoryWalk is flagged`() {
         let source = "enum FileDirectoryWalk {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `class DirectoryWalk is flagged`() {
         let source = "class DirectoryWalk {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `actor NonBlockingSelector is flagged`() {
         let source = "actor NonBlockingSelector {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `protocol IteratorProtocol is flagged`() {
         let source = "protocol IteratorProtocol {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -90,14 +90,14 @@ extension Lint.Rule.`compound type name Tests`.Unit {
     func `acronym-prefix IOError is flagged`() {
         // Acronym (IO) followed by a CamelCase word (Error) is a compound.
         let source = "struct IOError {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `acronym-prefix URLPath is flagged`() {
         let source = "struct URLPath {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -108,44 +108,44 @@ extension Lint.Rule.`compound type name Tests`.Unit {
             enum FileSystem {}
             class HTTPClient {}
             """
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.count == 3)
     }
 }
 
-extension Lint.Rule.`compound type name Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`compound type name Tests`.`Edge Case` {
     @Test
     func `single-word struct Foo is NOT flagged`() {
         let source = "struct Foo {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `single-word enum Walk is NOT flagged`() {
         let source = "enum Walk {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `acronym URL is NOT flagged`() {
         let source = "struct URL {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `acronym UUID is NOT flagged`() {
         let source = "struct UUID {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `short acronym IO is NOT flagged`() {
         let source = "enum IO {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -155,28 +155,28 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
     @Test
     func `stdlib-mirror AllSatisfy type is NOT flagged`() {
         let source = "enum AllSatisfy {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `spec namespace RFC_4122 is NOT flagged`() {
         let source = "enum RFC_4122 {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `spec namespace ISO_9945 is NOT flagged`() {
         let source = "enum ISO_9945 {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `package-scoped FooBar is NOT flagged`() {
         let source = "package struct FooBar {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -188,7 +188,7 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
                 struct InnerType {}
             }
             """
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -201,7 +201,7 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
         // underscore too — exempted. Document the limitation as edge case;
         // a follow-up could special-case leading underscore.
         let source = "struct _BoxStorage {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         // Documented behavior: leading-underscore SPI types are not flagged.
         #expect(findings.isEmpty)
     }
@@ -209,7 +209,7 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
     @Test
     func `single uppercase F is NOT flagged`() {
         let source = "struct F {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -221,7 +221,7 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
                 func walk() {}
             }
             """
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -233,7 +233,7 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
         // CamelCase API reference. The `Naming.isBackticked` exemption
         // short-circuits before the predicate scans for word boundaries.
         let source = "struct `Sequence FlatMap Tests` {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -244,7 +244,7 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
         // if word-boundary logic would normally split it, the
         // backtick exemption applies.
         let source = "struct `Edge Case` {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -253,7 +253,7 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
         // Regression guard: the backtick exemption MUST NOT
         // short-circuit non-backticked CamelCase type names.
         let source = "struct FileDirectoryWalk {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -266,14 +266,14 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
         // Private decls have no consumer-observable surface even within
         // the module — symmetric with [API-NAME-002] (2026-05-11).
         let source = "private enum UserCount {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `fileprivate struct FooBar is NOT flagged`() {
         let source = "fileprivate struct FooBar {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -287,7 +287,7 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
                 struct InnerType {}
             }
             """
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -296,7 +296,7 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
         // Regression guard: the visibility-scope exemption MUST NOT
         // short-circuit non-private CamelCase type decls.
         let source = "public struct FileDirectoryWalk {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -315,7 +315,7 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
                 public enum ForEach {}
             }
             """
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -325,14 +325,14 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
         // the citation dict. An arbitrary compound type name like
         // `MapReduce` (not in dict) still fires.
         let source = "public struct MapReduce {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
 // #16 Option C ledger, Entries III.a/III.b (DECISION 2026-07-23): brand
 // tokens whose internal capitals are brand/spec orthography.
-extension Lint.Rule.`compound type name Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`compound type name Tests`.`Edge Case` {
     @Test
     func `brand token OAuth is NOT flagged`() {
         // The swift-github-http `GitHub.HTTP.OAuth` shape (759330b seed).
@@ -341,7 +341,7 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
                 public enum OAuth: Sendable {}
             }
             """
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -353,14 +353,14 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
                 public struct GitHub: Sendable {}
             }
             """
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `brand token IPv4 is NOT flagged`() {
         let source = "public enum IPv4 {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -368,7 +368,7 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
     func `brand-token-prefixed compound is still flagged`() {
         // Exact-match only: `GitHubClient` is a genuine compound.
         let source = "public struct GitHubClient {}"
-        let findings = Lint.Rule.`compound type name Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
@@ -376,11 +376,11 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
 // Scan-scope gate, symmetric with `compound identifier` — a SwiftPM
 // manifest is build configuration, not API surface. Ruled
 // swift-institute/.github#90 comment 5150641576 item 1(a).
-extension Lint.Rule.`compound type name Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`compound type name Tests`.`Edge Case` {
     @Test
     func `bare Package swift filename is out of scan scope`() {
         // Bare-filename positive control.
-        let findings = Lint.Rule.`compound type name Tests`.findings(
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(
             in: "struct FooBar {}",
             file: "Package.swift"
         )
@@ -389,7 +389,7 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
 
     @Test
     func `nested Package swift path is out of scan scope`() {
-        let findings = Lint.Rule.`compound type name Tests`.findings(
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(
             in: "struct FooBar {}",
             file: "Tests/Fixtures/Package.swift"
         )
@@ -398,7 +398,7 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
 
     @Test
     func `version-specific Package at swift manifest is out of scan scope`() {
-        let findings = Lint.Rule.`compound type name Tests`.findings(
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(
             in: "struct FooBar {}",
             file: "Package@swift-6.3.swift"
         )
@@ -407,7 +407,7 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
 
     @Test
     func `the same source in an ordinary file is still flagged`() {
-        let findings = Lint.Rule.`compound type name Tests`.findings(
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(
             in: "struct FooBar {}",
             file: "Sources/Core/FooBar.swift"
         )
@@ -416,7 +416,7 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
 
     @Test
     func `PackageInfo swift is NOT treated as a manifest`() {
-        let findings = Lint.Rule.`compound type name Tests`.findings(
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(
             in: "struct FooBar {}",
             file: "Sources/Core/PackageInfo.swift"
         )
@@ -425,7 +425,7 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
 
     @Test
     func `a directory segment named Package swift does NOT gate the file`() {
-        let findings = Lint.Rule.`compound type name Tests`.findings(
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(
             in: "struct FooBar {}",
             file: "Sources/Package.swift/FooBar.swift"
         )
@@ -433,7 +433,7 @@ extension Lint.Rule.`compound type name Tests`.`Edge Case` {
     }
 }
 
-extension Lint.Rule.`compound type name Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`compound type name Tests`.`Edge Case` {
     @Test
     func `a framework name is compound unless the rule is given it`() {
         let parsed = Lint.Source.parsed(from: "public enum SwiftUI {}", file: "Sources/Core/SwiftUI.swift")

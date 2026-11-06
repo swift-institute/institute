@@ -7,14 +7,16 @@ import Testing
 
 /// The controls of the stale-binary refusal: a published binary at or after
 /// the pin passes; older, unpublished and tampered binaries are refused.
-extension Institute.Planner.Freshness {
+enum `Institute.Planner.Freshness Tests` {}
+
+extension `Institute.Planner.Freshness Tests` {
     @Suite struct Test {
         @Suite struct Unit {}
         @Suite struct `Edge Case` {}
     }
 }
 
-extension Institute.Planner.Freshness.Test {
+extension `Institute.Planner.Freshness Tests`.Test {
     /// A consumer pinned to the current revision, whose release also carries
     /// an older publication and a newer main-branch descendant.
     struct Scenario {
@@ -57,23 +59,23 @@ extension Institute.Planner.Freshness.Test {
     }
 }
 
-extension Institute.Planner.Freshness.Test.Unit {
+extension `Institute.Planner.Freshness Tests`.Test.Unit {
     @Test func `the pinned published binary is current`() {
-        let scenario = Institute.Planner.Freshness.Test.Scenario()
+        let scenario = `Institute.Planner.Freshness Tests`.Test.Scenario()
         #expect(scenario.refusal(running: scenario.binary(scenario.pinned)) == nil)
     }
 
     @Test func `a newer published main branch candidate is current`() {
-        let scenario = Institute.Planner.Freshness.Test.Scenario()
+        let scenario = `Institute.Planner.Freshness Tests`.Test.Scenario()
         #expect(scenario.refusal(running: scenario.binary(scenario.newer)) == nil)
     }
 }
 
-extension Institute.Planner.Freshness.Test.`Edge Case` {
+extension `Institute.Planner.Freshness Tests`.Test.`Edge Case` {
     /// The control that makes the refusal fire: the binary of an older
     /// published revision, against a pin that has moved on.
     @Test func `an older published binary is refused`() {
-        let scenario = Institute.Planner.Freshness.Test.Scenario()
+        let scenario = `Institute.Planner.Freshness Tests`.Test.Scenario()
         let refusal = scenario.refusal(running: scenario.binary(scenario.older))
         guard case .stale(_, let revision, let platform)? = refusal else {
             Issue.record("expected a stale refusal, got \(String(describing: refusal))")
@@ -85,7 +87,7 @@ extension Institute.Planner.Freshness.Test.`Edge Case` {
     }
 
     @Test func `a newer publication without main ancestry is refused`() {
-        var scenario = Institute.Planner.Freshness.Test.Scenario()
+        var scenario = `Institute.Planner.Freshness Tests`.Test.Scenario()
         scenario.fixture.assets[
             "ANCESTORS-\(Institute.Planner.Fixture.candidate)-300"
         ] = nil
@@ -94,13 +96,13 @@ extension Institute.Planner.Freshness.Test.`Edge Case` {
     }
 
     @Test func `an unpublished binary is refused and names the install command`() {
-        let scenario = Institute.Planner.Freshness.Test.Scenario()
+        let scenario = `Institute.Planner.Freshness Tests`.Test.Scenario()
         let refusal = scenario.refusal(running: [Byte](utf8: "a local build"))
         #expect(refusal?.description.contains("`institute install`") == true)
     }
 
     @Test func `a tampered published binary is refused and names the install command`() {
-        let scenario = Institute.Planner.Freshness.Test.Scenario()
+        let scenario = `Institute.Planner.Freshness Tests`.Test.Scenario()
         var tampered = scenario.binary(scenario.newer)
         tampered += [Byte](utf8: "tampered")
         let refusal = scenario.refusal(running: tampered)
@@ -108,7 +110,7 @@ extension Institute.Planner.Freshness.Test.`Edge Case` {
     }
 
     @Test func `a pin without a row for the platform is refused`() {
-        var scenario = Institute.Planner.Freshness.Test.Scenario()
+        var scenario = `Institute.Planner.Freshness Tests`.Test.Scenario()
         scenario.fixture.adopt(
             Institute.Planner.Fixture.current,
             rows: scenario.pinned.filter { !$0.contains(" macos-arm64 ") }
@@ -124,7 +126,7 @@ extension Institute.Planner.Freshness.Test.`Edge Case` {
     }
 }
 
-extension Institute.Planner.Freshness.Test {
+extension `Institute.Planner.Freshness Tests`.Test {
     func replaced(_ scenario: Scenario, running: [Byte], installed: Bool) throws(Institute.Planner.Error) -> Bool {
         try Institute.Planner.Freshness.replaced(
             running: FIPS_180_4.SHA256.digest(running),

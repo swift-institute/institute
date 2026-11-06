@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_RawValue
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `tagged extension public init Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`tagged extension public init Tests` {
+extension `Lint.Rule Tests`.`tagged extension public init Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "Sources/X/Test.swift"
@@ -52,7 +52,7 @@ extension Lint.Rule.`tagged extension public init Tests` {
     }
 }
 
-extension Lint.Rule.`tagged extension public init Tests`.Unit {
+extension `Lint.Rule Tests`.`tagged extension public init Tests`.Unit {
     @Test
     func `extension on bare Tagged with public init is flagged`() {
         let source = """
@@ -60,7 +60,7 @@ extension Lint.Rule.`tagged extension public init Tests`.Unit {
                 public init(rawValue: String) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "tagged extension public init")
@@ -81,7 +81,7 @@ extension Lint.Rule.`tagged extension public init Tests`.Unit {
             }
             """
         // swiftlint:enable no_tag_suffix_phantom
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -92,7 +92,7 @@ extension Lint.Rule.`tagged extension public init Tests`.Unit {
                 init(rawValue: String) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -103,7 +103,7 @@ extension Lint.Rule.`tagged extension public init Tests`.Unit {
                 public init(rawValue: String) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -115,7 +115,7 @@ extension Lint.Rule.`tagged extension public init Tests`.Unit {
                 public init(value: Int) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.count == 2)
     }
 
@@ -126,12 +126,12 @@ extension Lint.Rule.`tagged extension public init Tests`.Unit {
                 public func foo() {}
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`tagged extension public init Tests`.`Edge Case` {
     @Test
     func `extension on qualified Tagging Tagged is flagged`() {
         let source = """
@@ -139,7 +139,7 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
                 public init(_ s: String) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -156,7 +156,7 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
                 public init(_ s: String) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -167,7 +167,7 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
                 public init(_ s: String) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -187,7 +187,7 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
                 public init(integerLiteral value: Int) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -198,7 +198,7 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
                 public init(from decoder: any Decoder) throws { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -209,7 +209,7 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
                 public init?(rawValue: String) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -235,7 +235,7 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
                 public init(value: Int) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -246,7 +246,7 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
                 public init(_ s: String) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -258,7 +258,7 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
                 public init(_ int: Int) throws(Cardinal.Error) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         // Free generic Tag has no specific owner at which a per-tag
         // validation gate could live. The Underlying binding (==
         // Cardinal) signals "domain extension on Underlying axis",
@@ -275,7 +275,7 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
                 public init(_ index: Tagged<Tag, Ordinal>) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -286,7 +286,7 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
                 public init(_ raw: Cardinal) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         // Tag is bound to a concrete (MySpecificTag) so a per-tag
         // validation gate IS expressible here — the rule's intent
         // applies and the init should still fire.
@@ -305,7 +305,7 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
                 public init(_ s: String) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -319,7 +319,7 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
                 init(rawValue: String) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -330,7 +330,7 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
                 internal init(rawValue: String) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -349,7 +349,7 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
                 public init(rawValue: String) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -360,7 +360,7 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
                 public init(raw: RawValue) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(in: source)
         // No Underlying binding signals no domain intent. Both axes
         // are free generically, but the absence of Underlying ==
         // signals this is not a deliberate domain bridge — the rule
@@ -375,7 +375,7 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
                 public init(rawValue: String) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(
             in: source,
             types: ["Cardinal"]
         )
@@ -389,7 +389,7 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
                 public init(rawValue: String) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`tagged extension public init Tests`.findings(
+        let findings = `Lint.Rule Tests`.`tagged extension public init Tests`.findings(
             in: source,
             types: ["SomeConsumerType"]
         )

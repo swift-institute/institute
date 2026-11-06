@@ -17,7 +17,9 @@ import Testing
 
 @testable import Institute_Linter_Rule_Architecture
 
-extension Lint.Rule {
+enum `Lint.Rule Tests` {}
+
+extension `Lint.Rule Tests` {
     @Suite
     struct `architecture namespace shape Tests` {
         @Suite struct Unit {}
@@ -26,7 +28,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`architecture namespace shape Tests` {
+extension `Lint.Rule Tests`.`architecture namespace shape Tests` {
     static func findings(
         in source: String,
         file: String = "Sources/Model Core/Model.swift"

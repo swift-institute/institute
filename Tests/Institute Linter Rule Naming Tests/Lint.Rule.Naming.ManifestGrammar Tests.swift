@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Naming
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `manifest naming grammar Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`manifest naming grammar Tests` {
+extension `Lint.Rule Tests`.`manifest naming grammar Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "Package.swift"
@@ -36,7 +36,7 @@ extension Lint.Rule.`manifest naming grammar Tests` {
     }
 }
 
-extension Lint.Rule.`manifest naming grammar Tests`.Unit {
+extension `Lint.Rule Tests`.`manifest naming grammar Tests`.Unit {
     // Positive control — the known real instance class: the pre-split
     // institute-application head declared concatenated
     // `InstituteArchitecture*` target names (#65's cited fixture pair).
@@ -50,7 +50,7 @@ extension Lint.Rule.`manifest naming grammar Tests`.Unit {
               ]
             )
             """
-        let findings = Lint.Rule.`manifest naming grammar Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`manifest naming grammar Tests`.findings(in: source)
         #expect(findings.count == 1)
         #expect(findings.first?.identifier == "manifest naming grammar")
         #expect(findings.first?.message.contains("InstituteArchitectureCLI") == true)
@@ -66,7 +66,7 @@ extension Lint.Rule.`manifest naming grammar Tests`.Unit {
               ]
             )
             """
-        let findings = Lint.Rule.`manifest naming grammar Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`manifest naming grammar Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -76,7 +76,7 @@ extension Lint.Rule.`manifest naming grammar Tests`.Unit {
             let source = """
                 let package = Package(name: "\(bad)")
                 """
-            let findings = Lint.Rule.`manifest naming grammar Tests`.findings(in: source)
+            let findings = `Lint.Rule Tests`.`manifest naming grammar Tests`.findings(in: source)
             #expect(findings.count == 1, "expected slug finding for '\(bad)'")
         }
     }
@@ -91,7 +91,7 @@ extension Lint.Rule.`manifest naming grammar Tests`.Unit {
               ]
             )
             """
-        let findings = Lint.Rule.`manifest naming grammar Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`manifest naming grammar Tests`.findings(in: source)
         #expect(findings.count == 1)
         #expect(
             findings.first?.message.contains("differs from the target name only by spacing") == true
@@ -117,7 +117,7 @@ extension Lint.Rule.`manifest naming grammar Tests`.Unit {
               ]
             )
             """
-        let findings = Lint.Rule.`manifest naming grammar Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`manifest naming grammar Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -132,12 +132,12 @@ extension Lint.Rule.`manifest naming grammar Tests`.Unit {
               ]
             )
             """
-        let findings = Lint.Rule.`manifest naming grammar Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`manifest naming grammar Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`manifest naming grammar Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`manifest naming grammar Tests`.`Edge Case` {
     @Test
     func `third party dependency names are not policed`() {
         // `.product(name:package:)` and `.package(url:)` name what the
@@ -158,7 +158,7 @@ extension Lint.Rule.`manifest naming grammar Tests`.`Edge Case` {
               ]
             )
             """
-        let findings = Lint.Rule.`manifest naming grammar Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`manifest naming grammar Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -175,7 +175,7 @@ extension Lint.Rule.`manifest naming grammar Tests`.`Edge Case` {
               ]
             )
             """
-        let findings = Lint.Rule.`manifest naming grammar Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`manifest naming grammar Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -189,7 +189,7 @@ extension Lint.Rule.`manifest naming grammar Tests`.`Edge Case` {
               ]
             )
             """
-        let findings = Lint.Rule.`manifest naming grammar Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`manifest naming grammar Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -198,7 +198,7 @@ extension Lint.Rule.`manifest naming grammar Tests`.`Edge Case` {
         let source = """
             let package = Package(name: "testing")
             """
-        let findings = Lint.Rule.`manifest naming grammar Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`manifest naming grammar Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -207,7 +207,7 @@ extension Lint.Rule.`manifest naming grammar Tests`.`Edge Case` {
         let source = """
             let package = Package(name: "NotAManifest", targets: [.target(name: "FooBar")])
             """
-        let findings = Lint.Rule.`manifest naming grammar Tests`.findings(
+        let findings = `Lint.Rule Tests`.`manifest naming grammar Tests`.findings(
             in: source,
             file: "Sources/App/Builder.swift"
         )
@@ -219,7 +219,7 @@ extension Lint.Rule.`manifest naming grammar Tests`.`Edge Case` {
         let source = """
             let package = Package(name: "Bad_Name")
             """
-        let findings = Lint.Rule.`manifest naming grammar Tests`.findings(
+        let findings = `Lint.Rule Tests`.`manifest naming grammar Tests`.findings(
             in: source,
             file: "Package@swift-6.2.swift"
         )
@@ -237,7 +237,7 @@ extension Lint.Rule.`manifest naming grammar Tests`.`Edge Case` {
               ]
             )
             """
-        let findings = Lint.Rule.`manifest naming grammar Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`manifest naming grammar Tests`.findings(in: source)
         #expect(findings.count == 1)
         #expect(findings.first?.message.contains("'ArchitectureCLI'") == true)
     }
@@ -252,7 +252,7 @@ extension Lint.Rule.`manifest naming grammar Tests`.`Edge Case` {
               ]
             )
             """
-        let findings = Lint.Rule.`manifest naming grammar Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`manifest naming grammar Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -272,7 +272,7 @@ extension Lint.Rule.`manifest naming grammar Tests`.`Edge Case` {
               ]
             )
             """
-        let findings = Lint.Rule.`manifest naming grammar Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`manifest naming grammar Tests`.findings(in: source)
         #expect(findings.count == 1)
         #expect(findings.first?.message.contains("CImageMagickShim") == true)
     }
@@ -288,7 +288,7 @@ extension Lint.Rule.`manifest naming grammar Tests`.`Edge Case` {
               ]
             )
             """
-        let findings = Lint.Rule.`manifest naming grammar Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`manifest naming grammar Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -307,7 +307,7 @@ extension Lint.Rule.`manifest naming grammar Tests`.`Edge Case` {
               ]
             )
             """
-        let findings = Lint.Rule.`manifest naming grammar Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`manifest naming grammar Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -323,13 +323,13 @@ extension Lint.Rule.`manifest naming grammar Tests`.`Edge Case` {
               ]
             )
             """
-        let findings = Lint.Rule.`manifest naming grammar Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`manifest naming grammar Tests`.findings(in: source)
         #expect(findings.count == 1)
         #expect(findings.first?.message.contains("ImageMagickShims") == true)
     }
 }
 
-extension Lint.Rule.`manifest naming grammar Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`manifest naming grammar Tests`.`Edge Case` {
     @Test
     func `a framework name is concatenated unless the rule is given it`() {
         let parsed = Lint.Source.parsed(

@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Platform
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `typealiased namespace bridge Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`typealiased namespace bridge Tests` {
+extension `Lint.Rule Tests`.`typealiased namespace bridge Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -39,7 +39,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests` {
     }
 }
 
-extension Lint.Rule.`typealiased namespace bridge Tests`.Unit {
+extension `Lint.Rule Tests`.`typealiased namespace bridge Tests`.Unit {
     @Test
     func `cross-module typealias keeping leaf name is flagged`() {
         let source = """
@@ -49,7 +49,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.Unit {
             """
         let rule = Lint.Rule.`typealiased namespace bridge`
         #expect(rule.severity.default == .note)
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "typealiased namespace bridge")
@@ -62,7 +62,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.Unit {
         let source = """
             typealias Socket = Foundation.Socket
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -71,18 +71,18 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.Unit {
         let source = """
             typealias Descriptor = A.B.C.D.Descriptor
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`typealiased namespace bridge Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`typealiased namespace bridge Tests`.`Edge Case` {
     @Test
     func `typealias with different LHS-RHS leaf names is NOT flagged`() {
         let source = """
             typealias Storage = Internal.Buffer
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -91,7 +91,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.`Edge Case` {
         let source = """
             typealias Foo = Int
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -100,7 +100,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.`Edge Case` {
         let source = """
             typealias Bytes = Array<UInt8>
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -118,7 +118,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.`Edge Case` {
         // This DOES match the pattern (leaf names equal). Rule flags it
         // — correctly, because consumers calling `Holder.Foo.X` would
         // resolve through to `OtherType.Foo.X`.
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -131,7 +131,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.`Edge Case` {
                 typealias Mode = Other.Different
             }
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         // First two flagged (leaf match), third not (different leaf).
         #expect(findings.count == 2)
     }
@@ -151,7 +151,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.`Edge Case` {
                 typealias Index = Underlying.Index
             }
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -164,7 +164,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.`Edge Case` {
                 typealias Index = Underlying.Index
             }
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -197,7 +197,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.`Edge Case` {
                 public typealias Element = Base.Element
             }
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -218,7 +218,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.`Edge Case` {
                 typealias Element = Underlying.Element
             }
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -233,7 +233,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.`Edge Case` {
                 typealias Default = Array.Element
             }
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -257,7 +257,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.`Edge Case` {
                 typealias Element = Underlying.Element
             }
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -277,7 +277,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.`Edge Case` {
                 typealias Kernel = Foreign.Kernel
             }
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -288,7 +288,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.`Edge Case` {
                 typealias Kernel = Foreign.Kernel
             }
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -301,7 +301,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.`Edge Case` {
                 typealias Kernel = Foreign.Kernel
             }
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -312,7 +312,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.`Edge Case` {
                 typealias Kernel = Foreign.Kernel
             }
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -323,7 +323,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.`Edge Case` {
                 typealias Kernel = Foreign.Kernel
             }
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -335,7 +335,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.`Edge Case` {
                 typealias Kernel = Foreign.Kernel
             }
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -347,7 +347,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.`Edge Case` {
                 typealias Kernel = Foreign.Kernel
             }
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -358,7 +358,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.`Edge Case` {
                 typealias Kernel = Foreign.Kernel
             }
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -369,7 +369,7 @@ extension Lint.Rule.`typealiased namespace bridge Tests`.`Edge Case` {
                 typealias Kernel = Foreign.Kernel
             }
             """
-        let findings = Lint.Rule.`typealiased namespace bridge Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`typealiased namespace bridge Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }

@@ -9,7 +9,9 @@ import Testing
 
 @testable import Institute_Planner
 
-extension Institute.Planner.Adoption {
+enum `Institute.Planner.Adoption Tests` {}
+
+extension `Institute.Planner.Adoption Tests` {
     @Suite struct Test {
         @Suite struct Unit {}
         @Suite struct `Edge Case` {}
@@ -17,7 +19,7 @@ extension Institute.Planner.Adoption {
     }
 }
 
-extension Institute.Planner.Adoption.Test {
+extension `Institute.Planner.Adoption Tests`.Test {
     /// A consumer on the current planner (run 100) and a release that also
     /// carries the candidate (run 200).
     struct Scenario {
@@ -86,9 +88,9 @@ extension Institute.Planner.Adoption.Test {
     }
 }
 
-extension Institute.Planner.Adoption.Test.Unit {
+extension `Institute.Planner.Adoption Tests`.Test.Unit {
     @Test func `adoption appends the PIN lines verbatim and pins the revision, keeping comments`() throws {
-        let scenario = Institute.Planner.Adoption.Test.Scenario()
+        let scenario = `Institute.Planner.Adoption Tests`.Test.Scenario()
         let adoption = try scenario.adoption(scenario.evidence())
 
         #expect(adoption.pin == Institute.Planner.Fixture.pin(Institute.Planner.Fixture.candidate))
@@ -102,7 +104,7 @@ extension Institute.Planner.Adoption.Test.Unit {
     }
 
     @Test func `a ledger without a trailing newline gains one before the appended rows`() throws {
-        var scenario = Institute.Planner.Adoption.Test.Scenario()
+        var scenario = `Institute.Planner.Adoption Tests`.Test.Scenario()
         scenario.fixture.files[Institute.Planner.Consumer.ledger] = [Byte](
             utf8: Institute.Planner.Fixture.ledger(scenario.current).dropLast().description
         )
@@ -111,16 +113,16 @@ extension Institute.Planner.Adoption.Test.Unit {
     }
 
     @Test func `evidence round-trips through its JSON`() throws {
-        let evidence = Institute.Planner.Adoption.Test.Scenario().evidence()
+        let evidence = `Institute.Planner.Adoption Tests`.Test.Scenario().evidence()
         let decoded = try Institute.Planner.Evidence(jsonString: evidence.jsonString(pretty: true, sortKeys: true))
         #expect(decoded == evidence)
     }
 }
 
-extension Institute.Planner.Adoption.Test.`Edge Case` {
+extension `Institute.Planner.Adoption Tests`.Test.`Edge Case` {
     @Test(arguments: [Institute.Planner.Canary.Verdict.differs, .refused])
     func `evidence that is not adoptable is refused`(verdict: Institute.Planner.Canary.Verdict) {
-        let scenario = Institute.Planner.Adoption.Test.Scenario()
+        let scenario = `Institute.Planner.Adoption Tests`.Test.Scenario()
         guard case .evidence = scenario.refusal(scenario.evidence(verdict: verdict)) else {
             Issue.record("expected an evidence refusal for \(verdict)")
             return
@@ -128,7 +130,7 @@ extension Institute.Planner.Adoption.Test.`Edge Case` {
     }
 
     @Test func `evidence for another publish run is refused`() {
-        let scenario = Institute.Planner.Adoption.Test.Scenario()
+        let scenario = `Institute.Planner.Adoption Tests`.Test.Scenario()
         #expect(
             scenario.refusal(scenario.evidence(run: "199"))
                 == .evidence("the evidence is for publish run 199, not 200")
@@ -136,7 +138,7 @@ extension Institute.Planner.Adoption.Test.`Edge Case` {
     }
 
     @Test func `evidence whose PIN lines differ from the release's is refused`() {
-        let scenario = Institute.Planner.Adoption.Test.Scenario()
+        let scenario = `Institute.Planner.Adoption Tests`.Test.Scenario()
         guard case .evidence = scenario.refusal(scenario.evidence(rows: [scenario.candidate[0]])) else {
             Issue.record("expected an evidence refusal")
             return
@@ -144,7 +146,7 @@ extension Institute.Planner.Adoption.Test.`Edge Case` {
     }
 
     @Test func `evidence for another revision is refused`() {
-        let scenario = Institute.Planner.Adoption.Test.Scenario()
+        let scenario = `Institute.Planner.Adoption Tests`.Test.Scenario()
         guard case .evidence = scenario.refusal(scenario.evidence(revision: Institute.Planner.Fixture.current)) else {
             Issue.record("expected an evidence refusal")
             return
@@ -152,7 +154,7 @@ extension Institute.Planner.Adoption.Test.`Edge Case` {
     }
 
     @Test func `an adoption whose candidate binary is gone fails the contract`() throws {
-        var scenario = Institute.Planner.Adoption.Test.Scenario()
+        var scenario = `Institute.Planner.Adoption Tests`.Test.Scenario()
         let row = try Institute.Planner.Row(line: scenario.candidate[0])
         scenario.fixture.assets["institute-linux-x86_64-\(row.binary.hex)"] = nil
         #expect(
@@ -162,7 +164,7 @@ extension Institute.Planner.Adoption.Test.`Edge Case` {
     }
 
     @Test func `evidence whose verdict was edited does not decode`() throws {
-        let scenario = Institute.Planner.Adoption.Test.Scenario()
+        let scenario = `Institute.Planner.Adoption Tests`.Test.Scenario()
         var evidence = scenario.evidence(verdict: .differs).json
         let comparison = Institute.Planner.Canary.Comparison(
             repository: "swift-atoms/swift-addition",
@@ -187,9 +189,9 @@ extension Institute.Planner.Adoption.Test.`Edge Case` {
     }
 }
 
-extension Institute.Planner.Adoption.Test.Integration {
+extension `Institute.Planner.Adoption Tests`.Test.Integration {
     /// A consumer checkout on `main` holding the current files in one commit.
-    static func checkout(_ scenario: Institute.Planner.Adoption.Test.Scenario) throws -> Swift.String {
+    static func checkout(_ scenario: `Institute.Planner.Adoption Tests`.Test.Scenario) throws -> Swift.String {
         let anchor = try File.Path.Temporary.deterministic(prefix: "institute-planner-adopt", key: "", suffix: "")
         let root = try File.Path.Temporary.sibling(of: anchor, prefix: "institute-planner-adopt-").description
         let git = Git.Client()
@@ -209,7 +211,7 @@ extension Institute.Planner.Adoption.Test.Integration {
     }
 
     @Test func `recording commits exactly the two files once and pushes nothing`() throws {
-        let scenario = Institute.Planner.Adoption.Test.Scenario()
+        let scenario = `Institute.Planner.Adoption Tests`.Test.Scenario()
         let root = try Self.checkout(scenario)
         defer {
             // swift-linter:disable:next try optional
@@ -235,7 +237,7 @@ extension Institute.Planner.Adoption.Test.Integration {
     }
 
     @Test func `recording into a dirty checkout is refused and changes nothing`() throws {
-        let scenario = Institute.Planner.Adoption.Test.Scenario()
+        let scenario = `Institute.Planner.Adoption Tests`.Test.Scenario()
         let root = try Self.checkout(scenario)
         defer {
             // swift-linter:disable:next try optional

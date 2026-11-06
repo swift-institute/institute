@@ -4,7 +4,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Try
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `unchecked try outside tests Tests` {
         @Suite struct Unit {}
@@ -13,7 +13,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`unchecked try outside tests Tests` {
+extension `Lint.Rule Tests`.`unchecked try outside tests Tests` {
     static func findings(
         _ source: Swift::String,
         file: Swift::String = "Sources/Fixture/Fixture.swift"
@@ -24,10 +24,10 @@ extension Lint.Rule.`unchecked try outside tests Tests` {
     }
 }
 
-extension Lint.Rule.`unchecked try outside tests Tests`.Unit {
+extension `Lint.Rule Tests`.`unchecked try outside tests Tests`.Unit {
     @Test
     func `forced try in sources is flagged`() {
-        let findings = Lint.Rule.`unchecked try outside tests Tests`.findings(
+        let findings = `Lint.Rule Tests`.`unchecked try outside tests Tests`.findings(
             "func f() { let value = try! load() }"
         )
         #expect(findings.count == 1)
@@ -36,17 +36,17 @@ extension Lint.Rule.`unchecked try outside tests Tests`.Unit {
 
     @Test
     func `propagating and optional try are clean`() {
-        let findings = Lint.Rule.`unchecked try outside tests Tests`.findings(
+        let findings = `Lint.Rule Tests`.`unchecked try outside tests Tests`.findings(
             "func f() throws { let a = try load(); let b = try? load() }"
         )
         #expect(findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`unchecked try outside tests Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`unchecked try outside tests Tests`.`Edge Case` {
     @Test
     func `forced try in tests is admitted`() {
-        let findings = Lint.Rule.`unchecked try outside tests Tests`.findings(
+        let findings = `Lint.Rule Tests`.`unchecked try outside tests Tests`.findings(
             "func f() { let value = try! load() }",
             file: "Tests/Fixture Tests/Fixture Tests.swift"
         )
@@ -55,7 +55,7 @@ extension Lint.Rule.`unchecked try outside tests Tests`.`Edge Case` {
 
     @Test
     func `nested forced tries are each flagged`() {
-        let findings = Lint.Rule.`unchecked try outside tests Tests`.findings(
+        let findings = `Lint.Rule Tests`.`unchecked try outside tests Tests`.findings(
             "func f() { let value = try! load(try! key()) }",
             file: "/workspace/swift-fixture/Sources/Fixture/Fixture.swift"
         )
@@ -63,10 +63,10 @@ extension Lint.Rule.`unchecked try outside tests Tests`.`Edge Case` {
     }
 }
 
-extension Lint.Rule.`unchecked try outside tests Tests`.Integration {
+extension `Lint.Rule Tests`.`unchecked try outside tests Tests`.Integration {
     @Test
     func `forced try in an executable target is flagged`() {
-        let findings = Lint.Rule.`unchecked try outside tests Tests`.findings(
+        let findings = `Lint.Rule Tests`.`unchecked try outside tests Tests`.findings(
             "@main enum Tool { static func main() { try! run() } }",
             file: "Sources/Fixture CLI/Tool.swift"
         )

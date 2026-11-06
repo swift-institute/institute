@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Byte
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `stdlib forwarder outside sli Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`stdlib forwarder outside sli Tests` {
+extension `Lint.Rule Tests`.`stdlib forwarder outside sli Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -38,7 +38,7 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests` {
     }
 }
 
-extension Lint.Rule.`stdlib forwarder outside sli Tests`.Unit {
+extension `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.Unit {
     @Test
     func `disfavored init taking a qualified Swift Array of UInt8 in primary module is flagged`() {
         // The house convention module-qualifies stdlib collections
@@ -53,7 +53,7 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests`.Unit {
                 }
             }
             """
-        let result = Lint.Rule.`stdlib forwarder outside sli Tests`.findings(
+        let result = `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.findings(
             in: source,
             file: "/pkg/Sources/Foo/Bar.swift"
         )
@@ -70,7 +70,7 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests`.Unit {
                 }
             }
             """
-        let result = Lint.Rule.`stdlib forwarder outside sli Tests`.findings(
+        let result = `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.findings(
             in: source,
             file: "/pkg/Sources/Foo/Bar.swift"
         )
@@ -90,7 +90,7 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests`.Unit {
                 }
             }
             """
-        let result = Lint.Rule.`stdlib forwarder outside sli Tests`.findings(
+        let result = `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.findings(
             in: source,
             file: "/pkg/Sources/Foo/Bar.swift"
         )
@@ -107,7 +107,7 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests`.Unit {
                 }
             }
             """
-        let result = Lint.Rule.`stdlib forwarder outside sli Tests`.findings(
+        let result = `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.findings(
             in: source,
             file: "/pkg/Sources/Foo/Bar.swift"
         )
@@ -122,7 +122,7 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests`.Unit {
                 public mutating func append<S: Binary.Serializable>(_ s: S) {}
             }
             """
-        let result = Lint.Rule.`stdlib forwarder outside sli Tests`.findings(
+        let result = `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.findings(
             in: source,
             file: "/pkg/Sources/Foo/Bar.swift"
         )
@@ -130,7 +130,7 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`stdlib forwarder outside sli Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.`Edge Case` {
     @Test
     func `disfavored Array UInt8 in Standard Library Integration module is NOT flagged`() {
         let source = """
@@ -141,7 +141,7 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests`.`Edge Case` {
                 }
             }
             """
-        let result = Lint.Rule.`stdlib forwarder outside sli Tests`.findings(
+        let result = `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.findings(
             in: source,
             file: "/pkg/Sources/Foo Standard Library Integration/Bar.swift"
         )
@@ -165,7 +165,7 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests`.`Edge Case` {
                 }
             }
             """
-        let result = Lint.Rule.`stdlib forwarder outside sli Tests`.findings(
+        let result = `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.findings(
             in: source,
             file: "/Users/dev/Sources/checkout/Sources/Foo Standard Library Integration/Bar.swift"
         )
@@ -181,7 +181,7 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests`.`Edge Case` {
                 }
             }
             """
-        let result = Lint.Rule.`stdlib forwarder outside sli Tests`.findings(
+        let result = `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.findings(
             in: source,
             file: "/pkg/Sources/Foo/Bar.swift"
         )
@@ -196,7 +196,7 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests`.`Edge Case` {
                 public func bar(_ value: Byte) {}
             }
             """
-        let result = Lint.Rule.`stdlib forwarder outside sli Tests`.findings(
+        let result = `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.findings(
             in: source,
             file: "/pkg/Sources/Foo/Bar.swift"
         )
@@ -216,7 +216,7 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests`.`Edge Case` {
                 }
             }
             """
-        let result = Lint.Rule.`stdlib forwarder outside sli Tests`.findings(
+        let result = `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.findings(
             in: source,
             file: "/pkg/Sources/Foo/Bar.swift"
         )
@@ -231,7 +231,7 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests`.`Edge Case` {
                 public init(_ bytes: ArraySlice<UInt8>) {}
             }
             """
-        let result = Lint.Rule.`stdlib forwarder outside sli Tests`.findings(
+        let result = `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.findings(
             in: source,
             file: "/pkg/Sources/Foo/Bar.swift"
         )
@@ -246,7 +246,7 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests`.`Edge Case` {
                 public init(_ data: [UInt8]) {}
             }
             """
-        let result = Lint.Rule.`stdlib forwarder outside sli Tests`.findings(
+        let result = `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.findings(
             in: source,
             file: "/pkg/Sources/Foo/Bar.swift"
         )
@@ -263,7 +263,7 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests`.`Edge Case` {
                 }
             }
             """
-        let result = Lint.Rule.`stdlib forwarder outside sli Tests`.findings(
+        let result = `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.findings(
             in: source,
             file: "/pkg/Sources/Foo/Bar.swift"
         )
@@ -277,7 +277,7 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests`.`Edge Case` {
             @_disfavoredOverload
             public func bar(_ value: UInt8) {}
             """
-        let result = Lint.Rule.`stdlib forwarder outside sli Tests`.findings(
+        let result = `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.findings(
             in: source,
             file: "/pkg/Sources/Foo/Bar.swift"
         )
@@ -285,7 +285,7 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests`.`Edge Case` {
     }
 }
 
-extension Lint.Rule.`stdlib forwarder outside sli Tests`.Integration {
+extension `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.Integration {
     @Test
     func `multiple disfavored UInt8 forwarders in stdlib type extension are all flagged`() {
         let source = """
@@ -297,7 +297,7 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests`.Integration {
                 public func unrelated() {}
             }
             """
-        let result = Lint.Rule.`stdlib forwarder outside sli Tests`.findings(
+        let result = `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.findings(
             in: source,
             file: "/pkg/Sources/Foo/Bar.swift"
         )
@@ -314,11 +314,11 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests`.Integration {
                 public init<S: Binary.Serializable>(_ s: S) { self = [] }
             }
             """
-        let primary = Lint.Rule.`stdlib forwarder outside sli Tests`.findings(
+        let primary = `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.findings(
             in: primarySource,
             file: "/pkg/Sources/Foo/Bar.swift"
         )
-        let sli = Lint.Rule.`stdlib forwarder outside sli Tests`.findings(
+        let sli = `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.findings(
             in: primarySource,
             file: "/pkg/Sources/Foo Standard Library Integration/Bar.swift"
         )
@@ -339,7 +339,7 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests`.Integration {
                 public init<S: Binary.Serializable>(_ s: S) { self = [] }
             }
             """
-        let result = Lint.Rule.`stdlib forwarder outside sli Tests`.findings(
+        let result = `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.findings(
             in: source,
             file: "/pkg/Sources/Foo/Bar.swift"
         )
@@ -349,7 +349,7 @@ extension Lint.Rule.`stdlib forwarder outside sli Tests`.Integration {
     @Test
     func `large file with no disfavored UInt8 surfaces yields no findings`() {
         let source = String(repeating: "extension Foo { func bar() {} }\n", count: 200)
-        let result = Lint.Rule.`stdlib forwarder outside sli Tests`.findings(
+        let result = `Lint.Rule Tests`.`stdlib forwarder outside sli Tests`.findings(
             in: source,
             file: "/pkg/Sources/Foo/Bar.swift"
         )

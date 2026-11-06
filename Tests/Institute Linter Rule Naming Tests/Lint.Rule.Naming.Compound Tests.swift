@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Naming
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `compound identifier Tests` {
         @Suite struct Unit {}
@@ -26,18 +26,18 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`compound identifier Tests` {
+extension `Lint.Rule Tests`.`compound identifier Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`compound identifier`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`compound identifier Tests`.Unit {
+extension `Lint.Rule Tests`.`compound identifier Tests`.Unit {
     @Test
     func `func openWrite is flagged`() {
         let source = "public func openWrite() {}"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         let count = findings.count
         #expect(count == 1)
         if count == 1 {
@@ -49,28 +49,28 @@ extension Lint.Rule.`compound identifier Tests`.Unit {
     @Test
     func `func walkFiles is flagged`() {
         let source = "public func walkFiles() {}"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `var firstName is flagged`() {
         let source = "public var firstName: String = \"\""
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `let lastError is flagged`() {
         let source = "public let lastError: Int = 0"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `multi-camel name parseManifestFile is flagged`() {
         let source = "public func parseManifestFile() {}"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -81,44 +81,44 @@ extension Lint.Rule.`compound identifier Tests`.Unit {
             public func walkFiles() {}
             public var firstName: String = ""
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 3)
     }
 }
 
-extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`compound identifier Tests`.`Edge Case` {
     @Test
     func `func open is NOT flagged`() {
         let source = "func open() {}"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `boolean isEmpty is NOT flagged`() {
         let source = "var isEmpty: Bool = false"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `boolean hasValue is NOT flagged`() {
         let source = "var hasValue: Bool = false"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `boolean shouldRetry is NOT flagged`() {
         let source = "var shouldRetry: Bool = false"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `stdlib idiom rawValue is NOT flagged`() {
         let source = "var rawValue: Int = 0"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -128,7 +128,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
     @Test
     func `stdlib idiom allSatisfy is NOT flagged`() {
         let source = "var allSatisfy: Bool = false"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -139,7 +139,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public var mutableSpan: MutableSpan<Value> { fatalError() }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -150,7 +150,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public var span: Span<Value> { fatalError() }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -161,7 +161,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 var description: String { "x" }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -172,7 +172,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public func callAsFunction(_ x: Int) -> Int { x + 1 }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -183,7 +183,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public mutating func swapAt(_ a: Ordinal, _ b: Ordinal) {}
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -194,7 +194,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public func storeBytes<T>(of value: T, at offset: Ordinal, as type: T.Type) {}
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -205,7 +205,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public func moveInitialize(from source: Self, count: Cardinal) {}
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -216,28 +216,28 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public func quotientAndRemainder(dividingBy other: Self) -> (Self, Self) { fatalError() }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `package-scoped compound remains governed`() {
         let source = "package func walkFiles() {}"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `package-scoped variable remains governed`() {
         let source = "package var firstName: String = \"\""
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `function parameter labels are NOT flagged`() {
         let source = "func read(atOffset: Int) {}"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         // The rule visits decl names, not parameter labels. The decl name `read`
         // is not compound. Parameter `atOffset` is exempt per scope choice.
         #expect(findings.isEmpty)
@@ -246,7 +246,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
     @Test
     func `single underscore name is NOT flagged`() {
         let source = "var _x: Int = 0"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -258,7 +258,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public static func buildExpression(_ x: Int) -> [Int] { [x] }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -273,7 +273,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -289,7 +289,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public static func buildExpression(_ x: Int) -> [Int] { [x] }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -307,7 +307,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -323,7 +323,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public static func openWrite() {}
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -336,49 +336,49 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
     @Test
     func `fileprivate compound func is NOT flagged`() {
         let source = "fileprivate func walkFiles() {}"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `private compound func is NOT flagged`() {
         let source = "private func walkFiles() {}"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `fileprivate compound var is NOT flagged`() {
         let source = "fileprivate var firstName: String = \"\""
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `private compound var is NOT flagged`() {
         let source = "private var firstName: String = \"\""
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `internal compound func is outside the consumer API scope`() {
         let source = "internal func walkFiles() {}"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `public compound func IS still flagged`() {
         let source = "public func walkFiles() {}"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `unannotated compound func defaults outside the consumer API scope`() {
         let source = "func walkFiles() {}"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -393,7 +393,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 let payloadOffset: Int
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -404,7 +404,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 let destroyPayload: (Int) -> Void
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -415,7 +415,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 func walkFiles() {}
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -426,7 +426,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 let destroyPayload: (Int) -> Void
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -437,7 +437,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public let destroyPayload: (Int) -> Void
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -452,7 +452,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -463,7 +463,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 func walkFiles() {}
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -482,7 +482,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -493,14 +493,14 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 override func visitPost(_: SourceFileSyntax) {}
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `ordinary visitPost declaration remains governed`() {
         let source = "public func visitPost() {}"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -517,7 +517,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 func makeIterator() -> MyIterator { fatalError() }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -531,7 +531,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 static func encodeAtomicRepresentation(_ value: consuming Self) -> AtomicRepresentation { fatalError() }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -542,7 +542,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public func makeIterator() -> MyIterator { fatalError() }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -558,7 +558,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public mutating func nextSpan(maximumCount: Cardinal) -> Swift.Span<Element> { fatalError() }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -569,7 +569,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public mutating func nextSpan(maximumCount: Int) -> [Int] { [] }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -587,7 +587,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public var underestimatedCount: Int { Self.modulus }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -602,7 +602,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public mutating func removeAll(keepingCapacity: Bool = false) {}
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -614,7 +614,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public mutating func reserveCapacity(_ n: Index<Element>.Count) {}
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -628,7 +628,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -644,7 +644,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -661,7 +661,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -674,7 +674,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public var freeCapacity: Index<Element>.Count { capacity - count }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -691,7 +691,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
             @Test
             func `construction from UInt`() {}
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -705,7 +705,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
             @Test
             func `next emits objectStart and objectEnd for empty object`() {}
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -716,7 +716,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
         // makes the semantic explicit even though the predicate
         // would not have fired (no uppercase letters in `default`).
         let source = "func `default`() {}"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -727,7 +727,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
         // is narrative-identifier shape (per the same convention),
         // not API surface CamelCase.
         let source = "let `current Phase index`: Int = 0"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -740,7 +740,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
         // non-narrative backticks). Documented as part of the
         // exemption semantics so reviewers don't get surprised.
         let source = "func `openWrite`() {}"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -749,7 +749,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
         // Regression guard: the backtick exemption MUST NOT
         // short-circuit non-backticked CamelCase names.
         let source = "public func openWrite() {}"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -767,7 +767,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 func forkAndReadBoth() {}
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -776,7 +776,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
         // Regression guard: the nested-function exemption MUST NOT
         // short-circuit top-level (or member) compound function names.
         let source = "public func openWrite() {}"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -796,7 +796,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -810,7 +810,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -824,14 +824,14 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }
 
 // #16 Option C ledger, Entry III.d (DECISION 2026-07-23): the witness
 // allowlist mechanism — conformance-gated and name-only entries.
-extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`compound identifier Tests`.`Edge Case` {
     @Test
     func `conformance-gated property witness inside conforming extension is NOT flagged`() {
         // The Identity.OAuth.GitHub witness-file shape (0205e7f seed).
@@ -841,7 +841,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public var requiresTokenStorage: Bool { false }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -854,7 +854,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public var displayName: String { "w" }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -870,7 +870,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -882,7 +882,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public func walkFiles() {}
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
@@ -892,7 +892,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
 // (confirmed instance: compound `Codable` payload properties inside
 // `extension BulkTrackJob { struct Payload { … } }` where
 // `private struct BulkTrackJob` is declared earlier in the same file).
-extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`compound identifier Tests`.`Edge Case` {
     @Test
     func `properties in an extension of a same-file private struct are NOT flagged`() {
         let source = """
@@ -905,7 +905,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -918,7 +918,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 func openWrite() {}
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -931,7 +931,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 static func walkFiles() {}
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -946,7 +946,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 func openWrite() {}
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -960,7 +960,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 func openWrite() {}
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -973,14 +973,14 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
                 public func openWrite() {}
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
 // Scan-scope gate — a SwiftPM manifest is build configuration, not API
 // surface. Ruled swift-institute/.github#90 comment 5150641576 item 1(a).
-extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`compound identifier Tests`.`Edge Case` {
     /// The manifest shape that produced the 3 confirmed findings.
     static let manifestSource = """
         // swift-tools-version: 6.3.3
@@ -1002,7 +1002,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
     func `bare Package swift filename is out of scan scope`() {
         // Bare-filename positive control: the gate must match a path with no
         // directory component at all.
-        let findings = Lint.Rule.`compound identifier Tests`.findings(
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(
             in: Self.manifestSource,
             file: "Package.swift"
         )
@@ -1011,7 +1011,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
 
     @Test
     func `nested Package swift path is out of scan scope`() {
-        let findings = Lint.Rule.`compound identifier Tests`.findings(
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(
             in: Self.manifestSource,
             file: "Tests/Fixtures/Package.swift"
         )
@@ -1020,7 +1020,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
 
     @Test
     func `version-specific Package at swift manifest is out of scan scope`() {
-        let findings = Lint.Rule.`compound identifier Tests`.findings(
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(
             in: Self.manifestSource,
             file: "Package@swift-6.3.swift"
         )
@@ -1030,7 +1030,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
     // Both-directions controls: whole-filename matching only.
     @Test
     func `the same manifest source in an ordinary file is still flagged`() {
-        let findings = Lint.Rule.`compound identifier Tests`.findings(
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(
             in: Self.manifestSource,
             file: "Sources/Core/Names.swift"
         )
@@ -1039,7 +1039,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
 
     @Test
     func `PackageInfo swift is NOT treated as a manifest`() {
-        let findings = Lint.Rule.`compound identifier Tests`.findings(
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(
             in: "public func openWrite() {}",
             file: "Sources/Core/PackageInfo.swift"
         )
@@ -1048,7 +1048,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
 
     @Test
     func `MyPackage swift is NOT treated as a manifest`() {
-        let findings = Lint.Rule.`compound identifier Tests`.findings(
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(
             in: "public func openWrite() {}",
             file: "Sources/Core/MyPackage.swift"
         )
@@ -1057,7 +1057,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
 
     @Test
     func `a directory segment named Package swift does NOT gate the file`() {
-        let findings = Lint.Rule.`compound identifier Tests`.findings(
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(
             in: "public func openWrite() {}",
             file: "Sources/Package.swift/Names.swift"
         )
@@ -1072,7 +1072,7 @@ extension Lint.Rule.`compound identifier Tests`.`Edge Case` {
 // STILL fire, and a bare-filename positive control proving the suite is
 // not silenced wholesale by a path predicate.
 
-extension Lint.Rule.`compound identifier Tests`.Unit {
+extension `Lint.Rule Tests`.`compound identifier Tests`.Unit {
 
     // --- Exempt: the declaration carries the attribute itself ---
 
@@ -1082,7 +1082,7 @@ extension Lint.Rule.`compound identifier Tests`.Unit {
             @Suite struct S {}
             extension S { @Test func deadBeefRoundTrip() {} }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -1092,7 +1092,7 @@ extension Lint.Rule.`compound identifier Tests`.Unit {
             @Suite struct S {}
             extension S { @Testing.Test func deadBeefRoundTrip() {} }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -1105,7 +1105,7 @@ extension Lint.Rule.`compound identifier Tests`.Unit {
                 static let hexAlphabet: [UInt8] = []
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -1125,7 +1125,7 @@ extension Lint.Rule.`compound identifier Tests`.Unit {
                 static var intMonoid: Int { 0 }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -1140,7 +1140,7 @@ extension Lint.Rule.`compound identifier Tests`.Unit {
             @Suite struct `Binary.Base Tests` {}
             public struct Helper { public static var sampleBytes: Int { 0 } }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -1151,7 +1151,7 @@ extension Lint.Rule.`compound identifier Tests`.Unit {
         // the case a `Tests/` PATH exemption would have wrongly silenced, and
         // is the reason the exemption is an attribute gate.
         let source = "public struct Support { public static var sampleBytes: Int { 0 } }"
-        let findings = Lint.Rule.`compound identifier Tests`.findings(
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(
             in: source,
             file: "Tests/Support/Binary Base Test Support/Support.swift"
         )
@@ -1166,7 +1166,7 @@ extension Lint.Rule.`compound identifier Tests`.Unit {
                 public static var defaultAlphabet: Int { 0 }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -1175,7 +1175,7 @@ extension Lint.Rule.`compound identifier Tests`.Unit {
         let source = """
             @resultBuilder public struct B { public static var lastResult: Int { 0 } }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -1184,7 +1184,7 @@ extension Lint.Rule.`compound identifier Tests`.Unit {
         let source = """
             public struct Test { public static var intSemigroup: Int { 0 } }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -1195,7 +1195,7 @@ extension Lint.Rule.`compound identifier Tests`.Unit {
         // Guards the whole fixture suite: if a future path-scoped predicate
         // mis-handles a path with no directory separator, every other
         // expectation in this file would silently read as a clean zero.
-        let findings = Lint.Rule.`compound identifier Tests`.findings(
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(
             in: "public func openWrite() {}",
             file: "Names.swift"
         )
@@ -1205,7 +1205,7 @@ extension Lint.Rule.`compound identifier Tests`.Unit {
 
 // MARK: - #53 review follow-up (PR #56 review 4845547846)
 
-extension Lint.Rule.`compound identifier Tests`.Unit {
+extension `Lint.Rule Tests`.`compound identifier Tests`.Unit {
 
     // --- The `@Test`-on-the-declaration clause, isolated ---
     //
@@ -1219,7 +1219,7 @@ extension Lint.Rule.`compound identifier Tests`.Unit {
 
     @Test
     func `bare top-level Test function is exempt via the attribute clause`() {
-        let findings = Lint.Rule.`compound identifier Tests`.findings(
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(
             in: "@Test func deadBeefRoundTrip() {}"
         )
         #expect(findings.isEmpty)
@@ -1227,7 +1227,7 @@ extension Lint.Rule.`compound identifier Tests`.Unit {
 
     @Test
     func `bare top-level qualified Testing Test function is exempt via the attribute clause`() {
-        let findings = Lint.Rule.`compound identifier Tests`.findings(
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(
             in: "@Testing.Test func deadBeefRoundTrip() {}"
         )
         #expect(findings.isEmpty)
@@ -1256,7 +1256,7 @@ extension Lint.Rule.`compound identifier Tests`.Unit {
                 static var meterPerSecond: Int { 0 }
             }
             """
-        let findings = Lint.Rule.`compound identifier Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`compound identifier Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

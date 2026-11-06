@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Idiom
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `sli literal Tests` {
         @Suite struct Unit {}
@@ -26,14 +26,14 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`sli literal Tests` {
+extension `Lint.Rule Tests`.`sli literal Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`sli literal`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`sli literal Tests`.Unit {
+extension `Lint.Rule Tests`.`sli literal Tests`.Unit {
     @Test
     func `Index literal in subscript is flagged`() {
         let source = """
@@ -41,7 +41,7 @@ extension Lint.Rule.`sli literal Tests`.Unit {
                 slab[Index<Int>(Ordinal(UInt(0)))]
             }
             """
-        let findings = Lint.Rule.`sli literal Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`sli literal Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "sli literal")
@@ -54,7 +54,7 @@ extension Lint.Rule.`sli literal Tests`.Unit {
         let source = """
             let index = Tagged<Foo, Ordinal>(Ordinal(UInt(3)))
             """
-        let findings = Lint.Rule.`sli literal Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`sli literal Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -63,7 +63,7 @@ extension Lint.Rule.`sli literal Tests`.Unit {
         let source = """
             let i = Index<Element>(Ordinal(UInt(5)))
             """
-        let findings = Lint.Rule.`sli literal Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`sli literal Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -72,12 +72,12 @@ extension Lint.Rule.`sli literal Tests`.Unit {
         let source = """
             let i = Index(Ordinal(UInt(7)))
             """
-        let findings = Lint.Rule.`sli literal Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`sli literal Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`sli literal Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`sli literal Tests`.`Edge Case` {
     @Test
     func `Index over identifier runtime binding is NOT flagged`() {
         let source = """
@@ -85,7 +85,7 @@ extension Lint.Rule.`sli literal Tests`.`Edge Case` {
                 storage[Index<Element>(Ordinal(UInt(slot)))]
             }
             """
-        let findings = Lint.Rule.`sli literal Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`sli literal Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -95,7 +95,7 @@ extension Lint.Rule.`sli literal Tests`.`Edge Case` {
         let source = """
             let i = Index(_unchecked: Ordinal(UInt(5)))
             """
-        let findings = Lint.Rule.`sli literal Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`sli literal Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -104,7 +104,7 @@ extension Lint.Rule.`sli literal Tests`.`Edge Case` {
         let source = """
             let o = Ordinal(UInt(5))
             """
-        let findings = Lint.Rule.`sli literal Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`sli literal Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -113,7 +113,7 @@ extension Lint.Rule.`sli literal Tests`.`Edge Case` {
         let source = """
             let i = Index<E>(o)
             """
-        let findings = Lint.Rule.`sli literal Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`sli literal Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -122,7 +122,7 @@ extension Lint.Rule.`sli literal Tests`.`Edge Case` {
         let source = """
             let n = UInt(0)
             """
-        let findings = Lint.Rule.`sli literal Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`sli literal Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -133,7 +133,7 @@ extension Lint.Rule.`sli literal Tests`.`Edge Case` {
                 storage[Index<E>(Ordinal(UInt(count.rawValue)))]
             }
             """
-        let findings = Lint.Rule.`sli literal Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`sli literal Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

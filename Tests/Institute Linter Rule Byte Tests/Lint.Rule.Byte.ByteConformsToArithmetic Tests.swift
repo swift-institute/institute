@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Byte
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `byte conforms to arithmetic protocol Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`byte conforms to arithmetic protocol Tests` {
+extension `Lint.Rule Tests`.`byte conforms to arithmetic protocol Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -38,13 +38,13 @@ extension Lint.Rule.`byte conforms to arithmetic protocol Tests` {
     }
 }
 
-extension Lint.Rule.`byte conforms to arithmetic protocol Tests`.Unit {
+extension `Lint.Rule Tests`.`byte conforms to arithmetic protocol Tests`.Unit {
     @Test
     func `Byte conforming to AdditiveArithmetic is flagged`() {
         let source = """
             extension Byte: AdditiveArithmetic {}
             """
-        let result = Lint.Rule.`byte conforms to arithmetic protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`byte conforms to arithmetic protocol Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -53,7 +53,7 @@ extension Lint.Rule.`byte conforms to arithmetic protocol Tests`.Unit {
         let source = """
             extension Byte: Numeric {}
             """
-        let result = Lint.Rule.`byte conforms to arithmetic protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`byte conforms to arithmetic protocol Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -62,7 +62,7 @@ extension Lint.Rule.`byte conforms to arithmetic protocol Tests`.Unit {
         let source = """
             extension Byte: BinaryInteger {}
             """
-        let result = Lint.Rule.`byte conforms to arithmetic protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`byte conforms to arithmetic protocol Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -71,7 +71,7 @@ extension Lint.Rule.`byte conforms to arithmetic protocol Tests`.Unit {
         let source = """
             extension Byte: FixedWidthInteger {}
             """
-        let result = Lint.Rule.`byte conforms to arithmetic protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`byte conforms to arithmetic protocol Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -80,7 +80,7 @@ extension Lint.Rule.`byte conforms to arithmetic protocol Tests`.Unit {
         let source = """
             extension Byte: Strideable {}
             """
-        let result = Lint.Rule.`byte conforms to arithmetic protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`byte conforms to arithmetic protocol Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -92,7 +92,7 @@ extension Lint.Rule.`byte conforms to arithmetic protocol Tests`.Unit {
         let source = """
             public struct Byte: AdditiveArithmetic {}
             """
-        let result = Lint.Rule.`byte conforms to arithmetic protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`byte conforms to arithmetic protocol Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -101,12 +101,12 @@ extension Lint.Rule.`byte conforms to arithmetic protocol Tests`.Unit {
         let source = """
             extension Byte.Byte: Numeric {}
             """
-        let result = Lint.Rule.`byte conforms to arithmetic protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`byte conforms to arithmetic protocol Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 }
 
-extension Lint.Rule.`byte conforms to arithmetic protocol Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`byte conforms to arithmetic protocol Tests`.`Edge Case` {
     @Test
     func `unrelated namespace's nested Byte type is NOT flagged`() {
         // `RFC_1234.Byte` is an unrelated nested type in a consumer
@@ -115,12 +115,12 @@ extension Lint.Rule.`byte conforms to arithmetic protocol Tests`.`Edge Case` {
         let source = """
             extension RFC_1234.Byte: AdditiveArithmetic {}
             """
-        let result = Lint.Rule.`byte conforms to arithmetic protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`byte conforms to arithmetic protocol Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 }
 
-extension Lint.Rule.`byte conforms to arithmetic protocol Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`byte conforms to arithmetic protocol Tests`.`Edge Case` {
     @Test
     func `Byte conforming to Equatable Hashable Comparable is NOT flagged`() {
         let source = """
@@ -131,7 +131,7 @@ extension Lint.Rule.`byte conforms to arithmetic protocol Tests`.`Edge Case` {
             extension Byte: Codable {}
             extension Byte: CustomStringConvertible {}
             """
-        let result = Lint.Rule.`byte conforms to arithmetic protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`byte conforms to arithmetic protocol Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 
@@ -141,7 +141,7 @@ extension Lint.Rule.`byte conforms to arithmetic protocol Tests`.`Edge Case` {
         let source = """
             extension UInt8: BinaryInteger {}
             """
-        let result = Lint.Rule.`byte conforms to arithmetic protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`byte conforms to arithmetic protocol Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 
@@ -150,25 +150,25 @@ extension Lint.Rule.`byte conforms to arithmetic protocol Tests`.`Edge Case` {
         let source = """
             extension Byte: Swift.Numeric {}
             """
-        let result = Lint.Rule.`byte conforms to arithmetic protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`byte conforms to arithmetic protocol Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 }
 
-extension Lint.Rule.`byte conforms to arithmetic protocol Tests`.Integration {
+extension `Lint.Rule Tests`.`byte conforms to arithmetic protocol Tests`.Integration {
     @Test
     func `multiple arithmetic conformances in one extension fire per-protocol`() {
         let source = """
             extension Byte: AdditiveArithmetic, Numeric {}
             """
-        let result = Lint.Rule.`byte conforms to arithmetic protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`byte conforms to arithmetic protocol Tests`.findings(in: source)
         #expect(result.count == 2)
     }
 
     @Test
     func `large file with byte-domain conformances yields no findings`() {
         let source = String(repeating: "extension Byte: Equatable {}\n", count: 200)
-        let result = Lint.Rule.`byte conforms to arithmetic protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`byte conforms to arithmetic protocol Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 }

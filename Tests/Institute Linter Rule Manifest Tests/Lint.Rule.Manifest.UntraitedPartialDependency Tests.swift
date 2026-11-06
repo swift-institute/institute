@@ -4,7 +4,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Manifest
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `untraited partial dependency Tests` {
         @Suite struct Unit {}
@@ -13,7 +13,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`untraited partial dependency Tests` {
+extension `Lint.Rule Tests`.`untraited partial dependency Tests` {
     static func observation(
         _ source: Swift::String,
         file: Swift::String = "Package.swift"
@@ -22,10 +22,10 @@ extension Lint.Rule.`untraited partial dependency Tests` {
     }
 }
 
-extension Lint.Rule.`untraited partial dependency Tests`.Unit {
+extension `Lint.Rule Tests`.`untraited partial dependency Tests`.Unit {
     @Test
     func `a dependency one of two products needs is flagged`() {
-        let observation = Lint.Rule.`untraited partial dependency Tests`.observation(
+        let observation = `Lint.Rule Tests`.`untraited partial dependency Tests`.observation(
             """
             let package = Package(
                 name: "swift-owner",
@@ -59,7 +59,7 @@ extension Lint.Rule.`untraited partial dependency Tests`.Unit {
 
     @Test
     func `the same dependency behind a trait is clean`() {
-        let observation = Lint.Rule.`untraited partial dependency Tests`.observation(
+        let observation = `Lint.Rule Tests`.`untraited partial dependency Tests`.observation(
             """
             let package = Package(
                 name: "swift-owner",
@@ -86,7 +86,7 @@ extension Lint.Rule.`untraited partial dependency Tests`.Unit {
 
     @Test
     func `a dependency every product reaches through a shared core is clean`() {
-        let observation = Lint.Rule.`untraited partial dependency Tests`.observation(
+        let observation = `Lint.Rule Tests`.`untraited partial dependency Tests`.observation(
             """
             let package = Package(
                 name: "swift-owner",
@@ -107,7 +107,7 @@ extension Lint.Rule.`untraited partial dependency Tests`.Unit {
 
     @Test
     func `a dependency the primary product needs is clean though a slimmer product does without it`() {
-        let observation = Lint.Rule.`untraited partial dependency Tests`.observation(
+        let observation = `Lint.Rule Tests`.`untraited partial dependency Tests`.observation(
             """
             let package = Package(
                 name: "swift-owner",
@@ -133,10 +133,10 @@ extension Lint.Rule.`untraited partial dependency Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`untraited partial dependency Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`untraited partial dependency Tests`.`Edge Case` {
     @Test
     func `a package without a product named after it is inapplicable`() {
-        let observation = Lint.Rule.`untraited partial dependency Tests`.observation(
+        let observation = `Lint.Rule Tests`.`untraited partial dependency Tests`.observation(
             """
             let package = Package(
                 name: "swift-owner",
@@ -165,7 +165,7 @@ extension Lint.Rule.`untraited partial dependency Tests`.`Edge Case` {
 
     @Test
     func `a single main product with Test Support is inapplicable`() {
-        let observation = Lint.Rule.`untraited partial dependency Tests`.observation(
+        let observation = `Lint.Rule Tests`.`untraited partial dependency Tests`.observation(
             """
             let package = Package(
                 name: "swift-owner",
@@ -186,7 +186,7 @@ extension Lint.Rule.`untraited partial dependency Tests`.`Edge Case` {
 
     @Test
     func `a dependency only Test Support and test targets use is clean`() {
-        let observation = Lint.Rule.`untraited partial dependency Tests`.observation(
+        let observation = `Lint.Rule Tests`.`untraited partial dependency Tests`.observation(
             """
             let package = Package(
                 name: "swift-owner",
@@ -218,7 +218,7 @@ extension Lint.Rule.`untraited partial dependency Tests`.`Edge Case` {
 
     @Test
     func `a platform condition is not a trait gate`() {
-        let observation = Lint.Rule.`untraited partial dependency Tests`.observation(
+        let observation = `Lint.Rule Tests`.`untraited partial dependency Tests`.observation(
             """
             let package = Package(
                 name: "swift-owner",
@@ -243,7 +243,7 @@ extension Lint.Rule.`untraited partial dependency Tests`.`Edge Case` {
 
     @Test
     func `non-manifest files are inapplicable`() {
-        let observation = Lint.Rule.`untraited partial dependency Tests`.observation(
+        let observation = `Lint.Rule Tests`.`untraited partial dependency Tests`.observation(
             "let dependency = Target.Dependency.product(name: \"Glob\", package: \"swift-glob\")",
             file: "Sources/Fixture/Fixture.swift"
         )
@@ -252,10 +252,10 @@ extension Lint.Rule.`untraited partial dependency Tests`.`Edge Case` {
     }
 }
 
-extension Lint.Rule.`untraited partial dependency Tests`.Integration {
+extension `Lint.Rule Tests`.`untraited partial dependency Tests`.Integration {
     @Test
     func `typed manifest accessors resolve and each partial package is reported once`() {
-        let observation = Lint.Rule.`untraited partial dependency Tests`.observation(
+        let observation = `Lint.Rule Tests`.`untraited partial dependency Tests`.observation(
             """
             extension String {
                 static let owner: Self = "Owner"

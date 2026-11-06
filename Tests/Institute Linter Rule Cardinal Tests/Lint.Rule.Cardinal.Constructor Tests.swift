@@ -17,7 +17,9 @@ import Testing
 
 @testable import Institute_Linter_Rule_Cardinal
 
-extension Lint.Rule {
+enum `Lint.Rule Tests` {}
+
+extension `Lint.Rule Tests` {
     @Suite
     struct `zero or one literal Tests` {
         @Suite struct Unit {}
@@ -27,7 +29,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`zero or one literal Tests` {
+extension `Lint.Rule Tests`.`zero or one literal Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -48,12 +50,12 @@ extension Lint.Rule.`zero or one literal Tests` {
     }
 }
 
-extension Lint.Rule.`zero or one literal Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`zero or one literal Tests`.`Edge Case` {
     @Test
     func `Cardinal brand-owner run self-suppresses (§A)`() {
         // The run declares `Cardinal` — its own `Cardinal(0)` boundary
         // constructions are legitimate. Zero findings.
-        let findings = Lint.Rule.`zero or one literal Tests`.findings(
+        let findings = `Lint.Rule Tests`.`zero or one literal Tests`.findings(
             in: "let c = Cardinal(0)",
             types: ["Cardinal"]
         )
@@ -64,7 +66,7 @@ extension Lint.Rule.`zero or one literal Tests`.`Edge Case` {
     func `a different brand-owner still fires on a stray Cardinal(0) (§A)`() {
         // This rule is brand-SPECIFIC to `Cardinal`: a run that declares
         // `Ordinal` (not `Cardinal`) still catches a stray `Cardinal(0)`.
-        let findings = Lint.Rule.`zero or one literal Tests`.findings(
+        let findings = `Lint.Rule Tests`.`zero or one literal Tests`.findings(
             in: "let c = Cardinal(0)",
             types: ["Ordinal"]
         )
@@ -72,10 +74,10 @@ extension Lint.Rule.`zero or one literal Tests`.`Edge Case` {
     }
 }
 
-extension Lint.Rule.`zero or one literal Tests`.Unit {
+extension `Lint.Rule Tests`.`zero or one literal Tests`.Unit {
     @Test
     func `Cardinal(0) is flagged`() {
-        let findings = Lint.Rule.`zero or one literal Tests`.findings(in: "let c = Cardinal(0)")
+        let findings = `Lint.Rule Tests`.`zero or one literal Tests`.findings(in: "let c = Cardinal(0)")
         let count = findings.count
         #expect(count == 1)
         if count == 1 {
@@ -86,13 +88,13 @@ extension Lint.Rule.`zero or one literal Tests`.Unit {
 
     @Test
     func `Cardinal(1) is flagged`() {
-        let findings = Lint.Rule.`zero or one literal Tests`.findings(in: "let c = Cardinal(1)")
+        let findings = `Lint.Rule Tests`.`zero or one literal Tests`.findings(in: "let c = Cardinal(1)")
         #expect(findings.count == 1)
     }
 
     @Test
     func `Cardinal.init(0) is flagged`() {
-        let findings = Lint.Rule.`zero or one literal Tests`.findings(
+        let findings = `Lint.Rule Tests`.`zero or one literal Tests`.findings(
             in: "let c = Cardinal.init(0)"
         )
         #expect(findings.count == 1)
@@ -102,7 +104,7 @@ extension Lint.Rule.`zero or one literal Tests`.Unit {
     func `Cardinal-of-T angle-bracket generic-specialized (0) is flagged`() {
         // The doc advertises `Cardinal<T>(0)` explicitly; this exercises
         // the `GenericSpecializationExprSyntax` branch of `calleeTypeName`.
-        let findings = Lint.Rule.`zero or one literal Tests`.findings(
+        let findings = `Lint.Rule Tests`.`zero or one literal Tests`.findings(
             in: "let c = Cardinal<Int>(0)"
         )
         #expect(findings.count == 1)
@@ -110,7 +112,7 @@ extension Lint.Rule.`zero or one literal Tests`.Unit {
 
     @Test
     func `Cardinal-of-T angle-bracket generic-specialized dot init(1) is flagged`() {
-        let findings = Lint.Rule.`zero or one literal Tests`.findings(
+        let findings = `Lint.Rule Tests`.`zero or one literal Tests`.findings(
             in: "let c = Cardinal<Int>.init(1)"
         )
         #expect(findings.count == 1)
@@ -120,7 +122,7 @@ extension Lint.Rule.`zero or one literal Tests`.Unit {
     func `Cardinal-qualified Cardinal(0) is flagged`() {
         // Mirror image of the `.init` recursion: a qualified reference to
         // the type itself, with no `.init` in between.
-        let findings = Lint.Rule.`zero or one literal Tests`.findings(
+        let findings = `Lint.Rule Tests`.`zero or one literal Tests`.findings(
             in: "let c = Cardinal.Cardinal(0)"
         )
         #expect(findings.count == 1)
@@ -128,23 +130,23 @@ extension Lint.Rule.`zero or one literal Tests`.Unit {
 
     @Test
     func `Cardinal-qualified Cardinal dot init(1) is flagged`() {
-        let findings = Lint.Rule.`zero or one literal Tests`.findings(
+        let findings = `Lint.Rule Tests`.`zero or one literal Tests`.findings(
             in: "let c = Cardinal.Cardinal.init(1)"
         )
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`zero or one literal Tests`.Negative {
+extension `Lint.Rule Tests`.`zero or one literal Tests`.Negative {
     @Test
     func `Cardinal(2) is NOT flagged`() {
-        let findings = Lint.Rule.`zero or one literal Tests`.findings(in: "let c = Cardinal(2)")
+        let findings = `Lint.Rule Tests`.`zero or one literal Tests`.findings(in: "let c = Cardinal(2)")
         #expect(findings.isEmpty)
     }
 
     @Test
     func `Cardinal(unchecked, 0) (labeled single-arg) is NOT flagged`() {
-        let findings = Lint.Rule.`zero or one literal Tests`.findings(
+        let findings = `Lint.Rule Tests`.`zero or one literal Tests`.findings(
             in: "let c = Cardinal(unchecked: 0)"
         )
         #expect(findings.isEmpty)
@@ -156,7 +158,7 @@ extension Lint.Rule.`zero or one literal Tests`.Negative {
         // previous fixture under this title was a single labeled argument
         // and never reached the `node.arguments.count == 1` guard at all —
         // this exercises that guard directly.
-        let findings = Lint.Rule.`zero or one literal Tests`.findings(
+        let findings = `Lint.Rule Tests`.`zero or one literal Tests`.findings(
             in: "let c = Cardinal(0, radix: 10)"
         )
         #expect(findings.isEmpty)
@@ -164,7 +166,7 @@ extension Lint.Rule.`zero or one literal Tests`.Negative {
 
     @Test
     func `Cardinal(rawValue: 0) (labeled arg) is NOT flagged`() {
-        let findings = Lint.Rule.`zero or one literal Tests`.findings(
+        let findings = `Lint.Rule Tests`.`zero or one literal Tests`.findings(
             in: "let c = Cardinal(rawValue: 0)"
         )
         #expect(findings.isEmpty)
@@ -172,24 +174,24 @@ extension Lint.Rule.`zero or one literal Tests`.Negative {
 
     @Test
     func `Other type with literal 0 is NOT flagged`() {
-        let findings = Lint.Rule.`zero or one literal Tests`.findings(in: "let i = Int(0)")
+        let findings = `Lint.Rule Tests`.`zero or one literal Tests`.findings(in: "let i = Int(0)")
         #expect(findings.isEmpty)
     }
 
     @Test
     func `Cardinal.zero (canonical accessor) is NOT flagged`() {
-        let findings = Lint.Rule.`zero or one literal Tests`.findings(in: "let c = Cardinal.zero")
+        let findings = `Lint.Rule Tests`.`zero or one literal Tests`.findings(in: "let c = Cardinal.zero")
         #expect(findings.isEmpty)
     }
 
     @Test
     func `Cardinal in string literal is NOT flagged`() {
-        let findings = Lint.Rule.`zero or one literal Tests`.findings(in: #"let s = "Cardinal(0)""#)
+        let findings = `Lint.Rule Tests`.`zero or one literal Tests`.findings(in: #"let s = "Cardinal(0)""#)
         #expect(findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`zero or one literal Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`zero or one literal Tests`.`Edge Case` {
     @Test
     func `Multi-line Cardinal with newline-arg is flagged`() {
         let source = """
@@ -197,7 +199,7 @@ extension Lint.Rule.`zero or one literal Tests`.`Edge Case` {
                 0
             )
             """
-        let findings = Lint.Rule.`zero or one literal Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`zero or one literal Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -214,7 +216,7 @@ extension Lint.Rule.`zero or one literal Tests`.`Edge Case` {
 
     @Test
     func `Empty file produces no findings`() {
-        let findings = Lint.Rule.`zero or one literal Tests`.findings(in: "")
+        let findings = `Lint.Rule Tests`.`zero or one literal Tests`.findings(in: "")
         #expect(findings.isEmpty)
     }
 }

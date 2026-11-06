@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Throws
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `result wrapper for rethrows shim Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`result wrapper for rethrows shim Tests` {
+extension `Lint.Rule Tests`.`result wrapper for rethrows shim Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "Sources/X/Test.swift"
@@ -38,13 +38,13 @@ extension Lint.Rule.`result wrapper for rethrows shim Tests` {
     }
 }
 
-extension Lint.Rule.`result wrapper for rethrows shim Tests`.Unit {
+extension `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.Unit {
     @Test
     func `try inside map closure is flagged`() {
         let source = """
             let result = items.map { try transform($0) }
             """
-        let findings = Lint.Rule.`result wrapper for rethrows shim Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -53,7 +53,7 @@ extension Lint.Rule.`result wrapper for rethrows shim Tests`.Unit {
         let source = """
             let result = items.compactMap { try transform($0) }
             """
-        let findings = Lint.Rule.`result wrapper for rethrows shim Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -62,7 +62,7 @@ extension Lint.Rule.`result wrapper for rethrows shim Tests`.Unit {
         let source = """
             let result = items.filter { try predicate($0) }
             """
-        let findings = Lint.Rule.`result wrapper for rethrows shim Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -71,7 +71,7 @@ extension Lint.Rule.`result wrapper for rethrows shim Tests`.Unit {
         let source = """
             let result = items.map { transform($0) }
             """
-        let findings = Lint.Rule.`result wrapper for rethrows shim Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -80,7 +80,7 @@ extension Lint.Rule.`result wrapper for rethrows shim Tests`.Unit {
         let source = """
             let result = items.map { try? transform($0) }
             """
-        let findings = Lint.Rule.`result wrapper for rethrows shim Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -89,7 +89,7 @@ extension Lint.Rule.`result wrapper for rethrows shim Tests`.Unit {
         let source = """
             let result = items.map { try! transform($0) }
             """
-        let findings = Lint.Rule.`result wrapper for rethrows shim Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -100,7 +100,7 @@ extension Lint.Rule.`result wrapper for rethrows shim Tests`.Unit {
                 Result { try transform(input) }
             }
             """
-        let findings = Lint.Rule.`result wrapper for rethrows shim Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.findings(in: source)
         // The `try` is inside the inner Result init's closure (nested), our
         // visitor skips into nested closures so the inner `try` belongs to
         // the inner closure (which is not a known rethrows method on `Result`).
@@ -108,13 +108,13 @@ extension Lint.Rule.`result wrapper for rethrows shim Tests`.Unit {
     }
 }
 
-extension Lint.Rule.`result wrapper for rethrows shim Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.`Edge Case` {
     @Test
     func `non-stdlib rethrows method (custom name) is not flagged`() {
         let source = """
             let result = builder.processEach { try op($0) }
             """
-        let findings = Lint.Rule.`result wrapper for rethrows shim Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -123,7 +123,7 @@ extension Lint.Rule.`result wrapper for rethrows shim Tests`.`Edge Case` {
         let source = """
             items.forEach { try doIt($0) }
             """
-        let findings = Lint.Rule.`result wrapper for rethrows shim Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -132,7 +132,7 @@ extension Lint.Rule.`result wrapper for rethrows shim Tests`.`Edge Case` {
         let source = """
             let result = try base.map { value throws(MyError) in try transform(value) }
             """
-        let findings = Lint.Rule.`result wrapper for rethrows shim Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.findings(in: source)
         // The closure carries `throws(MyError)`; stdlib `rethrows` accepts
         // only untyped-throws closures. The call site is invoking a
         // typed-throws institute API, not stdlib rethrows.
@@ -144,7 +144,7 @@ extension Lint.Rule.`result wrapper for rethrows shim Tests`.`Edge Case` {
         let source = """
             try base.map { ordinal throws(Ordinal.Error) in try ordinal.successor.exact() }
             """
-        let findings = Lint.Rule.`result wrapper for rethrows shim Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -159,7 +159,7 @@ extension Lint.Rule.`result wrapper for rethrows shim Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`result wrapper for rethrows shim Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.findings(in: source)
         // A typed-only catch (`catch let error as MyError`) is not catch-all:
         // any error that doesn't match `MyError` propagates past it uncaught.
         // Per the #19 defect-3 ruling (coordinator adjudication, 2026-07-30),
@@ -180,7 +180,7 @@ extension Lint.Rule.`result wrapper for rethrows shim Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`result wrapper for rethrows shim Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.findings(in: source)
         // The catch re-throws (`throw error`) so the closure DOES
         // propagate; not the Result-materialization pattern, the rule
         // should still fire.

@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Naming
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `nested tag Tests` {
         @Suite struct Unit {}
@@ -26,14 +26,14 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`nested tag Tests` {
+extension `Lint.Rule Tests`.`nested tag Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`nested tag`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`nested tag Tests`.Unit {
+extension `Lint.Rule Tests`.`nested tag Tests`.Unit {
     @Test
     func `empty enum Tag nested in enum is flagged`() {
         let source = """
@@ -41,7 +41,7 @@ extension Lint.Rule.`nested tag Tests`.Unit {
                 enum Tag {}
             }
             """
-        let findings = Lint.Rule.`nested tag Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nested tag Tests`.findings(in: source)
         let count = findings.count
         #expect(count == 1)
         if count == 1 {
@@ -57,7 +57,7 @@ extension Lint.Rule.`nested tag Tests`.Unit {
                 struct Tag {}
             }
             """
-        let findings = Lint.Rule.`nested tag Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nested tag Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -68,7 +68,7 @@ extension Lint.Rule.`nested tag Tests`.Unit {
                 enum Tag {}
             }
             """
-        let findings = Lint.Rule.`nested tag Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nested tag Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -79,7 +79,7 @@ extension Lint.Rule.`nested tag Tests`.Unit {
                 enum Tag {}
             }
             """
-        let findings = Lint.Rule.`nested tag Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nested tag Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -90,7 +90,7 @@ extension Lint.Rule.`nested tag Tests`.Unit {
                 enum Tag {}
             }
             """
-        let findings = Lint.Rule.`nested tag Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nested tag Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -107,7 +107,7 @@ extension Lint.Rule.`nested tag Tests`.Unit {
                 struct Tag {}
             }
             """
-        let findings = Lint.Rule.`nested tag Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nested tag Tests`.findings(in: source)
         #expect(findings.count == 3)
     }
 
@@ -120,7 +120,7 @@ extension Lint.Rule.`nested tag Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`nested tag Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nested tag Tests`.findings(in: source)
         // Both the Middle.Tag (literally named Tag, nested) — and that's the only Tag.
         #expect(findings.count == 1)
     }
@@ -135,7 +135,7 @@ extension Lint.Rule.`nested tag Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`nested tag Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nested tag Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -150,24 +150,24 @@ extension Lint.Rule.`nested tag Tests`.Unit {
                 }
             }
             """
-        let findings = Lint.Rule.`nested tag Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nested tag Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`nested tag Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`nested tag Tests`.`Edge Case` {
     @Test
     func `top-level enum Tag is NOT flagged`() {
         // Top-level Tag has no enclosing namespace whose role it would duplicate.
         let source = "enum Tag {}"
-        let findings = Lint.Rule.`nested tag Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nested tag Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
     @Test
     func `top-level struct Tag is NOT flagged`() {
         let source = "struct Tag {}"
-        let findings = Lint.Rule.`nested tag Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nested tag Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -183,7 +183,7 @@ extension Lint.Rule.`nested tag Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`nested tag Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nested tag Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -198,7 +198,7 @@ extension Lint.Rule.`nested tag Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`nested tag Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nested tag Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -210,7 +210,7 @@ extension Lint.Rule.`nested tag Tests`.`Edge Case` {
                 enum Inner {}
             }
             """
-        let findings = Lint.Rule.`nested tag Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nested tag Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -223,7 +223,7 @@ extension Lint.Rule.`nested tag Tests`.`Edge Case` {
                 class Tag {}
             }
             """
-        let findings = Lint.Rule.`nested tag Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nested tag Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -236,7 +236,7 @@ extension Lint.Rule.`nested tag Tests`.`Edge Case` {
                 enum OrderTag {}
             }
             """
-        let findings = Lint.Rule.`nested tag Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`nested tag Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }

@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Naming
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `phantom suppression Tests` {
         @Suite struct Unit {}
@@ -26,14 +26,14 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`phantom suppression Tests` {
+extension `Lint.Rule Tests`.`phantom suppression Tests` {
     static func findings(in source: String, file: String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`phantom suppression`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`phantom suppression Tests`.Unit {
+extension `Lint.Rule Tests`.`phantom suppression Tests`.Unit {
     @Test
     func `extension Tagged where Tag is ~Copyable-only is flagged`() {
         let source = """
@@ -41,7 +41,7 @@ extension Lint.Rule.`phantom suppression Tests`.Unit {
                 public var probe: Int { 0 }
             }
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
             #expect(findings[0].identifier == "phantom suppression")
@@ -56,14 +56,14 @@ extension Lint.Rule.`phantom suppression Tests`.Unit {
                 public init<Tag: ~Copyable>(_ x: Tagged<Tag, Ordinal>) { self = 0 }
             }
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
     @Test
     func `typealias Index phantom Element is flagged`() {
         let source = "public typealias Index<Element: ~Copyable> = Tagged<Element, Ordinal>"
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -74,7 +74,7 @@ extension Lint.Rule.`phantom suppression Tests`.Unit {
                 public var probe: Int { 0 }
             }
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -85,7 +85,7 @@ extension Lint.Rule.`phantom suppression Tests`.Unit {
                 public func make<Tag: ~Copyable>(_ x: Tagged<Tag, Ordinal>) -> Int { 0 }
             }
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -96,7 +96,7 @@ extension Lint.Rule.`phantom suppression Tests`.Unit {
                 public subscript<Tag: ~Copyable>(x: Tagged<Tag, Ordinal>) -> Int { 0 }
             }
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -111,7 +111,7 @@ extension Lint.Rule.`phantom suppression Tests`.Unit {
                 public var probe: Int { 0 }
             }
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -125,12 +125,12 @@ extension Lint.Rule.`phantom suppression Tests`.Unit {
                 public func collect<Tag: ~Copyable>(_ x: [Tag]) {}
             }
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`phantom suppression Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`phantom suppression Tests`.`Edge Case` {
     @Test
     func `already-maximal ~Copyable and ~Escapable is NOT flagged`() {
         let source = """
@@ -138,7 +138,7 @@ extension Lint.Rule.`phantom suppression Tests`.`Edge Case` {
                 public var probe: Int { 0 }
             }
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -150,7 +150,7 @@ extension Lint.Rule.`phantom suppression Tests`.`Edge Case` {
                 public func collect<Element: ~Copyable>(_ x: [Element]) {}
             }
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -163,7 +163,7 @@ extension Lint.Rule.`phantom suppression Tests`.`Edge Case` {
                 public init<Tag: ~Copyable>(_ x: Tagged<Tag, Ordinal>, raw: Tag) { self = 0 }
             }
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -174,7 +174,7 @@ extension Lint.Rule.`phantom suppression Tests`.`Edge Case` {
                 public var probe: Int { 0 }
             }
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -189,7 +189,7 @@ extension Lint.Rule.`phantom suppression Tests`.`Edge Case` {
                 public var probe: Int { 0 }
             }
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -200,7 +200,7 @@ extension Lint.Rule.`phantom suppression Tests`.`Edge Case` {
         let source = """
             extension Tagged: Escapable where Tag: ~Copyable & ~Escapable, Underlying: Escapable & ~Copyable {}
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -213,7 +213,7 @@ extension Lint.Rule.`phantom suppression Tests`.`Edge Case` {
                 public var probe: Int { 0 }
             }
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -234,7 +234,7 @@ extension Lint.Rule.`phantom suppression Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -253,7 +253,7 @@ extension Lint.Rule.`phantom suppression Tests`.`Edge Case` {
                 }
             }
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         // Exactly one finding: `Tag` (no container binding fires); `E` (which
         // has one) stays exempt.
         #expect(findings.count == 1)
@@ -270,7 +270,7 @@ extension Lint.Rule.`phantom suppression Tests`.`Edge Case` {
 // Escapable)"). `UnsafeMutablePointer.Pointee` has no `~Escapable`
 // suppression, so `<P: ~Copyable & ~Escapable>` is rejected by the
 // compiler; such a parameter is not a pure phantom.
-extension Lint.Rule.`phantom suppression Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`phantom suppression Tests`.`Edge Case` {
     @Test
     func `parameter used as UnsafeMutablePointer Pointee is NOT flagged`() {
         let source = """
@@ -279,7 +279,7 @@ extension Lint.Rule.`phantom suppression Tests`.`Edge Case` {
                 at index: Index<E>
             ) {}
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -291,7 +291,7 @@ extension Lint.Rule.`phantom suppression Tests`.`Edge Case` {
                 at index: Index<E>
             ) {}
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -303,7 +303,7 @@ extension Lint.Rule.`phantom suppression Tests`.`Edge Case` {
                 from index: Index<E>
             ) {}
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
 
@@ -314,7 +314,7 @@ extension Lint.Rule.`phantom suppression Tests`.`Edge Case` {
         let source = """
             func advance<E: ~Copyable>(_ index: Index<E>, by step: Int) {}
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 
@@ -325,15 +325,15 @@ extension Lint.Rule.`phantom suppression Tests`.`Edge Case` {
         let source = """
             func advance<E: ~Copyable>(_ handle: MyPointer<E>, at index: Index<E>) {}
             """
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(in: source)
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`phantom suppression Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`phantom suppression Tests`.`Edge Case` {
     @Test
     func `module-qualified ~Swift.Escapable counts as maximal`() {
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(
             in: "extension Tagged: Swift.Escapable where Tag: ~Copyable & ~Swift.Escapable, Underlying: Swift.Escapable & ~Copyable {}"
         )
         #expect(findings.isEmpty)
@@ -341,7 +341,7 @@ extension Lint.Rule.`phantom suppression Tests`.`Edge Case` {
 
     @Test
     func `module-qualified ~Swift.Copyable alone is still flagged`() {
-        let findings = Lint.Rule.`phantom suppression Tests`.findings(
+        let findings = `Lint.Rule Tests`.`phantom suppression Tests`.findings(
             in: "extension Tagged where Underlying == Ordinal, Tag: ~Swift.Copyable { public var probe: Int { 0 } }"
         )
         #expect(findings.count == 1)

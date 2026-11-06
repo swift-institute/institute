@@ -18,7 +18,7 @@ import Text
 
 @testable import Institute_Linter_Rule_Idiom
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `unknown default Tests` {
         @Suite struct Unit {}
@@ -27,14 +27,14 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`unknown default Tests` {
+extension `Lint.Rule Tests`.`unknown default Tests` {
     static func findings(source: Swift::String) -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source)
         return Lint.Rule.`unknown default`.observe(parsed, .warning).findings
     }
 }
 
-extension Lint.Rule.`unknown default Tests`.Unit {
+extension `Lint.Rule Tests`.`unknown default Tests`.Unit {
     @Test
     func `unknown default in a switch is flagged`() {
         let source = """
@@ -45,7 +45,7 @@ extension Lint.Rule.`unknown default Tests`.Unit {
               }
             }
             """
-        let findings = Lint.Rule.`unknown default Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`unknown default Tests`.findings(source: source)
         #expect(findings.count == 1)
         #expect(findings.first?.identifier == "unknown default")
         #expect(findings.first?.severity == .warning)
@@ -61,7 +61,7 @@ extension Lint.Rule.`unknown default Tests`.Unit {
               }
             }
             """
-        let findings = Lint.Rule.`unknown default Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`unknown default Tests`.findings(source: source)
         #expect(findings.isEmpty)
     }
 
@@ -75,12 +75,12 @@ extension Lint.Rule.`unknown default Tests`.Unit {
               }
             }
             """
-        let findings = Lint.Rule.`unknown default Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`unknown default Tests`.findings(source: source)
         #expect(findings.isEmpty)
     }
 }
 
-extension Lint.Rule.`unknown default Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`unknown default Tests`.`Edge Case` {
     @Test
     func `each unknown default fires once across nested switches`() {
         let source = """
@@ -95,7 +95,7 @@ extension Lint.Rule.`unknown default Tests`.`Edge Case` {
               }
             }
             """
-        let findings = Lint.Rule.`unknown default Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`unknown default Tests`.findings(source: source)
         #expect(findings.count == 2)
     }
 
@@ -109,7 +109,7 @@ extension Lint.Rule.`unknown default Tests`.`Edge Case` {
               }
             }
             """
-        let findings = Lint.Rule.`unknown default Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`unknown default Tests`.findings(source: source)
         #expect(findings.count == 1)
     }
 
@@ -123,13 +123,13 @@ extension Lint.Rule.`unknown default Tests`.`Edge Case` {
               }
             }
             """
-        let findings = Lint.Rule.`unknown default Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`unknown default Tests`.findings(source: source)
         #expect(findings.first?.location.line == 4)
         #expect(findings.first?.location.column == 3)
     }
 }
 
-extension Lint.Rule.`unknown default Tests`.Unit {
+extension `Lint.Rule Tests`.`unknown default Tests`.Unit {
     // #24 defect 3: `@unknown case _:` is the same runtime-fallthrough
     // shape as `@unknown default:`, spelled as a wildcard case.
 
@@ -143,7 +143,7 @@ extension Lint.Rule.`unknown default Tests`.Unit {
               fatalError("unhandled category")
             }
             """
-        let findings = Lint.Rule.`unknown default Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`unknown default Tests`.findings(source: source)
         #expect(findings.count == 1)
     }
 
@@ -156,12 +156,12 @@ extension Lint.Rule.`unknown default Tests`.Unit {
               fatalError("unhandled category")
             }
             """
-        let findings = Lint.Rule.`unknown default Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`unknown default Tests`.findings(source: source)
         #expect(findings.count == 1)
     }
 }
 
-extension Lint.Rule.`unknown default Tests`.Integration {
+extension `Lint.Rule Tests`.`unknown default Tests`.Integration {
     @Test
     func `exemption analogue - an unknown-named attribute elsewhere does not fire`() {
         let source = """
@@ -174,7 +174,7 @@ extension Lint.Rule.`unknown default Tests`.Integration {
               }
             }
             """
-        let findings = Lint.Rule.`unknown default Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`unknown default Tests`.findings(source: source)
         #expect(findings.isEmpty)
     }
 
@@ -190,7 +190,7 @@ extension Lint.Rule.`unknown default Tests`.Integration {
               fatalError("unhandled category")
             }
             """
-        let findings = Lint.Rule.`unknown default Tests`.findings(source: source)
+        let findings = `Lint.Rule Tests`.`unknown default Tests`.findings(source: source)
         #expect(findings.count == 1)
     }
 }

@@ -7,7 +7,7 @@ import Text
 
 @testable import Institute_Linter_Rule_Idiom
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     /// A built-in constant that cannot be made unrepresentable (the SDK has no URL literal) and that a test covers may
     /// trap, suppressed with a reason; the rule sanctions exactly that directive (#245; swift-molecules/swift-lint#2:
     /// a violation, an exempt and a near-miss fixture).

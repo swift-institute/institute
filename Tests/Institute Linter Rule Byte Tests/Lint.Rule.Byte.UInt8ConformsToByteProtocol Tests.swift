@@ -17,7 +17,7 @@ import Testing
 
 @testable import Institute_Linter_Rule_Byte
 
-extension Lint.Rule {
+extension `Lint.Rule Tests` {
     @Suite
     struct `uint8 conforms to byte protocol Tests` {
         @Suite struct Unit {}
@@ -26,7 +26,7 @@ extension Lint.Rule {
     }
 }
 
-extension Lint.Rule.`uint8 conforms to byte protocol Tests` {
+extension `Lint.Rule Tests`.`uint8 conforms to byte protocol Tests` {
     static func findings(
         in source: Swift::String,
         file: Swift::String = "test.swift"
@@ -38,13 +38,13 @@ extension Lint.Rule.`uint8 conforms to byte protocol Tests` {
     }
 }
 
-extension Lint.Rule.`uint8 conforms to byte protocol Tests`.Unit {
+extension `Lint.Rule Tests`.`uint8 conforms to byte protocol Tests`.Unit {
     @Test
     func `extension UInt8 conforming to Byte Protocol is flagged`() {
         let source = """
             extension UInt8: Byte.`Protocol` {}
             """
-        let result = Lint.Rule.`uint8 conforms to byte protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 conforms to byte protocol Tests`.findings(in: source)
         #expect(result.count == 1)
         if result.count == 1 {
             #expect(result[0].identifier == "uint8 conforms to byte protocol")
@@ -56,7 +56,7 @@ extension Lint.Rule.`uint8 conforms to byte protocol Tests`.Unit {
         let source = """
             extension Swift.UInt8: Byte.`Protocol` {}
             """
-        let result = Lint.Rule.`uint8 conforms to byte protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 conforms to byte protocol Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
@@ -65,12 +65,12 @@ extension Lint.Rule.`uint8 conforms to byte protocol Tests`.Unit {
         let source = """
             extension UInt8: Byte.Byte.`Protocol` {}
             """
-        let result = Lint.Rule.`uint8 conforms to byte protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 conforms to byte protocol Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 }
 
-extension Lint.Rule.`uint8 conforms to byte protocol Tests`.`Edge Case` {
+extension `Lint.Rule Tests`.`uint8 conforms to byte protocol Tests`.`Edge Case` {
     @Test
     func `extension UInt8 with no Byte Protocol conformance is NOT flagged`() {
         let source = """
@@ -78,7 +78,7 @@ extension Lint.Rule.`uint8 conforms to byte protocol Tests`.`Edge Case` {
                 public var asciiUppercase: UInt8 { self & 0xDF }
             }
             """
-        let result = Lint.Rule.`uint8 conforms to byte protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 conforms to byte protocol Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 
@@ -87,7 +87,7 @@ extension Lint.Rule.`uint8 conforms to byte protocol Tests`.`Edge Case` {
         let source = """
             extension Byte: Byte.`Protocol` {}
             """
-        let result = Lint.Rule.`uint8 conforms to byte protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 conforms to byte protocol Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 
@@ -96,12 +96,12 @@ extension Lint.Rule.`uint8 conforms to byte protocol Tests`.`Edge Case` {
         let source = """
             extension UInt8: Sendable {}
             """
-        let result = Lint.Rule.`uint8 conforms to byte protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 conforms to byte protocol Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 }
 
-extension Lint.Rule.`uint8 conforms to byte protocol Tests`.Integration {
+extension `Lint.Rule Tests`.`uint8 conforms to byte protocol Tests`.Integration {
     @Test
     func `mixed file with one violation flags exactly once`() {
         let source = """
@@ -109,14 +109,14 @@ extension Lint.Rule.`uint8 conforms to byte protocol Tests`.Integration {
             extension UInt8: Byte.`Protocol` {}
             extension Int: Sendable {}
             """
-        let result = Lint.Rule.`uint8 conforms to byte protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 conforms to byte protocol Tests`.findings(in: source)
         #expect(result.count == 1)
     }
 
     @Test
     func `large file with no violations yields no findings`() {
         let source = String(repeating: "extension Int: Sendable {}\n", count: 200)
-        let result = Lint.Rule.`uint8 conforms to byte protocol Tests`.findings(in: source)
+        let result = `Lint.Rule Tests`.`uint8 conforms to byte protocol Tests`.findings(in: source)
         #expect(result.isEmpty)
     }
 }
