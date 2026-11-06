@@ -107,26 +107,26 @@ extension `Institute.Planner.Canary Tests`.Test.Integration {
     }
 
     @Test func `each planner measures with its own Xcode across a swift-format re-pin`() throws {
-        let fixture = Institute.Planner.Canary.Test.scenario()
-        let work = try Institute.Planner.Canary.Test.work()
+        let fixture = `Institute.Planner.Canary Tests`.Test.scenario()
+        let work = try `Institute.Planner.Canary Tests`.Test.work()
         defer {
             // swift-linter:disable:next try optional
             // REASON: fixture cleanup; residue in the temporary directory must not mask the test's outcome.
             try? File.System.Delete.delete(at: File.Path(work), recursive: true)
         }
-        let report = Institute.Planner.Canary.Outcome.Test.Report.output(
-            Institute.Planner.Canary.Outcome.Test.Report.report()
+        let report = `Institute.Planner.Canary.Outcome Tests`.Test.Report.output(
+            `Institute.Planner.Canary.Outcome Tests`.Test.Report.report()
         )
-        let calls = Institute.Planner.Canary.Test.Calls()
+        let calls = `Institute.Planner.Canary Tests`.Test.Calls()
         let evidence = Institute.Planner.Canary.evidence(
             run: "200",
-            repositories: [Institute.Planner.Canary.Test.repository],
+            repositories: [`Institute.Planner.Canary Tests`.Test.repository],
             work: work,
             xcode: "/Applications/Xcode-Old.app",
             candidateXcode: "/Applications/Xcode-New.app",
             release: fixture.release,
             consumer: fixture.consumer,
-            runner: Institute.Planner.Canary.Test.runner(current: report, candidate: report, calls: calls)
+            runner: `Institute.Planner.Canary Tests`.Test.runner(current: report, candidate: report, calls: calls)
         )
 
         #expect(evidence.verdict == .adoptable, "\(evidence.refusal)")
