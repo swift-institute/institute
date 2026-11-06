@@ -1,5 +1,5 @@
-import GitHub_Standard
 import Byte
+import GitHub_Standard
 import Institute_Command
 public import Institute_Model
 import Institute_Repository_Policy

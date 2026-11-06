@@ -1,5 +1,5 @@
-import GitHub_Standard
 import Foundation
+import GitHub_Standard
 import Institute_Model
 import Institute_Repository_Policy
 import Testing

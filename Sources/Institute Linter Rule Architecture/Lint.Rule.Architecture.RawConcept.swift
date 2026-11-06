@@ -28,13 +28,15 @@ extension Lint.Rule {
             ),
             .init(
                 id: "raw concept whole words at the end of a name",
-                source: "public struct Entry {\n    public var documentationURL: String\n    public var originalPath: String\n    public var modificationDate: String\n    public var fileName: String\n    public var counterpartyIBAN: String\n}",
+                source: "public struct Entry {\n    public var documentationURL: String\n    public var originalPath: String\n"
+                    + "    public var modificationDate: String\n    public var fileName: String\n    public var counterpartyIBAN: String\n}",
                 path: "Sources/Ledger/Entry.swift",
                 expectation: .findings(5)
             ),
             .init(
                 id: "raw concept a word inside another or not at the end",
-                source: "public struct Entry {\n    public var onHashChange: String\n    public var hashAlgorithm: String\n    public var shadowed: String\n    public var allocation: String\n    public var direction: String\n    public var pathStyle: String\n}",
+                source: "public struct Entry {\n    public var onHashChange: String\n    public var hashAlgorithm: String\n    public var shadowed: String\n"
+                    + "    public var allocation: String\n    public var direction: String\n    public var pathStyle: String\n}",
                 path: "Sources/Ledger/Entry.swift",
                 expectation: .clean
             ),

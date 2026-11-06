@@ -1,5 +1,5 @@
-import GitHub_Standard
 import File_System
+import GitHub_Standard
 import Git_Foundation
 import Institute_Model
 import Institute_Source_Workspace

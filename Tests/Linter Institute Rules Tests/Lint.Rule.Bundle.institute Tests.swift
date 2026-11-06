@@ -54,6 +54,9 @@ private let allDeclaredRuleIDs: Swift::Set<Swift::String> = [
     "chained rawvalue access",
     "closure typed throws annotation",
     "compound identifier",
+    // Concept map pair (coenttb/work#239).
+    "concept parallel",
+    "raw concept",
     // Naming grammar pair (#65, principal directive 2026-08-09).
     "manifest naming grammar",
     "macro expansion short name",

@@ -2,7 +2,6 @@ import ASCII
 import Byte
 import Environment
 public import File_System
-import ISO_9945_Kernel_File
 public import Institute_CI_Canon
 public import Institute_CI_Model
 public import Institute_Model

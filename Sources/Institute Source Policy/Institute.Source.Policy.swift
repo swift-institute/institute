@@ -1,5 +1,5 @@
 import GitHub_Standard
-import ISO_9945_Kernel_File
+import Path
 public import Institute_Model
 public import Source_Profile
 
@@ -51,13 +51,13 @@ extension Institute.Source {
                     id: .init("swift-format"),
                     platform: .macOSARM64,
                     version: "main",
-                    revision: "27B48",
-                    toolchain: "Xcode 27.2 (27B48)",
+                    revision: "27B52",
+                    toolchain: "Xcode 27.2 (27B52)",
                     schema: "swift-format:main",
                     executable: .init(
                         name: "swift-format",
                         digest: .init(
-                            "d16e078818b2dc41a6a977a8e6aaf57fb535c3e34f97bf087bb6e909b13a5d8f"
+                            "475d31f48c068e4ebc05870bc0f1ae7e9bb8cae1520e1053212aa91b8d7b7d34"
                         ),
                         origin: .xcode(
                             application: "/Applications/Xcode_27.2.app",

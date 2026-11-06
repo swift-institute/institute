@@ -71,7 +71,6 @@ let package = Package(
         .package(url: "https://github.com/swift-ietf/swift-rfc-3339.git", branch: "main"),
         .package(url: "https://github.com/swift-ietf/swift-rfc-4648.git", branch: "main"),
         .package(url: "https://github.com/swift-iso/swift-iso-8601.git", branch: "main"),
-        .package(url: "https://github.com/swift-iso/swift-iso-9945.git", branch: "main"),
         .package(url: "https://github.com/swift-standards/swift-fips-180-4.git", branch: "main"),
         .package(url: "https://github.com/swift-standards/swift-github-standard.git", branch: "main"),
         .package(url: "https://github.com/swift-standards/swift-spm-standard.git", branch: "main"),
@@ -206,7 +205,6 @@ let package = Package(
             dependencies: [
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
                 .product(name: "Path", package: "swift-path"),
-                .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
                 "Institute Model",
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
@@ -263,7 +261,6 @@ let package = Package(
         .target(
             name: "Institute CI Validation",
             dependencies: [
-                .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
                 "Institute CI Canon",
                 "Institute CI Inventory",
                 "Institute CI Model",
@@ -288,7 +285,6 @@ let package = Package(
             dependencies: [
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
                 .product(name: "ISO 8601", package: "swift-iso-8601"),
-                .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
                 "Institute Model",
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
@@ -335,7 +331,6 @@ let package = Package(
             name: "Institute Tests",
             dependencies: [
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
-                .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
                 "Institute Installation",
                 "Institute Model",
                 "Institute Source",
@@ -423,7 +418,6 @@ let package = Package(
             name: "Institute Version",
             dependencies: [
                 .product(name: "File System", package: "swift-file-system"),
-                .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
                 "Institute GitHub",
                 "Institute Model",
                 .product(name: "Byte", package: "swift-byte"),
@@ -434,7 +428,6 @@ let package = Package(
             name: "Institute Version Tests",
             dependencies: [
                 .product(name: "File System", package: "swift-file-system"),
-                .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
                 "Institute Model",
                 "Institute Repository Policy",
                 "Institute Version",
@@ -505,7 +498,6 @@ let package = Package(
             name: "Institute Planner Tests",
             dependencies: [
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
-                .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
                 "Institute Model",
                 "Institute Planner",
                 "Source Report",
@@ -522,7 +514,7 @@ let package = Package(
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "ISO 8601", package: "swift-iso-8601"),
-                .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
+                .product(name: "File System", package: "swift-file-system"),
                 "Institute CI Canon",
                 "Institute CI Model",
                 "Institute CI Validation",

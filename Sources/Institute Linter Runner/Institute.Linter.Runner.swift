@@ -1,5 +1,5 @@
-import GitHub_Standard
 import Environment
+import GitHub_Standard
 import Institute_Model
 import Linter
 import Linter_Institute_Rules
