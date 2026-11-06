@@ -120,7 +120,9 @@ extension `Institute.Planner.Canary.Outcome Tests`.Test {
 extension `Institute.Planner.Canary.Outcome Tests`.Test.Unit {
 
     @Test func `a clean report reads as clean with its control counted`() {
-        let outcome = Institute.Planner.Canary.Outcome(.init(code: 0, output: `Institute.Planner.Canary.Outcome Tests`.Test.Report.output(`Institute.Planner.Canary.Outcome Tests`.Test.Report.report())))
+        let outcome = Institute.Planner.Canary.Outcome(
+            .init(code: 0, output: `Institute.Planner.Canary.Outcome Tests`.Test.Report.output(`Institute.Planner.Canary.Outcome Tests`.Test.Report.report()))
+        )
         #expect(outcome == .init(status: .clean, code: 0, controls: ["clean": 1]))
     }
 
@@ -150,12 +152,16 @@ extension `Institute.Planner.Canary.Outcome Tests`.Test.Unit {
 extension `Institute.Planner.Canary.Outcome Tests`.Test.`Edge Case` {
 
     @Test func `a run ended by a signal crashed`() {
-        let outcome = Institute.Planner.Canary.Outcome(.init(code: nil, output: `Institute.Planner.Canary.Outcome Tests`.Test.Report.output(`Institute.Planner.Canary.Outcome Tests`.Test.Report.report())))
+        let outcome = Institute.Planner.Canary.Outcome(
+            .init(code: nil, output: `Institute.Planner.Canary.Outcome Tests`.Test.Report.output(`Institute.Planner.Canary.Outcome Tests`.Test.Report.report()))
+        )
         #expect(outcome.status == .crashed)
     }
 
     @Test func `an exit outside the source exit contract crashed`() {
-        let outcome = Institute.Planner.Canary.Outcome(.init(code: 64, output: `Institute.Planner.Canary.Outcome Tests`.Test.Report.output(`Institute.Planner.Canary.Outcome Tests`.Test.Report.report())))
+        let outcome = Institute.Planner.Canary.Outcome(
+            .init(code: 64, output: `Institute.Planner.Canary.Outcome Tests`.Test.Report.output(`Institute.Planner.Canary.Outcome Tests`.Test.Report.report()))
+        )
         #expect(outcome.status == .crashed)
     }
 
