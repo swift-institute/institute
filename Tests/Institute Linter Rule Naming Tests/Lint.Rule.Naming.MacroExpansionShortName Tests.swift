@@ -54,6 +54,35 @@ extension `Lint.Rule Tests`.`macro expansion short name Tests`.Unit {
 
 extension `Lint.Rule Tests`.`macro expansion short name Tests`.`Edge Case` {
     @Test
+    func `escape sequences are text, not type names`() {
+        let source = #"""
+            struct ValueMacro: MemberMacro {
+                static func expansion() -> [DeclSyntax] {
+                    let members = ["a", "b"].joined(separator: "\n\n    ")
+                    let tab = "\t\u{20}\\"
+                    return []
+                }
+            }
+            """#
+        let findings = `Lint.Rule Tests`.`macro expansion short name Tests`.findings(in: source)
+        #expect(findings.isEmpty)
+    }
+
+    @Test
+    func `a short name repeated in one literal is one finding`() {
+        let source = """
+            struct ValueMacro: ExtensionMacro {
+                static func expansion() -> [ExtensionDeclSyntax] {
+                    ["extension Value: Sendable {} extension Other: Sendable {}"]
+                }
+            }
+            """
+        let findings = `Lint.Rule Tests`.`macro expansion short name Tests`.findings(in: source)
+        #expect(findings.map(\.message).count == Swift::Set(findings.map(\.message)).count)
+        #expect(findings.contains { $0.message == namingMacroExpansionShortNameMessage("Sendable") })
+    }
+
+    @Test
     func `fully qualified extension target and inherited type are lawful`() {
         let source = """
             struct ValueMacro: ExtensionMacro {
