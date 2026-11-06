@@ -289,6 +289,29 @@ extension `target import edge Tests`.Exemption {
     }
 
     @Test
+    func `SDK frameworks and Foundation's Linux modules are exempt`() throws {
+        let fixture = try `target import edge Tests`.Fixture(
+            manifest: `target import edge Tests`.manifest(
+                targets: """
+                    .target(name: "A"),
+                    """
+            ),
+            files: [
+                "Sources/A/File.swift": """
+                import FoundationNetworking
+                import FoundationXML
+                import SwiftUI
+                import AppKit
+                import Security
+                import CoreGraphics
+                """
+            ]
+        )
+        defer { fixture.tearDown() }
+        #expect(try fixture.findings().isEmpty)
+    }
+
+    @Test
     func `own module import is exempt`() throws {
         let fixture = try `target import edge Tests`.Fixture(
             manifest: `target import edge Tests`.manifest(

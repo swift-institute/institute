@@ -37,6 +37,10 @@ package let packageTargetImportEdgeToolchainModules: Swift::Set<Swift::String> =
     "Observation", "Synchronization", "Builtin", "CRT", "ucrt",
     "SwiftShims", "DistributedActors", "Distributed", "RegexBuilder",
     "StringProcessing", "CoreFoundation", "ObjectiveC", "simd", "Accelerate",
+    "FoundationNetworking", "FoundationXML", "FoundationInternationalization",
+    "SwiftUI", "AppKit", "UIKit", "WebKit", "Network", "Security", "CryptoKit",
+    "CoreGraphics", "ImageIO", "UniformTypeIdentifiers", "AVFoundation", "Combine",
+    "CoreText", "QuartzCore", "CoreServices", "OSLog", "SystemConfiguration",
 ]
 
 package func packageTargetImportEdgeNormalize(_ name: Swift::String) -> Swift::String {
