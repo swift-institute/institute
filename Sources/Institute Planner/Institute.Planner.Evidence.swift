@@ -6,7 +6,7 @@ extension Institute.Planner {
     /// two binaries it ran, every canary comparison, and the verdict.
     /// `adopt` admits only an adoptable record for its own publish run.
     public struct Evidence: Sendable, Equatable {
-        public static let schema = 1
+        public static let schema = 2
 
         public let verdict: Canary.Verdict
         public let run: Swift.String
@@ -17,7 +17,10 @@ extension Institute.Planner {
         public let rows: [Swift.String]
         public let candidate: Binary?
         public let current: Binary?
+        /// The Xcode the current planner measured with.
         public let xcode: Swift.String
+        /// The Xcode the candidate measured with.
+        public let candidateXcode: Swift.String
         public let repositories: [Canary.Comparison]
         /// Why the canary refused; empty unless the verdict is refused.
         public let refusal: Swift.String
@@ -30,6 +33,7 @@ extension Institute.Planner {
             candidate: Binary? = nil,
             current: Binary? = nil,
             xcode: Swift.String = "",
+            candidateXcode: Swift.String = "",
             repositories: [Canary.Comparison] = [],
             refusal: Swift.String = ""
         ) {
@@ -40,6 +44,7 @@ extension Institute.Planner {
             self.candidate = candidate
             self.current = current
             self.xcode = xcode
+            self.candidateXcode = candidateXcode
             self.repositories = repositories
             self.refusal = refusal
         }
@@ -55,6 +60,7 @@ extension Institute.Planner.Evidence {
         current: Institute.Planner.Executable,
         rows: [Institute.Planner.Row],
         xcode: Swift.String,
+        candidateXcode: Swift.String,
         repositories: [Institute.Planner.Canary.Comparison]
     ) {
         self.init(
@@ -65,6 +71,7 @@ extension Institute.Planner.Evidence {
             candidate: .init(candidate),
             current: .init(current),
             xcode: xcode,
+            candidateXcode: candidateXcode,
             repositories: repositories
         )
     }
@@ -100,6 +107,7 @@ extension Institute.Planner.Evidence: JSON.Serializable {
             "candidate": value.candidate?.json ?? .null,
             "current": value.current?.json ?? .null,
             "xcodeApplication": value.xcode.json,
+            "candidateXcodeApplication": value.candidateXcode.json,
             "repositories": value.repositories.json,
             "refusal": value.refusal.json,
         ]
@@ -133,6 +141,7 @@ extension Institute.Planner.Evidence: JSON.Serializable {
             candidate: try json["candidate"].isNull ? nil : Binary(json: json["candidate"]),
             current: try json["current"].isNull ? nil : Binary(json: json["current"]),
             xcode: try Swift.String(json: json["xcodeApplication"]),
+            candidateXcode: try Swift.String(json: json["candidateXcodeApplication"]),
             repositories: repositories,
             refusal: try Swift.String(json: json["refusal"])
         )

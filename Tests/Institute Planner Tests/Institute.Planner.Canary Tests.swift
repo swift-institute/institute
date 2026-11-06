@@ -106,6 +106,40 @@ extension `Institute.Planner.Canary Tests`.Test.Integration {
         #expect(Institute.Planner.Fixture.hex(installed) == (try fixture.release.publication(run: "200")).row(for: .macos).binary.hex)
     }
 
+    @Test func `each planner measures with its own Xcode across a swift-format re-pin`() throws {
+        let fixture = Institute.Planner.Canary.Test.scenario()
+        let work = try Institute.Planner.Canary.Test.work()
+        defer {
+            // swift-linter:disable:next try optional
+            // REASON: fixture cleanup; residue in the temporary directory must not mask the test's outcome.
+            try? File.System.Delete.delete(at: File.Path(work), recursive: true)
+        }
+        let report = Institute.Planner.Canary.Outcome.Test.Report.output(
+            Institute.Planner.Canary.Outcome.Test.Report.report()
+        )
+        let calls = Institute.Planner.Canary.Test.Calls()
+        let evidence = Institute.Planner.Canary.evidence(
+            run: "200",
+            repositories: [Institute.Planner.Canary.Test.repository],
+            work: work,
+            xcode: "/Applications/Xcode-Old.app",
+            candidateXcode: "/Applications/Xcode-New.app",
+            release: fixture.release,
+            consumer: fixture.consumer,
+            runner: Institute.Planner.Canary.Test.runner(current: report, candidate: report, calls: calls)
+        )
+
+        #expect(evidence.verdict == .adoptable, "\(evidence.refusal)")
+        #expect(evidence.xcode == "/Applications/Xcode-Old.app")
+        #expect(evidence.candidateXcode == "/Applications/Xcode-New.app")
+        let runs = calls.all.filter { $0.hasPrefix("run ") }
+        #expect(runs.count == 2)
+        #expect(runs.first?.contains("institute-current") == true)
+        #expect(runs.first?.hasSuffix("--xcode-application /Applications/Xcode-Old.app") == true)
+        #expect(runs.last?.contains("institute-candidate") == true)
+        #expect(runs.last?.hasSuffix("--xcode-application /Applications/Xcode-New.app") == true)
+    }
+
     @Test func `a candidate that gains an error differs`() throws {
         let fixture = `Institute.Planner.Canary Tests`.Test.scenario()
         let work = try `Institute.Planner.Canary Tests`.Test.work()

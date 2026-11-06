@@ -18,11 +18,16 @@ extension Institute.Planner.Canary {
     /// A contract or verification failure refuses the whole canary; a
     /// repository that cannot be cloned or measured is recorded as not
     /// having run, which no candidate can be adopted over.
+    ///
+    /// Each planner verifies the swift-format it pins against its Xcode, so
+    /// a candidate that re-pins swift-format needs `candidateXcode`, the
+    /// Xcode carrying its pin; without it both planners use `xcode`.
     public static func evidence(
         run: Swift.String,
         repositories: [GitHub_Standard::GitHub.Repository.Slug],
         work: Swift.String,
         xcode: Swift.String,
+        candidateXcode: Swift.String? = nil,
         release: Institute.Planner.Release,
         consumer: Institute.Planner.Consumer,
         runner: Runner
@@ -41,6 +46,7 @@ extension Institute.Planner.Canary {
                 candidate: try install(candidate, at: "\(planner)/institute-candidate")
             )
 
+            let xcodes = (current: xcode, candidate: candidateXcode ?? xcode)
             var comparisons: [Comparison] = []
             for name in repositories {
                 let bundle = Institute.Organization.lintBundle(forRepository: name)
@@ -50,7 +56,7 @@ extension Institute.Planner.Canary {
                         url: "https://github.com/\(name).git",
                         bundle: bundle,
                         base: "\(work)/\(name)",
-                        xcode: xcode,
+                        xcodes: xcodes,
                         binaries: binaries,
                         runner: runner
                     )
@@ -61,7 +67,8 @@ extension Institute.Planner.Canary {
                 candidate: candidate,
                 current: current,
                 rows: publication.rows,
-                xcode: xcode,
+                xcode: xcodes.current,
+                candidateXcode: xcodes.candidate,
                 repositories: comparisons
             )
         } catch {
@@ -75,13 +82,16 @@ extension Institute.Planner.Canary {
         url: Swift.String,
         bundle: Swift.String,
         base: Swift.String,
-        xcode: Swift.String,
+        xcodes: (current: Swift.String, candidate: Swift.String),
         binaries: (current: Swift.String, candidate: Swift.String),
         runner: Runner
     ) -> Comparison {
         let subject = "\(base)/subject"
         var revision = ""
-        func measure(_ binary: Swift.String) throws(Institute.Planner.Error) -> Outcome {
+        func measure(
+            _ binary: Swift.String,
+            xcode: Swift.String
+        ) throws(Institute.Planner.Error) -> Outcome {
             let pinned = try Institute.Planner.Revision(revision)
             return Outcome(
                 try runner.execute(
@@ -98,13 +108,13 @@ extension Institute.Planner.Canary {
         do throws(Institute.Planner.Error) {
             try Institute.Planner.directory(Institute.Planner.path(base))
             revision = try runner.clone(url, subject).description
-            let current = try measure(binaries.current)
+            let current = try measure(binaries.current, xcode: xcodes.current)
             try move(subject, to: "\(base)/current")
             let again = try runner.clone("file://\(base)/current", subject)
             guard again.description == revision else {
                 throw .local("\(repository): the second clone is at \(again), not \(revision)")
             }
-            let candidate = try measure(binaries.candidate)
+            let candidate = try measure(binaries.candidate, xcode: xcodes.candidate)
             try move(subject, to: "\(base)/candidate")
             return .init(
                 repository: repository,
