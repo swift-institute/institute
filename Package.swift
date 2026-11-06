@@ -205,6 +205,7 @@ let package = Package(
             dependencies: [
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
                 .product(name: "Path", package: "swift-path"),
+                .product(name: "File System", package: "swift-file-system"),
                 "Institute Model",
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
