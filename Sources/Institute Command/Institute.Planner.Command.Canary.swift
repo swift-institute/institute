@@ -19,6 +19,7 @@ extension Institute.Planner.Command {
         public var repositories: [Swift.String]
         public var workPath: Swift.String
         public var outputPath: Swift.String
+        public var currentXcode: Swift.String
         public var candidateXcode: Swift.String
 
         public init(
@@ -26,12 +27,14 @@ extension Institute.Planner.Command {
             repositories: [Swift.String] = [],
             workPath: Swift.String = "",
             outputPath: Swift.String = "",
+            currentXcode: Swift.String = "",
             candidateXcode: Swift.String = ""
         ) {
             self.publication = publication
             self.repositories = repositories
             self.workPath = workPath
             self.outputPath = outputPath
+            self.currentXcode = currentXcode
             self.candidateXcode = candidateXcode
         }
 
@@ -45,7 +48,9 @@ extension Institute.Planner.Command {
                     --work-path must not exist yet; it defaults to a fresh temporary \
                     directory. --output-path defaults to evidence.json in the work path. \
                     A candidate that re-pins swift-format needs --candidate-xcode, the \
-                    Xcode carrying its pin, since each planner verifies its own.
+                    Xcode carrying its pin, since each planner verifies its own. \
+                    --current-xcode does the same for the current planner, when the Mac's \
+                    selected Xcode doesn't carry its pin.
                     """
             )
         }
@@ -73,6 +78,11 @@ extension Institute.Planner.Command {
                     placeholder: "evidence.json"
                 )
                 Command_Schema.Command.Option(
+                    \.currentXcode,
+                    name: .long(.literal("current-xcode")),
+                    placeholder: "/Applications/Xcode.app"
+                )
+                Command_Schema.Command.Option(
                     \.candidateXcode,
                     name: .long(.literal("candidate-xcode")),
                     placeholder: "/Applications/Xcode.app"
@@ -95,13 +105,10 @@ extension Institute.Planner.Command {
             guard workPath.isEmpty || workPath.hasPrefix("/") else {
                 throw .validationFailed(reason: "--work-path must be absolute")
             }
-            guard
-                candidateXcode.isEmpty
-                    || (candidateXcode.hasPrefix("/Applications/") && candidateXcode.hasSuffix(".app"))
-            else {
-                throw .validationFailed(
-                    reason: "--candidate-xcode must name an application under /Applications"
-                )
+            for (option, value) in [("--current-xcode", currentXcode), ("--candidate-xcode", candidateXcode)] {
+                guard value.isEmpty || (value.hasPrefix("/Applications/") && value.hasSuffix(".app")) else {
+                    throw .validationFailed(reason: "\(option) must name an application under /Applications")
+                }
             }
         }
 
@@ -119,7 +126,7 @@ extension Institute.Planner.Command {
                 run: publication,
                 repositories: selected,
                 work: work,
-                xcode: try Self.xcode(),
+                xcode: currentXcode.isEmpty ? try Self.xcode() : currentXcode,
                 candidateXcode: candidateXcode.isEmpty ? nil : candidateXcode,
                 release: .github,
                 consumer: .github,
