@@ -1,3 +1,5 @@
+import Path
+
 extension Source {
     public struct Report: Sendable, JSON.Serializable {
         public static let schema = 10
@@ -30,8 +32,8 @@ extension Source {
                 ($0.subject.identity, $0.engine.token) < ($1.subject.identity, $1.engine.token)
             }
             self.artifactEvidence = artifactEvidence.sorted {
-                ($0.subject, $0.artifact.path, $0.predicate.engine.token, $0.predicate.token)
-                    < ($1.subject, $1.artifact.path, $1.predicate.engine.token, $1.predicate.token)
+                ($0.subject, $0.artifact.path.string, $0.predicate.engine.token, $0.predicate.token)
+                    < ($1.subject, $1.artifact.path.string, $1.predicate.engine.token, $1.predicate.token)
             }
             self.controlEvidence = controlEvidence.sorted {
                 ($0.rule.engine.token, $0.rule.token, $0.identity)

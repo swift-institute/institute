@@ -1,3 +1,5 @@
+import Path
+
 extension Source.Report {
     public struct Complete: Sendable {
         public let report: Source.Report
@@ -68,7 +70,7 @@ extension Source.Report {
                     let engine = commitment.engines.first(where: { $0.id == requirement.engine }),
                     requirement.artifacts.allSatisfy({ path in
                         subject.artifacts.contains {
-                            $0.path == path && engine.artifactKinds.contains($0.kind)
+                            $0.path.string == path && engine.artifactKinds.contains($0.kind)
                         }
                     })
                 else { throw .commitment }
@@ -85,7 +87,7 @@ extension Source.Report {
                         $0.identity == requirement.subject
                     }),
                     requirement.artifacts.allSatisfy({ path in
-                        guard let artifact = subject.artifacts.first(where: { $0.path == path }) else {
+                        guard let artifact = subject.artifacts.first(where: { $0.path.string == path }) else {
                             return false
                         }
                         return requirement.predicates.allSatisfy { predicateID in
@@ -120,7 +122,7 @@ extension Source.Report {
                             path: Swift.String
                         )? in
                     guard case .control(let control) = artifact.purpose else { return nil }
-                    return (control.identity, control.predicate, subject.identity, artifact.path)
+                    return (control.identity, control.predicate, subject.identity, artifact.path.string)
                 }
             }
             guard Set(artifactControls.map(\.identity)).count == artifactControls.count,
@@ -169,7 +171,7 @@ extension Source.Report {
                     guard
                         let artifact = commitment.subjects
                             .first(where: { $0.identity == artifactControl.subject })?
-                            .artifacts.first(where: { $0.path == artifactControl.path }),
+                            .artifacts.first(where: { $0.path.string == artifactControl.path }),
                         case .control(let declaration) = artifact.purpose,
                         measured.expectation == declaration.expectation
                     else { throw .coverage(control.identity) }
@@ -219,7 +221,7 @@ extension Source.Report {
                         subjectIDs.contains(binding.owner.identity),
                         !binding.input.isEmpty,
                         !binding.revision.isEmpty,
-                        !binding.digest.isEmpty
+                        !binding.digest.hex.isEmpty
                     else { throw .artifacts(subject.identity) }
                 }
                 let measurements = report.measurements.filter {
@@ -230,7 +232,7 @@ extension Source.Report {
                 }
                 for requirement in requirements {
                     let artifacts = subject.artifacts.filter {
-                        requirement.artifacts.contains($0.path)
+                        requirement.artifacts.contains($0.path.string)
                     }
                     let matching = measurements.filter { $0.engine == requirement.engine }
                     guard matching.count == 1, let measurement = matching.first else {
@@ -239,7 +241,7 @@ extension Source.Report {
                     guard measurement.subject == subject,
                         measurement.files
                             == Self.absolute(
-                                artifacts.map(\.path),
+                                artifacts.map { $0.path.string },
                                 under: subject.root
                             ),
                         Set(measurement.activeRules) == Set(requirement.rules),
@@ -254,7 +256,7 @@ extension Source.Report {
 
                 for artifact in subject.artifacts {
                     let engineCoverage = requirements.contains {
-                        $0.artifacts.contains(artifact.path)
+                        $0.artifacts.contains(artifact.path.string)
                     }
                     let controlCoverage: Swift.Bool
                     if case .control(let control) = artifact.purpose {
@@ -267,7 +269,7 @@ extension Source.Report {
                     let requiredPredicateIDs = commitment.predicateRequirements
                         .filter {
                             $0.subject == subject.identity
-                                && $0.artifacts.contains(artifact.path)
+                                && $0.artifacts.contains(artifact.path.string)
                         }
                         .flatMap(\.predicates)
                     guard engineCoverage || controlCoverage || !requiredPredicateIDs.isEmpty else {
@@ -311,7 +313,7 @@ extension Source.Report {
                     commitment.predicateRequirements
                         .filter {
                             $0.subject == subject.identity
-                                && $0.artifacts.contains(artifact.path)
+                                && $0.artifacts.contains(artifact.path.string)
                         }
                         .flatMap(\.predicates)
                         .map { (subject.identity, artifact, $0) }

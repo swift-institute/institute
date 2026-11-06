@@ -1,5 +1,5 @@
 public import Byte
-import FIPS_180_4
+public import FIPS_180_4
 public import Institute_CI_Model
 public import Institute_Model
 
@@ -79,7 +79,7 @@ extension Institute.CI.Bootstrap.Identity {
 
     /// The cache key: lowercase hex SHA-256 of the canonical tuple
     /// bytes, through the R37 witness.
-    public var digest: String {
-        FIPS_180_4.SHA256.digest(canonicalBytes).hex
+    public var digest: FIPS_180_4.Digest {
+        FIPS_180_4.SHA256.digest(canonicalBytes)
     }
 }

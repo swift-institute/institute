@@ -1,3 +1,4 @@
+import ISO_9945_Kernel_File
 import Source_Measurement
 import Source_Report
 import Source_SwiftLint
@@ -12,7 +13,7 @@ private func repairCoverageSubject() -> Source.Subject {
         root: repairCoverageRoot,
         artifacts: ["Sources/A.swift", "Sources/B.swift"].map {
             .init(
-                path: $0,
+                path: .init(stringLiteral: $0),
                 kind: .swift,
                 purpose: .governedSource,
                 provenance: .authored,

@@ -3,13 +3,13 @@ extension Source.Artifact.Provenance {
         public let owner: Source.Artifact.Provenance.Owner
         public let input: Swift.String
         public let revision: Swift.String
-        public let digest: Swift.String
+        public let digest: Source.Artifact.Digest
 
         public init(
             owner: Source.Artifact.Provenance.Owner,
             input: Swift.String,
             revision: Swift.String,
-            digest: Swift.String
+            digest: Source.Artifact.Digest
         ) {
             self.owner = owner
             self.input = input
@@ -39,7 +39,7 @@ extension Source.Artifact.Provenance.Generated: JSON.Serializable {
             owner: Source.Artifact.Provenance.Owner(json: owner),
             input: Swift.String(json: input),
             revision: Swift.String(json: revision),
-            digest: Swift.String(json: digest)
+            digest: Source.Artifact.Digest(json: digest)
         )
     }
 }

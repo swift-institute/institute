@@ -1,3 +1,4 @@
+public import File_System
 public import Institute_Model
 public import JSON
 public import Source_Profile
@@ -15,7 +16,7 @@ extension Institute.Source {
         public let swiftLint: Tool
         public let linterExecutable: Swift.String
         public let linter: Tool
-        public let directory: Swift.String
+        public let directory: File.Directory
         public let profiles: [Swift.String: Source_Profile.Source.Profile.Digest]
         public let verifiedProfiles: [Swift.String]
 
@@ -28,7 +29,7 @@ extension Institute.Source {
             swiftLint: Tool,
             linterExecutable: Swift.String,
             linter: Tool,
-            directory: Swift.String,
+            directory: File.Directory,
             profiles: [Swift.String: Source_Profile.Source.Profile.Digest],
             verifiedProfiles: [Swift.String],
             swiftFormatXcodeBuild: Swift.String? = nil
@@ -59,7 +60,7 @@ extension Institute.Source {
                 "swiftLint": value.swiftLint.json,
                 "linterExecutable": value.linterExecutable.json,
                 "linter": value.linter.json,
-                "directory": value.directory.json,
+                "directory": value.directory.path.string.json,
                 "profiles": value.profiles.json,
                 "verifiedProfiles": value.verifiedProfiles.json,
             ]
@@ -97,6 +98,13 @@ extension Institute.Source {
                 let verifiedProfiles = object["verifiedProfiles"],
                 let swiftFormatXcodeBuild = object["swiftFormatXcodeBuild"]
             else { throw .missingKey("source preparation field") }
+            let directoryText = try Swift.String(json: directory)
+            let parsedDirectory: File.Directory
+            do throws(File.Path.Error) {
+                parsedDirectory = try File.Directory(validating: directoryText)
+            } catch {
+                throw .typeMismatch(expected: "source preparation directory", got: "invalid path")
+            }
             return try .init(
                 policyRevision: Swift.String(json: policyRevision),
                 binding: Binding(json: binding),
@@ -106,7 +114,7 @@ extension Institute.Source {
                 swiftLint: Tool(json: swiftLint),
                 linterExecutable: Swift.String(json: linterExecutable),
                 linter: Tool(json: linter),
-                directory: Swift.String(json: directory),
+                directory: parsedDirectory,
                 profiles: [Swift.String: Source_Profile.Source.Profile.Digest](json: profiles),
                 verifiedProfiles: [Swift.String](json: verifiedProfiles),
                 swiftFormatXcodeBuild: Swift.String?(json: swiftFormatXcodeBuild)

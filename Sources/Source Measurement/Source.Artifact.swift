@@ -1,13 +1,15 @@
+public import Path
+
 extension Source {
     public struct Artifact: Hashable, Sendable {
-        public let path: Swift.String
+        public let path: Path::Path
         public let kind: Kind
         public let purpose: Purpose
         public let provenance: Provenance
         public let digest: Digest
 
         public init(
-            path: Swift.String,
+            path: Path::Path,
             kind: Kind,
             purpose: Purpose,
             provenance: Provenance,
@@ -25,7 +27,7 @@ extension Source {
 extension Source.Artifact: JSON.Serializable {
     public static func serialize(_ value: Self) -> JSON {
         [
-            "path": value.path.json,
+            "path": value.path.string.json,
             "kind": value.kind.json,
             "purpose": value.purpose.json,
             "provenance": value.provenance.json,
@@ -47,8 +49,15 @@ extension Source.Artifact: JSON.Serializable {
             throw .missingKey("provenance")
         }
         guard let digest = object["digest"] else { throw .missingKey("digest") }
+        let text = try Swift.String(json: path)
+        let parsed: Path::Path
+        do throws(Path::Path.Error) {
+            parsed = try Path::Path(validating: text)
+        } catch {
+            throw .typeMismatch(expected: "source artifact path", got: "invalid path")
+        }
         return try Self(
-            path: Swift.String(json: path),
+            path: parsed,
             kind: Kind(json: kind),
             purpose: Purpose(json: purpose),
             provenance: Provenance(json: provenance),

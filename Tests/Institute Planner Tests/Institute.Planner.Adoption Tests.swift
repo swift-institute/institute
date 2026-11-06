@@ -192,7 +192,8 @@ extension Institute.Planner.Adoption.Test.Integration {
         let anchor = try File.Path.Temporary.deterministic(prefix: "institute-planner-adopt", key: "", suffix: "")
         let root = try File.Path.Temporary.sibling(of: anchor, prefix: "institute-planner-adopt-").description
         let git = Git.Client()
-        try git.initialize(at: root, bare: false)
+        let directory = try File.Path(root)
+        try git.initialize(at: directory, bare: false)
         try File(File.Path("\(root)/.git/HEAD")).write.atomic(contentsOf: [Byte](utf8: "ref: refs/heads/main\n"))
         let config = try Institute.Planner.read(Institute.Planner.path("\(root)/.git/config"))
         try File(File.Path("\(root)/.git/config")).write.atomic(
@@ -201,8 +202,8 @@ extension Institute.Planner.Adoption.Test.Integration {
         for path in Institute.Planner.Adoption.paths {
             try File(File.Path("\(root)/\(path)")).write.atomic(contentsOf: scenario.fixture.files[path] ?? [])
         }
-        try git.add(Institute.Planner.Adoption.paths, at: root)
-        _ = try git.commit(message: "Adopt the current planner", at: root)
+        try git.add(Institute.Planner.Adoption.paths, at: directory)
+        _ = try git.commit(message: "Adopt the current planner", at: directory)
         return root
     }
 
@@ -215,16 +216,16 @@ extension Institute.Planner.Adoption.Test.Integration {
             try? File.System.Delete.delete(at: File.Path(root), recursive: true)
         }
         let git = Git.Client()
-        let before = try git.head(at: root)
+        let before = try git.head(at: File.Path(root))
         let adoption = try scenario.adoption(scenario.evidence())
 
         let commit = try adoption.record(at: root, git: git)
 
         #expect(commit != before)
-        #expect(try git.head(at: root) == commit)
-        #expect(try git.count("HEAD", at: root) == 2)
-        #expect(try git.ancestor(before, of: commit, at: root))
-        #expect(try git.status(at: root).isEmpty)
+        #expect(try git.head(at: File.Path(root)) == commit)
+        #expect(try git.count("HEAD", at: File.Path(root)) == 2)
+        #expect(try git.ancestor(before, of: commit, at: File.Path(root)))
+        #expect(try git.status(at: File.Path(root)).isEmpty)
         let pin = try Institute.Planner.read(Institute.Planner.path("\(root)/\(Institute.Planner.Consumer.pin)"))
         #expect(Swift.String(decoding: pin, as: UTF8.self) == adoption.pin)
         let ledger = try Institute.Planner.read(Institute.Planner.path("\(root)/\(Institute.Planner.Consumer.ledger)"))
@@ -242,13 +243,13 @@ extension Institute.Planner.Adoption.Test.Integration {
         }
         try File(File.Path("\(root)/stray.txt")).write.atomic(contentsOf: [Byte](utf8: "stray\n"))
         let git = Git.Client()
-        let before = try git.head(at: root)
+        let before = try git.head(at: File.Path(root))
         let adoption = try scenario.adoption(scenario.evidence())
 
         #expect(throws: Institute.Planner.Error.self) {
             _ = try adoption.record(at: root, git: git)
         }
-        #expect(try git.head(at: root) == before)
+        #expect(try git.head(at: File.Path(root)) == before)
         let pin = try Institute.Planner.read(Institute.Planner.path("\(root)/\(Institute.Planner.Consumer.pin)"))
         #expect(Swift.String(decoding: pin, as: UTF8.self) == Institute.Planner.Fixture.pin(Institute.Planner.Fixture.current))
     }

@@ -14,11 +14,17 @@ extension Institute.Source.Workspace {
         root: Swift.String,
         using git: Git.Client = .init()
     ) throws(Institute.Error) -> Source.Subject {
+        let directory: File.Path
+        do throws(File.Path.Error) {
+            directory = try File.Path(root)
+        } catch {
+            throw .filesystem("cannot bind source package (repository): \(error)")
+        }
         let head: Swift.String
         let dirty: Swift.Bool
         do throws(Git.Client.Error) {
-            head = try git.head(at: root).rawValue
-            dirty = try !git.status(at: root).isEmpty
+            head = try git.head(at: directory).rawValue
+            dirty = try !git.status(at: directory).isEmpty
         } catch {
             throw .filesystem("cannot bind source package (repository): \(error)")
         }
@@ -36,8 +42,14 @@ extension Institute.Source.Workspace {
         root: Swift.String,
         using git: Git.Client = .init()
     ) throws(Institute.Error) -> Source.Subject {
+        let directory: File.Path
+        do throws(File.Path.Error) {
+            directory = try File.Path(root)
+        } catch {
+            throw .filesystem("cannot enumerate Git paths for \(identity): \(error)")
+        }
         let paths: [Swift.String]
-        do throws(Git.Client.Error) { paths = try git.paths(at: root) } catch {
+        do throws(Git.Client.Error) { paths = try git.paths(at: directory) } catch {
             throw .filesystem("cannot enumerate Git paths for \(identity): \(error)")
         }
         return try subject(identity: identity, root: root, paths: paths)
@@ -115,7 +127,7 @@ extension Institute.Source.Workspace {
             }
             artifacts.append(
                 .init(
-                    path: path,
+                    path: parsed,
                     kind: .swift,
                     purpose: controls[path].map {
                         .control(

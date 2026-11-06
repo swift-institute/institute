@@ -1,3 +1,4 @@
+import File_System
 import Institute_CI_Model
 import Institute_CI_Validation
 import Institute_Model
@@ -63,7 +64,7 @@ extension Institute.CI.Command {
 
         let evaluation: Package.Manifest.Evaluation
         do {
-            evaluation = try Package.Manager().evaluation(at: root)
+            evaluation = try Package.Manager().evaluation(at: File.Directory(validating: root))
         } catch {
             refuse("package validate could not evaluate manifest: \(error)")
         }

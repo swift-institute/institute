@@ -53,14 +53,14 @@ struct CIValidationGitignoreTests {
                 probes: work + Gitignore.junk + Gitignore.unadmitted
             )
             for probe in work {
-                #expect(!ignored.contains(probe.path), "\(`class`) work denied: \(probe.path)")
+                #expect(!ignored.contains("\(probe.path)"), "\(`class`) work denied: \(probe.path)")
             }
             for probe in Gitignore.junk {
-                #expect(ignored.contains(probe.path), "\(`class`) junk tracked: \(probe.path)")
+                #expect(ignored.contains("\(probe.path)"), "\(`class`) junk tracked: \(probe.path)")
             }
             for probe in Gitignore.unadmitted {
                 #expect(
-                    ignored.contains(probe.path),
+                    ignored.contains("\(probe.path)"),
                     "\(`class`) admits the unadmitted: \(probe.path)"
                 )
             }
@@ -330,7 +330,7 @@ struct CIValidationGitignoreTests {
                 probes: Gitignore.work(for: .package) + Gitignore.junk
             )
             #expect(ignored.isEmpty)
-            let tracked = Gitignore.junk.filter { !ignored.contains($0.path) }
+            let tracked = Gitignore.junk.filter { !ignored.contains("\($0.path)") }
             #expect(tracked.count == Gitignore.junk.count)
         }
 
@@ -418,7 +418,7 @@ struct CIValidationGitignoreTests {
                 )
                 for probe in packageWork {
                     #expect(
-                        !ignored.contains(probe.path),
+                        !ignored.contains("\(probe.path)"),
                         "\(`class`) narrows the package class: \(probe.path)"
                     )
                 }

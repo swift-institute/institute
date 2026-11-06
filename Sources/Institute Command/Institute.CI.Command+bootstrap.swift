@@ -1,4 +1,6 @@
 import Byte
+import FIPS_180_4
+import File_System
 import Institute_CI_Contract
 import Institute_CI_Model
 import Institute_Model
@@ -47,7 +49,7 @@ extension Institute.CI.Command {
                 "operatingSystem": identity.operatingSystem.json,
                 "architecture": identity.architecture.json,
                 "provisioning": identity.provisioning.sorted().json,
-                "key": identity.digest.json,
+                "key": identity.digest.hex.json,
             ])
 
         case .bootstrapManifest:
@@ -58,19 +60,21 @@ extension Institute.CI.Command {
             {
                 guard let bytes = contents(atPath: root + "/" + path)
                 else { refuse("bootstrap-manifest: unreadable executable \(path)") }
+                guard let filePath = try? File.Path(path)
+                else { refuse("bootstrap-manifest: invalid executable path \(path)") }
                 let executable = Institute.CI.Bootstrap.Manifest.Executable(
-                    path: path,
+                    path: filePath,
                     bytes: bytes
                 )
                 executables.append([
-                    "path": executable.path.json,
-                    "digest": executable.digest.json,
+                    "path": executable.path.string.json,
+                    "digest": executable.digest.hex.json,
                 ])
             }
             if executables.isEmpty { refuse("bootstrap-manifest: no executables") }
             emit([
                 "identity": identityJSON(identity),
-                "key": identity.digest.json,
+                "key": identity.digest.hex.json,
                 "executables": .array(executables),
                 "producerRun": value("--producer-run", in: rest).json,
             ])
@@ -96,27 +100,31 @@ extension Institute.CI.Command {
                 provisioning: (identityObject["provisioning"]?.array ?? [])
                     .map { Swift.String($0) }
             )
+            var executables: [Institute.CI.Bootstrap.Manifest.Executable] = []
+            for executable in executableValues {
+                guard let path = Swift.String(executable["path"] as JSON?),
+                    let filePath = try? File.Path(path),
+                    let hex = Swift.String(executable["digest"] as JSON?),
+                    let digest = FIPS_180_4.Digest(hex: hex)
+                else { refuse("bootstrap-verify: malformed manifest") }
+                executables.append(.init(path: filePath, digest: digest))
+            }
             let manifest = Institute.CI.Bootstrap.Manifest(
                 identity: recorded,
                 key: key,
-                executables: executableValues.map {
-                    .init(
-                        path: Swift.String($0["path"]),
-                        digest: Swift.String($0["digest"])
-                    )
-                },
+                executables: executables,
                 producerRun: producerRun
             )
             do throws(Institute.CI.Bootstrap.Manifest.VerificationError) {
                 try manifest.verify(against: identity) { path in
-                    contents(atPath: root + "/" + path)
+                    contents(atPath: root + "/" + path.string)
                 }
             } catch {
                 refuse("bootstrap cache entry refused (fail closed): \(error)")
             }
             print(
                 """
-                verified: key \(identity.digest), \
+                verified: key \(identity.digest.hex), \
                 \(executableValues.count) executable(s), producer run \(producerRun)
                 """
             )

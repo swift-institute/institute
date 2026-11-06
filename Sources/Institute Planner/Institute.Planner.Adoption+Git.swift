@@ -11,9 +11,10 @@ extension Institute.Planner.Adoption {
         at checkout: Swift.String,
         git: Git.Client = .init()
     ) throws(Institute.Planner.Error) -> Git.Object.ID {
+        let directory = try Institute.Planner.path(checkout)
         let isRepository: Swift.Bool
         do throws(Git.Client.Error) {
-            isRepository = try git.repository(at: checkout)
+            isRepository = try git.repository(at: directory)
         } catch {
             throw .local("cannot read \(checkout): \(error)")
         }
@@ -28,8 +29,8 @@ extension Institute.Planner.Adoption {
             to: Institute.Planner.path("\(checkout)/\(Institute.Planner.Consumer.ledger)")
         )
         do throws(Git.Client.Error) {
-            try git.add(Self.paths, at: checkout)
-            return try git.commit(message: message, at: checkout)
+            try git.add(Self.paths, at: directory)
+            return try git.commit(message: message, at: directory)
         } catch {
             throw .local("cannot commit the adoption in \(checkout): \(error)")
         }
@@ -41,11 +42,12 @@ extension Institute.Planner.Adoption {
     }
 
     private func require(_ checkout: Swift.String, git: Git.Client) throws(Institute.Planner.Error) {
+        let directory = try Institute.Planner.path(checkout)
         let branch: Swift.String
         let changes: Swift.Int
         do throws(Git.Client.Error) {
-            branch = try git.branch(at: checkout)
-            changes = try git.status(at: checkout).count
+            branch = try git.branch(at: directory)
+            changes = try git.status(at: directory).count
         } catch {
             throw .local("cannot read \(checkout): \(error)")
         }

@@ -16,7 +16,7 @@ import Testing
 func `Institute source preparation round trips its parse receipt`() throws {
     let preparation = Institute.Source.Preparation(
         policyRevision: "source-enforcement-v3",
-        binding: .package(.init(identity: "swift-atoms/swift-example@revision", digest: "subject-digest")),
+        binding: .package(.init(identity: "swift-atoms/swift-example@revision", digest: FIPS_180_4.SHA256.digest([]))),
         swiftFormatExecutable: "/tools/swift-format",
         swiftFormatTool: .init("format-tool"),
         swiftLintExecutable: "/tools/swiftlint",
@@ -29,7 +29,7 @@ func `Institute source preparation round trips its parse receipt`() throws {
             origin: .published(asset: "swift-linter-macos-arm64"),
             digest: .init("linter-tool")
         ),
-        directory: "/artifacts/.source",
+        directory: try File.Directory(validating: "/artifacts/.source"),
         profiles: ["institute": .init("profile-digest")],
         verifiedProfiles: ["institute"],
         swiftFormatXcodeBuild: "27A9275"
@@ -59,7 +59,7 @@ func `Institute source preparation round trips its parse receipt`() throws {
 @Test
 func `Institute source preparation binds one exact package subject`() throws {
     let binding = Institute.Source.Preparation.Binding.package(
-        .init(identity: "swift-standards/swift-iso-639@revision", digest: "subject-digest")
+        .init(identity: "swift-standards/swift-iso-639@revision", digest: FIPS_180_4.SHA256.digest([]))
     )
     let preparation = Institute.Source.Preparation(
         policyRevision: "source-enforcement-v3",
@@ -70,7 +70,7 @@ func `Institute source preparation binds one exact package subject`() throws {
         swiftLint: .init(origin: .local, digest: .init("swiftlint-tool")),
         linterExecutable: "/tools/swift-linter",
         linter: .init(origin: .local, digest: .init("linter-tool")),
-        directory: "/package/.source",
+        directory: try File.Directory(validating: "/package/.source"),
         profiles: [:],
         verifiedProfiles: []
     )
@@ -86,14 +86,14 @@ func `Institute source preparation binds one exact package subject`() throws {
 func `Institute source preparation rejects receipts without a parse verdict`() throws {
     let preparation = Institute.Source.Preparation(
         policyRevision: "source-enforcement-v3",
-        binding: .package(.init(identity: "swift-atoms/swift-example@revision", digest: "subject-digest")),
+        binding: .package(.init(identity: "swift-atoms/swift-example@revision", digest: FIPS_180_4.SHA256.digest([]))),
         swiftFormatExecutable: "/tools/swift-format",
         swiftFormatTool: .init("format-tool"),
         swiftLintExecutable: "/tools/swiftlint",
         swiftLint: .init(origin: .local, digest: .init("swiftlint-tool")),
         linterExecutable: "/tools/swift-linter",
         linter: .init(origin: .local, digest: .init("linter-tool")),
-        directory: "/artifacts/.source",
+        directory: try File.Directory(validating: "/artifacts/.source"),
         profiles: [:],
         verifiedProfiles: []
     )
@@ -284,14 +284,14 @@ func `Xcode source acquisition succeeds across build changes and records the obs
     #expect(observed == build)
     let preparation = Institute.Source.Preparation(
         policyRevision: "source-enforcement-v3",
-        binding: .package(.init(identity: "swift-atoms/swift-example@revision", digest: "subject-digest")),
+        binding: .package(.init(identity: "swift-atoms/swift-example@revision", digest: FIPS_180_4.SHA256.digest([]))),
         swiftFormatExecutable: tool.description,
         swiftFormatTool: digest,
         swiftLintExecutable: "/tools/swiftlint",
         swiftLint: .init(origin: .local, digest: .init("swiftlint-tool")),
         linterExecutable: "/tools/swift-linter",
         linter: .init(origin: .local, digest: .init("linter-tool")),
-        directory: root,
+        directory: try File.Directory(validating: root),
         profiles: [:],
         verifiedProfiles: [],
         swiftFormatXcodeBuild: observed
@@ -360,14 +360,14 @@ func `Local source linter snapshot is content addressed and omits its input path
     )
     let preparation = Institute.Source.Preparation(
         policyRevision: "source-enforcement-v3",
-        binding: .package(.init(identity: "swift-atoms/swift-example@revision", digest: "subject-digest")),
+        binding: .package(.init(identity: "swift-atoms/swift-example@revision", digest: FIPS_180_4.SHA256.digest([]))),
         swiftFormatExecutable: "/tools/swift-format",
         swiftFormatTool: .init("format-tool"),
         swiftLintExecutable: "/tools/swiftlint",
         swiftLint: .init(origin: .local, digest: .init("swiftlint-tool")),
         linterExecutable: snapshot.file.description,
         linter: .init(origin: .local, digest: snapshot.digest),
-        directory: root,
+        directory: try File.Directory(validating: root),
         profiles: [:],
         verifiedProfiles: []
     )
@@ -528,7 +528,7 @@ func `Source measurement refuses a tampered local linter snapshot`() async throw
             origin: .local,
             digest: try Institute.Source.Application.digest(file: linter)
         ),
-        directory: root,
+        directory: try File.Directory(validating: root),
         profiles: [:],
         verifiedProfiles: []
     )

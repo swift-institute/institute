@@ -1,7 +1,10 @@
 public import Byte
 import FIPS_180_4
+public import File_System
 public import Institute_CI_Model
 public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI.Bootstrap {
     /// The provenance manifest stored inside a cache entry: the identity
@@ -46,15 +49,15 @@ extension Institute.CI.Bootstrap.Manifest {
     /// manifest path to the restored file's bytes, or nil when absent.
     public func verify(
         against expected: Institute.CI.Bootstrap.Identity,
-        bytes: (String) -> [Byte]?
+        bytes: (File.Path) -> [Byte]?
     ) throws(VerificationError) {
         do throws(Institute.CI.Bootstrap.Identity.ValidationError) {
             try identity.validate()
         } catch {
             throw .identity(error)
         }
-        guard key == identity.digest else {
-            throw .keyMismatch(recorded: key, recomputed: identity.digest)
+        guard key == identity.digest.hex else {
+            throw .keyMismatch(recorded: key, recomputed: identity.digest.hex)
         }
         for (field, recorded, observed) in [
             ("workspaceRevision", identity.workspaceRevision, expected.workspaceRevision),
@@ -68,14 +71,14 @@ extension Institute.CI.Bootstrap.Manifest {
         guard !executables.isEmpty else { throw .noExecutables }
         for executable in executables {
             guard let restored = bytes(executable.path) else {
-                throw .executableMissing(path: executable.path)
+                throw .executableMissing(path: executable.path.string)
             }
-            let observed = FIPS_180_4.SHA256.digest(restored).hex
+            let observed = FIPS_180_4.SHA256.digest(restored)
             guard observed == executable.digest else {
                 throw .executableDigestMismatch(
-                    path: executable.path,
-                    recorded: executable.digest,
-                    observed: observed
+                    path: executable.path.string,
+                    recorded: executable.digest.hex,
+                    observed: observed.hex
                 )
             }
         }

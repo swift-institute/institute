@@ -1,3 +1,5 @@
+public import File_System
+import ISO_9945_Kernel_File
 public import Institute_Model
 
 extension Institute.Version {
@@ -22,7 +24,7 @@ extension Institute.Version {
 
 extension Institute.Version.Gate {
     /// The workflow file every package's generated caller lives in.
-    public static let workflow = ".github/workflows/ci.yml"
+    public static let workflow: File.Path = ".github/workflows/ci.yml"
     /// The check name of `ci-ok` as the generated caller's `ci / matrix`
     /// job reports it.
     public static let check = "ci / matrix / ci-ok"
@@ -34,14 +36,14 @@ extension Institute.Version.Gate {
         public let suite: Swift.Int
         public let event: Swift.String
         public let branch: Swift.String
-        public let path: Swift.String
+        public let path: File.Path
         public let completed: Swift.Bool
 
         public init(
             suite: Swift.Int,
             event: Swift.String,
             branch: Swift.String,
-            path: Swift.String,
+            path: File.Path,
             completed: Swift.Bool
         ) {
             self.suite = suite

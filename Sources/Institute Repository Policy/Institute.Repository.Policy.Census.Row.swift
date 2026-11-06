@@ -6,6 +6,8 @@ extension Institute.Repository.Policy.Census {
         public var censusVersion: String
         public var repository: String
         public var headSha: String
+        // swift-linter:disable:next raw concept
+        // REASON: a field of a census row, a CI wire format: sentinel rows spell it empty, which File.Path refuses.
         public var path: String
         public var coordinateKind: Kind
         public var coordinateId: String
@@ -24,6 +26,8 @@ extension Institute.Repository.Policy.Census {
             censusVersion: String = "1",
             repository: String,
             headSha: String,
+            // swift-linter:disable:next raw concept
+            // REASON: a field of a census row, a CI wire format: sentinel rows spell it empty, which File.Path refuses.
             path: String,
             coordinateKind: Kind,
             coordinateId: String,

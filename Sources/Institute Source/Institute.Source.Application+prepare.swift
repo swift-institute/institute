@@ -96,15 +96,15 @@ extension Institute.Source.Application {
         let swiftFormatTool = swiftFormatAsset.digest
         let swiftLintTool = swiftLint.digest
         let linterTool = linter.digest
-        let format = directory[file: try Self.component(policy.swiftFormat.path)]
+        let format = directory[file: try Self.component(policy.swiftFormat.path.string)]
         do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
             try await format.write.atomic(policy.swiftFormat.contents)
         } catch { throw .filesystem("cannot render \(format): \(error)") }
-        let formatRepair = directory[file: try Self.component(policy.swiftFormatRepair.path)]
+        let formatRepair = directory[file: try Self.component(policy.swiftFormatRepair.path.string)]
         do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
             try await formatRepair.write.atomic(policy.swiftFormatRepair.contents)
         } catch { throw .filesystem("cannot render \(formatRepair): \(error)") }
-        let swiftLintConfiguration = directory[file: try Self.component(policy.swiftLint.path)]
+        let swiftLintConfiguration = directory[file: try Self.component(policy.swiftLint.path.string)]
         do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
             try await swiftLintConfiguration.write.atomic(policy.swiftLint.contents)
         } catch { throw .filesystem("cannot render \(swiftLintConfiguration): \(error)") }
@@ -148,7 +148,7 @@ extension Institute.Source.Application {
             swiftLint: swiftLint,
             linterExecutable: linterExecutable,
             linter: linter,
-            directory: directory.description,
+            directory: directory,
             profiles: profiles,
             verifiedProfiles: verifiedProfiles.sorted(),
             swiftFormatXcodeBuild: swiftFormatXcodeBuild

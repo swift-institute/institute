@@ -1,4 +1,5 @@
 public import Byte
+public import File_System
 public import Institute_Model
 import JSON
 import RFC_4648
@@ -15,7 +16,7 @@ extension Institute.GitHub.Contents {
     /// The bytes of the regular file at `path` in `repository` at `ref`.
     public static func read(
         repository: Swift.String,
-        path: Swift.String,
+        path: File.Path,
         ref: Swift.String
     ) throws(Institute.GitHub.Release.Error) -> [Byte] {
         let location = "/repos/\(repository)/contents/\(path)?ref=\(ref)"

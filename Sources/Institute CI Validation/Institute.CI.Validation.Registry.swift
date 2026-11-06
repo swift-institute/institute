@@ -67,6 +67,8 @@ extension Institute.CI.Validation {
         /// registered spelling. Case-insensitive matching against the
         /// registry replaces the hand-maintained `prefix_for` table, so
         /// the two spellings cannot drift apart.
+        // swift-linter:disable:next raw concept
+        // REASON: a fixture directory's name, the rule identifier lower-cased and matched case-insensitively against Rule.rawValue: a name, not a location, so File.Directory and File.Path misdescribe it.
         public static func rule(forCorpusDirectory directory: String) -> Rule? {
             rules.first { $0.rawValue.lowercased() == directory.lowercased() }
         }

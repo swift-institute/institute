@@ -16,6 +16,8 @@ extension Institute.Repository.Policy.Prose {
         .sorted()
     }
 
+    // swift-linter:disable:next raw concept
+    // REASON: a tracked entry as the git index lists it, only quoted back; git admits names with control characters, which File.Path refuses, and such a file must still be reported.
     public static func message(_ path: Swift.String) -> Swift.String {
         "`\(path)` is prose outside README.md. A repository's prose is its README.md, written for agents to read "
             + "first; fold this into it or delete it. Admitted besides: LICENSE.md, an organization's community-health "

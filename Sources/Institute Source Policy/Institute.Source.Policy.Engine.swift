@@ -5,6 +5,8 @@ extension Institute.Source.Policy {
     public struct Engine: Sendable {
         public let id: Source_Profile.Source.Engine.ID
         public let platform: Platform
+        // swift-linter:disable:next raw concept
+        // REASON: the engine's version as the policy pins it, free text such as `main` and `ci-binaries` beside `0.65.1`: Version.Semantic and Version.Tools refuse those.
         public let version: Swift.String
         public let revision: Swift.String
         public let toolchain: Swift.String
@@ -17,6 +19,8 @@ extension Institute.Source.Policy {
         public init(
             id: Source_Profile.Source.Engine.ID,
             platform: Platform,
+            // swift-linter:disable:next raw concept
+            // REASON: the engine's version as the policy pins it, free text such as `main` and `ci-binaries` beside `0.65.1`: Version.Semantic and Version.Tools refuse those.
             version: Swift.String,
             revision: Swift.String,
             toolchain: Swift.String,

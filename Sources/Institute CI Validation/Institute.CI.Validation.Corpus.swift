@@ -39,6 +39,8 @@ extension Institute.CI.Validation {
             /// identifier, lower-cased. Resolved to a `Rule` by
             /// `Registry.rule(forCorpusDirectory:)`, which is where the
             /// registered spelling lives.
+            // swift-linter:disable:next raw concept
+            // REASON: a fixture directory's name, the rule identifier lower-cased: a name, not a location, so File.Directory and File.Path misdescribe it, and Rule holds the registered spelling, not this one.
             public let directory: String
             public let expectation: Expectation
             public let name: String
@@ -76,6 +78,8 @@ extension Institute.CI.Validation {
 
         /// Every scenario under one rule directory, in
         /// expectation-then-name order.
+        // swift-linter:disable:next raw concept
+        // REASON: a fixture directory's name, the rule identifier lower-cased: a name, not a location, so File.Directory and File.Path misdescribe it, and Rule holds the registered spelling, not this one.
         public func scenarios(in directory: String) throws(EnvironmentDefect) -> [Scenario] {
             var scenarios: [Scenario] = []
             for expectation in Expectation.allCases.sorted(by: { $0.rawValue < $1.rawValue }) {

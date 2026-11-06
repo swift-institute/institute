@@ -17,14 +17,11 @@ extension Institute.Source.Application {
         subject: Source.Subject,
         evidence: [Source.Artifact.Evidence]
     ) {
-        let directory: File.Directory
-        do throws(File.Path.Error) {
-            directory = File.Directory(try .init(preparation.directory))
-        } catch { throw .configuration("invalid source preparation directory") }
+        let directory = preparation.directory
         let declared: [(artifact: Institute.Source.Artifact, path: Swift.String)] =
             [
-                (policy.swiftFormat, policy.swiftFormat.path),
-                (policy.swiftLint, policy.swiftLint.path),
+                (policy.swiftFormat, policy.swiftFormat.path.string),
+                (policy.swiftLint, policy.swiftLint.path.string),
             ]
             + policy.bundles.map { bundle in
                 let artifact = policy.linter(
@@ -45,6 +42,10 @@ extension Institute.Source.Application {
             do throws(File.Path.Component.Error) { component = try .init(path) } catch {
                 throw .configuration("invalid source configuration artifact path \(path): \(error)")
             }
+            let artifactPath: File.Path
+            do throws(File.Path.Error) { artifactPath = try .init(path) } catch {
+                throw .configuration("invalid source configuration artifact path \(path): \(error)")
+            }
             let file = directory[file: component]
             let actual: Source.Profile.Digest
             let readReason: Source.Reason?
@@ -56,7 +57,7 @@ extension Institute.Source.Application {
                 readReason = .init(code: "configuration-read", detail: "\(error)")
             }
             let artifact = Source.Artifact(
-                path: path,
+                path: artifactPath,
                 kind: .configuration,
                 purpose: .generatedPolicy,
                 provenance: .generated(
@@ -64,7 +65,7 @@ extension Institute.Source.Application {
                         owner: .init(Self.configurationSubject),
                         input: "Institute.Source.Policy",
                         revision: policy.revision,
-                        digest: declaration.digest.hex
+                        digest: .init(declaration.digest.hex)
                     )
                 ),
                 digest: .init(actual.hex)
@@ -103,7 +104,7 @@ extension Institute.Source.Application {
         return (
             subject: .init(
                 identity: Self.configurationSubject,
-                root: preparation.directory,
+                root: preparation.directory.path.string,
                 artifacts: artifacts
             ),
             evidence: evidence

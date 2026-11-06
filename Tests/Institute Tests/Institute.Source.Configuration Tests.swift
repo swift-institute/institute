@@ -1,3 +1,5 @@
+import File_System
+import ISO_9945_Kernel_File
 import Institute_Model
 import Institute_Source_Policy
 import Institute_Source_Profile
@@ -16,11 +18,11 @@ private func renderedConfigurationPreparation(
     try MainFixtureFiles.createDirectory(root)
     try MainFixtureFiles.write(
         bytes: Array(policy.swiftFormat.contents.utf8),
-        to: MainFixtureFiles.join(root, policy.swiftFormat.path)
+        to: MainFixtureFiles.join(root, policy.swiftFormat.path.string)
     )
     try MainFixtureFiles.write(
         bytes: Array(policy.swiftLint.contents.utf8),
-        to: MainFixtureFiles.join(root, policy.swiftLint.path)
+        to: MainFixtureFiles.join(root, policy.swiftLint.path.string)
     )
     for bundle in policy.bundles {
         let artifact = policy.linter(
@@ -35,7 +37,7 @@ private func renderedConfigurationPreparation(
     return Institute.Source.Preparation(
         policyRevision: policy.revision,
         binding: .package(
-            .init(identity: "swift-institute/swift-example@revision", digest: "subject-digest")
+            .init(identity: "swift-institute/swift-example@revision", digest: FIPS_180_4.SHA256.digest([]))
         ),
         swiftFormatExecutable: "/tools/swift-format",
         swiftFormatTool: .init("format-tool"),
@@ -46,7 +48,7 @@ private func renderedConfigurationPreparation(
             origin: .published(asset: "swift-linter-macos-arm64"),
             digest: .init("linter-tool")
         ),
-        directory: root,
+        directory: try File.Directory(validating: root),
         profiles: [:],
         verifiedProfiles: []
     )
@@ -114,7 +116,7 @@ private func configurationReport(
         predicateRequirements: [
             .init(
                 subject: configuration.subject.identity,
-                artifacts: configuration.subject.artifacts.map(\.path),
+                artifacts: configuration.subject.artifacts.map { $0.path.string },
                 predicates: [policy.configuration.predicate]
             )
         ]

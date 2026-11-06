@@ -18,6 +18,16 @@ extension Institute.Source {
 
         public init(timeout: Duration = .seconds(300)) {
             self.process = .init { executable, arguments, directory, environment in
+                let workingDirectory: File.Path
+                do throws(File.Path.Error) {
+                    workingDirectory = try File.Path(directory)
+                } catch {
+                    return .init(
+                        status: 127,
+                        output: "",
+                        diagnostics: "cannot execute \(executable): \(error)"
+                    )
+                }
                 do throws(Process.Error) {
                     let output = try Process.Spawn.run(
                         .init(
@@ -29,7 +39,7 @@ extension Institute.Source {
                             stdin: .inherit,
                             stdout: .pipe,
                             stderr: .pipe,
-                            directory: directory,
+                            directory: workingDirectory,
                             timeout: timeout
                         )
                     )

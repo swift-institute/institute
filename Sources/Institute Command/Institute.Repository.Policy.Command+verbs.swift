@@ -1,6 +1,7 @@
 import Byte
 import Calendar_Gregorian
 import GitHub_App
+import ISO_8601
 import Institute_Model
 import Institute_Repository_Policy
 import JSON
@@ -128,9 +129,10 @@ extension Institute.Repository.Policy.Command {
         } catch {
             throw .metadata(error)
         }
-        let render = Institute.Repository.Policy.Metadata.Draft.Render(
-            generatedOn: date ?? Self.today
-        )
+        guard let stamp = ISO_8601.CalendarDate(extended: date ?? Self.today) else {
+            throw configuration("draft-metadata --date must be YYYY-MM-DD")
+        }
+        let render = Institute.Repository.Policy.Metadata.Draft.Render(generatedOn: stamp)
         print(render(draft), terminator: "")
     }
 

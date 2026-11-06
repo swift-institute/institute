@@ -1,5 +1,6 @@
 import Async_Fanout
 import FIPS_180_4
+import File_System
 public import Institute_Model
 public import Institute_Source_Policy
 internal import Institute_Source_Profile
@@ -249,7 +250,7 @@ extension Institute.Source.Application {
                 predicateRequirements: [
                     .init(
                         subject: configuration.subject.identity,
-                        artifacts: configuration.subject.artifacts.map(\.path),
+                        artifacts: configuration.subject.artifacts.map { $0.path.string },
                         predicates: [policy.configuration.predicate]
                     )
                 ]
@@ -285,7 +286,7 @@ extension Institute.Source.Application {
             ),
             Self.matches(file: preparation.linterExecutable, digest: preparation.linterTool)
         else {
-            return .init(code: "stale-tool", detail: preparation.directory)
+            return .init(code: "stale-tool", detail: preparation.directory.description)
         }
         guard
             Self.matches(

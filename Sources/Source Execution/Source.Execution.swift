@@ -1,3 +1,5 @@
+import Path
+
 extension Source {
     public struct Execution: Sendable {
         private let drivers: [Engine.ID: Engine.Driver]
@@ -27,7 +29,7 @@ extension Source {
                             subject: subject,
                             activeRules: engine.rules,
                             applicableRules: [],
-                            files: artifacts.map(\.path),
+                            files: artifacts.map { $0.path.string },
                             verdict: .unmeasured([
                                 .init(
                                     code: "missing-driver",
@@ -62,7 +64,7 @@ extension Source {
             let declared = subject.artifacts.compactMap {
                 artifact -> (path: Swift.String, control: Artifact.Purpose.Control)? in
                 guard case .control(let control) = artifact.purpose else { return nil }
-                return (prefix + artifact.path, control)
+                return (prefix + artifact.path.string, control)
             }
             guard !declared.isEmpty else { return measurement }
             let controlFiles = Swift.Set(declared.map(\.path))
@@ -166,29 +168,29 @@ extension Source {
                     continue
                 }
                 let proposal = await driver.repair(subject, engine)
-                let governedPaths = Swift.Set(subject.governed.artifacts.map(\.path))
+                let governedPaths = Swift.Set(subject.governed.artifacts.map { $0.path.string })
                 var repairs: [Repair.Evidence] = proposal.edits.filter { edit in
                     let prefix = subject.root.hasSuffix("/") ? subject.root : subject.root + "/"
-                    return !edit.path.hasPrefix(prefix)
-                        || governedPaths.contains(Swift.String(edit.path.dropFirst(prefix.count)))
+                    return !edit.path.string.hasPrefix(prefix)
+                        || governedPaths.contains(Swift.String(edit.path.string.dropFirst(prefix.count)))
                 }.map { edit in
                     let disposition: Repair.Evidence.Disposition
                     if subject.artifacts.contains(where: {
                         let prefix = subject.root.hasSuffix("/") ? subject.root : subject.root + "/"
-                        return edit.path.hasPrefix(prefix)
-                            && $0.path == Swift.String(edit.path.dropFirst(prefix.count))
+                        return edit.path.string.hasPrefix(prefix)
+                            && $0.path.string == Swift.String(edit.path.string.dropFirst(prefix.count))
                             && $0.digest.hex == edit.expected
                     }) {
                         disposition = .edits([
                             .rewrite(
-                                path: edit.path,
+                                path: edit.path.string,
                                 contents: Swift.String(decoding: edit.replacement, as: UTF8.self)
                             )
                         ])
                     } else {
-                        disposition = .refused(.init(code: "stale-repair-evidence", detail: edit.path))
+                        disposition = .refused(.init(code: "stale-repair-evidence", detail: edit.path.string))
                     }
-                    return .init(file: edit.path, rule: rule, disposition: disposition)
+                    return .init(file: edit.path.string, rule: rule, disposition: disposition)
                 }
                 repairs.append(
                     contentsOf: proposal.refusals.map {

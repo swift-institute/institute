@@ -1,8 +1,11 @@
 import Command
+import ISO_9945_Kernel_File
 import Institute_CI_Model
 import Institute_Model
 import Source_Report
 import Testing
+
+import struct Swift.String
 
 @testable import Institute_Command
 
@@ -120,7 +123,7 @@ private enum PolicyReport {
     static let control = "fixture-control"
     static let reason = Source.Reason(code: "fixture", detail: "fixture finding")
     static let artifact = Source.Artifact(
-        path: path,
+        path: .init(stringLiteral: path),
         kind: .swift,
         purpose: .governedSource,
         provenance: .authored,

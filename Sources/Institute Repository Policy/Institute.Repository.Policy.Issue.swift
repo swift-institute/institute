@@ -1,5 +1,5 @@
 import Byte
-import FIPS_180_4
+public import FIPS_180_4
 public import Institute_Model
 
 extension Institute.Repository.Policy {
@@ -100,13 +100,13 @@ extension Institute.Repository.Policy.Issue {
     public struct CompactionCheckpoint: Codable, Equatable, Sendable {
         public let grammarVersion: Int
         public let source: String
-        public let digest: String
+        public let digest: FIPS_180_4.Digest
 
-        public init(grammarVersion: Int, source: String, digest: String) throws(Error) {
+        public init(grammarVersion: Int, source: String, digest: FIPS_180_4.Digest) throws(Error) {
             guard grammarVersion == 1 else {
                 throw Error.unsupportedVersion(grammarVersion)
             }
-            guard !source.isEmpty, FIPS_180_4.SHA1.isDigestHex(digest) else {
+            guard !source.isEmpty, digest.bytes.count == FIPS_180_4.SHA1.digestLength else {
                 throw Error.invalidCheckpoint
             }
             self.grammarVersion = grammarVersion
@@ -180,10 +180,15 @@ extension Institute.Repository.Policy.Issue {
 
         public static func checkpoint(_ body: String) throws(Error) -> CompactionCheckpoint {
             let fields = try fields(in: body, profile: .checkpoint)
+            let grammarVersion = Int(try required("Grammar version", in: fields)) ?? -1
+            let source = try required("Source", in: fields)
+            guard let digest = FIPS_180_4.Digest(hex: try required("Digest", in: fields)) else {
+                throw Error.invalidCheckpoint
+            }
             return try CompactionCheckpoint(
-                grammarVersion: Int(try required("Grammar version", in: fields)) ?? -1,
-                source: try required("Source", in: fields),
-                digest: try required("Digest", in: fields)
+                grammarVersion: grammarVersion,
+                source: source,
+                digest: digest
             )
         }
 
@@ -346,8 +351,8 @@ extension Institute.Repository.Policy.Issue {
             self.native = native
         }
 
-        public var digest: String {
-            FIPS_180_4.SHA1.digest(Array(body.utf8).map(Byte.init(_:))).hex
+        public var digest: FIPS_180_4.Digest {
+            FIPS_180_4.SHA1.digest(Array(body.utf8).map(Byte.init(_:)))
         }
     }
 
@@ -355,10 +360,10 @@ extension Institute.Repository.Policy.Issue {
     /// describe the current body; a revision alone is not a content witness.
     public struct Guard: Equatable, Sendable {
         public let revision: String
-        public let digest: String
+        public let digest: FIPS_180_4.Digest
 
-        public init(revision: String, digest: String) throws(Error) {
-            guard !revision.isEmpty, FIPS_180_4.SHA1.isDigestHex(digest) else {
+        public init(revision: String, digest: FIPS_180_4.Digest) throws(Error) {
+            guard !revision.isEmpty, digest.bytes.count == FIPS_180_4.SHA1.digestLength else {
                 throw Error.invalidDigest
             }
             self.revision = revision
@@ -438,7 +443,7 @@ extension Institute.Repository.Policy.Issue {
 
             ### Digest
 
-            \(checkpoint.digest)
+            \(checkpoint.digest.hex)
             """
         }
     }

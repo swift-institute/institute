@@ -1,3 +1,4 @@
+public import File_System
 import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_Model
@@ -21,8 +22,12 @@ extension Institute.CI.Validation.BranchPins {
         /// One suppressed declaration.
         public struct Entry: Sendable, Hashable {
             public let repository: String
+            // swift-linter:disable:next raw concept
+            // REASON: a dependency URL as a manifest spells it, the ledger's key and compared whole; SwiftPM admits git@host:org/repo forms that RFC_3986.URI and WHATWG_URL.URL refuse.
             public let url: String
 
+            // swift-linter:disable:next raw concept
+            // REASON: a dependency URL as a manifest spells it, the ledger's key and compared whole; SwiftPM admits git@host:org/repo forms that RFC_3986.URI and WHATWG_URL.URL refuse.
             public init(repository: String, url: String) {
                 self.repository = repository
                 self.url = url
@@ -37,6 +42,8 @@ extension Institute.CI.Validation.BranchPins {
             self.entries = entries
         }
 
+        // swift-linter:disable:next raw concept
+        // REASON: a dependency URL as a manifest spells it, the ledger's key and compared whole; SwiftPM admits git@host:org/repo forms that RFC_3986.URI and WHATWG_URL.URL refuse.
         public func suppresses(repository: String, url: String) -> Bool {
             entries.contains(Entry(repository: repository, url: url))
         }
@@ -49,11 +56,11 @@ extension Institute.CI.Validation.BranchPins {
         /// malformed ledger line must not silently suppress something
         /// adjacent to what it names.
         public static func read(
-            at path: String?
+            at path: File.Path?
         ) throws(Institute.CI.Validation.EnvironmentDefect) -> Self {
-            guard let path, Institute.CI.Validation.exists(path) else { return .empty }
-            guard let text = Institute.CI.Validation.text(at: path) else {
-                throw .unreadableFile(path: path)
+            guard let path, Institute.CI.Validation.exists(path.string) else { return .empty }
+            guard let text = Institute.CI.Validation.text(at: path.string) else {
+                throw .unreadableFile(path: path.string)
             }
             var entries: Set<Entry> = []
             for line in text.split(

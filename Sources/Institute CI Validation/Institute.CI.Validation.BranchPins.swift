@@ -1,3 +1,4 @@
+public import File_System
 import GitHub_Standard
 public import Institute_CI_Model
 public import Institute_Model
@@ -42,9 +43,9 @@ extension Institute.CI.Validation {
         public let organizations: Organizations
 
         /// The burn-down ledger. `nil` is an empty ledger.
-        public let baselineFile: String?
+        public let baselineFile: File.Path?
 
-        public init(organizations: Organizations = .institute, baselineFile: String? = nil) {
+        public init(organizations: Organizations = .institute, baselineFile: File.Path? = nil) {
             self.organizations = organizations
             self.baselineFile = baselineFile
         }

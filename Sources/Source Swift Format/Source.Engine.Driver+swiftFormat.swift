@@ -1,3 +1,5 @@
+import Path
+
 extension Source.Engine.Driver {
     public static func swiftFormat(process: Source.Engine.Process) -> Self {
         let id = Source.Engine.ID("swift-format")
@@ -60,15 +62,16 @@ extension Source.Engine.Driver {
                     let prefix = subject.root.hasSuffix("/") ? subject.root : subject.root + "/"
                     guard file.hasPrefix(prefix),
                         let artifact = subject.artifacts.first(where: {
-                            $0.path == Swift.String(file.dropFirst(prefix.count))
-                        })
+                            $0.path.string == Swift.String(file.dropFirst(prefix.count))
+                        }),
+                        let path = try? Path::Path(validating: file)
                     else {
                         refusals.append(.init(code: "repair-file-mismatch", detail: file))
                         continue
                     }
                     edits.append(
                         .init(
-                            path: file,
+                            path: path,
                             expected: artifact.digest.hex,
                             replacement: Array(repair.output.utf8)
                         )

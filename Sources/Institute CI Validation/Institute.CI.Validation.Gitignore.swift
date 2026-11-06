@@ -1,7 +1,8 @@
 import ASCII
 import Byte
 import Environment
-import File_System
+public import File_System
+import ISO_9945_Kernel_File
 public import Institute_CI_Canon
 public import Institute_CI_Model
 public import Institute_Model
@@ -66,10 +67,10 @@ extension Institute.CI.Validation {
         /// slash — `**/.*/` — never matches a path git does not know to
         /// be one.
         public struct Probe: Sendable, Equatable {
-            public let path: String
+            public let path: File.Path
             public let isDirectory: Bool
 
-            public init(_ path: String, isDirectory: Bool = false) {
+            public init(_ path: File.Path, isDirectory: Bool = false) {
                 self.path = path
                 self.isDirectory = isDirectory
             }
@@ -292,7 +293,7 @@ extension Institute.CI.Validation {
                 under: text,
                 probes: work + Self.junk + Self.unadmitted
             )
-            for probe in work where ignored.contains(probe.path) {
+            for probe in work where ignored.contains(probe.path.string) {
                 findings.append(
                     Finding(
                         repository: subject.repository,
@@ -302,7 +303,7 @@ extension Institute.CI.Validation {
                     )
                 )
             }
-            let tracked = Self.junk.filter { !ignored.contains($0.path) }
+            let tracked = Self.junk.filter { !ignored.contains($0.path.string) }
             if !tracked.isEmpty {
                 // The control failed. Reported as a finding rather than
                 // passed: a harness that cannot detect denial makes every
@@ -317,7 +318,7 @@ extension Institute.CI.Validation {
                     )
                 )
             }
-            for probe in Self.unadmitted where !ignored.contains(probe.path) {
+            for probe in Self.unadmitted where !ignored.contains(probe.path.string) {
                 findings.append(
                     Finding(
                         repository: subject.repository,
@@ -553,11 +554,11 @@ extension Institute.CI.Validation.Gitignore {
         var ignored: Set<String> = []
         for probe in probes {
             // 0 = ignored, 1 = not ignored, >1 = git itself failed.
-            let verdict = try git(["check-ignore", "-q", "--", probe.path], in: root).status
+            let verdict = try git(["check-ignore", "-q", "--", probe.path.string], in: root).status
             guard verdict <= 1 else {
                 throw .missingSupportFile(path: "git check-ignore \(probe.path)")
             }
-            if verdict == 0 { ignored.insert(probe.path) }
+            if verdict == 0 { ignored.insert(probe.path.string) }
         }
         return ignored
     }

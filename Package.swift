@@ -70,6 +70,8 @@ let package = Package(
         .package(url: "https://github.com/swift-molecules/swift-source.git", branch: "main"),
         .package(url: "https://github.com/swift-ietf/swift-rfc-3339.git", branch: "main"),
         .package(url: "https://github.com/swift-ietf/swift-rfc-4648.git", branch: "main"),
+        .package(url: "https://github.com/swift-iso/swift-iso-8601.git", branch: "main"),
+        .package(url: "https://github.com/swift-iso/swift-iso-9945.git", branch: "main"),
         .package(url: "https://github.com/swift-standards/swift-fips-180-4.git", branch: "main"),
         .package(url: "https://github.com/swift-standards/swift-github-standard.git", branch: "main"),
         .package(url: "https://github.com/swift-standards/swift-spm-standard.git", branch: "main"),
@@ -91,6 +93,7 @@ let package = Package(
         .target(
             name: "Source Measurement",
             dependencies: [
+                .product(name: "Path", package: "swift-path"),
                 .product(name: "Source", package: "swift-source"),
                 .product(name: "Diagnostic", package: "swift-diagnostic"),
                 .product(name: "JSON", package: "swift-json"),
@@ -108,7 +111,11 @@ let package = Package(
         ),
         .target(
             name: "Source Swift Format",
-            dependencies: ["Source Measurement", "Source Profile"],
+            dependencies: [
+                "Source Measurement",
+                "Source Profile",
+                .product(name: "Path", package: "swift-path"),
+            ],
             swiftSettings: vendoredSourceSettings
         ),
         .target(
@@ -132,6 +139,7 @@ let package = Package(
         .target(
             name: "Source Execution",
             dependencies: [
+                .product(name: "Path", package: "swift-path"),
                 "Source Measurement",
                 "Source Profile",
                 "Source Swift Format",
@@ -144,12 +152,14 @@ let package = Package(
             name: "Source Report",
             dependencies: [
                 "Source Measurement", "Source Profile", .product(name: "JSON", package: "swift-json"),
+                .product(name: "Path", package: "swift-path"),
             ],
             swiftSettings: vendoredSourceSettings
         ),
         .target(
             name: "Source Repair",
             dependencies: [
+                .product(name: "Path", package: "swift-path"),
                 .product(name: "Source", package: "swift-source"),
                 "Source Measurement",
                 "Source Profile",
@@ -192,6 +202,8 @@ let package = Package(
         .target(
             name: "Institute Source Policy",
             dependencies: [
+                .product(name: "Path", package: "swift-path"),
+                .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
                 "Institute Model",
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
@@ -246,6 +258,7 @@ let package = Package(
         .target(
             name: "Institute CI Validation",
             dependencies: [
+                .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
                 "Institute CI Canon",
                 "Institute CI Inventory",
                 "Institute CI Model",
@@ -268,6 +281,8 @@ let package = Package(
         .target(
             name: "Institute Repository Policy",
             dependencies: [
+                .product(name: "ISO 8601", package: "swift-iso-8601"),
+                .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
                 "Institute Model",
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
@@ -312,6 +327,7 @@ let package = Package(
         .testTarget(
             name: "Institute Tests",
             dependencies: [
+                .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
                 "Institute Installation",
                 "Institute Model",
                 "Institute Source",
@@ -395,6 +411,8 @@ let package = Package(
         .target(
             name: "Institute Version",
             dependencies: [
+                .product(name: "File System", package: "swift-file-system"),
+                .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
                 "Institute GitHub",
                 "Institute Model",
                 .product(name: "Byte", package: "swift-byte"),
@@ -404,6 +422,8 @@ let package = Package(
         .testTarget(
             name: "Institute Version Tests",
             dependencies: [
+                .product(name: "File System", package: "swift-file-system"),
+                .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
                 "Institute Model",
                 "Institute Repository Policy",
                 "Institute Version",
@@ -428,6 +448,7 @@ let package = Package(
         .target(
             name: "Institute Command",
             dependencies: [
+                .product(name: "ISO 8601", package: "swift-iso-8601"),
                 "Institute CI Canon",
                 "Institute CI Contract",
                 "Institute CI Model",
@@ -470,6 +491,7 @@ let package = Package(
         .testTarget(
             name: "Institute Planner Tests",
             dependencies: [
+                .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
                 "Institute Model",
                 "Institute Planner",
                 "Source Report",
@@ -483,6 +505,9 @@ let package = Package(
         .testTarget(
             name: "Institute Command Tests",
             dependencies: [
+                .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
+                .product(name: "ISO 8601", package: "swift-iso-8601"),
+                .product(name: "ISO 9945 Kernel File", package: "swift-iso-9945"),
                 "Institute CI Canon",
                 "Institute CI Model",
                 "Institute CI Validation",
@@ -567,6 +592,7 @@ let linterRuleTargets: [Target] = [
         name: "Institute Linter Rule Manifest",
         dependencies: [
             .target(name: "Institute Model"),
+            .product(name: "File System", package: "swift-file-system"),
             .product(name: "Lint", package: "swift-lint"),
             .product(name: "Linter Rule Scope", package: "swift-linter-rules"),
             .product(name: "SwiftParser", package: "swift-syntax"),

@@ -22,12 +22,16 @@ extension Institute.CI.Inventory.Anchor.Source {
     /// express the arrangement it replaces cannot be compared against it.
     public struct Tree: Sendable, Equatable {
         /// The repository-relative directory whose tree is recorded.
+        // swift-linter:disable:next raw concept
+        // REASON: the directory inside a source repository whose tree a pin records, read from the anchor's JSON: `.` is the root and isRoot admits empty, which File.Path refuses, and the text goes verbatim to git rev-parse and the workflow YAML.
         public let path: String
 
         /// The recorded tree object name.
         public let oid: Institute.CI.Inventory.Anchor.Revision
 
         public init(
+            // swift-linter:disable:next raw concept
+            // REASON: the directory inside a source repository whose tree a pin records, read from the anchor's JSON: `.` is the root and isRoot admits empty, which File.Path refuses, and the text goes verbatim to git rev-parse and the workflow YAML.
             path: String,
             oid: Institute.CI.Inventory.Anchor.Revision
         ) {

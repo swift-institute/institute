@@ -1,4 +1,5 @@
 public import Institute_Model
+public import Path
 public import Source_Profile
 
 extension Institute.Source.Policy {
@@ -18,7 +19,7 @@ extension Institute.Source.Policy {
         /// The owning repository, `owner/name`.
         public let repository: Swift.String
         /// The fixture's path relative to the repository root.
-        public let path: Swift.String
+        public let path: Path::Path
         /// The rule the fixture violates.
         public let rule: Source.Rule.ID
         /// How many findings of `rule` the fixture must produce; at least one.
@@ -26,7 +27,7 @@ extension Institute.Source.Policy {
 
         public init(
             repository: Swift.String,
-            path: Swift.String,
+            path: Path::Path,
             rule: Source.Rule.ID,
             findings: Swift.Int = 1
         ) {
@@ -47,7 +48,7 @@ extension Institute.Source.Policy {
     ) -> [Swift.String: NegativeControl] {
         var controls: [Swift.String: NegativeControl] = [:]
         for control in negativeControls where control.repository == repository {
-            controls[control.path] = control
+            controls[control.path.string] = control
         }
         return controls
     }

@@ -6,6 +6,7 @@ extension Lint.Rule {
     public static let `raw concept` = Lint.Rule(
         id: "raw concept",
         default: .warning,
+        suppression: .both,
         controls: [
             .init(
                 id: "raw concept parameter",

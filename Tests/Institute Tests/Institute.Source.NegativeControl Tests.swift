@@ -1,3 +1,4 @@
+import ISO_9945_Kernel_File
 import Institute_Model
 import Institute_Source_Policy
 import Institute_Source_Workspace
@@ -118,7 +119,7 @@ private actor Measured {
 
 private func measure(findingsPerFile: Swift.Int) async throws -> (Source.Measurement, [[Swift.String]]) {
     let artifact = { (path: Swift.String, purpose: Source.Artifact.Purpose) in
-        Source.Artifact(path: path, kind: .swift, purpose: purpose, provenance: .authored, digest: .init("00"))
+        Source.Artifact(path: .init(stringLiteral: path), kind: .swift, purpose: purpose, provenance: .authored, digest: .init("00"))
     }
     let control = Source.Artifact.Purpose.Control(identity: "fixture", predicate: suffix, expectation: .findings(1))
     let subject = Source.Subject(

@@ -1,6 +1,9 @@
+import ISO_9945_Kernel_File
 import Institute_Model
 import Source_Report
 import Testing
+
+import struct Swift.String
 
 @testable import Institute_Planner
 
@@ -27,7 +30,7 @@ extension Institute.Planner.Canary.Outcome.Test {
         static let control = "fixture-control"
         static let reason = Source.Reason(code: "fixture", detail: "fixture finding")
         static let artifact = Source.Artifact(
-            path: path,
+            path: .init(stringLiteral: path),
             kind: .swift,
             purpose: .governedSource,
             provenance: .authored,

@@ -1,3 +1,4 @@
+import File_System
 import Git_Foundation
 import Institute_Model
 import Institute_Source_Workspace
@@ -54,12 +55,13 @@ private func sourcePackageFixture() throws -> (root: Swift.String, revision: Swi
     try MainFixtureFiles.write("// swift-tools-version: 6.4\n", toURLPath: MainFixtureFiles.join(root, "Package.swift"))
     try MainFixtureFiles.write("public enum Example {}\n", toURLPath: MainFixtureFiles.join(root, "Sources/Example.swift"))
     let git = Git.Client()
-    try git.initialize(at: root, bare: false)
+    let directory = try File.Path(root)
+    try git.initialize(at: directory, bare: false)
     try sourceGit(["config", "user.email", "workspace@swift.institute"], temporaryName: rootName)
     try sourceGit(["config", "user.name", "Institute Tests"], temporaryName: rootName)
     try sourceGit(["add", "Package.swift", "Sources/Example.swift"], temporaryName: rootName)
     try sourceGit(["commit", "-m", "Fixture package"], temporaryName: rootName)
-    return (root, try git.head(at: root).rawValue)
+    return (root, try git.head(at: directory).rawValue)
 }
 
 private func sourceGit(_ arguments: [Swift.String], temporaryName: Swift.String) throws {

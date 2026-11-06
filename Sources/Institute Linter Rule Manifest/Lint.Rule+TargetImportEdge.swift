@@ -1,3 +1,4 @@
+internal import File_System
 public import Lint
 internal import Linter_Rule_Scope
 internal import SwiftParser
@@ -141,7 +142,13 @@ package func packageTargetImportEdgeFindings(
         }
 
         var sightings: [Swift::String: (Swift::String, Swift::Int)] = [:]
-        for swiftFile in Lint.Scope.File.swiftFiles(under: sourceDirectory) {
+        let sources: File.Directory
+        do throws(File.Path.Error) {
+            sources = try File.Directory(validating: sourceDirectory)
+        } catch {
+            continue
+        }
+        for swiftFile in Lint.Scope.File.swiftFiles(under: sources) {
             guard let text = Lint.Scope.File.text(at: swiftFile) else { continue }
             let tree = Parser.parse(source: text)
             let converter = SourceLocationConverter(fileName: swiftFile, tree: tree)

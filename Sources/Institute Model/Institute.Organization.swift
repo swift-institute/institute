@@ -37,6 +37,8 @@ extension Institute.Organization {
         }
     }
 
+    // swift-linter:disable:next raw concept
+    // REASON: a dependency URL as a manifest spells it, read by prefix and first segment; SwiftPM admits git@host:org/repo forms that RFC_3986.URI and WHATWG_URL.URL refuse, and those are no organization here, nil.
     public init?(url: Swift.String) {
         let prefix = "https://github.com/"
         guard url.hasPrefix(prefix) else { return nil }

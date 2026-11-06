@@ -1,5 +1,8 @@
+public import File_System
 public import Institute_CI_Model
 public import Institute_Model
+
+import struct Swift.String
 
 extension Institute.CI {
     /// The package-relevant part of a repository change.
@@ -11,20 +14,20 @@ extension Institute.CI {
     public enum Package {
         public struct Content: Sendable, Equatable {
             public struct Change: Sendable, Equatable, Hashable {
-                public let path: String
-                public let previousPath: String?
+                public let path: File.Path
+                public let previousPath: File.Path?
 
-                public init(path: String, previousPath: String? = nil) {
+                public init(path: File.Path, previousPath: File.Path? = nil) {
                     self.path = path
                     self.previousPath = previousPath
                 }
 
-                var paths: [String] { [path, previousPath].compactMap { $0 } }
+                var paths: [String] { [path, previousPath].compactMap { $0?.string } }
             }
 
             public let declaredRoots: Set<String>
 
-            public init(declaredRoots: some Sequence<String>) {
+            public init(declaredRoots: some Swift.Sequence<String>) {
                 self.declaredRoots = Set(declaredRoots.map(Self.normalizedRoot)).union([""])
             }
 

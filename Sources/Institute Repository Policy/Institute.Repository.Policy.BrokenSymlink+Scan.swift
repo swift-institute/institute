@@ -26,9 +26,12 @@ extension Institute.Repository.Policy.BrokenSymlink {
                 continue
             }
             if !stat.exists {
-                findings.append(.init(path: path))
+                guard let relative = try? File.Path(path) else {
+                    throw .unreadablePath(path)
+                }
+                findings.append(.init(path: relative))
             }
         }
-        return findings.sorted { $0.path < $1.path }
+        return findings.sorted { $0.path.string < $1.path.string }
     }
 }

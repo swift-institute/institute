@@ -56,6 +56,8 @@ extension Institute.GitHub.Transport {
     /// the operation owner decides which statuses its contract admits.
     public static func request(
         method: String,
+        // swift-linter:disable:next raw concept
+        // REASON: a `gh api` endpoint, its path and query with repository file paths unencoded: not a File.Path, and RFC_3986.URI.Path can't hold the query.
         path: String,
         body: [Byte]? = nil
     ) throws(Error) -> Response {

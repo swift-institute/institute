@@ -16,6 +16,6 @@ struct `Repository Policy BrokenSymlink Tests` {
 
         let findings = try Institute.Repository.Policy.BrokenSymlink.findings(at: root.path)
 
-        #expect(findings == [.init(path: "broken")])
+        #expect(findings.map { "\($0.path)" } == ["broken"])
     }
 }

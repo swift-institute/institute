@@ -21,6 +21,8 @@ extension Institute.Source.Policy {
     /// `path` is as the engine reported it, absolute or relative to `root`.
     public func reportsAsWarning(
         identifier: Swift.String,
+        // swift-linter:disable:next raw concept
+        // REASON: a finding's filePath or fileID as the engine reported it, absolute, relative or a file ID, only classified by prefix against root: File.Path misdescribes a file ID and adds a parse that can fail.
         path: Swift.String,
         root: Swift.String
     ) -> Swift.Bool {

@@ -10,10 +10,11 @@ extension Institute.Planner.Canary.Runner {
         .init(
             clone: { remote, directory throws(Institute.Planner.Error) in
                 let git = Git.Client()
+                let target = try Institute.Planner.path(directory)
                 let head: Git.Object.ID
                 do throws(Git.Client.Error) {
-                    try git.clone(remote, depth: 1, to: directory)
-                    head = try git.head(at: directory)
+                    try git.clone(remote, depth: 1, to: target)
+                    head = try git.head(at: target)
                 } catch {
                     throw .local("cannot clone \(remote): \(error)")
                 }

@@ -25,6 +25,8 @@ extension Institute.CI.Validation.ThinCallers {
         /// A reusable-workflow reference to an org `.github` repository.
         public struct Reference: Sendable, Equatable {
             /// `<org>/.github/.github/workflows/<file>`.
+            // swift-linter:disable:next raw concept
+            // REASON: `<org>/.github/.github/workflows/<file>`, a GitHub `uses:` coordinate naming a repository and a file in it, not a file-system path: File.Path misdescribes it and GitHub_Standard has no type for it.
             public let path: String
             /// Whatever follows `@`.
             public let ref: String
