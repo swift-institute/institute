@@ -25,9 +25,24 @@ extension Lint.Rule {
                         """,
                     path: "Controls/ForLoopInResultBuilder.swift",
                     expectation: .findings(1)
-                )
+                ),
+                .init(
+                    id: "for loop in result builder in tests",
+                    source: """
+                        let values = Array<Int> {
+                          for value in 0..<100 {
+                            value
+                          }
+                        }
+                        """,
+                    path: "Tests/Builder Tests/ForLoop.swift",
+                    expectation: .clean
+                ),
             ],
             observe: Lint.Rule.measured { source, severity in
+                if source.file.filePath.split(separator: "/", omittingEmptySubsequences: true).dropLast().contains("Tests") {
+                    return []
+                }
                 let visitor = ResultBuilderForLoopVisitor(
                     source: source.file,
                     severity: severity,

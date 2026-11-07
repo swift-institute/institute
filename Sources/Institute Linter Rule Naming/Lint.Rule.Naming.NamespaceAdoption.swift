@@ -13,6 +13,12 @@ extension Lint.Rule {
                 expectation: .findings(1)
             ),
             .init(
+                id: "namespace adoption typealias module selector in tests",
+                source: "public typealias Span = Swift::Span",
+                path: "Tests/Naming Core Tests/Span.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "namespace adoption typealias same leaf",
                 source: "public typealias Event = Kernel.Event",
                 path: "Sources/Naming Core/SameLeaf.swift",
@@ -32,6 +38,9 @@ extension Lint.Rule {
             ),
         ],
         observe: Lint.Rule.measured { source, severity in
+            if source.file.filePath.split(separator: "/", omittingEmptySubsequences: true).dropLast().contains("Tests") {
+                return []
+            }
             let visitor = NamingNamespaceAdoptionVisitor(
                 source: source.file,
                 severity: severity,

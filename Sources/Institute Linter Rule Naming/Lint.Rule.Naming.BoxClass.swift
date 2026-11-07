@@ -13,6 +13,12 @@ extension Lint.Rule {
                 expectation: .findings(1)
             ),
             .init(
+                id: "ad hoc box class in tests",
+                source: "final class Storage {}",
+                path: "Tests/Box Tests/Baseline.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "ad hoc box class unrelated name",
                 source: "final class Inventory {}",
                 path: "Controls/AdHocBoxClass/UnrelatedName.swift",
@@ -26,6 +32,9 @@ extension Lint.Rule {
             ),
         ],
         observe: Lint.Rule.measured { source, severity in
+            if source.file.filePath.split(separator: "/", omittingEmptySubsequences: true).dropLast().contains("Tests") {
+                return []
+            }
             let visitor = NamingBoxClassVisitor(
                 source: source.file,
                 severity: severity,

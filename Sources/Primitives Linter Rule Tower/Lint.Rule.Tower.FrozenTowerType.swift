@@ -31,8 +31,23 @@ extension Lint.Rule {
                 path: "Controls/FrozenTowerType.swift",
                 expectation: .findings(1)
             ),
+            .init(
+                id: "frozen tower type in tests",
+                source: """
+                    extension Storage {
+                        public struct Generational {
+                            public var count: Int
+                        }
+                    }
+                    """,
+                path: "Tests/Storage Tests/Fixture.swift",
+                expectation: .clean
+            ),
         ],
         observe: Lint.Rule.measured { source, severity in
+            if source.file.filePath.split(separator: "/", omittingEmptySubsequences: true).dropLast().contains("Tests") {
+                return []
+            }
             let visitor = FrozenTowerTypeVisitor(
                 source: source.file,
                 severity: severity,

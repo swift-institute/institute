@@ -174,3 +174,20 @@ extension `Lint.Rule Tests`.`frozen tower type Tests`.Negative {
         #expect(findings.isEmpty)
     }
 }
+
+extension `Lint.Rule Tests`.`frozen tower type Tests`.Negative {
+    @Test
+    func `a fixture in Tests is not flagged`() {
+        let findings = `Lint.Rule Tests`.`frozen tower type Tests`.findings(
+            in: """
+                extension Storage {
+                    public struct Generational {
+                        public var count: Int
+                    }
+                }
+                """,
+            file: "Tests/Storage Tests/Fixture.swift"
+        )
+        #expect(findings.isEmpty)
+    }
+}

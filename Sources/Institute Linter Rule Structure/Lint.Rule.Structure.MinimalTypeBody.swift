@@ -19,6 +19,12 @@ extension Lint.Rule {
                 expectation: .findings(1)
             ),
             .init(
+                id: "minimal type body method in tests",
+                source: "struct Value { func read() -> Int { 0 } }",
+                path: "Tests/Structure Core Tests/Value.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "minimal type body storage and initializer",
                 source: "struct Value { let raw: Int; init(raw: Int) { self.raw = raw } }",
                 path: "Sources/Structure Core/Value.swift",
@@ -32,6 +38,9 @@ extension Lint.Rule {
             ),
         ],
         observe: Lint.Rule.measured { source, severity in
+            if source.file.filePath.split(separator: "/", omittingEmptySubsequences: true).dropLast().contains("Tests") {
+                return []
+            }
             let visitor = StructureMinimalTypeBodyVisitor(
                 source: source.file,
                 severity: severity,

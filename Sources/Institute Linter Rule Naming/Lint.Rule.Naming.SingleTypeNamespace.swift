@@ -13,6 +13,12 @@ extension Lint.Rule {
                 expectation: .findings(1)
             ),
             .init(
+                id: "single type namespace one type in tests",
+                source: "public enum Cooperative { public struct Executor {} }",
+                path: "Tests/Naming Core Tests/SingleNestedType.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "single type namespace two types",
                 source: "public enum Cooperative { public struct Executor {}; public struct Scheduler {} }",
                 path: "Sources/Naming Core/TwoNestedTypes.swift",
@@ -26,6 +32,9 @@ extension Lint.Rule {
             ),
         ],
         observe: Lint.Rule.measured { source, severity in
+            if source.file.filePath.split(separator: "/", omittingEmptySubsequences: true).dropLast().contains("Tests") {
+                return []
+            }
             let visitor = NamingSingleTypeNamespaceVisitor(
                 source: source.file,
                 severity: severity,

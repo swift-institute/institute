@@ -13,6 +13,12 @@ extension Lint.Rule {
                 expectation: .findings(1)
             ),
             .init(
+                id: "raw value access consumer in tests",
+                source: "func value(_ tag: Tag) -> Int { tag.rawValue }",
+                path: "Tests/Structure Core Tests/Consumer.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "raw value access initializer boundary",
                 source: "struct Wrapper { init(_ tag: Tag) { _ = tag.rawValue } }",
                 path: "Sources/Structure Core/Wrapper.swift",
@@ -26,6 +32,9 @@ extension Lint.Rule {
             ),
         ],
         observe: Lint.Rule.measured { source, severity in
+            if source.file.filePath.split(separator: "/", omittingEmptySubsequences: true).dropLast().contains("Tests") {
+                return []
+            }
             if Lint.Brand.owned(Lint.Brand.vocabulary, in: source) { return [] }
             let visitor = StructureRawValueAccessVisitor(
                 source: source.file,

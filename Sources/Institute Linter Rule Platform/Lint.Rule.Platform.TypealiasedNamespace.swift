@@ -13,6 +13,12 @@ extension Lint.Rule {
                 expectation: .findings(1)
             ),
             .init(
+                id: "typealiased namespace bridge module selector in tests",
+                source: "public typealias Span = Swift::Span",
+                path: "Tests/Platform Core Tests/Span.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "typealiased namespace bridge matching leaf",
                 source: "typealias Socket = Foundation.Socket",
                 path: "Sources/Platform Core/SocketBridge.swift",
@@ -32,6 +38,9 @@ extension Lint.Rule {
             ),
         ],
         observe: Lint.Rule.measured { source, severity in
+            if source.file.filePath.split(separator: "/", omittingEmptySubsequences: true).dropLast().contains("Tests") {
+                return []
+            }
             let visitor = PlatformTypealiasedNamespaceVisitor(
                 source: source.file,
                 severity: severity,
