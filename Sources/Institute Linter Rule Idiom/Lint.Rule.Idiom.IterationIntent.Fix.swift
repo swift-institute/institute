@@ -14,6 +14,7 @@ internal func idiomIterationIntentIsFixable(_ loop: ForStmtSyntax) -> Swift::Boo
     guard loop.pattern.is(IdentifierPatternSyntax.self) else { return false }
     guard idiomIsRangeExpression(loop.sequence) else { return false }
     guard !idiomLoopPreservesTypedThrows(loop) else { return false }
+    guard !idiomLoopHasNoElementwiseForm(loop) else { return false }
     guard loop.whereClause == nil, loop.typeAnnotation == nil else { return false }
     guard loop.parent?.as(LabeledStmtSyntax.self) == nil else { return false }
     guard !idiomIterationIntentProducesContent(loop) else { return false }

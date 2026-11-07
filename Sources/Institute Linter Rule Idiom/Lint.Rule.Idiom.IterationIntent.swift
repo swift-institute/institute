@@ -24,6 +24,19 @@ extension Lint.Rule {
                 path: "Sources/Idiom Core/ElementIteration.swift",
                 expectation: .clean
             ),
+            .init(
+                id: "counter loop iteration triangular",
+                source: "func scan(items: [Int]) { for i in 0..<items.count { "
+                    + "for j in (i + 1)..<items.count { use(items[i], items[j]) } } }",
+                path: "Sources/Idiom Core/TriangularLoop.swift",
+                expectation: .findings(1)
+            ),
+            .init(
+                id: "counter loop iteration span",
+                source: "func scan(bytes: Span<UInt8>) { for index in 0..<bytes.count { use(bytes[index]) } }",
+                path: "Sources/Idiom Core/SpanLoop.swift",
+                expectation: .clean
+            ),
         ],
         observe: Lint.Rule.measured { source, severity in
             let visitor = IdiomIterationIntentVisitor(
@@ -56,6 +69,69 @@ internal let idiomIterationIntentMessage: Swift::String =
     + "typed throws (`throws(E)`) — `Sequence.forEach(_:)` is `rethrows` "
     + "and erases `throws(E)` to `any Error`, so the counter loop is the "
     + "lawful spelling there, not mechanism."
+
+/// A range loop with no element-wise spelling: a triangular loop whose
+/// lower bound uses an enclosing loop's variable (`(i + 1)..<n`), or one
+/// over a span, which has no `forEach` and whose closure couldn't capture
+/// a `~Escapable` value.
+internal func idiomLoopHasNoElementwiseForm(_ loop: ForStmtSyntax) -> Swift::Bool {
+    var outerNames: Swift::Set<Swift::String> = []
+    var current = loop.parent
+    while let candidate = current {
+        if let outer = candidate.as(ForStmtSyntax.self),
+            let pattern = outer.pattern.as(IdentifierPatternSyntax.self)
+        {
+            outerNames.insert(pattern.identifier.text)
+        }
+        current = candidate.parent
+    }
+    let collector = IdiomSpanBindingCollector(viewMode: .sourceAccurate)
+    collector.walk(Syntax(loop).root)
+    let names = outerNames.union(collector.names)
+    guard !names.isEmpty else { return false }
+    let finder = IdiomNameReferenceFinder(names: names)
+    finder.walk(loop.sequence)
+    return finder.found
+}
+
+private final class IdiomSpanBindingCollector: SyntaxVisitor {
+    var names: Swift::Set<Swift::String> = []
+
+    private static func isSpan(_ type: TypeSyntax) -> Swift::Bool {
+        type.trimmedDescription.contains("Span")
+    }
+
+    override func visit(_ node: FunctionParameterSyntax) -> SyntaxVisitorContinueKind {
+        if Self.isSpan(node.type) {
+            names.insert(node.secondName?.text ?? node.firstName.text)
+        }
+        return .visitChildren
+    }
+
+    override func visit(_ node: PatternBindingSyntax) -> SyntaxVisitorContinueKind {
+        if let annotation = node.typeAnnotation, Self.isSpan(annotation.type),
+            let pattern = node.pattern.as(IdentifierPatternSyntax.self)
+        {
+            names.insert(pattern.identifier.text)
+        }
+        return .visitChildren
+    }
+}
+
+private final class IdiomNameReferenceFinder: SyntaxVisitor {
+    let names: Swift::Set<Swift::String>
+    var found = false
+
+    init(names: Swift::Set<Swift::String>) {
+        self.names = names
+        super.init(viewMode: .sourceAccurate)
+    }
+
+    override func visit(_ node: DeclReferenceExprSyntax) -> SyntaxVisitorContinueKind {
+        if names.contains(node.baseName.text) { found = true }
+        return .skipChildren
+    }
+}
 
 internal func idiomIsRangeExpression(_ expression: ExprSyntax) -> Swift::Bool {
     if idiomIsBareRangeExpression(expression) {
@@ -154,6 +230,7 @@ internal final class IdiomIterationIntentVisitor: SyntaxVisitor {
         guard node.pattern.is(IdentifierPatternSyntax.self) else { return .visitChildren }
         guard idiomIsRangeExpression(node.sequence) else { return .visitChildren }
         if idiomLoopPreservesTypedThrows(node) { return .visitChildren }
+        if idiomLoopHasNoElementwiseForm(node) { return .visitChildren }
         let location = converter.location(for: node.forKeyword.positionAfterSkippingLeadingTrivia)
         matches.append(
             Diagnostic.Record(
