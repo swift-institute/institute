@@ -8,6 +8,18 @@ extension Lint.Rule {
         default: .warning,
         controls: [
             .init(
+                id: "file name nested path backticked name",
+                source: "extension Lint.Rule { struct `Path Grammar` {} }",
+                path: "Sources/Structure Core/Lint.Rule.Path Grammar.swift",
+                expectation: .clean
+            ),
+            .init(
+                id: "file name nested path hoisted type",
+                source: "struct __ParserError {}",
+                path: "Sources/Structure Core/Parser.Error.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "file name nested path upstream licensed package",
                 source: "enum Array { struct Dynamic {} }",
                 path: "Sources/Structure Core/Array.swift",
@@ -126,7 +138,12 @@ private func structureFileNameNestedPathFindings(
         }
     }
 
+    // A backticked name is spelled without its backticks in a file name.
+    dottedPath = Swift::String(dottedPath.filter { $0 != "`" })
     guard basename != dottedPath else { return [] }
+    // A `__`-hoisted type is filed under its public typealias's path,
+    // which this file alone can't resolve.
+    if dottedPath.split(separator: ".").contains(where: { $0.hasPrefix("__") }) { return [] }
 
     let wrappingPosition = primary.wrappingExtension?.position
     let others = collector.topLevelExtensions.filter { $0.position != wrappingPosition }
