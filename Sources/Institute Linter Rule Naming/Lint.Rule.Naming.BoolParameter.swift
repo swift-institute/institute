@@ -24,6 +24,13 @@ extension Lint.Rule {
                 path: "Sources/Naming Core/EnumAlternative.swift",
                 expectation: .clean
             ),
+            .init(
+                id: "bool public parameter memberwise record",
+                source: "public struct Flags { public let compressed: Bool; "
+                    + "public init(compressed: Bool) { self.compressed = compressed } }",
+                path: "Sources/Naming Consumer/MemberwiseRecord.swift",
+                expectation: .clean
+            ),
         ],
         observe: Lint.Rule.measured { source, severity in
             let visitor = NamingBoolParameterVisitor(
@@ -44,11 +51,9 @@ private let namingBoolParameterMessage: Swift::String =
     + "and so call sites read as intent (`mode: .strict`) rather than "
     + "magic flags (`strict: true`). `package`-scope and non-public "
     + "declarations are exempt; closure-typed parameters with internal "
-    + "Bool arguments are exempt. Memberwise initializers of wire-schema "
-    + "types (`Codable`/`Decodable`/`Encodable` conformers whose Bool "
-    + "field mirrors a remote provider's schema) and of `Options` "
-    + "named-options structs (the rule's own prescribed remedy) are "
-    + "exempt per the #16 Option C ledger, Entry II.3."
+    + "Bool arguments are exempt. Initializer parameters stored "
+    + "directly as the same-named property are exempt: they mirror a "
+    + "record's Bool field, whose type is the API decision."
 
 private func namingBoolParameterIsBoolType(_ type: TypeSyntax) -> Bool {
     var current = type
@@ -118,15 +123,13 @@ internal final class NamingBoolParameterVisitor: SyntaxVisitor {
         {
             return .visitChildren
         }
-        let wireSchema = namingBoolParameterHasWireSchemaConformance(Syntax(node))
-        let optionsStruct = namingBoolParameterEnclosingTypeName(Syntax(node)) == "Options"
         for parameter in parameters {
             guard namingBoolParameterIsBoolType(parameter.type) else { continue }
-            if wireSchema || optionsStruct {
-                let internalName = parameter.secondName?.text ?? parameter.firstName.text
-                if namingBoolParameterAssignsSelf(node.body, parameter: internalName) {
-                    continue
-                }
+            // A memberwise parameter stored as the same-named property mirrors
+            // the record's field: renaming it means renaming the field.
+            let internalName = parameter.secondName?.text ?? parameter.firstName.text
+            if namingBoolParameterAssignsSelf(node.body, parameter: internalName) {
+                continue
             }
             emit(parameter)
         }
@@ -160,31 +163,6 @@ internal final class NamingBoolParameterVisitor: SyntaxVisitor {
             )
         )
     }
-}
-
-private func namingBoolParameterHasWireSchemaConformance(_ node: Syntax) -> Bool {
-    let wireSchemaLeaves: Swift::Set<Swift::String> = ["Codable", "Decodable", "Encodable"]
-    for leaf in Naming.conformances(node) where wireSchemaLeaves.contains(leaf) {
-        return true
-    }
-    return false
-}
-
-private func namingBoolParameterEnclosingTypeName(_ node: Syntax) -> Swift::String? {
-    var current: Syntax? = node.parent
-    while let candidate = current {
-        if let decl = candidate.as(StructDeclSyntax.self) { return decl.name.text }
-        if let decl = candidate.as(ClassDeclSyntax.self) { return decl.name.text }
-        if let decl = candidate.as(EnumDeclSyntax.self) { return decl.name.text }
-        if let decl = candidate.as(ActorDeclSyntax.self) { return decl.name.text }
-        if let ext = candidate.as(ExtensionDeclSyntax.self) {
-            let path = ext.extendedType.trimmedDescription
-            if let leaf = path.split(separator: ".").last { return Swift::String(leaf) }
-            return path
-        }
-        current = candidate.parent
-    }
-    return nil
 }
 
 private func namingBoolParameterAssignsSelf(

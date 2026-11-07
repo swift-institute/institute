@@ -293,9 +293,9 @@ extension `Lint.Rule Tests`.`bool public parameter Tests`.`Edge Case` {
     }
 
     @Test
-    func `memberwise Bool init on plain public struct is still flagged`() {
-        // Positive control: no wire-schema conformance, not an Options
-        // struct — the behavioral-API signal is preserved.
+    func `memberwise Bool init on plain public struct is NOT flagged`() {
+        // The parameter mirrors a stored Bool field: the field's type is
+        // the API decision, and the initializer only repeats it.
         let source = """
             public struct Walker {
                 public let recursive: Bool
@@ -305,6 +305,6 @@ extension `Lint.Rule Tests`.`bool public parameter Tests`.`Edge Case` {
             }
             """
         let findings = `Lint.Rule Tests`.`bool public parameter Tests`.findings(in: source)
-        #expect(findings.count == 1)
+        #expect(findings.isEmpty)
     }
 }
