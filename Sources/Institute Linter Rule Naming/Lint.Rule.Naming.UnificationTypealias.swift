@@ -66,6 +66,12 @@ extension Lint.Rule {
                 expectation: .findings(1)
             ),
             .init(
+                id: "unification typealias private abbreviation",
+                source: "private typealias Map = Dictionary.Ordered\nfunc f() { typealias Row = Table.Record }",
+                path: "Sources/Naming Core/PrivateAbbreviation.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "unification typealias swift bridge",
                 source: "public typealias Protocol = Swift.Equatable",
                 path: "Sources/Naming Core/SwiftBridge.swift",
@@ -142,12 +148,28 @@ internal final class NamingUnificationTypealiasVisitor: SyntaxVisitor {
         "BitwiseCopyable",
     ]
 
+    /// An alias in a function, closure or accessor body abbreviates for that body only.
+    private static func isLocal(_ syntax: Syntax) -> Swift::Bool {
+        var current = syntax.parent
+        while let candidate = current {
+            if candidate.is(CodeBlockSyntax.self) || candidate.is(ClosureExprSyntax.self) { return true }
+            if candidate.is(MemberBlockSyntax.self) || candidate.is(SourceFileSyntax.self) { return false }
+            current = candidate.parent
+        }
+        return false
+    }
+
     override func visit(_ node: TypeAliasDeclSyntax) -> SyntaxVisitorContinueKind {
         let lhsName = node.name.text
         guard let member = node.initializer.value.as(MemberTypeSyntax.self) else {
             return .visitChildren
         }
         if member.genericArgumentClause != nil { return .visitChildren }
+        if node.modifiers.contains(where: {
+            $0.name.tokenKind == .keyword(.private) || $0.name.tokenKind == .keyword(.fileprivate)
+        }) || Self.isLocal(Syntax(node)) {
+            return .visitChildren
+        }
         let rhsLeaf = member.name.text
         guard
             Lint.Syntax.Identifier.unescaped(rhsLeaf).lowercased()

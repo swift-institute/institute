@@ -14,6 +14,12 @@ extension Lint.Rule {
                 expectation: .findings(1)
             ),
             .init(
+                id: "try optional deferred cleanup",
+                source: "func f() throws { defer { try? handle.close() }; try work() }",
+                path: "Sources/Try Consumer/Cleanup.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "try optional propagating try",
                 source: "let value = try load()",
                 path: "Sources/Try Consumer/PropagatingTry.swift",
@@ -69,12 +75,28 @@ internal final class TryOptionalVisitor: SyntaxVisitor {
         super.init(viewMode: .sourceAccurate)
     }
 
+    /// `defer { try? handle.close() }`: cleanup on the way out has no caller left to report a failure to.
+    private static func isCleanup(_ syntax: Syntax) -> Swift::Bool {
+        var current = syntax.parent
+        while let candidate = current {
+            if candidate.is(DeferStmtSyntax.self) { return true }
+            if candidate.is(ClosureExprSyntax.self) || candidate.is(FunctionDeclSyntax.self)
+                || candidate.is(InitializerDeclSyntax.self) || candidate.is(AccessorDeclSyntax.self)
+            {
+                return false
+            }
+            current = candidate.parent
+        }
+        return false
+    }
+
     override func visit(_ node: TryExprSyntax) -> SyntaxVisitorContinueKind {
         guard let mark = node.questionOrExclamationMark,
             mark.tokenKind == .postfixQuestionMark
         else {
             return .visitChildren
         }
+        if Self.isCleanup(Syntax(node)) { return .visitChildren }
         let location = converter.location(for: mark.positionAfterSkippingLeadingTrivia)
         matches.append(
             Diagnostic.Record(

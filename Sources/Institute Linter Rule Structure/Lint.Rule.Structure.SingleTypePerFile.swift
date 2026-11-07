@@ -8,6 +8,12 @@ extension Lint.Rule {
         default: .warning,
         controls: [
             .init(
+                id: "single type per file private helper",
+                source: "struct Value: Codable { let a: Int }\nextension Value { private enum CodingKeys: String, CodingKey { case a } }\nfileprivate struct Helper {}",
+                path: "Sources/Structure Core/Value.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "single type per file two declarations",
                 source: "struct First {}\nstruct Second {}",
                 path: "Sources/Structure Core/First.swift",
@@ -71,6 +77,13 @@ internal final class StructureSingleTypePerFileVisitor: SyntaxVisitor {
 
     private func handleTypeDecl(_ node: some SyntaxProtocol, at position: AbsolutePosition) {
         guard structureIsFileSignificant(node) else { return }
+        if let declaration = Syntax(node).asProtocol((any WithModifiersSyntax).self),
+            declaration.modifiers.contains(where: {
+                $0.name.tokenKind == .keyword(.private) || $0.name.tokenKind == .keyword(.fileprivate)
+            })
+        {
+            return
+        }
         topLevelCount += .one
         guard topLevelCount > .one else { return }
         let location = converter.location(for: position)

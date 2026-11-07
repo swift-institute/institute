@@ -12,6 +12,12 @@ extension Lint.Rule {
             default: .warning,
             controls: [
                 .init(
+                    id: "compound type name local and coding keys",
+                    source: "func f() { struct LocalRecord {} }\nstruct Value: Codable { enum CodingKeys: String, CodingKey { case a } }",
+                    path: "Sources/Naming Core/Value.swift",
+                    expectation: .clean
+                ),
+                .init(
                     id: "compound type name public compound",
                     source: "public struct FileDirectory {}",
                     path: "Sources/Naming Core/CompoundType.swift",
@@ -139,6 +145,7 @@ internal final class NamingCompoundTypeVisitor: SyntaxVisitor {
             return
         }
         if Naming.isBackticked(token) { return }
+        if token.text == "CodingKeys" || Self.isLocal(syntax) { return }
         let text = token.text
         guard isCompoundTypeIdentifier(text) else { return }
         let location = converter.location(for: token.positionAfterSkippingLeadingTrivia)
@@ -155,6 +162,21 @@ internal final class NamingCompoundTypeVisitor: SyntaxVisitor {
                 message: namingCompoundTypeMessage
             )
         )
+    }
+
+    /// A type declared in a function, closure or accessor body has no surface outside it.
+    private static func isLocal(_ syntax: Syntax) -> Swift::Bool {
+        var current = syntax.parent
+        while let candidate = current {
+            if candidate.is(CodeBlockSyntax.self) || candidate.is(ClosureExprSyntax.self)
+                || candidate.is(AccessorBlockSyntax.self)
+            {
+                return true
+            }
+            if candidate.is(MemberBlockSyntax.self) || candidate.is(SourceFileSyntax.self) { return false }
+            current = candidate.parent
+        }
+        return false
     }
 
     private func hasPackageModifier(_ modifiers: DeclModifierListSyntax) -> Bool {

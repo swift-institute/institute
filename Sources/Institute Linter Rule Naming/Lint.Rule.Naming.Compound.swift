@@ -7,6 +7,13 @@ extension Lint.Rule {
         default: .warning,
         controls: [
             .init(
+                id: "compound identifier standard library witness",
+                source: "public enum Mode { case a }\nextension Mode: CaseIterable { public static let allCases: [Mode] = [.a] }\n"
+                    + "public actor Worker { public nonisolated var unownedExecutor: UnownedSerialExecutor { e.asUnownedSerialExecutor() } }",
+                path: "Sources/Naming Core/Witness.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "compound identifier public compound",
                 source: "public func openWrite() {}",
                 path: "Sources/Naming Core/Compound.swift",
@@ -169,6 +176,22 @@ private let namingCompoundProtocolWitnessMethodCitations: [Swift::String: (citat
         "Swift.AtomicRepresentable.decodeAtomicRepresentation(_:)", true
     ),
     "makeIterator": ("Swift.Sequence.makeIterator()", true),
+    "makeAsyncIterator": ("Swift.AsyncSequence.makeAsyncIterator()", false),
+    "allCases": ("Swift.CaseIterable.allCases", false),
+    "appendInterpolation": ("Swift.StringInterpolationProtocol.appendInterpolation", false),
+    "appendLiteral": ("Swift.StringInterpolationProtocol.appendLiteral(_:)", false),
+    "unownedExecutor": ("Swift.Actor.unownedExecutor", false),
+    "asUnownedSerialExecutor": ("Swift.SerialExecutor.asUnownedSerialExecutor()", false),
+    "asUnownedTaskExecutor": ("Swift.TaskExecutor.asUnownedTaskExecutor()", false),
+    "customDumpMirror": ("CustomDump.CustomDumpReflectable.customDumpMirror", false),
+    "customDumpDescription": ("CustomDump.CustomDumpStringConvertible.customDumpDescription", false),
+    "errorDescription": ("Foundation.LocalizedError.errorDescription", false),
+    "failureReason": ("Foundation.LocalizedError.failureReason", false),
+    "recoverySuggestion": ("Foundation.LocalizedError.recoverySuggestion", false),
+    "underestimatedCount": ("Swift.Sequence.underestimatedCount", false),
+    "popLast": ("Swift.RangeReplaceableCollection.popLast() — drop-in stdlib vocabulary", true),
+    "removeValue": ("Swift.Dictionary.removeValue(forKey:) — drop-in stdlib vocabulary", true),
+    "removeFirst": ("Swift.RangeReplaceableCollection.removeFirst() — drop-in stdlib vocabulary", true),
     "liveValue": ("Dependency.Key.liveValue (swift-dependency)", true),
     "testValue": ("Dependency.Key.testValue (swift-dependency)", true),
     "previewValue": ("Dependency.Key.previewValue (swift-dependency)", true),
