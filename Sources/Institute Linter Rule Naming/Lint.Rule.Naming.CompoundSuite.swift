@@ -86,6 +86,25 @@ extension Lint.Rule {
                 expectation: .findings(2)
             ),
             .init(
+                id: "compound suite name categories in a Test namespace enum",
+                source: "enum `Foo Tests` {}\nextension `Foo Tests` { enum Test { @Suite struct Unit {}; @Suite struct `Edge Case` {} } }\n"
+                    + "extension Foo { enum Test { @Suite struct Integration {} } }",
+                path: "Tests/Naming Tests/Foo Tests.swift",
+                expectation: .clean
+            ),
+            .init(
+                id: "compound suite name categories in a Tests namespace extension",
+                source: "extension `Foo Tests` { @Suite struct Unit {}; @Suite struct `Edge Case` {} }",
+                path: "Tests/Naming Tests/Foo Tests.swift",
+                expectation: .clean
+            ),
+            .init(
+                id: "compound suite name category in another plain namespace",
+                source: "enum Helpers { @Suite struct Unit {} }",
+                path: "Tests/Naming Tests/Foo Tests.swift",
+                expectation: .findings(1)
+            ),
+            .init(
                 id: "compound suite name narrative suite",
                 source: "@Suite struct `Memory Buffer Tests` {}",
                 path: "Sources/Naming Core/NarrativeSuite.swift",
@@ -138,6 +157,21 @@ private func compoundSuiteIsSingleWordFallback(_ name: TokenSyntax) -> Swift::Bo
     return first.isUppercase && !word.contains(" ")
 }
 
+/// #239's layout: categories in a plain `enum Test` (or `struct Test`) namespace, or directly in the
+/// `enum \`Foo Tests\`` namespace through `extension \`Foo Tests\``.
+private func compoundSuiteIsTestNamespace(_ container: Syntax) -> Swift::Bool {
+    if let extensionDecl = container.as(ExtensionDeclSyntax.self) {
+        let last = extensionDecl.extendedType.as(MemberTypeSyntax.self)?.name
+            ?? extensionDecl.extendedType.as(IdentifierTypeSyntax.self)?.name
+        guard let last else { return false }
+        let unescaped = Lint.Syntax.Identifier.unescaped(last.text)
+        return unescaped == "Test" || unescaped.hasSuffix(" Tests")
+    }
+    let name = container.as(EnumDeclSyntax.self)?.name ?? container.as(StructDeclSyntax.self)?.name
+    guard let name else { return false }
+    return Lint.Syntax.Identifier.unescaped(name.text) == "Test"
+}
+
 private func compoundSuiteIsLawful(_ node: Syntax, name: TokenSyntax) -> Swift::Bool {
     guard node.parent?.is(MemberBlockItemSyntax.self) == true,
         let container = node.parent?.parent?.parent?.parent
@@ -145,6 +179,7 @@ private func compoundSuiteIsLawful(_ node: Syntax, name: TokenSyntax) -> Swift::
         return compoundSuiteIsSingleWordFallback(name)
     }
     let isCategory = compoundSuiteCategories.contains(Lint.Syntax.Identifier.unescaped(name.text))
+    if isCategory, compoundSuiteIsTestNamespace(container) { return true }
     if !container.is(ExtensionDeclSyntax.self),
         let group = container.asProtocol((any DeclGroupSyntax).self),
         compoundSuiteHasSuiteAttribute(group.attributes)

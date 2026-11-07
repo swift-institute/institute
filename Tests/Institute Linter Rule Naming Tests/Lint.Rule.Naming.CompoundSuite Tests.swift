@@ -273,3 +273,30 @@ extension `Lint.Rule Tests`.`compound suite name Tests`.`Edge Case` {
         }
     }
 }
+
+extension `Lint.Rule Tests`.`compound suite name Tests`.Unit {
+    @Test
+    func `the categories of #239's layout are lawful`() {
+        let source = """
+            enum `Glob Tests` {}
+            extension `Glob Tests` {
+                enum Test {
+                    @Suite struct Unit {}
+                    @Suite struct `Edge Case` {}
+                    @Suite struct Integration {}
+                    @Suite(.serialized) struct Performance {}
+                }
+            }
+            extension `Buffer Storage Tests` { @Suite struct Unit {} }
+            """
+        let findings = `Lint.Rule Tests`.`compound suite name Tests`.findings(in: source, file: "Tests/X Tests/Glob Tests.swift")
+        #expect(findings.isEmpty)
+    }
+
+    @Test
+    func `a category in a namespace other than Test is still flagged`() {
+        let source = "enum Helpers { @Suite struct Unit {} }"
+        let findings = `Lint.Rule Tests`.`compound suite name Tests`.findings(in: source, file: "Tests/X Tests/Glob Tests.swift")
+        #expect(findings.count == 1)
+    }
+}
