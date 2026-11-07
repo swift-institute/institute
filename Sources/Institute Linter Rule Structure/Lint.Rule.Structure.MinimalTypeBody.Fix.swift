@@ -192,23 +192,24 @@ internal func structureMinimalTypeBodySuppressionWhereClause(
         let types = suppressed.map {
             TypeSyntax(SuppressedTypeSyntax(withoutTilde: .prefixOperator("~"), type: IdentifierTypeSyntax(name: .identifier($0))))
         }
-        let right: TypeSyntax
-        if types.count == 1 {
-            right = types[0]
-        } else {
-            right = TypeSyntax(
-                CompositionTypeSyntax(
-                    elements: CompositionTypeElementListSyntax(
-                        types.enumerated().map { index, type in
-                            CompositionTypeElementSyntax(
-                                type: type.with(\.trailingTrivia, index < types.count - 1 ? .space : []),
-                                ampersand: index < types.count - 1 ? .binaryOperator("&", trailingTrivia: .space) : nil
-                            )
-                        }
+        let right: TypeSyntax =
+            if types.count == 1 {
+                types[0]
+            } else {
+                TypeSyntax(
+                    CompositionTypeSyntax(
+                        elements: CompositionTypeElementListSyntax(
+                            types.enumerated().map { index, type in
+                                let last = index == types.indices.last
+                                return CompositionTypeElementSyntax(
+                                    type: type.with(\.trailingTrivia, last ? [] : .space),
+                                    ampersand: last ? nil : .binaryOperator("&", trailingTrivia: .space)
+                                )
+                            }
+                        )
                     )
                 )
-            )
-        }
+            }
         requirements.append(
             GenericRequirementSyntax(
                 requirement: .conformanceRequirement(
@@ -223,7 +224,7 @@ internal func structureMinimalTypeBodySuppressionWhereClause(
     }
     guard !requirements.isEmpty else { return nil }
     let list = requirements.enumerated().map { index, requirement in
-        requirement.with(\.trailingComma, index < requirements.count - 1 ? .commaToken(trailingTrivia: .space) : nil)
+        requirement.with(\.trailingComma, index == requirements.indices.last ? nil : .commaToken(trailingTrivia: .space))
     }
     return GenericWhereClauseSyntax(
         leadingTrivia: .space,
