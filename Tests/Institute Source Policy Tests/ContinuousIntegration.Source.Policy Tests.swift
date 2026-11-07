@@ -201,9 +201,9 @@ extension `Institute source policy` {
     func `adopted linter catalog preserves published bundle identities and profiles`() {
         let policy = Institute.Source.Policy.current
         let expected: [(Institute.Source.Bundle, Swift.Int, Swift.String)] = [
-            (.institute, 140, "e716c3307a26fad5c677975ee6a3cdcc040296f1b37a9f9816d0f30f024515d2"),
-            (.primitives, 143, "80a29fe5505d3d8cc7f0cf6518acab181031fee079bc9240010e2cd98aa05a0b"),
-            (.standards, 136, "472f9b32637b396403878e5215eabb4d02b036ed439da38c9dca962456ed7dcf"),
+            (.institute, 136, "9bc70a0ca29d8a03c5f9f30b0aad01bd4784ffe34f9b6b95102cf55762e9c4ed"),
+            (.primitives, 139, "1899290c1d3d3742c390cccac71cc2ef24618c782c2debbc4cab1c7287b153e4"),
+            (.standards, 132, "ca918fb62d75781811bfbd6acb70e5168ed6dadc6cfb315b1b26629479aa8a9b"),
         ]
         let engine = policy.engines.first { $0.id.token == "swift-linter" }
         #expect(engine?.revision == "2a07c960bc947b035b2b0857f89af6f4902c5935")
