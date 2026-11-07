@@ -20,6 +20,12 @@ extension Lint.Rule {
                 expectation: .clean
             ),
             .init(
+                id: "untyped throws existential error",
+                source: "func read() throws(any Error) {}",
+                path: "Sources/Throws Consumer/ExistentialError.swift",
+                expectation: .findings(1)
+            ),
+            .init(
                 id: "untyped throws encodable witness",
                 source: "extension Value: Encodable { "
                     + "func encode(to encoder: any Encoder) throws {} }",
@@ -46,7 +52,8 @@ internal let throwsUntypedMessage: Swift::String =
     + "time and the error path stays exhaustive. Untyped throws boxes the error as "
     + "`any Error`, which the institute convention forbids. `@Test` and "
     + "`@Suite`-member declarations are exempt (#16 Option C ledger, Entry III.c "
-    + "— a test rethrows to the runner and has no API surface)."
+    + "— a test rethrows to the runner and has no API surface). `throws(any Error)` "
+    + "is the same thing spelled out, and is reported the same way."
 
 @usableFromInline
 internal let throwsConformanceForcedAllowlist: [(protocolSuffix: Swift::String, method: Swift::String)] = [
@@ -72,7 +79,7 @@ internal final class ThrowsUntypedVisitor: SyntaxVisitor {
         guard node.throwsSpecifier.tokenKind == .keyword(.throws) else {
             return .visitChildren
         }
-        guard node.type == nil else {
+        if let type = node.type, !Self.isAnyError(type) {
             return .visitChildren
         }
         if Self.isConformanceForcedUntypedThrows(node) {
@@ -98,6 +105,19 @@ internal final class ThrowsUntypedVisitor: SyntaxVisitor {
             )
         )
         return .visitChildren
+    }
+
+    /// `any Error` or `any Swift.Error`: the boxed existential, which bare `throws` already means.
+    static func isAnyError(_ type: TypeSyntax) -> Swift::Bool {
+        guard let some = type.as(SomeOrAnyTypeSyntax.self), some.someOrAnySpecifier.tokenKind == .keyword(.any)
+        else { return false }
+        if let identifier = some.constraint.as(IdentifierTypeSyntax.self) { return identifier.name.text == "Error" }
+        if let member = some.constraint.as(MemberTypeSyntax.self), member.name.text == "Error",
+            let base = member.baseType.as(IdentifierTypeSyntax.self)
+        {
+            return base.name.text == "Swift"
+        }
+        return false
     }
 
     static func isConformanceForcedUntypedThrows(_ node: ThrowsClauseSyntax) -> Swift::Bool {

@@ -101,6 +101,24 @@ extension `Lint.Rule Tests`.`untyped throws Tests`.Unit {
 
 extension `Lint.Rule Tests`.`untyped throws Tests`.`Edge Case` {
     @Test
+    func `throws(any Error) is flagged like bare throws`() {
+        let source = """
+            func f() throws(any Error) -> Int { 0 }
+            func g() throws(any Swift.Error) {}
+            func h() throws(any LocalizedError) {}
+            """
+        let findings = `Lint.Rule Tests`.`untyped throws Tests`.findings(in: source)
+        #expect(findings.count == 2)
+        #expect(findings.allSatisfy { $0.identifier == "untyped throws" })
+    }
+
+    @Test
+    func `throws(any Error) in an Encodable witness is NOT flagged`() {
+        let source = "extension V: Encodable { func encode(to encoder: any Encoder) throws(any Error) {} }"
+        #expect(`Lint.Rule Tests`.`untyped throws Tests`.findings(in: source).isEmpty)
+    }
+
+    @Test
     func `throws(SomeError) is NOT flagged`() {
         let source = """
             struct E: Swift.Error {}

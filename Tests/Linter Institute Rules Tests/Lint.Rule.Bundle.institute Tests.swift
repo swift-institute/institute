@@ -94,14 +94,11 @@ private let allDeclaredRuleIDs: Swift::Set<Swift::String> = [
     "diagnostic message format",
     "do throws for typed catch",
     "do throws for typed catch with throw",
-    "existential throws",
     "extension file naming",
     "file name nested path",
     "foundation import",
     "foundation integration leaf target",
     "forbidden license header",
-    "fully qualified error in typed throws",
-    "generic throws missing never",
     "hoisted error in public throws",
     "hoisted protocol alias",
     "int public parameter",
@@ -126,7 +123,6 @@ private let allDeclaredRuleIDs: Swift::Set<Swift::String> = [
     "raw value access",
     "redundant prefix",
     "result wrapper for rethrows shim",
-    "safe attribute undocumented",
     "single type namespace",
     "single type per file",
     "sli literal",
@@ -355,11 +351,6 @@ extension `Lint Rule Bundle institute Tests`.`Severity` {
     ])
     func `rules graduated after two clean fleet measurements are errors`(id: Swift::String) {
         #expect(`Lint Rule Bundle institute Tests`.effectiveSeverity(of: id) == .error)
-    }
-
-    @Test
-    func `safe attribute undocumented stays a note`() {
-        #expect(`Lint Rule Bundle institute Tests`.effectiveSeverity(of: "safe attribute undocumented") == .note)
     }
 
     @Test
