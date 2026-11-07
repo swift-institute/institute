@@ -86,9 +86,9 @@ extension `Lint.Rule Tests`.`count minus one Tests`.Evasion {
     }
 
     @Test
-    func `Algebraic-flip i + 1 less-than seq.count is flagged`() {
+    func `Algebraic-flip i + 1 less-than seq.count is NOT flagged (lookahead guard)`() {
         let findings = `Lint.Rule Tests`.`count minus one Tests`.findings(in: "if i + 1 < seq.count { }")
-        #expect(findings.count == 1)
+        #expect(findings.isEmpty)
     }
 
     @Test
@@ -100,15 +100,15 @@ extension `Lint.Rule Tests`.`count minus one Tests`.Evasion {
     }
 
     @Test
-    func `Algebraic-flip seq.count greater-than i + 1 is flagged`() {
+    func `Algebraic-flip seq.count greater-than i + 1 is NOT flagged (lookahead guard)`() {
         let findings = `Lint.Rule Tests`.`count minus one Tests`.findings(in: "if seq.count > i + 1 { }")
-        #expect(findings.count == 1)
+        #expect(findings.isEmpty)
     }
 
     @Test
-    func `Algebraic-flip with 1 + i (commutative) is flagged`() {
+    func `Algebraic-flip with 1 + i (commutative) is NOT flagged (lookahead guard)`() {
         let findings = `Lint.Rule Tests`.`count minus one Tests`.findings(in: "if 1 + i < seq.count { }")
-        #expect(findings.count == 1)
+        #expect(findings.isEmpty)
     }
 
     @Test
@@ -227,7 +227,7 @@ extension `Lint.Rule Tests`.`count minus one Tests`.`Edge Case` {
     }
 
     @Test
-    func `Multi-line nested algebraic-flip is flagged`() {
+    func `Multi-line nested algebraic-flip is NOT flagged (lookahead guard)`() {
         let source = """
             if i + 1
                 < seq.count {
@@ -235,7 +235,7 @@ extension `Lint.Rule Tests`.`count minus one Tests`.`Edge Case` {
             }
             """
         let findings = `Lint.Rule Tests`.`count minus one Tests`.findings(in: source)
-        #expect(findings.count == 1)
+        #expect(findings.isEmpty)
     }
 }
 
@@ -283,9 +283,9 @@ extension `Lint.Rule Tests`.`count minus one Tests`.`Edge Case` {
     // Near-miss controls: real index arithmetic must still fire after the
     // count-vs-count refinement.
     @Test
-    func `index + 1 compared against a count is still flagged`() {
+    func `index + 1 compared against a count is NOT flagged (lookahead guard)`() {
         let findings = `Lint.Rule Tests`.`count minus one Tests`.findings(in: "let ok = i + 1 < seq.count")
-        #expect(findings.count == 1)
+        #expect(findings.isEmpty)
     }
 
     @Test

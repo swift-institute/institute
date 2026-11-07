@@ -25,6 +25,12 @@ extension Lint.Rule {
                 path: "Sources/Cardinal Consumer/BareCount.swift",
                 expectation: .clean
             ),
+            .init(
+                id: "count minus one lookahead guard",
+                source: "if index + 1 < values.count { use(values[index + 1]) }",
+                path: "Sources/Cardinal Consumer/Lookahead.swift",
+                expectation: .clean
+            ),
         ],
         observe: Lint.Rule.measured { source, severity in
             let folded = OperatorTable.standardOperators.foldAll(
@@ -46,7 +52,7 @@ extension Lint.Rule {
 internal let cardinalCountMinusOneMessage: Swift::String =
     "[count minus one] [INFRA-200]: `<expr>.count - 1` (or syntactic "
     + "equivalents — paren-wrap `(seq.count) - 1`, cast-outside `Double(seq.count) - 1`, "
-    + "algebraic-flip `+ 1 [<=] seq.count`, operand-reorder `seq.count - i - 1`) "
+    + "equality-flip `+ 1 == seq.count`, operand-reorder `seq.count - i - 1`) "
     + "indicates `count: Int` not `count: Cardinal` (the typed form would not compile). "
     + "Use `.subtract.saturating(.one)` / `.subtract.exact(.one)` / typed `count - .one` "
     + "per [INFRA-025], or for stdlib-Int sites where no typed surface is available "
@@ -82,7 +88,9 @@ internal final class CardinalCountVisitor: SyntaxVisitor {
             return .visitChildren
         }
 
-        if Self.isComparisonOperator(opText) {
+        // `i + 1 == seq.count` tests for the last index; an ordering
+        // `i + 1 < seq.count` is a lookahead bounds guard and isn't reported.
+        if opText == "==" || opText == "!=" {
             if Self.isIndexPlusOne(node.leftOperand),
                 Self.isCountDerivedExpression(node.rightOperand)
             {
