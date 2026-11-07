@@ -149,6 +149,24 @@ extension `Lint.Rule Tests`.`module selector spelling Tests`.Integration {
     }
 
     @Test
+    func `repair keeps a same-named type the file shows`() {
+        let repaired = Self.repaired(
+            """
+            internal import W3C_XML
+            let a: W3C_XML::W3C_XML.Element? = nil
+            let b: W3C_XML.Attribute? = nil
+            """
+        )
+        #expect(
+            repaired == """
+                internal import W3C_XML
+                let a: W3C_XML::W3C_XML.Element? = nil
+                let b: W3C_XML::W3C_XML.Attribute? = nil
+                """
+        )
+    }
+
+    @Test
     func `repair leaves selector spelling unchanged`() {
         let proposal = Lint.Rule.`module selector spelling`.repair(
             Lint.Source.parsed(from: "let value: Swift::Int = 0", file: "Sources/Fixture/Fixture.swift")

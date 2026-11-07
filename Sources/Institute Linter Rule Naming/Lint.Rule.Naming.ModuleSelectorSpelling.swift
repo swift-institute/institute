@@ -78,9 +78,18 @@ extension Lint.Rule {
             )
             visitor.walk(source.tree)
             guard !visitor.periods.isEmpty else { return .unchanged }
-            var bytes = Swift::Array(source.tree.description.utf8)
-            for offset in visitor.periods.sorted(by: >) {
-                bytes.replaceSubrange(offset..<offset + 1, with: "::".utf8)
+            // A module with a same-named type resolves `M.Name` to the type:
+            // the selector spelling keeps it, `M::M.Name`. The file shows
+            // that type when it spells `M::M.` or extends `M`.
+            let text = source.tree.description
+            var bytes = Swift::Array(text.utf8)
+            for (offset, module) in zip(visitor.periods, visitor.periodModules).sorted(by: { $0.0 > $1.0 }) {
+                let selfNamed =
+                    text.contains("\(module)::\(module).")
+                    || text.contains("extension \(module) ") || text.contains("extension \(module).")
+                    || text.contains("extension \(module)::\(module)")
+                let replacement = selfNamed ? "::\(module)." : "::"
+                bytes.replaceSubrange(offset..<offset + 1, with: replacement.utf8)
             }
             return .edits([
                 .rewrite(path: source.path, contents: Swift::String(decoding: bytes, as: Swift::UTF8.self))
@@ -124,6 +133,7 @@ internal final class NamingModuleSelectorSpellingVisitor: SyntaxVisitor {
     let modules: Swift::Set<Swift::String>
     var matches: [Diagnostic.Record] = []
     var periods: [Swift::Int] = []
+    var periodModules: [Swift::String] = []
 
     init(
         source: Source.File,
@@ -146,6 +156,7 @@ internal final class NamingModuleSelectorSpellingVisitor: SyntaxVisitor {
         {
             emit(at: node.positionAfterSkippingLeadingTrivia)
             periods.append(node.period.positionAfterSkippingLeadingTrivia.utf8Offset)
+            periodModules.append(base.name.text)
         }
         return .visitChildren
     }
@@ -157,6 +168,7 @@ internal final class NamingModuleSelectorSpellingVisitor: SyntaxVisitor {
         {
             emit(at: node.positionAfterSkippingLeadingTrivia)
             periods.append(node.period.positionAfterSkippingLeadingTrivia.utf8Offset)
+            periodModules.append(base.baseName.text)
         }
         return .visitChildren
     }
