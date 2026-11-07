@@ -164,12 +164,13 @@ extension Institute.CI.Command {
             } catch {
                 throw .configuration("source report serialization did not parse: \(error)")
             }
+            let overruns = Ratchet.overruns(repository: repository, counts: Ratchet.counts(report))
             let code = (Policy(rawValue: exitPolicy) ?? .advisory).code(
                 status: Source_Report::Source.Report.Status(report, expected: report.commitment),
-                errors: report.errors
+                errors: report.errors || !overruns.isEmpty
             )
             print(bytes)
-            for line in Self.summary(report, exitCode: code) {
+            for line in Self.summary(report, exitCode: code) + overruns {
                 Console.Output.error(line + "\n")
             }
             Process.Exit.normal(code)
