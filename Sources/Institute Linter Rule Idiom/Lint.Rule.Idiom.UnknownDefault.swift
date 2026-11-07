@@ -8,9 +8,15 @@ extension Lint.Rule {
         controls: [
             .init(
                 id: "unknown default annotated",
-                source: "func classify(value: Value) { switch value { case .byte: break; @unknown default: break } }",
+                source: "enum Value { case byte, other }\nfunc classify(value: Value) { switch value { case .byte: break; @unknown default: break } }",
                 path: "Sources/Idiom Core/UnknownDefault.swift",
                 expectation: .findings(1)
+            ),
+            .init(
+                id: "unknown default over a foreign enum",
+                source: "func classify(value: FloatingPointClassification) { switch value { case .signalingNaN: break; @unknown default: break } }",
+                path: "Sources/Idiom Core/ForeignUnknownDefault.swift",
+                expectation: .clean
             ),
             .init(
                 id: "unknown default explicit cases",
@@ -73,11 +79,48 @@ internal final class IdiomUnknownDefaultVisitor: SyntaxVisitor {
         return false
     }
 
+    /// Case names of enums declared in this file. `@unknown default` is
+    /// required over a resilient module's non-frozen enum, so the rule
+    /// reports only switches whose named cases are all declared here.
+    /// Case names of enums declared in this file. `@unknown default` is
+    /// required over a resilient module's non-frozen enum, so the rule
+    /// reports only switches whose named cases are all declared here.
+    private var localCaseNames: Swift.Set<Swift::String>?
+
+    private func caseNames(in root: Syntax) -> Swift.Set<Swift::String> {
+        if let localCaseNames { return localCaseNames }
+        let collector = IdiomEnumCaseCollector(viewMode: .sourceAccurate)
+        collector.walk(root)
+        localCaseNames = collector.names
+        return collector.names
+    }
+
+    private func switchesOverLocalEnum(_ node: SwitchCaseSyntax) -> Swift::Bool {
+        guard let cases = node.parent?.as(SwitchCaseListSyntax.self) else { return false }
+        var named: [Swift::String] = []
+        for element in cases {
+            guard case .switchCase(let switchCase) = element,
+                case .case(let label) = switchCase.label
+            else { continue }
+            for item in label.caseItems {
+                for token in item.pattern.tokens(viewMode: .sourceAccurate) {
+                    if token.tokenKind == .period, let next = token.nextToken(viewMode: .sourceAccurate),
+                        case .identifier(let name) = next.tokenKind
+                    {
+                        named.append(name)
+                    }
+                }
+            }
+        }
+        return !named.isEmpty && named.allSatisfy(caseNames(in: Syntax(node).root).contains)
+    }
+
     override func visit(_ node: SwitchCaseSyntax) -> SyntaxVisitorContinueKind {
         guard
             let attribute = node.attribute,
             attribute.attributeName.trimmedDescription == "unknown",
-            isDefaultLikeLabel(node.label)
+            isDefaultLikeLabel(node.label),
+            switchesOverLocalEnum(node)
         else {
             return .visitChildren
         }
@@ -96,5 +139,14 @@ internal final class IdiomUnknownDefaultVisitor: SyntaxVisitor {
             )
         )
         return .visitChildren
+    }
+}
+
+private final class IdiomEnumCaseCollector: SyntaxVisitor {
+    var names: Swift.Set<Swift::String> = []
+
+    override func visit(_ node: EnumCaseElementSyntax) -> SyntaxVisitorContinueKind {
+        names.insert(node.name.text)
+        return .skipChildren
     }
 }

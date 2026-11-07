@@ -61,7 +61,7 @@ extension `Lint.Rule Tests`.`closure typed throws annotation Tests`.Unit {
         let source = """
             struct S {
                 init() throws(MyError) {
-                    values.forEach { _ in try work() }
+                    _ = values.map { _ in try work() }
                 }
             }
             """
@@ -382,5 +382,30 @@ extension `Lint.Rule Tests`.`closure typed throws annotation Tests`.`Edge Case` 
             """
         let findings = `Lint.Rule Tests`.`closure typed throws annotation Tests`.findings(in: source)
         #expect(findings.count == 1)
+    }
+}
+
+extension `Lint.Rule Tests`.`closure typed throws annotation Tests` {
+    @Test
+    func `closure passed to an untyped throws parameter is NOT flagged`() {
+        let source = """
+            func scope<T>(_ body: () throws -> T) rethrows -> T { try body() }
+            func read() throws(MyError) {
+                _ = scope { try work() }
+            }
+            """
+        let findings = `Lint.Rule Tests`.`closure typed throws annotation Tests`.findings(in: source)
+        #expect(findings.isEmpty)
+    }
+
+    @Test
+    func `closure passed to an unresolved callee is NOT flagged`() {
+        let source = """
+            func read() throws(MyError) {
+                try database.read { db in try fetch(db) }
+            }
+            """
+        let findings = `Lint.Rule Tests`.`closure typed throws annotation Tests`.findings(in: source)
+        #expect(findings.isEmpty)
     }
 }

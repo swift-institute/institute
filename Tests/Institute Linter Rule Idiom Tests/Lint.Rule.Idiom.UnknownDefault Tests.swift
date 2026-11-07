@@ -38,6 +38,7 @@ extension `Lint.Rule Tests`.`unknown default Tests`.Unit {
     @Test
     func `unknown default in a switch is flagged`() {
         let source = """
+            enum Kind { case byte, word, ambient, playback }
             func kind(of value: Value) -> Kind {
               switch value {
               case .byte: .byte
@@ -54,6 +55,7 @@ extension `Lint.Rule Tests`.`unknown default Tests`.Unit {
     @Test
     func `explicit case handling is permitted`() {
         let source = """
+            enum Kind { case byte, word, ambient, playback }
             func kind(of value: Value) -> Kind {
               switch value {
               case .byte: .byte
@@ -68,6 +70,7 @@ extension `Lint.Rule Tests`.`unknown default Tests`.Unit {
     @Test
     func `plain default is outside this rule`() {
         let source = """
+            enum Kind { case byte, word, ambient, playback }
             func kind(of value: Value) -> Kind {
               switch value {
               case .byte: .byte
@@ -84,6 +87,7 @@ extension `Lint.Rule Tests`.`unknown default Tests`.`Edge Case` {
     @Test
     func `each unknown default fires once across nested switches`() {
         let source = """
+            enum Kind { case byte, word, ambient, playback }
             func classify(_ a: Value, _ b: Value) -> Kind {
               switch a {
               case .byte:
@@ -102,6 +106,7 @@ extension `Lint.Rule Tests`.`unknown default Tests`.`Edge Case` {
     @Test
     func `unknown default inside a closure is detected`() {
         let source = """
+            enum Kind { case byte, word, ambient, playback }
             let kind = values.map { value in
               switch value {
               case .byte: Kind.byte
@@ -116,6 +121,7 @@ extension `Lint.Rule Tests`.`unknown default Tests`.`Edge Case` {
     @Test
     func `diagnostic is located at the attribute`() {
         let source = """
+            enum Kind { case byte, word, ambient, playback }
             func kind(of value: Value) -> Kind {
               switch value {
               case .byte: .byte
@@ -124,7 +130,7 @@ extension `Lint.Rule Tests`.`unknown default Tests`.`Edge Case` {
             }
             """
         let findings = `Lint.Rule Tests`.`unknown default Tests`.findings(source: source)
-        #expect(findings.first?.location.line == 4)
+        #expect(findings.first?.location.line == 5)
         #expect(findings.first?.location.column == 3)
     }
 }
@@ -136,6 +142,7 @@ extension `Lint.Rule Tests`.`unknown default Tests`.Unit {
     @Test
     func `unknown wildcard case is flagged`() {
         let source = """
+            enum Kind { case byte, word, ambient, playback }
             switch soundCategory {
             case .ambient: break
             case .playback: break
@@ -150,6 +157,7 @@ extension `Lint.Rule Tests`.`unknown default Tests`.Unit {
     @Test
     func `unknown default keyword still fires alongside wildcard support`() {
         let source = """
+            enum Kind { case byte, word, ambient, playback }
             switch soundCategory {
             case .ambient: break
             @unknown default:
@@ -165,6 +173,7 @@ extension `Lint.Rule Tests`.`unknown default Tests`.Integration {
     @Test
     func `exemption analogue - an unknown-named attribute elsewhere does not fire`() {
         let source = """
+            enum Kind { case byte, word, ambient, playback }
             @unknown struct Marker {}
 
             func kind(of value: Value) -> Kind {
@@ -183,6 +192,7 @@ extension `Lint.Rule Tests`.`unknown default Tests`.Integration {
         // The construct exactly as widely published external guidance
         // recommends it, which is the shape this rule exists to catch.
         let source = """
+            enum Kind { case byte, word, ambient, playback }
             switch soundCategory {
             case .ambient: break
             case .playback: break
@@ -192,5 +202,19 @@ extension `Lint.Rule Tests`.`unknown default Tests`.Integration {
             """
         let findings = `Lint.Rule Tests`.`unknown default Tests`.findings(source: source)
         #expect(findings.count == 1)
+    }
+}
+
+extension `Lint.Rule Tests`.`unknown default Tests` {
+    @Test
+    func `unknown default over an enum declared elsewhere is NOT flagged`() {
+        let source = """
+            switch classification {
+            case .signalingNaN: break
+            @unknown default: break
+            }
+            """
+        let findings = `Lint.Rule Tests`.`unknown default Tests`.findings(source: source)
+        #expect(findings.isEmpty)
     }
 }

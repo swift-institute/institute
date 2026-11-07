@@ -28,6 +28,20 @@ extension Lint.Rule {
                 path: "Sources/Throws Consumer/ExpectThrows.swift",
                 expectation: .clean
             ),
+            .init(
+                id: "closure typed throws annotation untyped callee",
+                source: "func scope<T>(_ body: () throws -> T) rethrows -> T { try body() }\n"
+                    + "func read() throws(Read.Error) { _ = scope { try load() } }",
+                path: "Sources/Throws Consumer/UntypedCallee.swift",
+                expectation: .clean
+            ),
+            .init(
+                id: "closure typed throws annotation typed callee",
+                source: "func trapping<E>(_ body: () throws(E) -> Void) throws(E) { try body() }\n"
+                    + "func read() throws(Read.Error) { trapping { try load() } }",
+                path: "Sources/Throws Consumer/TypedCallee.swift",
+                expectation: .findings(1)
+            ),
         ],
         observe: Lint.Rule.measured { source, severity in
             let visitor = ThrowsClosureAnnotationVisitor(
@@ -91,6 +105,64 @@ internal func throwsClosureCatchIsNonPropagating(_ clause: CatchClauseSyntax) ->
     let finder = ThrowsClosureCatchPropagationFinder(viewMode: .sourceAccurate)
     finder.walk(clause.body)
     return !finder.foundPropagation
+}
+
+/// Standard library functions whose closure parameter is `throws(E)`.
+private let throwsClosureTypedStandardCallees: Swift.Set<Swift::String> = [
+    "map", "flatMap", "compactMap",
+]
+
+/// The closure is passed to a callee whose closure parameter is typed:
+/// one declared in this file with a `throws(...)` function-type parameter,
+/// or a standard library function known to be typed. A closure passed to
+/// an untyped `() throws -> T` parameter cannot carry `throws(E)` usefully,
+/// and a callee the file cannot resolve is not reported. A closure that is
+/// not a call argument (stored, returned) is always checked.
+internal func throwsClosureCalleeTakesTypedThrows(_ node: ClosureExprSyntax) -> Swift::Bool {
+    var parent = node.parent
+    if parent?.is(LabeledExprSyntax.self) == true { parent = parent?.parent?.parent }
+    guard let call = parent?.as(FunctionCallExprSyntax.self) else { return true }
+    let callee: Swift::String
+    if let reference = call.calledExpression.as(DeclReferenceExprSyntax.self) {
+        callee = reference.baseName.text
+    } else if let member = call.calledExpression.as(MemberAccessExprSyntax.self) {
+        callee = member.declName.baseName.text
+    } else {
+        return false
+    }
+    if throwsClosureTypedStandardCallees.contains(callee) { return true }
+    let collector = ThrowsClosureTypedCalleeCollector(name: callee)
+    collector.walk(Syntax(node).root)
+    return collector.found
+}
+
+private final class ThrowsClosureTypedCalleeCollector: SyntaxVisitor {
+    let name: Swift::String
+    var found = false
+
+    init(name: Swift::String) {
+        self.name = name
+        super.init(viewMode: .sourceAccurate)
+    }
+
+    override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
+        guard node.name.text == name else { return .visitChildren }
+        for parameter in node.signature.parameterClause.parameters {
+            let finder = ThrowsClosureTypedFunctionTypeFinder(viewMode: .sourceAccurate)
+            finder.walk(parameter.type)
+            if finder.found { found = true }
+        }
+        return .visitChildren
+    }
+}
+
+private final class ThrowsClosureTypedFunctionTypeFinder: SyntaxVisitor {
+    var found = false
+
+    override func visit(_ node: FunctionTypeSyntax) -> SyntaxVisitorContinueKind {
+        if node.effectSpecifiers?.throwsClause?.type != nil { found = true }
+        return .visitChildren
+    }
 }
 
 internal final class ThrowsClosureAnnotationVisitor: SyntaxVisitor {
@@ -166,6 +238,9 @@ internal final class ThrowsClosureAnnotationVisitor: SyntaxVisitor {
         if isTyped { typedThrowsDepth += 1 }
         guard wasInTypedContext, !isTyped else { return .visitChildren }
         if throwsClosureIsInsideExpectThrows(node) {
+            return .visitChildren
+        }
+        if !throwsClosureCalleeTakesTypedThrows(node) {
             return .visitChildren
         }
         let finder = ThrowsClosureTryFinder(viewMode: .sourceAccurate)
