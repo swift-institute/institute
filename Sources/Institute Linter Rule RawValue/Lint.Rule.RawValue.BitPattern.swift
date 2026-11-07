@@ -24,6 +24,12 @@ extension Lint.Rule {
                 path: "Sources/Raw Value Core/OtherInitializer.swift",
                 expectation: .clean
             ),
+            .init(
+                id: "bitpattern rawvalue chain nested in an expression",
+                source: "let value = Int8(bitPattern: UInt8(v.rawValue >> 8))",
+                path: "Sources/RawValue Consumer/Shifted.swift",
+                expectation: .clean
+            ),
         ],
         observe: Lint.Rule.measured { source, severity in
             if Lint.Brand.owned(Lint.Brand.vocabulary, in: source) { return [] }
@@ -88,9 +94,16 @@ internal final class RawValueBitPatternVisitor: SyntaxVisitor {
         return .visitChildren
     }
 
+    /// The argument *is* a `.rawValue` access (through parentheses), not an
+    /// expression that merely uses one, such as `UInt8(v.rawValue >> 8)`.
     private static func containsRawValueAccess(_ expr: ExprSyntax) -> Swift::Bool {
-        let finder = RawValueBitPatternFinder(viewMode: .sourceAccurate)
-        finder.walk(expr)
-        return finder.found
+        var current = expr
+        while let tuple = current.as(TupleExprSyntax.self), tuple.elements.count == 1,
+            let only = tuple.elements.first, only.label == nil
+        {
+            current = only.expression
+        }
+        guard let member = current.as(MemberAccessExprSyntax.self) else { return false }
+        return member.declName.baseName.text == "rawValue"
     }
 }
