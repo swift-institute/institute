@@ -449,3 +449,51 @@ extension `Lint.Rule Tests`.`minimal type body fix Tests`.`Not Fixable` {
         }
     }
 }
+
+extension `Lint.Rule Tests`.`minimal type body fix Tests`.`Edge Case` {
+    @Test
+    func `a generic parameter suppressed as ~Copyable keeps its suppression in the extension`() {
+        // `extension Box { func peek() }` would require `T: Copyable`, so `Box<NC>` loses `peek()`
+        // (swiftc: "referencing instance method 'peek()' on 'Box' requires that 'NC' conform to 'Copyable'").
+        let source = """
+            struct Box<T: ~Copyable>: ~Copyable {
+                var value: T
+                func peek() -> Int { 0 }
+            }
+            """
+        `Lint.Rule Tests`.`minimal type body fix Tests`.roundTrips(source)
+        let output = `Lint.Rule Tests`.`minimal type body fix Tests`.fixed(source)
+        #expect(output?.contains("extension Box where T: ~Copyable {") == true)
+    }
+
+    @Test
+    func `a suppression in the type's where clause is kept too`() {
+        let source = """
+            struct Pair<A, B>: ~Copyable where A: ~Copyable & ~Escapable {
+                var b: B
+                func f() {}
+            }
+            """
+        let output = `Lint.Rule Tests`.`minimal type body fix Tests`.fixed(source)
+        #expect(output?.contains("extension Pair where A: ~Copyable & ~Escapable {") == true)
+    }
+}
+
+extension `Lint.Rule Tests`.`minimal type body fix Tests`.`Not Fixable` {
+    @Test
+    func `a type nested in an extension declines when its members name the enclosing type's siblings`() {
+        // In `extension Outer.Inner` a bare `Helper` is no longer looked up in `Outer`
+        // (swiftc: "cannot find type 'Helper' in scope"), wherever `Outer.Helper` is declared.
+        `Lint.Rule Tests`.`minimal type body fix Tests`.declines(
+            """
+            extension Outer {
+                struct Inner {
+                    let x: Int
+                    func f() -> Helper { Helper() }
+                }
+            }
+            """
+        )
+    }
+}
+
