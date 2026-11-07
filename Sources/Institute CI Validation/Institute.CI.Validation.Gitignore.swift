@@ -182,7 +182,6 @@ extension Institute.CI.Validation {
         }
 
         public func findings(in subject: Subject) throws(EnvironmentDefect) -> [Finding] {
-            // A root that is not there is not a repository of any class.
             guard Institute.CI.Validation.isDirectory(subject.root)
             else { return [] }
             try Self.validateRepositoryEnvironment(subject.root)
@@ -283,10 +282,6 @@ extension Institute.CI.Validation {
                 )
             }
 
-            // 002 and 003 evaluate the repository's ACTUAL file,
-            // canonical or not — a divergent file that loses real work or
-            // admits the unadmitted should say so on its own terms, not
-            // only via 001.
             let work = Self.work(for: `class`)
             let ignored = try Self.ignored(
                 under: text,
@@ -304,9 +299,6 @@ extension Institute.CI.Validation {
             }
             let tracked = Self.junk.filter { !ignored.contains($0.path.string) }
             if !tracked.isEmpty {
-                // The control failed. Reported as a finding rather than
-                // passed: a harness that cannot detect denial makes every
-                // clean 002 above vacuous.
                 findings.append(
                     Finding(
                         repository: subject.repository,
@@ -349,11 +341,6 @@ extension Institute.CI.Validation.Gitignore {
     /// `nil` when no ancestor carries it.
     static var resolvedCanonPath: String? {
         currentWorkingDirectory.flatMap { resolvedCanonPath(startingAt: $0) }
-            // The canon rides its owner: this package carries the
-            // authoritative `canon/gitignore-package.txt` at its own
-            // root, so a caller whose working directory is elsewhere —
-            // a test runner, a consumer package — still resolves the
-            // document this validator was built against.
             ?? resolvedCanonPath(startingAt: String(#filePath).directoryPortion)
     }
 
@@ -438,12 +425,6 @@ extension Institute.CI.Validation.Gitignore {
                 } catch {
                     lastError = error
                     if attempt + 1 < attempts {
-                        // Exponential backoff, capped at one second. The
-                        // kernel sleep is reached through WinSDK directly:
-                        // this branch is Windows-only bootstrap around a
-                        // Defender/Search-Indexer scan race, and no
-                        // Institute-owned substrate owns a synchronous
-                        // sleep yet.
                         var milliseconds: UInt32 = 50
                         for _ in 0..<attempt where milliseconds < 1000 {
                             milliseconds *= 2
@@ -496,8 +477,6 @@ extension Institute.CI.Validation.Gitignore {
         guard let root = scratchDirectory(prefix: "ci-validation-gitignore-") else {
             throw .missingSupportFile(path: "temporary directory")
         }
-        // A scratch tree that outlives the probe is not a verdict about
-        // anything; deletion failure changes nothing downstream.
         defer {
             if let path = try? File.Path(root) {
                 try? File.System.Delete.delete(at: path, recursive: true)
@@ -507,9 +486,6 @@ extension Institute.CI.Validation.Gitignore {
         for probe in probes {
             let target = "\(root)/\(probe.path)"
             let directory = probe.isDirectory ? target : target.directoryPortion
-            // Directory creation failure here is exactly the defect
-            // raised in the catch. Retried on Windows — see
-            // `retryingTransientWindowsFailures`.
             do {
                 try Self.retryingTransientWindowsFailures {
                     let path = try File.Path(directory)
@@ -532,12 +508,6 @@ extension Institute.CI.Validation.Gitignore {
                 }
             }
         }
-        // LAST, and deliberately so: `.gitignore` is itself a probe —
-        // the file must not ignore itself — and materialising probes
-        // as empty files would otherwise truncate the very file under
-        // test. Every verdict in the run would then reflect an empty
-        // ignore file, so all junk reads as tracked and all work
-        // reads as kept. The junk control caught exactly this.
         do {
             try Self.retryingTransientWindowsFailures {
                 let path = try File.Path("\(root)/.gitignore" as String)
@@ -552,7 +522,6 @@ extension Institute.CI.Validation.Gitignore {
         }
         var ignored: Set<String> = []
         for probe in probes {
-            // 0 = ignored, 1 = not ignored, >1 = git itself failed.
             let verdict = try git(["check-ignore", "-q", "--", probe.path.string], in: root).status
             guard verdict <= 1 else {
                 throw .missingSupportFile(path: "git check-ignore \(probe.path)")
@@ -633,10 +602,6 @@ extension Institute.CI.Validation.Gitignore {
                     : directory.relative + "/" + entry.name
                 if relative == ".git" { continue }
                 if entry.name == ".gitignore" { paths.append(relative) }
-                // Symbolic links are evaluated by pathname without
-                // dereferencing: the listing reports a link as a link,
-                // never as the directory it points at, so a linked
-                // subtree is not walked.
                 if entry.isDirectory {
                     directories.append((directory.path + "/" + entry.name, relative))
                 }
@@ -791,27 +756,13 @@ extension Institute.CI.Validation.Gitignore {
         } catch {
             throw .missingSupportFile(path: "git")
         }
-        // The spawn is retried as one unit on Windows — see
-        // `retryingTransientWindowsFailures`. Every call site invokes
-        // `git` idempotently (`init`, `check-ignore`, `ls-files`), so
-        // rerunning it is safe.
         do {
             let output = try Self.retryingTransientWindowsFailures {
                 try Process.Spawn.run(
                     .init(
                         executable: executable,
                         arguments: ["-C", root] + arguments,
-                        // Git's ambient control variables can redirect the
-                        // repository, work tree, index, object database,
-                        // configuration, and namespace. A fixed environment
-                        // removes that entire input surface rather than
-                        // trying to maintain a partial deny-list of Git
-                        // variables.
                         environment: controlledGitEnvironment(environment, executable: executable),
-                        // The seam feeds no stdin and none of the invoked
-                        // subcommands (`init`, `check-ignore` without
-                        // `--stdin`, `ls-files`) read it; the capture runner
-                        // supports no stdin pipe, so the stream is inherited.
                         stdin: .inherit,
                         stdout: .pipe,
                         stderr: .pipe
@@ -855,16 +806,6 @@ extension Institute.CI.Validation.Gitignore {
             "XDG_CONFIG_HOME": null,
         ]
         #if os(Windows)
-            // Git for Windows launches through its MSYS/Cygwin POSIX
-            // emulation layer, which bootstraps from the Win32 environment
-            // — including `SystemRoot` — to translate host paths into the
-            // form its runtime operates on. A child environment that omits
-            // these is a documented way to break any Win32-hosted
-            // program's startup, not a git-specific quirk. None of these
-            // carry the ambient *git* control surface this isolation
-            // exists to remove — they are OS bootstrap variables, not git
-            // variables — so restoring them narrows nothing this function
-            // isolates.
             for name in [
                 "SystemRoot", "SystemDrive", "windir", "ComSpec",
                 "TEMP", "TMP", "USERPROFILE", "ALLUSERSPROFILE",

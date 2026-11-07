@@ -80,10 +80,6 @@ extension Institute.CI.Validation.SkillHygiene {
                     continue
 
                 default:
-                    // Present but not a non-empty string — a number, a
-                    // boolean, a mapping, or whitespace. All of them
-                    // leave the field unusable, and the retired script
-                    // reported them under one message.
                     findings.append(finding(Rules.identity, "`\(field)` is empty"))
                 }
             }

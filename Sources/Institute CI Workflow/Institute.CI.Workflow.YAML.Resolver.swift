@@ -33,8 +33,6 @@ extension Institute.CI.Workflow.YAML {
             }
         }
 
-        // PyYAML's bool resolver, spelled out rather than lower-cased,
-        // because 1.1 accepts only these spellings — `yEs` is a string.
         private static func boolean(_ text: String) -> Bool? {
             switch text {
             case "yes", "Yes", "YES", "true", "True", "TRUE", "on", "On", "ON": true
@@ -80,8 +78,6 @@ extension Institute.CI.Workflow.YAML {
             case ".nan", ".NaN", ".NAN": return .nan
             default: break
             }
-            // Require a decimal point or exponent so a bare word never
-            // resolves numerically.
             guard text.contains(where: { $0 == "." || $0 == "e" || $0 == "E" }) else { return nil }
             guard text.allSatisfy({ $0.isNumber || "+-._eE".contains($0) }) else { return nil }
             return Double(String(text.filter { $0 != "_" }))

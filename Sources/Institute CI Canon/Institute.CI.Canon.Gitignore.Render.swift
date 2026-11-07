@@ -16,10 +16,6 @@ extension Institute.CI.Canon.Gitignore {
 
         public init(canon: Institute.CI.Canon.Gitignore) throws(Error) {
             guard canon.isGenerated else { throw .terminatorAbsent }
-            // Git may materialize a text checkout with CRLF on Windows.
-            // The canon is one Git document whose blob remains LF-pinned;
-            // line-ending conversion must not make its closed admission
-            // vocabulary disappear from the parser.
             let normalized = canon.text.normalized(to: .lf)
             guard
                 normalized.contains(

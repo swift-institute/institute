@@ -5,12 +5,6 @@ import Institute_Model
 
 import struct Swift.String
 
-// The validation rules read repository trees through these accessors so
-// each rule states *what* it reads — a file's text, a directory's entry
-// names, a subtree's files — and the kernel-backed mechanics stay in one
-// place. Every absence collapses to `nil`/`false`/empty on purpose: a
-// validator's contract is to report findings about what is there, and
-// "not there" is an input state, not an error path.
 extension Institute.CI.Validation {
 
     /// The UTF-8 text of the file at `path`, or `nil` when the path is

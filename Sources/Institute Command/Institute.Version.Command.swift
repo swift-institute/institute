@@ -11,7 +11,7 @@ extension Institute.Version.Command {
     ///
     /// Prints one line per repository and exits 1 when any repository
     /// needs a person (a refusal or a failure), else 0.
-    public struct Tag: Sendable, Command_Schema.Command.`Protocol` {
+    public struct Tag: Sendable, Command_Schema::Command.`Protocol` {
         public var organizations: [Swift.String]
         public var repositories: [Swift.String]
         public var backfill: Swift.Bool
@@ -29,7 +29,7 @@ extension Institute.Version.Command {
             self.dryRun = dryRun
         }
 
-        public static var configuration: Command_Schema.Command.Configuration {
+        public static var configuration: Command_Schema::Command.Configuration {
             .init(
                 name: "tag",
                 abstract: "Tag each main head that passed CI with its next development version.",
@@ -43,26 +43,26 @@ extension Institute.Version.Command {
             )
         }
 
-        public static var schema: Command_Schema.Command.Schema.Definition<Self> {
+        public static var schema: Command_Schema::Command.Schema.Definition<Self> {
             .init {
-                Command_Schema.Command.Option<Self, Swift.String>.Many(
+                Command_Schema::Command.Option<Self, Swift.String>.Many(
                     \.organizations,
                     name: .long(.literal("org")),
                     placeholder: "organization",
                     help: .init(abstract: "Sweep every repository of this organization (repeatable).")
                 )
-                Command_Schema.Command.Option<Self, Swift.String>.Many(
+                Command_Schema::Command.Option<Self, Swift.String>.Many(
                     \.repositories,
                     name: .long(.literal("repository")),
                     placeholder: "owner/name",
                     help: .init(abstract: "Sweep only this repository (repeatable).")
                 )
-                Command_Schema.Command.Flag(
+                Command_Schema::Command.Flag(
                     \.backfill,
                     name: .long(.literal("backfill")),
                     help: .init(abstract: "Tag only repositories that have no tag on the line yet.")
                 )
-                Command_Schema.Command.Flag(
+                Command_Schema::Command.Flag(
                     \.dryRun,
                     name: .long(.literal("dry-run")),
                     help: .init(abstract: "Write nothing; print the tag a real run would create.")
@@ -70,7 +70,7 @@ extension Institute.Version.Command {
             }
         }
 
-        public mutating func validate() throws(Command_Schema.Command.Error) {
+        public mutating func validate() throws(Command_Schema::Command.Error) {
             guard organizations.isEmpty || repositories.isEmpty else {
                 throw .validationFailed(reason: "pass --org or --repository, not both")
             }
@@ -152,17 +152,17 @@ extension Institute.Version.Command.Tag {
 
 extension Institute.Version {
     /// `institute version` — development versions of the Institute's packages.
-    public enum Command: Sendable, Command_Schema.Command.`Protocol` {
+    public enum Command: Sendable, Command_Schema::Command.`Protocol` {
         case tag(Tag)
 
-        public static var configuration: Command_Schema.Command.Configuration {
+        public static var configuration: Command_Schema::Command.Configuration {
             .init(name: "version", abstract: "Tag the Institute's packages with development versions.")
         }
 
-        public static var schema: Command_Schema.Command.Schema.Definition<Self> {
+        public static var schema: Command_Schema::Command.Schema.Definition<Self> {
             .init {
-                Command_Schema.Command.Subcommand.Group {
-                    Command_Schema.Command.Subcommand.Case(
+                Command_Schema::Command.Subcommand.Group {
+                    Command_Schema::Command.Subcommand.Case(
                         "tag",
                         help: .init(abstract: "Tag each main head that passed CI with its next version."),
                         initial: { .init() },

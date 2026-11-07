@@ -72,10 +72,10 @@ private func measuredSourceSubject(identity: Swift.String) -> Source.Subject {
 private func configurationReport(
     configuration: (subject: Source.Subject, evidence: [Source.Artifact.Evidence]),
     measured: [Source.Subject]
-) -> Source_Report.Source.Report {
+) -> Source_Report::Source.Report {
     let policy = Institute.Source.Policy.current
     let format = Source.Rule.ID(engine: .init("swift-format"), token: "format")
-    let requirements: [Source_Report.Source.Report.Commitment.Requirement] = measured.map {
+    let requirements: [Source_Report::Source.Report.Commitment.Requirement] = measured.map {
         .init(
             subject: $0.identity,
             engine: format.engine,
@@ -98,7 +98,7 @@ private func configurationReport(
         )
     }
     let subjects = measured + [configuration.subject]
-    let commitment = Source_Report.Source.Report.Commitment(
+    let commitment = Source_Report::Source.Report.Commitment(
         subjects: subjects,
         engines: [
             .init(id: format.engine, artifactKinds: [.swift], controlPolicy: .transitionalExternal),
@@ -171,9 +171,9 @@ func `Package scope source report with generated configuration is complete and c
     )
 
     #expect(throws: Never.self) {
-        try Source_Report.Source.Report.Complete(report, expected: report.commitment)
+        try Source_Report::Source.Report.Complete(report, expected: report.commitment)
     }
-    #expect(Source_Report.Source.Report.Status(report, expected: report.commitment) == .clean)
+    #expect(Source_Report::Source.Report.Status(report, expected: report.commitment) == .clean)
 }
 
 @Test
@@ -195,9 +195,9 @@ func `Workspace scope source report with a control row and generated configurati
     )
 
     #expect(throws: Never.self) {
-        try Source_Report.Source.Report.Complete(report, expected: report.commitment)
+        try Source_Report::Source.Report.Complete(report, expected: report.commitment)
     }
-    #expect(Source_Report.Source.Report.Status(report, expected: report.commitment) == .clean)
+    #expect(Source_Report::Source.Report.Status(report, expected: report.commitment) == .clean)
 }
 
 @Test
@@ -247,8 +247,8 @@ func `Source report whose generated configuration names an absent owner is unmea
         measured: [measuredSourceSubject(identity: "swift-institute/swift-example@revision")]
     )
 
-    #expect(throws: Source_Report.Source.Report.Complete.Error.self) {
-        try Source_Report.Source.Report.Complete(report, expected: report.commitment)
+    #expect(throws: Source_Report::Source.Report.Complete.Error.self) {
+        try Source_Report::Source.Report.Complete(report, expected: report.commitment)
     }
-    #expect(Source_Report.Source.Report.Status(report, expected: report.commitment) == .unmeasured)
+    #expect(Source_Report::Source.Report.Status(report, expected: report.commitment) == .unmeasured)
 }

@@ -193,17 +193,7 @@ extension Institute.CI.Inventory {
                 cache[id] = 0
                 return 0
             }
-            // Seeded before recursing: a cyclic `needs` graph is not a
-            // legal workflow, and this bounds the recursion rather than
-            // trusting that.
             cache[id] = 0
-            // `Self.` is load-bearing: an unqualified `wave` inside the
-            // closure resolves to the `let` being declared, not to this
-            // function, and Swift 6.3 — the toolchain CI builds with —
-            // rejects it as calling a value of non-function type. 6.4
-            // resolves it the other way, which is why it compiled on a
-            // developer machine and failed on the runner (canary
-            // 31165009465).
             let depth = 1 + (declared.map { Self.wave(of: $0, needs: needs, cache: &cache) }.max() ?? 0)
             cache[id] = depth
             return depth

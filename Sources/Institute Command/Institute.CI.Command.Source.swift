@@ -14,7 +14,7 @@ import Process
 import Source_Report
 
 extension Institute.CI.Command {
-    public struct Source: Sendable, Command_Schema.Command.`Protocol` {
+    public struct Source: Sendable, Command_Schema::Command.`Protocol` {
         public var repository: Swift.String
         public var revision: Swift.String
         public var root: Swift.String
@@ -38,7 +38,7 @@ extension Institute.CI.Command {
             self.exitPolicy = exitPolicy
         }
 
-        public static var configuration: Command_Schema.Command.Configuration {
+        public static var configuration: Command_Schema::Command.Configuration {
             .init(name: "source", abstract: "Measure one checked-out package source subject.")
         }
 
@@ -68,34 +68,34 @@ extension Institute.CI.Command {
             Invalid arguments exit 64 before measurement; other failures exit 2.
             """
 
-        public static var schema: Command_Schema.Command.Schema.Definition<Self> {
+        public static var schema: Command_Schema::Command.Schema.Definition<Self> {
             .init {
-                Command_Schema.Command.Option(
+                Command_Schema::Command.Option(
                     \.repository,
                     name: .long(.literal("repository")),
                     placeholder: "owner/name"
                 )
-                Command_Schema.Command.Option(
+                Command_Schema::Command.Option(
                     \.revision,
                     name: .long(.literal("revision")),
                     placeholder: "commit"
                 )
-                Command_Schema.Command.Option(
+                Command_Schema::Command.Option(
                     \.root,
                     name: .long(.literal("root")),
                     placeholder: "package-root"
                 )
-                Command_Schema.Command.Option(
+                Command_Schema::Command.Option(
                     \.xcodeApplication,
                     name: .long(.literal("xcode-application")),
                     placeholder: "/Applications/Xcode.app"
                 )
-                Command_Schema.Command.Option(
+                Command_Schema::Command.Option(
                     \.jobs,
                     name: .long(.literal("jobs")),
                     placeholder: "positive-count"
                 )
-                Command_Schema.Command.Option(
+                Command_Schema::Command.Option(
                     \.exitPolicy,
                     name: .long(.literal("exit-policy")),
                     placeholder: "advisory|strict"
@@ -103,7 +103,7 @@ extension Institute.CI.Command {
             }
         }
 
-        public mutating func validate() throws(Command_Schema.Command.Error) {
+        public mutating func validate() throws(Command_Schema::Command.Error) {
             guard GitHub_Standard::GitHub.Repository.Slug(repository) != nil else {
                 throw .validationFailed(reason: "--repository must be owner/name")
             }
@@ -158,14 +158,14 @@ extension Institute.CI.Command {
                 preparation: preparation
             )
             let bytes = measured.jsonString(sortKeys: true)
-            let report: Source_Report.Source.Report
+            let report: Source_Report::Source.Report
             do throws(JSON.Error) {
                 report = try .init(jsonString: bytes)
             } catch {
                 throw .configuration("source report serialization did not parse: \(error)")
             }
             let code = (Policy(rawValue: exitPolicy) ?? .advisory).code(
-                status: Source_Report.Source.Report.Status(report, expected: report.commitment),
+                status: Source_Report::Source.Report.Status(report, expected: report.commitment),
                 errors: report.errors
             )
             print(bytes)
@@ -178,8 +178,8 @@ extension Institute.CI.Command {
 
     static func source(_ arguments: [Swift.String]) async {
         var command: Source
-        do throws(Command_Schema.Command.Error) {
-            command = try Command_Schema.Command.parse(
+        do throws(Command_Schema::Command.Error) {
+            command = try Command_Schema::Command.parse(
                 Source.self,
                 from: arguments,
                 initial: .init()

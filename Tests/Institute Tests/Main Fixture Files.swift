@@ -56,7 +56,7 @@ enum MainFixtureFiles {
 
     static func isDirectory(_ path: Swift.String) -> Swift.Bool {
         var directory: ObjCBool = false
-        return FileManager.default.fileExists(atPath: path, isDirectory: &directory)
+        return unsafe FileManager.default.fileExists(atPath: path, isDirectory: &directory)
             && directory.boolValue
     }
 

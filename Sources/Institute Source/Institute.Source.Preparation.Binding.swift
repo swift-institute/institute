@@ -4,7 +4,7 @@ public import Source_Repair
 
 extension Institute.Source.Preparation {
     public enum Binding: Sendable, Equatable, JSON.Serializable {
-        case package(Source_Repair.Source.Subject.Binding)
+        case package(Source_Repair::Source.Subject.Binding)
 
         public static func serialize(_ value: Self) -> JSON {
             switch value {
@@ -22,7 +22,7 @@ extension Institute.Source.Preparation {
                 guard Set(object.keys) == ["kind", "subject"], let subject = object["subject"] else {
                     throw .typeMismatch(expected: "package source binding", got: "other")
                 }
-                return try .package(Source_Repair.Source.Subject.Binding(json: subject))
+                return try .package(Source_Repair::Source.Subject.Binding(json: subject))
             default:
                 throw .typeMismatch(expected: "package source binding", got: "other")
             }

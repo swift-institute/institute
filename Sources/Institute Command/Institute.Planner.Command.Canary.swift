@@ -14,7 +14,7 @@ extension Institute.Planner.Command {
     /// `run` and the current planner, measure each canary repository with
     /// both, and write the comparison as evidence. Exits 0 when the
     /// candidate is adoptable, 1 when it differs, 2 when refused.
-    public struct Canary: Sendable, Command_Schema.Command.`Protocol` {
+    public struct Canary: Sendable, Command_Schema::Command.`Protocol` {
         public var publication: Swift.String
         public var repositories: [Swift.String]
         public var workPath: Swift.String
@@ -38,7 +38,7 @@ extension Institute.Planner.Command {
             self.candidateXcode = candidateXcode
         }
 
-        public static var configuration: Command_Schema.Command.Configuration {
+        public static var configuration: Command_Schema::Command.Configuration {
             .init(
                 name: "canary",
                 abstract: "Run a published planner against the current one.",
@@ -55,34 +55,34 @@ extension Institute.Planner.Command {
             )
         }
 
-        public static var schema: Command_Schema.Command.Schema.Definition<Self> {
+        public static var schema: Command_Schema::Command.Schema.Definition<Self> {
             .init {
-                Command_Schema.Command.Option(
+                Command_Schema::Command.Option(
                     \.publication,
                     name: .long(.literal("publish-run")),
                     placeholder: "run-id"
                 )
-                Command_Schema.Command.Option<Self, Swift.String>.Many(
+                Command_Schema::Command.Option<Self, Swift.String>.Many(
                     \.repositories,
                     name: .long(.literal("repository")),
                     placeholder: "owner/name"
                 )
-                Command_Schema.Command.Option(
+                Command_Schema::Command.Option(
                     \.workPath,
                     name: .long(.literal("work-path")),
                     placeholder: "directory"
                 )
-                Command_Schema.Command.Option(
+                Command_Schema::Command.Option(
                     \.outputPath,
                     name: .long(.literal("output-path")),
                     placeholder: "evidence.json"
                 )
-                Command_Schema.Command.Option(
+                Command_Schema::Command.Option(
                     \.currentXcode,
                     name: .long(.literal("current-xcode")),
                     placeholder: "/Applications/Xcode.app"
                 )
-                Command_Schema.Command.Option(
+                Command_Schema::Command.Option(
                     \.candidateXcode,
                     name: .long(.literal("candidate-xcode")),
                     placeholder: "/Applications/Xcode.app"
@@ -90,7 +90,7 @@ extension Institute.Planner.Command {
             }
         }
 
-        public mutating func validate() throws(Command_Schema.Command.Error) {
+        public mutating func validate() throws(Command_Schema::Command.Error) {
             guard Institute.Planner.isRun(publication) else {
                 throw .validationFailed(reason: "--publish-run must be a publish-planner run id")
             }

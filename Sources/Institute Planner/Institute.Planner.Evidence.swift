@@ -125,8 +125,6 @@ extension Institute.Planner.Evidence: JSON.Serializable {
             throw .typeMismatch(expected: "adoptable, differs or refused", got: "other verdict")
         }
         let repositories = try [Institute.Planner.Canary.Comparison](json: json["repositories"])
-        // A recorded verdict must be the one its comparisons give, so an
-        // edited verdict cannot turn a differing canary adoptable.
         guard verdict == .refused || verdict == .init(repositories) else {
             throw .typeMismatch(
                 expected: "the verdict the comparisons give",

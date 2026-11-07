@@ -3,7 +3,7 @@ public import Institute_Source_Policy
 public import Source_Measurement
 import Source_Profile
 
-extension Institute_Model.Institute.Source {
+extension Institute_Model::Institute.Source {
     public struct Profile: Sendable {
         public let policy: Institute.Source.Policy
 
@@ -15,7 +15,7 @@ extension Institute_Model.Institute.Source {
 
         public func rules(
             for bundle: Institute.Source.Bundle
-        ) -> [Source_Measurement.Source.Rule.ID] {
+        ) -> [Source_Measurement::Source.Rule.ID] {
             policy.linterRules(for: bundle)
         }
     }

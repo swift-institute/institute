@@ -87,14 +87,10 @@ extension Institute.Repository.Policy.Census.Generator {
         return Institute.Repository.Policy.Census(rows: rows)
     }
 
-    // MARK: traversal
-
     static func walk(root: Swift.String, under directory: Swift.String) -> [Swift.String] {
         var results: [Swift.String] = []
         var stack = [directory]
         while let dir = stack.popLast() {
-            // An unlistable directory contributes no coordinates; absence
-            // of the whole `.github` tree is the common, legitimate case.
             guard let entries = Institute.Repository.Policy.names(at: dir) else { continue }
             for entry in entries.sorted() {
                 if entry == ".git" { continue }
@@ -110,8 +106,6 @@ extension Institute.Repository.Policy.Census.Generator {
         }
         return results.sorted()
     }
-
-    // MARK: per-file coordinates
 
     static func rows(
         for rel: Swift.String,
@@ -307,8 +301,6 @@ extension Institute.Repository.Policy.Census.Generator {
     static func digest(_ text: Swift.String) -> Swift.String {
         digest([Byte](utf8: text))
     }
-
-    // MARK: frozen family and sentinel rows
 
     static var leafCallerFamilyRow: Row {
         Row(

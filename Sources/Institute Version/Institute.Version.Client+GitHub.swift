@@ -38,7 +38,6 @@ extension Institute.Version.Client {
             },
             head: { repository throws(Institute.Version.Error) in
                 let path = "/repos/\(repository.description)/git/ref/heads/main"
-                // 404: no `main`; 409: an empty repository.
                 guard let reference = try GitHub.get(path, absent: [404, 409]) else { return nil }
                 return try GitHub.commit(of: reference, in: repository, at: path)
             },
@@ -136,7 +135,6 @@ extension Institute.Version.Client {
                 case 201:
                     return .created
                 case 422:
-                    // The name exists: report what it names, never replace it.
                     let existing = "/repos/\(repository.description)/git/ref/tags/\(tag.name)"
                     guard let reference = try GitHub.get(existing, absent: [404]) else {
                         throw .status(method: "POST", path: path, status: 422)
@@ -200,8 +198,6 @@ extension Institute.Version.Client {
         ) throws(Institute.Version.Error) -> Swift.String {
             var object = reference["object"]
             var location = path
-            // An annotated tag may tag another tag; a chain longer than a
-            // handful is not something a person made.
             for _ in 0..<8 {
                 guard
                     let sha = Swift.String(object["sha"] as JSON?), isCommit(sha),

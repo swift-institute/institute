@@ -36,10 +36,6 @@ extension Institute.CI.Validation {
         public init() {}
 
         public func findings(in subject: Subject) throws(EnvironmentDefect) -> [Finding] {
-            // Parse refusals cite CI-040, the primary of the pair, as the
-            // retired validator did. A document that will not parse does
-            // not violate one of the two rather than the other, but the
-            // TSV's rule column needs a value.
             let (documents, refusals) = try subject.workflows(citing: rules[0])
             var findings = refusals
             for document in documents {

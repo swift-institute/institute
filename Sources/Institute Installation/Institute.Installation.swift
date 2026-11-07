@@ -313,8 +313,6 @@ extension Institute.Installation {
             return findings
         }
         #if !os(Windows)
-            // The POSIX mode-bit precheck has no Windows counterpart. There only the structural
-            // checks apply; whether the file launches is decided where it is run.
             do throws(File.System.Metadata.Permissions.Error) {
                 if try File.System.Metadata.Permissions(at: executable.path) != .executable {
                     findings.append("managed Institute executable is not executable: \(executable)")

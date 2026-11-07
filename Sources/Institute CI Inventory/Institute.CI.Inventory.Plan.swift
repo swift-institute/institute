@@ -51,9 +51,6 @@ extension Institute.CI.Inventory {
                 )
                 .legs.map(\.id)
             } catch {
-                // The owner refusing its own full tier under no platform
-                // filter would mean the vocabulary has no members, which
-                // the drift test reports rather than this accessor.
                 return []
             }
         }

@@ -57,11 +57,6 @@ extension Institute.CI.Validation.Drift {
             let alert = try Self.parse(alertText, at: subject.path(Self.alertPath))
             let watched = try Self.watched(in: alert)
 
-            // `*.yml` only, and the alert workflow excluded — it carries
-            // no `schedule:` trigger of its own, so the exclusion is belt
-            // and braces rather than load-bearing. Both narrowings are
-            // the retired script's; widening either would change which
-            // documents the rule reads.
             guard let names = Institute.CI.Validation.names(at: directory) else {
                 throw .unreadableFile(path: directory)
             }

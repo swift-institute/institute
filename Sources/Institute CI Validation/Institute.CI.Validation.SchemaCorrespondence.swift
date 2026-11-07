@@ -100,8 +100,6 @@ extension Institute.CI.Validation {
             let schemaText = try Self.text(at: schemaPath)
             let workflowText = try Self.text(at: workflowPath)
             let readmeText = try Self.text(at: readmePath)
-            // `JSON.parse` throws typed; its failure here is exactly the
-            // defect raised below.
             let schema: JSON
             do throws(JSON.Error) {
                 schema = try JSON.parse(schemaText)
@@ -184,9 +182,6 @@ extension Institute.CI.Validation.SchemaCorrespondence {
 
         for (field, constant) in readmePairs {
             let declared = schemaEnum(schema, block: "readme", field: field)
-            // Flattens the double optional: an absent constant and one
-            // present-but-not-a-literal-tuple (`.some(nil)`) both report
-            // as the guard below.
             let read = constants[constant].flatMap { $0 }
             guard let declared else {
                 problems.append(
@@ -273,13 +268,6 @@ extension Institute.CI.Validation.SchemaCorrespondence {
         var found: [String: [String]?] = [:]
         for name in names { found[name] = .some(nil) }
 
-        // `"\r\n"` is a single extended grapheme cluster in Swift — one
-        // `Character`, distinct from the bare `"\n"` split below —  so a
-        // CRLF checkout of this LF-pinned consumer source (Windows'
-        // `core.autocrlf`) would not leave a stray `\r` per line, it
-        // would remove every split point and read as one line. Normalize
-        // before splitting rather than trying to tolerate both grapheme
-        // shapes in the splitter.
         let normalized =
             source
             .replacing("\r\n", with: "\n")
@@ -290,8 +278,6 @@ extension Institute.CI.Validation.SchemaCorrespondence {
             let line = lines[index]
             defer { index += 1 }
             guard let name = names.first(where: { matches(line, name: $0) }) else { continue }
-            // Everything after the `=`, plus continuation lines until
-            // the brackets balance (or the file ends).
             guard let equals = line.firstIndex(of: "=") else { continue }
             var expression = String(line[line.index(after: equals)...])
             var lookahead = index
@@ -309,8 +295,6 @@ extension Institute.CI.Validation.SchemaCorrespondence {
     private static func matches(_ line: Substring, name: String) -> Bool {
         guard line.hasPrefix(name) else { return false }
         var rest = line.dropFirst(name.count)
-        // The identifier must end here: `EXEMPTIONS2 = …` is a
-        // different name.
         if let next = rest.first,
             next.isLetter || next.isNumber || next == "_"
         {
@@ -400,7 +384,6 @@ extension Institute.CI.Validation.SchemaCorrespondence {
                     case "\\", "'", "\"": value.append(escapedCharacter)
 
                     default:
-                        // Python keeps an unrecognised escape verbatim.
                         value.append("\\")
                         value.append(escapedCharacter)
                     }

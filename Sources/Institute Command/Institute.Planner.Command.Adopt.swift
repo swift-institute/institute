@@ -15,7 +15,7 @@ extension Institute.Planner.Command {
     /// record it as one local commit. Refuses (exit 2) unless the evidence
     /// is an adoptable canary of the same run. Never pushes: it prints the
     /// push for a human to run after their go.
-    public struct Adopt: Sendable, Command_Schema.Command.`Protocol` {
+    public struct Adopt: Sendable, Command_Schema::Command.`Protocol` {
         public var publication: Swift.String
         public var evidencePath: Swift.String
         public var checkout: Swift.String
@@ -30,23 +30,23 @@ extension Institute.Planner.Command {
             self.checkout = checkout
         }
 
-        public static var configuration: Command_Schema.Command.Configuration {
+        public static var configuration: Command_Schema::Command.Configuration {
             .init(name: "adopt", abstract: "Commit an adoptable planner to the consumer checkout.")
         }
 
-        public static var schema: Command_Schema.Command.Schema.Definition<Self> {
+        public static var schema: Command_Schema::Command.Schema.Definition<Self> {
             .init {
-                Command_Schema.Command.Option(
+                Command_Schema::Command.Option(
                     \.publication,
                     name: .long(.literal("publish-run")),
                     placeholder: "run-id"
                 )
-                Command_Schema.Command.Option(
+                Command_Schema::Command.Option(
                     \.evidencePath,
                     name: .long(.literal("evidence-path")),
                     placeholder: "evidence.json"
                 )
-                Command_Schema.Command.Option(
+                Command_Schema::Command.Option(
                     \.checkout,
                     name: .long(.literal("github-checkout")),
                     placeholder: "swift-institute/.github"
@@ -54,7 +54,7 @@ extension Institute.Planner.Command {
             }
         }
 
-        public mutating func validate() throws(Command_Schema.Command.Error) {
+        public mutating func validate() throws(Command_Schema::Command.Error) {
             guard Institute.Planner.isRun(publication) else {
                 throw .validationFailed(reason: "--publish-run must be a publish-planner run id")
             }

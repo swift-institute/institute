@@ -32,19 +32,6 @@ extension Institute.CI.Workflow.YAML {
         }
 
         static func scan(_ text: String) -> [Self] {
-            // Normalise line endings *before* splitting. Swift's `Character`
-            // is an extended grapheme cluster, and CR+LF is itself one
-            // grapheme cluster — so `text.split(separator: "\n")` on a
-            // CRLF document matches nothing and the entire document
-            // collapses into a single "line". This is not
-            // platform-conditional code reading a platform fact; it is a
-            // Unicode-model fact that fires identically on every OS
-            // whenever the *input bytes* happen to be CRLF, which in
-            // practice means every Windows `git checkout` of an
-            // LF-committed workflow file (default `core.autocrlf`).
-            // Normalizing first (CRLF, then any bare CR) removes both the
-            // collapse and the per-line trailing-`\r` case entirely, so
-            // there is nothing left for `raw`/`content` to strip.
             let normalized =
                 text
                 .replacing("\r\n", with: "\n")

@@ -14,7 +14,7 @@ extension Institute.Source {
     /// The executable source-quality capability. It deliberately has no build
     /// coordinator dependency: measuring source is independent of compiling it.
     public struct Application: Sendable {
-        public let process: Source_Measurement.Source.Engine.Process
+        public let process: Source_Measurement::Source.Engine.Process
 
         public init(timeout: Duration = .seconds(300)) {
             self.process = .init { executable, arguments, directory, environment in
@@ -34,8 +34,6 @@ extension Institute.Source {
                             executable: executable,
                             arguments: arguments,
                             environment: environment.isEmpty ? nil : environment,
-                            // The capture runner supports no stdin pipe, and the source
-                            // commands feed none; the stream is inherited.
                             stdin: .inherit,
                             stdout: .pipe,
                             stderr: .pipe,

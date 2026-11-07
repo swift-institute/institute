@@ -91,8 +91,6 @@ extension Institute.CI.Validation {
 
             let skillFiles = tree.files(named: "SKILL.md")
             guard !skillFiles.isEmpty else {
-                // Fail closed. If the corpus moved or the clone is wrong,
-                // a silent zero is indistinguishable from a clean scan.
                 return [
                     Finding(
                         repository: subject.repository,
@@ -103,9 +101,6 @@ extension Institute.CI.Validation {
                 ]
             }
 
-            // An owner already named on the sanctioned list joins the
-            // watch set, so sanctioning `Internal/Skills` is what makes a
-            // later `Internal/<anything>` visible to this check.
             let sanctioned = sanctionedList(in: tree)
             let watched = instituteOrganizations().union(
                 sanctioned.compactMap { token in
@@ -119,8 +114,6 @@ extension Institute.CI.Validation {
 
             for path in tree.files(withExtension: ".md") {
                 guard let text = tree.text(at: path) else {
-                    // SKILL.md files are already reported above; report
-                    // any other file once.
                     if path.finalPathComponent != "SKILL.md" {
                         findings.append(
                             Finding(
@@ -177,8 +170,6 @@ extension Institute.CI.Validation {
             do {
                 node = try Institute.CI.Workflow.YAML.Parser.parse(text)
             } catch {
-                // An unparseable manifest widens nothing — the retired
-                // script's posture for every way of not-knowing here.
                 return []
             }
             guard let entries = node.sequence else { return [] }

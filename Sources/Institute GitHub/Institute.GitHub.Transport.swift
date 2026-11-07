@@ -96,9 +96,6 @@ extension Institute.GitHub.Transport {
             throw .exit("gh did not exit normally: \(output.status)")
         }
         let stdout = output.stdout ?? []
-        // `gh api` exits non-zero for non-2xx statuses while still
-        // printing the full response; an empty stdout is the only
-        // transport-level failure.
         guard !stdout.isEmpty else {
             let message = String(decoding: output.stderr ?? [], as: Swift.UTF8.self)
             throw .exit(
@@ -166,7 +163,6 @@ extension Institute.GitHub.Transport {
         let statusLine = String(decoding: statusBytes, as: Swift.UTF8.self)
         lines.removeFirst()
 
-        // "HTTP/2.0 200 OK" — take the second whitespace-separated field.
         let statusFields = statusLine.split(separator: " ", omittingEmptySubsequences: true)
         guard
             statusFields.count >= 2,

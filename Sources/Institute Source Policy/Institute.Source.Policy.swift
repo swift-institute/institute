@@ -8,11 +8,11 @@ extension Institute.Source {
         public static let current = Self(revision: "source-enforcement-v3")
 
         public let revision: Swift.String
-        public let requiredEngines: [Source_Profile.Source.Engine.ID]
+        public let requiredEngines: [Source_Profile::Source.Engine.ID]
         public let swiftFormat: Artifact
         public let swiftFormatRepair: Artifact
         public let swiftLint: Artifact
-        public let swiftLintRules: [Source_Profile.Source.Rule.ID]
+        public let swiftLintRules: [Source_Profile::Source.Rule.ID]
         public let engines: [Engine]
         public let bundles: [Bundle]
         public let externallyStandardizedTargets: [ExternallyStandardizedTarget]
@@ -42,7 +42,7 @@ extension Institute.Source {
                 contents: Self.swiftLintConfiguration,
                 schema: "swiftlint:0.65.1"
             )
-            let swiftLintID = Source_Profile.Source.Engine.ID("swiftlint")
+            let swiftLintID = Source_Profile::Source.Engine.ID("swiftlint")
             self.swiftLintRules = Self.swiftLintRuleTokens.map {
                 .init(engine: swiftLintID, token: $0)
             }
@@ -119,8 +119,8 @@ extension Institute.Source {
             ]
             self.bundles = Bundle.allCases
             self.externallyStandardizedTargets = [.init("CSS")]
-            let linterID = Source_Profile.Source.Engine.ID("swift-linter")
-            let swiftFormatID = Source_Profile.Source.Engine.ID("swift-format")
+            let linterID = Source_Profile::Source.Engine.ID("swift-linter")
+            let swiftFormatID = Source_Profile::Source.Engine.ID("swift-format")
             self.negativeControls = [
                 .init(
                     repository: "swift-institute/institute",
@@ -217,7 +217,7 @@ extension Institute.Source {
                 controls: ["application", "institute", "continuous-integration"],
                 rule: .init(suffix: "-linter-rules")
             )
-            let engine = Source_Profile.Source.Engine.ID("source-policy")
+            let engine = Source_Profile::Source.Engine.ID("source-policy")
             self.configuration = .init(
                 engine: engine,
                 predicate: .init(engine: engine, token: "exact-configuration")
@@ -226,9 +226,9 @@ extension Institute.Source {
 
         public func linter(
             bundle: Bundle,
-            rules: [Source_Profile.Source.Rule.ID]
+            rules: [Source_Profile::Source.Rule.ID]
         ) -> Artifact {
-            let compoundIdentifier = Source_Profile.Source.Rule.ID(
+            let compoundIdentifier = Source_Profile::Source.Rule.ID(
                 engine: .init("swift-linter"),
                 token: "compound identifier"
             )
@@ -275,22 +275,22 @@ extension Institute.Source {
         }
 
         public func profile(
-            swiftFormat formatInstallation: (executable: Swift.String, tool: Source_Profile.Source.Profile.Digest, configurationPath: Swift.String),
-            swiftLint lintInstallation: (executable: Swift.String, tool: Source_Profile.Source.Profile.Digest, configurationPath: Swift.String),
-            linter linterInstallation: (executable: Swift.String, tool: Source_Profile.Source.Profile.Digest, configurationPath: Swift.String),
+            swiftFormat formatInstallation: (executable: Swift.String, tool: Source_Profile::Source.Profile.Digest, configurationPath: Swift.String),
+            swiftLint lintInstallation: (executable: Swift.String, tool: Source_Profile::Source.Profile.Digest, configurationPath: Swift.String),
+            linter linterInstallation: (executable: Swift.String, tool: Source_Profile::Source.Profile.Digest, configurationPath: Swift.String),
             bundle: Bundle,
-            linterRules: [Source_Profile.Source.Rule.ID],
+            linterRules: [Source_Profile::Source.Rule.ID],
             repository: Institute.Repository.Coordinate? = nil,
             repair: Swift.Bool = false
-        ) -> Source_Profile.Source.Profile {
+        ) -> Source_Profile::Source.Profile {
             let (swiftFormatExecutable, swiftFormatTool, swiftFormatConfigurationPath) = formatInstallation
             let (swiftLintExecutable, swiftLintTool, swiftLintConfigurationPath) = lintInstallation
             let (linterExecutable, linterTool, linterConfigurationPath) = linterInstallation
-            let swiftFormatID = Source_Profile.Source.Engine.ID("swift-format")
-            let swiftLintID = Source_Profile.Source.Engine.ID("swiftlint")
-            let linterID = Source_Profile.Source.Engine.ID("swift-linter")
+            let swiftFormatID = Source_Profile::Source.Engine.ID("swift-format")
+            let swiftLintID = Source_Profile::Source.Engine.ID("swiftlint")
+            let linterID = Source_Profile::Source.Engine.ID("swift-linter")
             let formatConfiguration = repair ? swiftFormatRepair : swiftFormat
-            return Source_Profile.Source.Profile(
+            return Source_Profile::Source.Profile(
                 revision: revision,
                 engines: [
                     .init(

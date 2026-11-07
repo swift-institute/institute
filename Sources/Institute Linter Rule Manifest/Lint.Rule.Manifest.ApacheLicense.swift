@@ -148,8 +148,6 @@ package func manifestLicenseNamesUpstreamHolder(_ text: Swift::String) -> Swift:
         } else if rest.hasPrefix("© ") {
             rest = rest.dropFirst(2)
         } else if rest.first?.isNumber != true {
-            // Without `(c)` a year must follow, so the terms' own "Copyright License" and the appendix's
-            // unfilled `[yyyy]` never count as a holder.
             return false
         }
         let holder = rest.drop { $0.isNumber || $0 == "-" || $0 == "," || $0 == " " }

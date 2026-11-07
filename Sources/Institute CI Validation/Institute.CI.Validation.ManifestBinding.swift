@@ -173,10 +173,6 @@ extension Institute.CI.Validation {
                     )
                 }
 
-                // Collected for check 2 at any status. A non-empty
-                // deprecated path is already flagged by check 4, and
-                // counting it here is what stops check 2 double-firing on
-                // the same defect.
                 if let script = entry["validator-script"]?.text, !script.isEmpty {
                     referencedScripts.insert(script)
                 }
@@ -276,7 +272,6 @@ extension Institute.CI.Validation {
             let directory = subject.path(".github/scripts")
             guard Institute.CI.Validation.isDirectory(directory)
             else { return [] }
-            // An unlistable directory is exactly the defect raised here.
             guard let names = Institute.CI.Validation.names(at: directory) else {
                 throw EnvironmentDefect.unreadableFile(path: directory)
             }

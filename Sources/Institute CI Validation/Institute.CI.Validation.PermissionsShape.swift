@@ -41,16 +41,12 @@ extension Institute.CI.Validation {
         public init() {}
 
         public func findings(in subject: Subject) throws(EnvironmentDefect) -> [Finding] {
-            // Parse refusals cite CI-090, the general rule of the pair,
-            // as the retired validator did.
             let (documents, refusals) = try subject.workflows(citing: rules[0])
             var findings = refusals
             for document in documents {
                 guard let triggers = document.triggers, let body = document.body else { continue }
                 let isCallable = triggers["workflow_call"] != nil
                 let isStandalone = Self.standaloneTriggers.contains { triggers[$0] != nil }
-                // Absent, present-and-empty, and present-and-populated are
-                // three distinct states, and the rule separates all three.
                 let declared = body["permissions"]
                 if isCallable {
                     guard declared != nil else { continue }

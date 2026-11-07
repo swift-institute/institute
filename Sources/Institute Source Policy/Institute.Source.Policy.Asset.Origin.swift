@@ -7,7 +7,7 @@ extension Institute.Source.Policy.Asset {
         case releaseArchive(
             base: Swift.String,
             archive: Swift.String,
-            digest: Source_Profile.Source.Profile.Digest,
+            digest: Source_Profile::Source.Profile.Digest,
             member: Swift.String
         )
         case xcode(

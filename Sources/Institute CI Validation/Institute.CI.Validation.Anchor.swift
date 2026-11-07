@@ -77,8 +77,6 @@ extension Institute.CI.Validation {
             let manifestRelative = manifestFile ?? Self.manifestPath
             let workflowRelative = workflowFile ?? Self.workflowPath
 
-            // Absent manifest: this repository claims no anchor. Every
-            // other unknown below is a finding.
             guard let manifestText = try subject.text(at: manifestRelative) else { return [] }
 
             let anchor: Institute.CI.Inventory.Anchor

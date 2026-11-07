@@ -8,7 +8,7 @@ extension Institute.Source {
     public struct Artifact: Equatable, Sendable {
         public let path: Path::Path
         public let contents: Swift.String
-        public let digest: Source_Profile.Source.Profile.Digest
+        public let digest: Source_Profile::Source.Profile.Digest
         public let schema: Swift.String
 
         public init(path: Path::Path, contents: Swift.String, schema: Swift.String) {

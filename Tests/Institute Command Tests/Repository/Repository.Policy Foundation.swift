@@ -14,7 +14,7 @@ enum RepositoryPolicyFoundation {
         try Data(contentsOf: url).map { Byte(bitPattern: $0) }
     }
 
-    static func jsonObject<Bytes: Sequence>(with bytes: Bytes) throws -> Any where Bytes.Element == UInt8 {
+    static func jsonObject<Bytes: Swift.Sequence>(with bytes: Bytes) throws -> Any where Bytes.Element == UInt8 {
         try JSONSerialization.jsonObject(with: Data(bytes))
     }
 

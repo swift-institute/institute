@@ -78,8 +78,6 @@ extension Institute.CI.Canon.Gitignore.Class {
         if repository.description.hasPrefix("swift-institute/") { return .institute }
         guard let manifest else { return .scaffold }
         if manifest.contains("Generation\"") || manifest.contains("Generator\"") {
-            // A target or product named for generation is the one
-            // mechanical generator fact a manifest carries today.
             return .generator
         }
         return .package

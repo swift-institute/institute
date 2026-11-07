@@ -1,18 +1,5 @@
 // swift-format-ignore-file
-// This file's body is a multiline string literal holding vendored,
-// byte-for-byte YAML/JSON content — swift-format's own indentation and
-// spacing rules do not apply to embedded third-party config text, and
-// reformatting it would corrupt the vendored bytes this file exists to
-// preserve exactly.
-//
 // swiftlint:disable all
-// The vendored .swiftlint.yml text below is itself full of rule
-// descriptions and regex patterns that mention things like `try?`,
-// `Thread.isMainThread`, and `catch let error where` — SwiftLint's
-// custom_rules match on raw text, not the AST, so without this directive
-// it flags its own configuration's prose as violations of the very rules
-// that prose defines. Disabled for the whole file because the entire
-// body is vendored text, not authored logic.
 
 import Institute_Model
 

@@ -11,7 +11,6 @@ extension Institute.CI {
 
 extension Institute.CI.Control {
     public enum Validation {
-        // The compositor intentionally runs heterogeneous canonical validators.
         // swiftlint:disable:next no_any_protocol_existential
         private static let mechanics: [any Institute.CI.Validation.Validator] = [
             Institute.CI.Validation.BinaryInstallChecksum(),
@@ -29,8 +28,6 @@ extension Institute.CI.Control {
             Institute.CI.Validation.VisibilityGate(),
         ]
 
-        // The Institute-owned terminal control-plane predicates. Historical
-        // correspondence checks do not become policy by proximity.
         // swiftlint:disable:next no_any_protocol_existential
         private static let institute: [any Institute.CI.Validation.Validator] = [
             Institute.CI.Validation.Anchor(),

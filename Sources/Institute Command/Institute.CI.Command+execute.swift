@@ -20,8 +20,6 @@ extension Institute.CI.Command {
     }
 
     private static func run(_ arguments: [Swift.String]) async throws(Error) {
-        // The workflow verbs dispatch first and exit on their own verdict;
-        // everything else is the gitignore command's argument grammar.
         if let first = arguments.first, let verb = Verb(rawValue: first) {
             await run(verb, Array(arguments.dropFirst()))
             return

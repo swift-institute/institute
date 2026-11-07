@@ -7,18 +7,18 @@ extension Institute.Repository.Policy {
     /// `institute repository` — the typed repository-policy passthrough.
     /// The family owns its own argument grammar (`execute(_:)`); the
     /// router forwards the bare tokens.
-    public struct Command: Sendable, Command_Schema.Command.`Protocol` {
+    public struct Command: Sendable, Command_Schema::Command.`Protocol` {
         public var arguments: [Swift.String]
 
         public init(arguments: [Swift.String] = []) { self.arguments = arguments }
 
-        public static var configuration: Command_Schema.Command.Configuration {
+        public static var configuration: Command_Schema::Command.Configuration {
             .init(name: "repository", abstract: "Operate the repository-policy families.")
         }
 
-        public static var schema: Command_Schema.Command.Schema.Definition<Self> {
+        public static var schema: Command_Schema::Command.Schema.Definition<Self> {
             .init {
-                Command_Schema.Command.Positional<Self, Swift.String>.Many(
+                Command_Schema::Command.Positional<Self, Swift.String>.Many(
                     \.arguments,
                     name: "arguments",
                     placeholder: "repository-arguments",

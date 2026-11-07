@@ -57,7 +57,7 @@ extension Institute.Planner.Canary.Outcome {
             self.init(status: .crashed, code: execution.code)
             return
         }
-        let report: Source_Report.Source.Report
+        let report: Source_Report::Source.Report
         do throws(JSON.Error) {
             report = try .init(jsonString: Swift.String(line))
         } catch {
@@ -67,9 +67,9 @@ extension Institute.Planner.Canary.Outcome {
         self.init(report, code: code)
     }
 
-    init(_ report: Source_Report.Source.Report, code: Swift.Int32) {
+    init(_ report: Source_Report::Source.Report, code: Swift.Int32) {
         let status: Status =
-            switch Source_Report.Source.Report.Status(report, expected: report.commitment) {
+            switch Source_Report::Source.Report.Status(report, expected: report.commitment) {
             case .clean: .clean
             case .findings: .findings
             case .unmeasured: .unmeasured
@@ -77,8 +77,8 @@ extension Institute.Planner.Canary.Outcome {
         var errors: [Swift.String: Swift.Int] = [:]
         var unmeasured: [Swift.String] = []
         var controls: [Swift.String: Swift.Int] = [:]
-        do throws(Source_Report.Source.Report.Complete.Error) {
-            _ = try Source_Report.Source.Report.Complete(report, expected: report.commitment)
+        do throws(Source_Report::Source.Report.Complete.Error) {
+            _ = try Source_Report::Source.Report.Complete(report, expected: report.commitment)
         } catch {
             unmeasured.append("incomplete report: \(error)")
         }

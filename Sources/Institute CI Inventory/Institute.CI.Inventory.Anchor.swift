@@ -246,8 +246,6 @@ extension Institute.CI.Inventory.Anchor {
     /// would regenerate a partial block and the correspondence check
     /// would then agree with it.
     public init(manifest text: String) throws(Institute.CI.Inventory.Error) {
-        // `JSON.parse` throws typed; its failure is exactly the refusal
-        // raised below.
         let document: JSON
         do throws(JSON.Error) {
             document = try JSON.parse(text)

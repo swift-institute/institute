@@ -3,9 +3,6 @@ import Institute_Model
 
 import struct Swift.String
 
-// Pure-Swift spellings of the string operations the validation rules
-// use, so the rules read as the predicates they publish and the target
-// stays free of the Foundation module family.
 extension StringProtocol {
     /// The string with ASCII and Unicode whitespace (including newlines)
     /// removed from both ends.

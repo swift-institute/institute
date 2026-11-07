@@ -117,17 +117,10 @@ extension Institute.Materialization {
             canonical: File.Path,
             info: File.System.Metadata.Info
         ) throws(Institute.Error) -> Verdict {
-            // Mechanism-agnostic resolution equality: a symbolic link or
-            // junction at `path` resolves to the target's own canonical
-            // path; an unmanaged real entry resolves to itself.
             if let resolvedPath = resolve(path) {
                 if let resolvedTarget = resolve(canonical), resolvedPath == resolvedTarget {
                     return .satisfied
                 }
-                // Distinguish a real entry (resolves to itself) from a
-                // link form resolving elsewhere. A real entry's
-                // resolution is its parent's resolution plus its own
-                // name; a reparse form's is not.
                 if let parent = path.parent,
                     let name = Array(path.components).last,
                     let resolvedParent = resolve(parent),
@@ -137,9 +130,6 @@ extension Institute.Materialization {
                 }
                 return .divergent
             }
-            // A real entry always resolves, so an unresolvable path is a
-            // dangling link form — a materialization of something that
-            // is not the declared target.
             return .divergent
         }
 
@@ -178,7 +168,6 @@ extension Institute.Materialization {
                 return .satisfied
 
             case .regular:
-                // A file copy-materialization matches its target's bytes.
                 guard let targetInfo = try metadata(at: canonical),
                     targetInfo.type == .regular,
                     try read(File(path)) == read(File(canonical))

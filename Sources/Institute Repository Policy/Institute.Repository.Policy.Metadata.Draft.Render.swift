@@ -37,10 +37,6 @@ extension Institute.Repository.Policy.Metadata.Draft.Render {
             lines.append("topics:")
             lines += draft.metadata.topics.map { "  - \($0)" }
         }
-        // An empty homepage omits the key rather than asserting an empty
-        // one: an organization's `.github` repository has no website, and
-        // `homepage: ""` would tell `sync-metadata` to clear whatever is
-        // there.
         if !draft.metadata.homepage.isEmpty {
             lines.append("homepage: \"\(draft.metadata.homepage)\"")
         }

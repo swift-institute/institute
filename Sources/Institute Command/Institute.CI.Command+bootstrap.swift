@@ -9,7 +9,6 @@ import JSON
 import struct Swift.String
 
 extension Institute.CI.Command {
-    // MARK: - bootstrap
 
     static func identityJSON(
         _ identity: Institute.CI.Bootstrap.Identity

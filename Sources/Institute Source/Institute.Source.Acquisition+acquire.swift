@@ -11,7 +11,7 @@ extension Institute.Source.Acquisition {
         into directory: File.Directory
     ) throws(Institute.Error) -> (
         file: File,
-        digest: Source_Profile.Source.Profile.Digest
+        digest: Source_Profile::Source.Profile.Digest
     ) {
         let source: File
         do throws(File.Path.Error) { source = File(try .init(path)) } catch {
@@ -21,8 +21,6 @@ extension Institute.Source.Acquisition {
             throw .configuration("local source tool is not a regular file")
         }
         #if !os(Windows)
-            // The POSIX mode-bit precheck has no Windows counterpart. There only the structural
-            // checks apply; whether the file launches is decided where it is run.
             let sourcePermissions: File.System.Metadata.Permissions
             do throws(Kernel.File.Stats.Error) { sourcePermissions = try source.stat.permissions } catch {
                 throw .filesystem("cannot inspect local source tool permissions: \(error)")
@@ -191,7 +189,7 @@ extension Institute.Source.Acquisition {
         asset: Institute.Source.Policy.Asset,
         base: Swift.String,
         archive: Swift.String,
-        archiveDigest: Source_Profile.Source.Profile.Digest,
+        archiveDigest: Source_Profile::Source.Profile.Digest,
         member: Swift.String,
         to destination: File,
         under directory: File.Directory

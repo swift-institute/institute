@@ -157,7 +157,6 @@ private func manifestDeclarativeIsPackageAppend(_ expression: ExprSyntax) -> Swi
     {
         return manifestDeclarativeIsPackageProperty(infix.leftOperand)
     }
-    // An unfolded tree spells `package.products += [...]` as a sequence: operand, operator, operand.
     if let sequence = expression.as(SequenceExprSyntax.self), sequence.elements.count == 3 {
         let elements = Swift::Array(sequence.elements)
         guard let operation = elements[1].as(BinaryOperatorExprSyntax.self), operation.operator.text == "+="

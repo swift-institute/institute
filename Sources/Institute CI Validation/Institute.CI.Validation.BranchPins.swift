@@ -64,9 +64,6 @@ extension Institute.CI.Validation {
                         let organization = Self.gitHubOrganization(of: url),
                         organizations.contains(organization),
                         let branch = Self.branchRequirement(in: call),
-                        // Ruled convention: an untagged Institute
-                        // dependency pinned to "main" is not a
-                        // moving-target violation.
                         branch != "main"
                     else { continue }
                     let baselined =
@@ -90,8 +87,6 @@ extension Institute.CI.Validation {
             return findings
         }
 
-        // MARK: - Discovery
-
         /// Root manifests, sorted: `Package.swift` and
         /// `Package@swift-<version>.swift`, and nothing else. Sub-package
         /// manifests are out of scope — this rule is about what a
@@ -109,8 +104,6 @@ extension Institute.CI.Validation {
             let version = middle.dropFirst("@swift-".count)
             return !version.isEmpty && version.allSatisfy { $0.isNumber || $0 == "." }
         }
-
-        // MARK: - Manifest scanning
 
         /// Remove `//` line comments and nested `/* */` block comments.
         ///
@@ -300,9 +293,6 @@ extension Institute.CI.Validation {
                 index += 1
                 let open = index
                 while index < characters.count, characters[index] != "\"" { index += 1 }
-                // `[^"]+` for a URL, `[^"]*` for a branch: an empty branch
-                // name is a real, if absurd, pin and the retired scan
-                // reported it.
                 guard index < characters.count else {
                     start += 1
                     continue
@@ -351,8 +341,6 @@ extension Institute.CI.Validation {
             }
             return nil
         }
-
-        // MARK: - Messages
 
         static func message(manifest: String, url: String, branch: String) -> String {
             "\(manifest): `\(url)` pinned to branch \"\(branch)\" — Institute dependencies "

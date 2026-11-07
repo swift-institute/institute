@@ -67,8 +67,6 @@ extension Institute.CI.Validation {
             return findings
         }
 
-        // MARK: - Steps
-
         /// One step, with the label a finding cites it by.
         struct Step {
             let run: String?
@@ -90,8 +88,6 @@ extension Institute.CI.Validation {
                 )
             }
         }
-
-        // MARK: - The four failure modes
 
         static func findings(
             in script: String,
@@ -286,10 +282,6 @@ extension Institute.CI.Validation {
                 var rest = line[index...]
                 guard let or = rest.range(of: "||") else { return false }
                 rest = rest[or.upperBound...].drop(while: \.isWhitespace)
-                // `true\b` and `:\b` — the second requires a word
-                // character after the colon, which is the retired
-                // pattern's own quirk and is kept rather than quietly
-                // widened.
                 if rest.hasPrefix("true") {
                     guard let next = rest.dropFirst(4).first else { return true }
                     return !Self.isWordCharacter(next)
@@ -312,8 +304,6 @@ extension Institute.CI.Validation {
                     || !Self.isWordCharacter(rest[found.upperBound])
             }
         }
-
-        // MARK: - Shell-text scanning
 
         /// Run `predicate` at every position of every line, stopping at
         /// the first true. Every pattern here is line-scoped: a `run:`

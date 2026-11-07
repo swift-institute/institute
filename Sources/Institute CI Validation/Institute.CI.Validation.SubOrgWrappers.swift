@@ -34,10 +34,10 @@ extension Institute.CI.Validation {
 
         public func findings(in subject: Subject) throws(EnvironmentDefect) -> [Finding] {
             guard let organization = try Self.subOrganization(of: subject) else {
-                return []  // not a sub-org `.github` repository — out of scope
+                return []
             }
             guard try subject.text(at: ".github/workflows/swift-ci.yml") != nil else {
-                return []  // the canonical state: no wrapper exists
+                return []
             }
             return [
                 Finding(

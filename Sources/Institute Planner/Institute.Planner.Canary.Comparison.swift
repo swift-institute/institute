@@ -87,7 +87,6 @@ extension Institute.Planner.Canary.Comparison {
             let before = current.controls[verdict] ?? 0
             let after = candidate.controls[verdict] ?? 0
             guard before != after else { continue }
-            // More clean controls is better; more of any other verdict is worse.
             let worse = verdict == "clean" ? after < before : after > before
             differences.append(
                 .init(worse ? .regression : .improvement, "controls \(verdict) \(before) -> \(after)")

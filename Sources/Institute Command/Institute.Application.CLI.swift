@@ -12,7 +12,7 @@ extension Institute.Application {
     /// verb, and nothing else. Every option, every validation, and every
     /// execution body lives with its family; this type only names the
     /// grammar's first token.
-    public enum CLI: Sendable, Command_Schema.Command.`Protocol` {
+    public enum CLI: Sendable, Command_Schema::Command.`Protocol` {
         case install(Institute.Application.Install)
         case ci(Institute.CI.Command)
         case planner(Institute.Planner.Command)
@@ -21,53 +21,53 @@ extension Institute.Application {
         case version(Institute.Version.Command)
         case organizations(Institute.Application.Organizations)
 
-        public static var configuration: Command_Schema.Command.Configuration {
+        public static var configuration: Command_Schema::Command.Configuration {
             .init(
                 name: "institute",
                 abstract: "Operate the Swift Institute's central CI and its GitHub organizations."
             )
         }
 
-        public static var schema: Command_Schema.Command.Schema.Definition<Self> {
+        public static var schema: Command_Schema::Command.Schema.Definition<Self> {
             .init {
-                Command_Schema.Command.Subcommand.Group {
-                    Command_Schema.Command.Subcommand.Case(
+                Command_Schema::Command.Subcommand.Group {
+                    Command_Schema::Command.Subcommand.Case(
                         "install",
                         help: .init(abstract: "Install the published planner pinned by the CI policy."),
                         initial: { .init() },
                         map: Self.install
                     )
-                    Command_Schema.Command.Subcommand.Case(
+                    Command_Schema::Command.Subcommand.Case(
                         "ci",
                         help: .init(abstract: "Run the CI planner verbs."),
                         initial: { .init() },
                         map: Self.ci
                     )
-                    Command_Schema.Command.Subcommand.Case(
+                    Command_Schema::Command.Subcommand.Case(
                         "planner",
                         help: .init(abstract: "Canary and adopt a published CI planner."),
                         initial: { .canary(.init()) },
                         map: Self.planner
                     )
-                    Command_Schema.Command.Subcommand.Case(
+                    Command_Schema::Command.Subcommand.Case(
                         "repository",
                         help: .init(abstract: "Operate the repository-policy families."),
                         initial: { .init() },
                         map: Self.repository
                     )
-                    Command_Schema.Command.Subcommand.Case(
+                    Command_Schema::Command.Subcommand.Case(
                         "github",
                         help: .init(abstract: "Mint GitHub App installation credentials."),
                         initial: { .token(.init()) },
                         map: Self.github
                     )
-                    Command_Schema.Command.Subcommand.Case(
+                    Command_Schema::Command.Subcommand.Case(
                         "version",
                         help: .init(abstract: "Tag the Institute's packages with development versions."),
                         initial: { .tag(.init()) },
                         map: Self.version
                     )
-                    Command_Schema.Command.Subcommand.Case(
+                    Command_Schema::Command.Subcommand.Case(
                         "organizations",
                         help: .init(abstract: "Print the Institute's organizations as one JSON array."),
                         initial: { .init() },

@@ -8,23 +8,23 @@ extension Institute.Application {
     /// in declaration order, optionally narrowed to one layer. Workflows
     /// that fan out over the organizations read their matrix from here
     /// instead of keeping a list of their own.
-    public struct Organizations: Sendable, Command_Schema.Command.`Protocol` {
+    public struct Organizations: Sendable, Command_Schema::Command.`Protocol` {
         public var layer: Swift.String
 
         public init(layer: Swift.String = "") {
             self.layer = layer
         }
 
-        public static var configuration: Command_Schema.Command.Configuration {
+        public static var configuration: Command_Schema::Command.Configuration {
             .init(
                 name: "organizations",
                 abstract: "Print the Institute's organizations as one JSON array."
             )
         }
 
-        public static var schema: Command_Schema.Command.Schema.Definition<Self> {
+        public static var schema: Command_Schema::Command.Schema.Definition<Self> {
             .init {
-                Command_Schema.Command.Option(
+                Command_Schema::Command.Option(
                     \.layer,
                     name: .long(.literal("layer")),
                     placeholder: "layer",
@@ -36,7 +36,7 @@ extension Institute.Application {
             }
         }
 
-        public mutating func validate() throws(Command_Schema.Command.Error) {
+        public mutating func validate() throws(Command_Schema::Command.Error) {
             guard layer.isEmpty || Self.layer(named: layer) != nil else {
                 throw .validationFailed(reason: "--layer \(layer) is not a layer")
             }

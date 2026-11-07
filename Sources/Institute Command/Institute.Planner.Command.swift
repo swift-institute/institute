@@ -8,24 +8,24 @@ extension Institute.Planner {
     /// release chain: `canary` judges a publish run against the current
     /// planner, `adopt` records an adoptable one as a local commit in the
     /// consumer checkout. Neither pushes.
-    public enum Command: Sendable, Command_Schema.Command.`Protocol` {
+    public enum Command: Sendable, Command_Schema::Command.`Protocol` {
         case canary(Canary)
         case adopt(Adopt)
 
-        public static var configuration: Command_Schema.Command.Configuration {
+        public static var configuration: Command_Schema::Command.Configuration {
             .init(name: "planner", abstract: "Canary and adopt a published CI planner.")
         }
 
-        public static var schema: Command_Schema.Command.Schema.Definition<Self> {
+        public static var schema: Command_Schema::Command.Schema.Definition<Self> {
             .init {
-                Command_Schema.Command.Subcommand.Group {
-                    Command_Schema.Command.Subcommand.Case(
+                Command_Schema::Command.Subcommand.Group {
+                    Command_Schema::Command.Subcommand.Case(
                         "canary",
                         help: .init(abstract: "Run a published planner against the current one."),
                         initial: { .init() },
                         map: Self.canary
                     )
-                    Command_Schema.Command.Subcommand.Case(
+                    Command_Schema::Command.Subcommand.Case(
                         "adopt",
                         help: .init(abstract: "Commit an adoptable planner to the consumer checkout."),
                         initial: { .init() },

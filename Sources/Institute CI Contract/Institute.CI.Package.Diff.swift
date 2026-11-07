@@ -260,8 +260,6 @@ extension Institute.CI.Package {
             revision.count == 40 && revision.allSatisfy { $0 == "0" }
         }
 
-        // MARK: filesystem
-
         /// The UTF-8 text of the file at `path`, or `nil` when unreadable.
         static func text(atPath path: Swift.String) -> Swift.String? {
             guard let filePath = try? File.Path(path) else { return nil }

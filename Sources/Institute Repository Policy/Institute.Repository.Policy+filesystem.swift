@@ -4,10 +4,6 @@ import Institute_Model
 
 import struct Swift.String
 
-// The policy scans read checked-out trees through these accessors so the
-// kernel-backed mechanics stay in one place. Absence collapses to
-// `nil`/`false`: each scan decides whether a missing directory is a
-// refusal or simply contributes nothing.
 extension Institute.Repository.Policy {
     /// The UTF-8 text of the file at `path`, or `nil` when the path is
     /// invalid, missing, or unreadable.

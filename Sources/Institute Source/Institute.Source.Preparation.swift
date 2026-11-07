@@ -10,27 +10,27 @@ extension Institute.Source {
         public let policyRevision: Swift.String
         public let binding: Binding
         public let swiftFormatExecutable: Swift.String
-        public let swiftFormatTool: Source_Profile.Source.Profile.Digest
+        public let swiftFormatTool: Source_Profile::Source.Profile.Digest
         public let swiftFormatXcodeBuild: Swift.String?
         public let swiftLintExecutable: Swift.String
         public let swiftLint: Tool
         public let linterExecutable: Swift.String
         public let linter: Tool
         public let directory: File.Directory
-        public let profiles: [Swift.String: Source_Profile.Source.Profile.Digest]
+        public let profiles: [Swift.String: Source_Profile::Source.Profile.Digest]
         public let verifiedProfiles: [Swift.String]
 
         public init(
             policyRevision: Swift.String,
             binding: Binding,
             swiftFormatExecutable: Swift.String,
-            swiftFormatTool: Source_Profile.Source.Profile.Digest,
+            swiftFormatTool: Source_Profile::Source.Profile.Digest,
             swiftLintExecutable: Swift.String,
             swiftLint: Tool,
             linterExecutable: Swift.String,
             linter: Tool,
             directory: File.Directory,
-            profiles: [Swift.String: Source_Profile.Source.Profile.Digest],
+            profiles: [Swift.String: Source_Profile::Source.Profile.Digest],
             verifiedProfiles: [Swift.String],
             swiftFormatXcodeBuild: Swift.String? = nil
         ) {
@@ -109,13 +109,13 @@ extension Institute.Source {
                 policyRevision: Swift.String(json: policyRevision),
                 binding: Binding(json: binding),
                 swiftFormatExecutable: Swift.String(json: swiftFormatExecutable),
-                swiftFormatTool: Source_Profile.Source.Profile.Digest(json: swiftFormatTool),
+                swiftFormatTool: Source_Profile::Source.Profile.Digest(json: swiftFormatTool),
                 swiftLintExecutable: Swift.String(json: swiftLintExecutable),
                 swiftLint: Tool(json: swiftLint),
                 linterExecutable: Swift.String(json: linterExecutable),
                 linter: Tool(json: linter),
                 directory: parsedDirectory,
-                profiles: [Swift.String: Source_Profile.Source.Profile.Digest](json: profiles),
+                profiles: [Swift.String: Source_Profile::Source.Profile.Digest](json: profiles),
                 verifiedProfiles: [Swift.String](json: verifiedProfiles),
                 swiftFormatXcodeBuild: Swift.String?(json: swiftFormatXcodeBuild)
             )
@@ -124,16 +124,16 @@ extension Institute.Source {
 }
 
 extension Institute.Source.Preparation {
-    public var swiftLintTool: Source_Profile.Source.Profile.Digest { swiftLint.digest }
-    public var linterTool: Source_Profile.Source.Profile.Digest { linter.digest }
+    public var swiftLintTool: Source_Profile::Source.Profile.Digest { swiftLint.digest }
+    public var linterTool: Source_Profile::Source.Profile.Digest { linter.digest }
 
     public struct Tool: Sendable, JSON.Serializable {
         public let origin: Origin
-        public let digest: Source_Profile.Source.Profile.Digest
+        public let digest: Source_Profile::Source.Profile.Digest
 
         public init(
             origin: Origin,
-            digest: Source_Profile.Source.Profile.Digest
+            digest: Source_Profile::Source.Profile.Digest
         ) {
             self.origin = origin
             self.digest = digest
@@ -157,7 +157,7 @@ extension Institute.Source.Preparation {
             guard let digest = object["digest"] else { throw .missingKey("digest") }
             return try .init(
                 origin: Origin(json: origin),
-                digest: Source_Profile.Source.Profile.Digest(json: digest)
+                digest: Source_Profile::Source.Profile.Digest(json: digest)
             )
         }
     }

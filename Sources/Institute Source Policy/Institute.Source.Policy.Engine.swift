@@ -3,7 +3,7 @@ public import Source_Profile
 
 extension Institute.Source.Policy {
     public struct Engine: Sendable {
-        public let id: Source_Profile.Source.Engine.ID
+        public let id: Source_Profile::Source.Engine.ID
         public let platform: Platform
         // swift-linter:disable:next raw concept
         // REASON: the engine's version as the policy pins it, free text such as `main` and `ci-binaries` beside `0.65.1`: Version.Semantic and Version.Tools refuse those.
@@ -17,7 +17,7 @@ extension Institute.Source.Policy {
         public let checksums: Asset?
 
         public init(
-            id: Source_Profile.Source.Engine.ID,
+            id: Source_Profile::Source.Engine.ID,
             platform: Platform,
             // swift-linter:disable:next raw concept
             // REASON: the engine's version as the policy pins it, free text such as `main` and `ci-binaries` beside `0.65.1`: Version.Semantic and Version.Tools refuse those.

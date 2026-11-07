@@ -36,8 +36,6 @@ extension Institute.CI.Workflow.YAML {
 
         private mutating func document() throws(Error) -> Node {
             skipBlanks()
-            // A leading `---` directive-end marker is tolerated; a second
-            // one means a multi-document stream, which is refused.
             if cursor < lines.count, lines[cursor].content == "---" {
                 cursor += 1
                 skipBlanks()
@@ -53,8 +51,6 @@ extension Institute.CI.Workflow.YAML {
             }
             return node
         }
-
-        // MARK: - Block structure
 
         private mutating func block(atLeast minimum: Int) throws(Error) -> Node {
             skipBlanks()
@@ -80,9 +76,6 @@ extension Institute.CI.Workflow.YAML {
                     cursor += 1
                     elements.append(try block(atLeast: indent + 1))
                 } else {
-                    // `- uses: x` opens a mapping whose column is where the
-                    // item's content starts; continuation keys sit at that
-                    // same column on following lines.
                     let column = line.indent + (line.content.count - inline.count)
                     cursor += 1
                     elements.append(try inlineItem(inline, column: column, of: line))
@@ -105,9 +98,6 @@ extension Institute.CI.Workflow.YAML {
                 )
             }
             if inline.hasPrefix("&") {
-                // Anchors are supported on mapping values, where the
-                // corpus uses them. Refused here rather than mis-read as
-                // a plain scalar beginning with `&`.
                 throw Error.unsupported(
                     line: line.number,
                     construct: "an anchor on a sequence item"
@@ -171,8 +161,6 @@ extension Institute.CI.Workflow.YAML {
             }
 
             if value.isEmpty {
-                // A nested block may sit deeper, or — for a sequence only
-                // — at the parent's own column.
                 skipBlanks()
                 if cursor < lines.count, lines[cursor].indent == indent, lines[cursor].isSequenceItem {
                     entries.append((key, try sequence(at: indent)))
@@ -189,8 +177,6 @@ extension Institute.CI.Workflow.YAML {
 
             entries.append((key, try scalar(value, on: line)))
         }
-
-        // MARK: - Scalars
 
         /// Split a leading `&anchor` off a node's inline text.
         static func detachAnchor(from value: String) -> (anchor: String?, rest: String) {
@@ -239,13 +225,9 @@ extension Institute.CI.Workflow.YAML {
                 raw.append(line)
                 cursor += 1
             }
-            // Trailing blank lines belong to whatever follows, not to the
-            // scalar's body, except as chomping-relevant newlines.
             while let last = raw.last, last.isEmpty { raw.removeLast() }
             return BlockScalar.render(raw, indicator: indicator)
         }
-
-        // MARK: - Cursor
 
         private mutating func skipBlanks() {
             while cursor < lines.count, lines[cursor].isSkippable { cursor += 1 }

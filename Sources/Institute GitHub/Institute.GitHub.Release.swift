@@ -55,8 +55,6 @@ extension Institute.GitHub.Release {
         asset: Swift.String,
         to destination: File.Path
     ) throws(Error) {
-        // `gh release download --pattern` matches a glob; an asset name
-        // carrying a glob metacharacter could select a different asset.
         guard !asset.isEmpty, !asset.contains(where: { "*?[]".contains($0) }) else {
             throw .malformed("asset name \(asset) is not an exact name")
         }

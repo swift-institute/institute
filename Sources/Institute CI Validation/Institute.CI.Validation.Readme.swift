@@ -91,12 +91,6 @@ extension Institute.CI.Validation {
             "Pre-implementation", "Namespace-reservation", "Unnecessary", "Archived",
         ]
 
-        // The retired patterns, reproduced verbatim; the differential
-        // gate is what proves the engines agree. `SkillHygiene.Pattern`
-        // is the module's one `finditer`-faithful regex wrapper, reused
-        // rather than re-implemented (its own `internalRuleID` covers a
-        // different curated segment list, so the pattern itself is not
-        // shared).
         typealias Pattern = Institute.CI.Validation.SkillHygiene.Pattern
 
         /// Internal rule-ID citations — `[README-017]`,
@@ -134,9 +128,6 @@ extension Institute.CI.Validation {
                 ]
             }
             if family == "exempt" {
-                // Declared out of scope for routing. Emit nothing — a
-                // stated exemption is a clean result, not a suppressed
-                // finding.
                 return []
             }
 
@@ -145,9 +136,6 @@ extension Institute.CI.Validation {
             do {
                 content = try subject.text(at: relative)
             } catch {
-                // The retired script reported any read failure as a
-                // finding, not a crash: the repository routed to a family
-                // whose README cannot be read is dirty, not unaskable.
                 return [
                     Finding(
                         repository: subject.repository,
@@ -158,8 +146,6 @@ extension Institute.CI.Validation {
             }
             guard let content else {
                 if family == "F" {
-                    // Family F can be implicit: no README means namespace
-                    // reservation.
                     return []
                 }
                 return [
@@ -188,7 +174,7 @@ extension Institute.CI.Validation {
                 findings += Self.familyG(subject.repository, name: name, content: content)
 
             default:
-                break  // Family A has no per-family rules in v1.
+                break
             }
             return findings
         }
@@ -206,9 +192,6 @@ extension Institute.CI.Validation.Readme {
             guard let text = try subject.text(at: ".github/metadata.yaml") else { return nil }
             document = try Institute.CI.Workflow.YAML.Parser.parse(text)
         } catch {
-            // Every way of not-knowing (absent file, unreadable file,
-            // unparseable YAML) is `nil`, not an error — the retired
-            // `detect_family` posture.
             return nil
         }
         guard let top = document.mapping,
@@ -288,9 +271,6 @@ extension Institute.CI.Validation.Readme {
         let nonblank = lines.filter {
             !$0.trimmedWhitespace.isEmpty
         }
-        // [README-017] H1 present and exactly one. Counted over
-        // fence-stripped content (mirroring the [README-026] scan) so a
-        // shell comment inside a ```bash fence is not miscounted as an H1.
         let stripped = strippingCodeBlocks(content)
         let h1Count = splitLines(stripped)
             .count { h1Line.firstMatch(in: String($0)) != nil }
@@ -321,8 +301,6 @@ extension Institute.CI.Validation.Readme {
                 )
             )
         }
-        // [README-026] no internal rule-ID citations outside code blocks.
-        // One finding suffices.
         if let match = forbiddenRuleID.firstMatch(in: stripped) {
             findings.append(
                 Finding(
@@ -343,9 +321,6 @@ extension Institute.CI.Validation.Readme {
     ) -> [Institute.CI.Validation.Finding] {
         typealias Finding = Institute.CI.Validation.Finding
         var findings: [Finding] = []
-        // [README-003] removed 2026-07-30: superseded in full by
-        // swift-institute/.github#126.
-        // [README-160] Only what the language cannot express.
         for line in splitLines(content) where h2OrDeeper.firstMatch(in: String(line)) != nil {
             let heading = String(line).trimmedWhitespace
             guard heading != "## Laws" else { continue }
@@ -377,7 +352,6 @@ extension Institute.CI.Validation.Readme {
                 )
             )
         }
-        // [README-161] The title is the repository's name.
         let repository =
             subject.repository.description.split(separator: "/").last.map(String.init)
             ?? subject.repository.description
@@ -395,7 +369,6 @@ extension Institute.CI.Validation.Readme {
                 )
             )
         }
-        // [README-162] One paragraph before `## Laws`.
         let paragraphs = paragraphCount(in: lines)
         if paragraphs != 1 {
             findings.append(
@@ -406,7 +379,6 @@ extension Institute.CI.Validation.Readme {
                 )
             )
         }
-        // [README-016] forbidden sections.
         for forbidden in ["## Roadmap", "## TODO", "## Changelog"]
         where content.contains(forbidden) {
             findings.append(
@@ -445,10 +417,6 @@ extension Institute.CI.Validation.Readme {
     ) -> [Institute.CI.Validation.Finding] {
         typealias Finding = Institute.CI.Validation.Finding
         var findings: [Finding] = []
-        // [README-137] no Installation / badges / Quick Start. The badge
-        // probe is anchored at the start of the document — the retired
-        // `BADGE_LINE` was compiled without MULTILINE, and its reach is
-        // part of the published rule.
         if content.contains("## Installation") {
             findings.append(
                 Finding(
@@ -476,7 +444,6 @@ extension Institute.CI.Validation.Readme {
                 )
             )
         }
-        // [README-138] length budget.
         let lineCount = splitLines(content).count
         if lineCount > 80 {
             findings.append(
@@ -498,8 +465,6 @@ extension Institute.CI.Validation.Readme {
     ) -> [Institute.CI.Validation.Finding] {
         typealias Finding = Institute.CI.Validation.Finding
         var findings: [Finding] = []
-        // [README-150] H1 + status blockquote only — no other ##
-        // sections. License is universal; allowed as the one exception.
         let extraH2 = splitLines(content).filter {
             h2Line.firstMatch(in: String($0)) != nil && !$0.contains("## License")
         }
@@ -514,7 +479,6 @@ extension Institute.CI.Validation.Readme {
                 )
             )
         }
-        // [README-151] status value enumerated.
         if let match = statusLine.firstMatch(in: content),
             let status = match.groups[1]?.trimmedWhitespace,
             !statusValues.contains(status)
@@ -537,7 +501,6 @@ extension Institute.CI.Validation.Readme {
         name: String,
         content: String
     ) -> [Institute.CI.Validation.Finding] {
-        // [README-117] The control organization's profile is the one exception.
         guard repository.description != "\(Institute.Organization.`swift-institute`.rawValue)/.github" else {
             return []
         }

@@ -125,25 +125,15 @@ extension Institute.CI {
             case "exhaustive": tier = .exhaustive
             default: throw .unknownForcedTier(forcedTier)
             }
-            // `[ci exhaustive]` is tested before the automatic promotions
-            // below, because those would otherwise settle on `.full` first
-            // and silently drop the extra legs that were asked for.
             if tier == nil, headMessage.contains("[ci exhaustive]") { tier = .exhaustive }
             if tier == nil, ref.hasPrefix("refs/tags/") { tier = .full }
             if tier == nil {
                 if headMessage.contains("[ci full]") { tier = .full } else if headMessage.contains("[ci build]") { tier = .build }
             }
             if tier == nil, event == "workflow_dispatch" { tier = .full }
-            // The integration ref promotes unconditionally, as before —
-            // a caller cannot narrow its own merge verification. The one
-            // exception is a tier that is already wider: promoting
-            // exhaustive to full would be a downgrade wearing the name of
-            // a promotion.
             if ref == "refs/heads/main", tier != .exhaustive { tier = .full }
             let selected = tier ?? .build
             self.tier = selected
-            // An explicit dispatch is a deliberate request to verify, so it
-            // never inherits a no-work classification from the event diff.
             let packageContentChanged = packageContentChanged || event == "workflow_dispatch"
             self.packageContentChanged = packageContentChanged
 
@@ -211,9 +201,6 @@ extension Institute.CI {
         ) throws(Error) -> Set<Leg.Family> {
             guard !platformSupport.isEmpty else { return [] }
             if platformSupport.hasSuffix(",") {
-                // The shell reports the trailing-empty case distinctly.
-                // (Its per-token loop sees the empty token first; the
-                // dedicated case exists for the diagnostic, matched here.)
                 if platformSupport.dropLast().split(
                     separator: ",",
                     omittingEmptySubsequences: false

@@ -326,8 +326,6 @@ internal final class ManifestUntraitedPartialDependencyVisitor: SyntaxVisitor {
             })
         else { return nil }
 
-        // Per dependency: the main products whose closure uses it without a
-        // trait condition, and the first such use.
         var needing: [Swift::String: Swift::Set<Swift::String>] = [:]
         var firstUse: [Swift::String: AbsolutePosition] = [:]
         for product in mainProducts {

@@ -9,7 +9,6 @@ import JSON
 import struct Swift.String
 
 extension Institute.CI.Command {
-    // MARK: - plan
 
     static func plan(_ rest: [Swift.String]) {
         let subjectRepository = value("--subject-repository", in: rest)
@@ -18,16 +17,9 @@ extension Institute.CI.Command {
 
         let today = value("--today", in: rest)
         var deschedule: [Swift.String: Swift.String] = [:]
-        // Optional by construction, like the release-floor exception below:
-        // the leg it classifies is opt-in, so a run that never schedules it
-        // has no exception to validate. Present, it must validate — an
-        // exception cannot be half-supplied into silence.
         let nightlyImage = value("--nightly-main-image", in: rest)
         if !nightlyImage.isEmpty {
             do {
-                // Class-aware expiry: malformed fields refuse everywhere; a
-                // well-formed expired exception refuses only on the owner
-                // repository and deschedules its classified leg elsewhere.
                 let nightly = Institute.CI.NightlyException(
                     image: nightlyImage,
                     upstreamIssue: value("--nightly-main-upstream-issue", in: rest),
@@ -51,8 +43,6 @@ extension Institute.CI.Command {
         let floorImage = value("--release-floor-image", in: rest)
         let linuxImage: Swift.String
         do {
-            // Optional by construction: an absent image is the terminal
-            // state, resolving to the official `swift:<floor>`.
             linuxImage = try Institute.CI.ReleaseFloorException.resolve(
                 swiftVersion: swiftVersion,
                 exception: floorImage.isEmpty
@@ -101,14 +91,11 @@ extension Institute.CI.Command {
             "linux-image": linuxImage.json,
             "lint-bundle": lintBundle.json,
             "embedded-target": deviation.embeddedTarget.json,
-            // `leg=reason` records; empty when nothing was descheduled.
             "descheduled": plan.descheduled
                 .map { "\($0.leg.id)=\($0.reason)" }
                 .joined(separator: ",").json,
         ])
     }
-
-    // MARK: - aggregate
 
     static func aggregate(_ rest: [Swift.String]) {
         let needsJSON = value("--needs-json", in: rest)
@@ -133,7 +120,6 @@ extension Institute.CI.Command {
             tier: value("--tier", in: rest),
             requireFullTier: rest.contains("--require-full-tier"),
             packageContentChanged: value("--package-content-changed", in: rest) != "false",
-            // `leg=reason` records from the plan; the audit keys on ids.
             descheduled: value("--descheduled", in: rest)
                 .split(separator: ",")
                 .map { Swift.String($0.split(separator: "=")[0]) }

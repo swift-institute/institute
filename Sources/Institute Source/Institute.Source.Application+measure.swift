@@ -26,13 +26,13 @@ extension Institute.Source.Application {
     }
 
     public func measure(
-        subject: Source_Measurement.Source.Subject,
+        subject: Source_Measurement::Source.Subject,
         bundle: Institute.Source.Bundle,
-        engines: Set<Source_Measurement.Source.Engine.ID>? = nil,
+        engines: Set<Source_Measurement::Source.Engine.ID>? = nil,
         jobs: Swift.Int? = nil,
         preparation: Institute.Source.Preparation
-    ) async throws(Institute.Error) -> Source_Report.Source.Report {
-        let scope: Source_Report.Source.Report.Scope = engines == nil ? .workspace : .partial
+    ) async throws(Institute.Error) -> Source_Report::Source.Report {
+        let scope: Source_Report::Source.Report.Scope = engines == nil ? .workspace : .partial
         guard preparation.binding == .package(subject.binding) else {
             return Self.unmeasuredReport(
                 scope: scope,
@@ -50,20 +50,20 @@ extension Institute.Source.Application {
     }
 
     private func measure(
-        entries: [(bundle: Institute.Source.Bundle, subject: Source_Measurement.Source.Subject)],
-        scope: Source_Report.Source.Report.Scope,
-        engines: Set<Source_Measurement.Source.Engine.ID>?,
+        entries: [(bundle: Institute.Source.Bundle, subject: Source_Measurement::Source.Subject)],
+        scope: Source_Report::Source.Report.Scope,
+        engines: Set<Source_Measurement::Source.Engine.ID>?,
         jobs: Swift.Int?,
-        references: [Source_Measurement.Source.Reason],
+        references: [Source_Measurement::Source.Reason],
         preparation: Institute.Source.Preparation
-    ) async throws(Institute.Error) -> Source_Report.Source.Report {
+    ) async throws(Institute.Error) -> Source_Report::Source.Report {
         let policy = Institute.Source.Policy.current
         if let reason = Self.staleness(of: preparation) {
             return Self.unmeasuredReport(scope: scope, reason: reason)
         }
 
-        let execution: Source_Execution.Source.Execution
-        do throws(Source_Execution.Source.Execution.Error) {
+        let execution: Source_Execution::Source.Execution
+        do throws(Source_Execution::Source.Execution.Error) {
             execution = try .init(process: process)
         } catch {
             throw .configuration("cannot register source engines: \(error)")
@@ -72,12 +72,12 @@ extension Institute.Source.Application {
         let configuration = try Self.configuration(policy: policy, preparation: preparation)
         subjects.append(configuration.subject)
         let owner = Institute.Source.Profile(policy: policy)
-        var requirements: [Source_Report.Source.Report.Commitment.Requirement] = []
+        var requirements: [Source_Report::Source.Report.Commitment.Requirement] = []
         for entry in entries {
             let bundle = entry.bundle
             let artifacts = entry.subject.governed.paths(of: .swift)
             for engine in policy.requiredEngines where engines?.contains(engine) ?? true {
-                let rules: [Source_Measurement.Source.Rule.ID]
+                let rules: [Source_Measurement::Source.Rule.ID]
                 switch engine.token {
                 case "swift-format":
                     rules = [.init(engine: engine, token: "format")]
@@ -98,7 +98,7 @@ extension Institute.Source.Application {
                 )
             }
         }
-        let measuredBySubject: [[Source_Measurement.Source.Measurement]] = await Async.Fanout(
+        let measuredBySubject: [[Source_Measurement::Source.Measurement]] = await Async.Fanout(
             jobs: jobs ?? 1
         ).mapAsync(entries) { entry in
             let subject = entry.subject
@@ -166,7 +166,7 @@ extension Institute.Source.Application {
                         )
                     }
                 }
-            let current: Source_Measurement.Source.Subject
+            let current: Source_Measurement::Source.Subject
             do throws(Institute.Error) {
                 current = try Institute.Source.Workspace.subject(
                     identity: subject.identity,
@@ -210,14 +210,14 @@ extension Institute.Source.Application {
         let profileBytes = preparation.profiles.keys.sorted()
             .compactMap { preparation.profiles[$0]?.hex }
             .joined(separator: ":").utf8.map(Byte.init(_:))
-        let digest = Source_Profile.Source.Profile.Digest(FIPS_180_4.SHA256.digest(profileBytes).hex)
+        let digest = Source_Profile::Source.Profile.Digest(FIPS_180_4.SHA256.digest(profileBytes).hex)
         return .init(
             scope: scope,
             profile: digest,
             commitment: .init(
                 subjects: subjects,
                 engines: policy.requiredEngines.map {
-                    let controlPolicy: Source_Report.Source.Report.Commitment.Engine.ControlPolicy =
+                    let controlPolicy: Source_Report::Source.Report.Commitment.Engine.ControlPolicy =
                         switch $0.token {
                         case "swift-format", "swiftlint":
                             .transitionalExternal
@@ -270,7 +270,7 @@ extension Institute.Source.Application {
     /// it before running any engine.
     public static func staleness(
         of preparation: Institute.Source.Preparation
-    ) -> Source_Measurement.Source.Reason? {
+    ) -> Source_Measurement::Source.Reason? {
         let policy = Institute.Source.Policy.current
         guard preparation.policyRevision == policy.revision else {
             return .init(code: "stale-profile", detail: preparation.policyRevision)
@@ -304,9 +304,9 @@ extension Institute.Source.Application {
     }
 
     private static func unmeasuredReport(
-        scope: Source_Report.Source.Report.Scope,
-        reason: Source_Measurement.Source.Reason
-    ) -> Source_Report.Source.Report {
+        scope: Source_Report::Source.Report.Scope,
+        reason: Source_Measurement::Source.Reason
+    ) -> Source_Report::Source.Report {
         .init(
             scope: scope,
             profile: .init("stale"),

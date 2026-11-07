@@ -80,9 +80,6 @@ extension Institute.Source.Workspace {
         for path in paths where path.hasSuffix(".swift") {
             guard valid(path) else { throw .configuration("invalid source artifact path \(path)") }
             sources.append(path)
-            // Only a real manifest makes a nested package: a production file named
-            // Package.swift (a `Package` namespace, a fixture) stays a source, as it
-            // does for SwiftPM and swift-linter.
             if path != "Package.swift", path.hasSuffix("/Package.swift"),
                 try Package.Manifest.recognizes(bytes(of: path, under: root))
             {
@@ -96,10 +93,6 @@ extension Institute.Source.Workspace {
         }
         let controls =
             repository(of: identity).map { Institute.Source.Policy.current.negativeControls(for: $0) } ?? [:]
-        // A declaration whose fixture is gone would leave its rule without a
-        // control, so it is an error — once there are sources to look in. An
-        // empty enumeration is a binding without sources (the target catalog's),
-        // where nothing is missing.
         for path in controls.keys.sorted() where !paths.isEmpty && !candidates.contains(path) {
             throw .configuration("declared negative control is not a source artifact: \(path)")
         }

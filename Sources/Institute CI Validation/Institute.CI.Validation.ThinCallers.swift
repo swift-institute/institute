@@ -123,8 +123,6 @@ extension Institute.CI.Validation {
         }
 
         public func findings(in subject: Subject) throws(EnvironmentDefect) -> [Finding] {
-            // `[GH-REPO-074]` scopes to per-package repositories. No root
-            // manifest, no obligation.
             guard try subject.text(at: "Package.swift") != nil else { return [] }
             var findings: [Finding] = []
             if let text = try subject.text(at: ".github/workflows/ci.yml") {
@@ -138,9 +136,6 @@ extension Institute.CI.Validation {
             in text: String,
             subject: Subject
         ) throws(EnvironmentDefect) -> [Finding] {
-            // File-level carve-out for every rule here: a workflow that
-            // declares `workflow_call:` *is* a reusable. Tool-host
-            // packages ([GH-REPO-077]) host action refs on purpose.
             guard !Line.all(text).contains(where: { $0.declaresWorkflowCall }) else { return [] }
 
             let repository = subject.repository
@@ -191,8 +186,6 @@ extension Institute.CI.Validation {
             }
             return String(subject.repository.description.prefix { $0 != "/" })
         }
-
-        // MARK: - [GH-REPO-074]
 
         static func standaloneWorkflowFindings(
             in subject: Subject
@@ -284,10 +277,6 @@ extension Institute.CI.Validation {
             do throws(Institute.CI.Workflow.YAML.Error) {
                 document = try Institute.CI.Workflow.Document(name: "ci.yml", text: text)
             } catch {
-                // A document the reader refuses proves nothing, and this
-                // is the one predicate here that must fail closed: the
-                // suppression it gates would otherwise be granted on an
-                // unverified walk.
                 return false
             }
             guard let mapping = document.body?["jobs"]?.mapping else { return false }
@@ -297,8 +286,6 @@ extension Institute.CI.Validation {
             }
             return read.count == mapping.entries.count && read == jobs.map(\.name)
         }
-
-        // MARK: - [CI-030]
 
         static func pinFindings(in text: String, repository: GitHub_Standard::GitHub.Repository.Slug) -> [Finding] {
             Line.all(text).compactMap { line in
@@ -312,8 +299,6 @@ extension Institute.CI.Validation {
             }
         }
 
-        // MARK: - [CI-059]
-
         static func secretFindings(
             in text: String,
             repository: GitHub_Standard::GitHub.Repository.Slug,
@@ -322,7 +307,7 @@ extension Institute.CI.Validation {
             let crossOrganization = subOrganizations.contains(organization)
             return jobs(in: text).flatMap { job -> [Finding] in
                 guard job.lines.contains(where: { $0.intraInstituteReference != nil }) else {
-                    return []  // this job invokes no intra-Institute reusable
+                    return []
                 }
                 return crossOrganization
                     ? crossOrganizationFindings(job, repository: repository)
@@ -419,8 +404,6 @@ extension Institute.CI.Validation {
                     + "(\(exemption.ruling)): \(message)"
             )
         }
-
-        // MARK: - INTEGRATED-DOCS-ADMISSION
 
         static func integratedDocsFindings(in text: String, repository: GitHub_Standard::GitHub.Repository.Slug) -> [Finding] {
             jobs(in: text).compactMap { job in

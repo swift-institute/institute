@@ -8,14 +8,14 @@ extension Institute.Application {
     /// `institute install` — install the published, digest-verified planner
     /// that swift-institute/.github pins for this platform, and record what
     /// was installed. It never builds.
-    public struct Install: Sendable, Command_Schema.Command.`Protocol` {
+    public struct Install: Sendable, Command_Schema::Command.`Protocol` {
         public init() {}
 
-        public static var configuration: Command_Schema.Command.Configuration {
+        public static var configuration: Command_Schema::Command.Configuration {
             .init(name: "install", abstract: "Install the published planner pinned by the CI policy.")
         }
 
-        public static var schema: Command_Schema.Command.Schema.Definition<Self> {
+        public static var schema: Command_Schema::Command.Schema.Definition<Self> {
             .init(nodes: [])
         }
 

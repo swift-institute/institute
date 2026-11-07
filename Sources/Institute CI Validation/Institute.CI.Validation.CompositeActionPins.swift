@@ -57,8 +57,6 @@ extension Institute.CI.Validation {
             return findings
         }
 
-        // MARK: - Scanning
-
         /// One unpinned self-referential composite-action reference.
         public struct Site: Sendable, Equatable {
             public let line: Int
@@ -106,9 +104,6 @@ extension Institute.CI.Validation {
             rest = rest.dropFirst()
             let reference = rest.prefix { !$0.isWhitespace }
             guard !reference.isEmpty else { return nil }
-            // Anything after the reference must be whitespace, or
-            // whitespace then a trailing `#` comment. A second token is
-            // not a `uses:` line this rule recognises.
             let trailing = rest.dropFirst(reference.count).drop { $0.isWhitespace }
             guard trailing.isEmpty || trailing.first == "#" else { return nil }
             guard !Self.isIdentityPin(reference) else { return nil }
@@ -145,8 +140,6 @@ extension Institute.CI.Validation {
             if lines.last?.isEmpty == true { lines.removeLast() }
             return lines
         }
-
-        // MARK: - Exemptions
 
         /// A typed, reasoned exemption — owner, trigger, reason,
         /// retirement condition — recorded as data rather than as a
@@ -192,8 +185,6 @@ extension Institute.CI.Validation {
         static func exemption(workflow: String, action: String) -> Exemption? {
             exemptions.first { $0.workflow == workflow && $0.action == action }
         }
-
-        // MARK: - Messages
 
         static func message(workflow: String, site: Site) -> String {
             "\(workflow):\(site.line): \(referencePrefix)\(site.action)@\(site.reference) "

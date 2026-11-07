@@ -33,8 +33,6 @@ extension Institute.CI.Validation.SkillHygiene {
             var seen: Set<String> = []
             var stack = [root]
             while let directory = stack.popLast() {
-                // An unlistable directory contributes no files; the
-                // subject root itself was already verified above.
                 let names = Institute.CI.Validation.names(at: directory) ?? []
                 for name in names where name != ".git" {
                     let path = "\(directory)/\(name)"
