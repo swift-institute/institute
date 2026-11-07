@@ -7,6 +7,12 @@ extension Lint.Rule {
         default: .warning,
         controls: [
             .init(
+                id: "type transform placement executor witness",
+                source: "final class Loop: SerialExecutor { func asUnownedSerialExecutor() -> UnownedSerialExecutor { UnownedSerialExecutor(ordinary: self) } }",
+                path: "Sources/Structure Core/Loop.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "type transform placement instance conversion",
                 source: "extension Source { func toTarget() -> Target { fatalError() } }",
                 path: "Sources/Structure Core/Source.swift",
@@ -106,6 +112,10 @@ internal final class StructureTypeTransformPlacementVisitor: SyntaxVisitor {
 
     override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
         if structureTypeTransformPlacementHasStaticOrClassModifier(node.modifiers) {
+            return .visitChildren
+        }
+        // Standard library executor requirements fix these names.
+        if ["asUnownedSerialExecutor", "asUnownedTaskExecutor"].contains(node.name.text) {
             return .visitChildren
         }
         let name = node.name.text
