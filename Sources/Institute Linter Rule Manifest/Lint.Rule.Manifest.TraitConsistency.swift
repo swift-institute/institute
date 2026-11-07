@@ -31,6 +31,17 @@ extension Lint.Rule {
                 ]
             ),
             .init(
+                id: "trait consistency conditioned import under a trait-defined condition",
+                source: "let package = Package(name: \"swift-owner\", traits: [.trait(name: \"Parser\")], "
+                    + "dependencies: [.package(url: \"https://github.com/swift-atoms/swift-parser.git\", branch: \"main\")], "
+                    + "targets: [.target(name: \"Owner\", dependencies: ["
+                    + ".product(name: \"Parser\", package: \"swift-parser\", condition: .when(traits: [\"Parser\"]))], "
+                    + "swiftSettings: [.define(\"OWNER_PARSER\", .when(traits: [\"Parser\"]))])])",
+                path: "Package.swift",
+                expectation: .clean,
+                files: ["Sources/Owner/Owner.swift": "#if OWNER_PARSER\nimport Parser\n#endif"]
+            ),
+            .init(
                 id: "trait consistency conditioned import outside its guard",
                 source: manifestTraitConsistencyFixture(condition: ", condition: .when(traits: [\"Parser\"])"),
                 path: "Package.swift",
@@ -137,8 +148,11 @@ internal struct ManifestTraitConsistency {
                 let uses = imports.filter { $0.import.module == module }
                 guard !uses.isEmpty else { continue }
                 if let conditioned = dependency.traits {
-                    let allowed = names.filter { !Self.closure(of: $0, in: traits).isDisjoint(with: conditioned) }
-                    for use in uses where !use.import.isGuarded(by: allowed, among: names) {
+                    let allowedTraits = names.filter { !Self.closure(of: $0, in: traits).isDisjoint(with: conditioned) }
+                    let allowedDefines = collector.defines.filter { !$0.value.isDisjoint(with: allowedTraits) }.keys
+                    let allowed = allowedTraits.union(allowedDefines)
+                    let guardNames = names.union(collector.defines.keys)
+                    for use in uses where !use.import.isGuarded(by: allowed, among: guardNames) {
                         issues.append(
                             Issue(
                                 position: dependency.position,
@@ -209,6 +223,10 @@ internal final class ManifestTraitConsistencyCollector: SyntaxVisitor {
 
     var targets: [Target] = []
 
+    /// Compilation conditions a setting defines only under some traits:
+    /// `.define("X", .when(traits: ["T"]))` makes `#if X` a guard for `T`.
+    var defines: [Swift::String: Swift::Set<Swift::String>] = [:]
+
     var unhandledSourceShape: Swift::String?
 
     private static let roots: [Swift::String: Swift::String] = [
@@ -232,6 +250,9 @@ internal final class ManifestTraitConsistencyCollector: SyntaxVisitor {
                 dependencies += array.elements.compactMap { dependency($0.expression) }
             }
             targets.append(Target(name: name, path: Self.string(node, "path"), defaultRoot: root, dependencies: dependencies))
+            let settings = ManifestTraitConsistencyDefineCollector(viewMode: .sourceAccurate)
+            settings.walk(node)
+            defines.merge(settings.defines) { $0.union($1) }
             return .skipChildren
         }
         return .visitChildren
@@ -287,5 +308,25 @@ internal final class ManifestTraitConsistencyCollector: SyntaxVisitor {
         expression?.as(ArrayExprSyntax.self)?.elements.compactMap {
             $0.expression.as(StringLiteralExprSyntax.self).flatMap(manifestStringLiteralText)
         }
+    }
+}
+
+private final class ManifestTraitConsistencyDefineCollector: SyntaxVisitor {
+    var defines: [Swift::String: Swift::Set<Swift::String>] = [:]
+
+    override func visit(_ node: FunctionCallExprSyntax) -> SyntaxVisitorContinueKind {
+        guard node.calledExpression.as(MemberAccessExprSyntax.self)?.declName.baseName.text == "define",
+            let name = node.arguments.first?.expression.as(StringLiteralExprSyntax.self).flatMap(manifestStringLiteralText),
+            let condition = node.arguments.dropFirst().first(where: {
+                $0.label == nil || $0.label?.text == "condition" || $0.label?.text == "to"
+            })?.expression.as(FunctionCallExprSyntax.self)
+                ?? node.arguments.last?.expression.as(FunctionCallExprSyntax.self),
+            let traits = condition.arguments.first(where: { $0.label?.text == "traits" })?.expression.as(ArrayExprSyntax.self)
+        else { return .visitChildren }
+        let names = traits.elements.compactMap {
+            $0.expression.as(StringLiteralExprSyntax.self).flatMap(manifestStringLiteralText)
+        }
+        defines[name, default: []].formUnion(names)
+        return .visitChildren
     }
 }
