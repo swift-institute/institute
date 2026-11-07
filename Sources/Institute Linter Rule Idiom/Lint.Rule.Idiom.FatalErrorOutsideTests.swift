@@ -122,6 +122,18 @@ extension Lint.Rule {
                 expectation: .findings(1)
             ),
             .init(
+                id: "fatal error outside tests unavailable declaration",
+                source: "struct S { @available(*, unavailable) init() { fatalError() } }",
+                path: "Sources/Idiom Consumer/Unavailable.swift",
+                expectation: .clean
+            ),
+            .init(
+                id: "fatal error outside tests test support target",
+                source: "func f() -> Never { fatalError() }",
+                path: "Sources/Idiom Test Support/Trap.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "fatal error outside tests member",
                 source: "func f() { logger.fatalError(\"message\") }",
                 path: "Sources/Idiom Consumer/Log.swift",
@@ -131,6 +143,10 @@ extension Lint.Rule {
         observe: Lint.Rule.measured { source, severity in
             let path = source.file.filePath
             guard path.hasPrefix("Sources/") || path.contains("/Sources/") else {
+                return []
+            }
+            // A '* Test Support' target exists only for tests.
+            if path.split(separator: "/").contains(where: { $0.hasSuffix("Test Support") }) {
                 return []
             }
             let visitor = IdiomFatalErrorOutsideTestsVisitor(
@@ -168,6 +184,29 @@ internal final class IdiomFatalErrorOutsideTestsVisitor: SyntaxVisitor {
         super.init(viewMode: .sourceAccurate)
     }
 
+    /// `@available(*, unavailable)` declarations can never be called; their
+    /// body exists only to satisfy the compiler.
+    private func isInsideUnavailableDecl(_ node: Syntax) -> Swift::Bool {
+        var current = node.parent
+        while let candidate = current {
+            if let attributes = candidate.asProtocol((any WithAttributesSyntax).self)?.attributes {
+                for element in attributes {
+                    guard case .attribute(let attribute) = element,
+                        attribute.attributeName.trimmedDescription == "available",
+                        let arguments = attribute.arguments
+                    else { continue }
+                    if arguments.tokens(viewMode: .sourceAccurate).contains(where: {
+                        $0.tokenKind == .keyword(.unavailable) || $0.text == "unavailable"
+                    }) {
+                        return true
+                    }
+                }
+            }
+            current = candidate.parent
+        }
+        return false
+    }
+
     override func visit(_ node: FunctionCallExprSyntax) -> SyntaxVisitorContinueKind {
         let isFatalError: Swift::Bool =
             if let reference = node.calledExpression.as(DeclReferenceExprSyntax.self) {
@@ -178,7 +217,8 @@ internal final class IdiomFatalErrorOutsideTestsVisitor: SyntaxVisitor {
             } else {
                 false
             }
-        guard isFatalError, !isLeafProtocolDefaultBody(node) else { return .visitChildren }
+        guard isFatalError, !isLeafProtocolDefaultBody(node), !isInsideUnavailableDecl(Syntax(node))
+        else { return .visitChildren }
         let location = converter.location(for: node.positionAfterSkippingLeadingTrivia)
         matches.append(
             Diagnostic.Record(
