@@ -7,6 +7,14 @@ extension Lint.Rule {
         default: .warning,
         controls: [
             .init(
+                id: "int public parameter witnesses and source location",
+                source: "public struct Count: ExpressibleByIntegerLiteral, RawRepresentable { public init(integerLiteral value: Int) {}; "
+                    + "public init?(rawValue: Int) {}; public init?(exactly value: Int) {} }\n"
+                    + "public func check(_ ok: Cardinal, line: Int = #line, column: Int = #column) {}",
+                path: "Sources/Naming Core/Witness.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "int public parameter public int",
                 source: "public func read(count: Int) {}",
                 path: "Sources/Naming Core/PublicInt.swift",
@@ -51,6 +59,11 @@ private let namingIntParameterMessageReturn: Swift::String =
     + "bare `Int`. Push the stdlib boundary out — return a typed wrapper "
     + "(`Cardinal`, `Count<T>`, `Offset<T>`) so consumers see typed "
     + "intent rather than a raw machine integer."
+
+/// Labels of initializers a standard library protocol or integer conversion fixes: the `Int` is the requirement.
+private let namingIntParameterWitnessLabels: Swift::Set<Swift::String> = [
+    "integerLiteral", "rawValue", "exactly", "truncatingIfNeeded", "clamping", "bitPattern",
+]
 
 private func namingIntParameterIsBareInt(_ type: TypeSyntax) -> Bool {
     var current = type
@@ -120,6 +133,11 @@ internal final class NamingIntParameterVisitor: SyntaxVisitor {
         guard Naming.hasPublicOrOpenEffective(Syntax(node), modifiers: node.modifiers) else {
             return .visitChildren
         }
+        if let first = node.signature.parameterClause.parameters.first,
+            namingIntParameterWitnessLabels.contains(first.firstName.text)
+        {
+            return .visitChildren
+        }
         checkParameters(node.signature.parameterClause.parameters)
         return .visitChildren
     }
@@ -141,6 +159,11 @@ internal final class NamingIntParameterVisitor: SyntaxVisitor {
     private func checkParameters(_ parameters: FunctionParameterListSyntax) {
         for parameter in parameters {
             guard namingIntParameterIsBareInt(parameter.type) else {
+                continue
+            }
+            if let macro = parameter.defaultValue?.value.as(MacroExpansionExprSyntax.self),
+                ["line", "column"].contains(macro.macroName.text)
+            {
                 continue
             }
             emit(

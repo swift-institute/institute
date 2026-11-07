@@ -19,6 +19,12 @@ extension Lint.Rule {
                 expectation: .clean
             ),
             .init(
+                id: "canimport conditional inside an os guard",
+                source: "#if os(Linux)\n#if canImport(Linux_Kernel)\nimport Linux_Kernel\n#endif\n#endif",
+                path: "Sources/Platform Core/Guarded.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "canimport conditional os boundary",
                 source: "#if os(Linux)\nimport Glibc\n#endif",
                 path: "Sources/Platform Core/OperatingSystem.swift",
@@ -90,8 +96,24 @@ internal final class PlatformPlatformConditionalVisitor: SyntaxVisitor {
 
     override func visit(_ node: IfConfigClauseSyntax) -> SyntaxVisitorContinueKind {
         guard let condition = node.condition else { return .visitChildren }
+        if Self.isPlatformGuarded(node) { return .visitChildren }
         checkCondition(condition)
         return .visitChildren
+    }
+
+    /// Nested inside `#if os(Linux)`, the platform is already decided:
+    /// the module check only asks whether the package's own platform target is built.
+    private static func isPlatformGuarded(_ clause: IfConfigClauseSyntax) -> Swift::Bool {
+        func mentionsOS(_ condition: ExprSyntax?) -> Swift::Bool {
+            guard let condition else { return false }
+            return condition.tokens(viewMode: .sourceAccurate).contains { $0.text == "os" }
+        }
+        var current = clause.parent
+        while let candidate = current {
+            if let outer = candidate.as(IfConfigClauseSyntax.self), mentionsOS(outer.condition) { return true }
+            current = candidate.parent
+        }
+        return false
     }
 
     private func rootModuleIdentifier(of expression: ExprSyntax) -> TokenSyntax? {
