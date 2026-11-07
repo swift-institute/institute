@@ -71,6 +71,12 @@ extension Lint.Rule {
                 expectation: .findings(1)
             ),
             .init(
+                id: "extension file naming suppression-only where clause",
+                source: "extension Array.Dynamic where Element: ~Copyable & ~Escapable { func iterate() {} }",
+                path: "Sources/Structure Core/Array.Dynamic.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "extension file naming test scope",
                 source: "extension Array.Dynamic { func iterate() {} }",
                 path: "Tests/Structure Tests/Array.Dynamic.swift",
@@ -164,7 +170,10 @@ private func structureExtensionFileNamingFindings(
         }
         .filter { !structureIsStdlibConformance($0) }
     }
-    let hasWhere = collector.extensions.contains { $0.genericWhereClause != nil }
+    let hasWhere = collector.extensions.contains {
+        guard let clause = $0.genericWhereClause else { return false }
+        return !structureExtensionFileNamingIsSuppressionOnly(clause)
+    }
 
     if !conformances.isEmpty {
         let conformancePrefix = "\(base)+"
@@ -285,6 +294,22 @@ private func structureExtensionFileNamingIsConversionOwned(
         }
     }
     return false
+}
+
+/// `where Self: ~Copyable & ~Escapable` and the like only lift default
+/// constraints; they discriminate nothing, so they don't name a file.
+private func structureExtensionFileNamingIsSuppressionOnly(
+    _ clause: GenericWhereClauseSyntax
+) -> Swift::Bool {
+    clause.requirements.allSatisfy { requirement in
+        guard case .conformanceRequirement(let conformance) = requirement.requirement else {
+            return false
+        }
+        let right = conformance.rightType
+        if right.is(SuppressedTypeSyntax.self) { return true }
+        guard let composition = right.as(CompositionTypeSyntax.self) else { return false }
+        return composition.elements.allSatisfy { $0.type.is(SuppressedTypeSyntax.self) }
+    }
 }
 
 private final class StructureExtensionFileNamingCollector: SyntaxVisitor {
