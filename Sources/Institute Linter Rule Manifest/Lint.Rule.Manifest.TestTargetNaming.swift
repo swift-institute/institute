@@ -21,6 +21,13 @@ extension Lint.Rule {
                 expectation: .findings(1)
             ),
             .init(
+                id: "test target naming cross-target integration",
+                source: "let package = Package(name: \"Fixture\", targets: ["
+                    + ".target(name: \"Fixture Core\"), .testTarget(name: \"Fixture Core Integration Tests\")])",
+                path: "Package.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "test target naming no subject",
                 source: "let package = Package(name: \"Fixture\", targets: ["
                     + ".target(name: \"Fixture Core\"), .testTarget(name: \"Fixture Tests\")])",
@@ -52,7 +59,9 @@ extension Lint.Rule {
                 let reason: Swift::String? =
                     if !test.name.hasSuffix(" Tests") {
                         "`\(test.name)` must be named `<Target> Tests`."
-                    } else if !subjects.contains(Swift::String(test.name.dropLast(" Tests".count))) {
+                    } else if !subjects.contains(Swift::String(test.name.dropLast(" Tests".count))),
+                        !manifestTestTargetIsCrossTarget(test.name, subjects: subjects)
+                    {
                         "`\(test.name)` names no target of this package; a test target tests exactly one target."
                     } else if !seen.insert(test.name).inserted {
                         "`\(test.name)` is declared twice; one test target per target."
@@ -123,4 +132,20 @@ internal final class ManifestTestTargetNamingVisitor: SyntaxVisitor {
         }
         return .visitChildren
     }
+}
+
+/// Integration, conformance and performance suites exercise several
+/// targets together: `<Target> Integration Tests` or `Integration Tests`.
+private func manifestTestTargetIsCrossTarget(
+    _ name: Swift::String,
+    subjects: Swift::Set<Swift::String>
+) -> Swift::Bool {
+    for kind in ["Integration Tests", "Conformance Tests", "Performance Tests"] {
+        if name == kind { return true }
+        let suffix = " " + kind
+        if name.hasSuffix(suffix), subjects.contains(Swift::String(name.dropLast(suffix.count))) {
+            return true
+        }
+    }
+    return false
 }
