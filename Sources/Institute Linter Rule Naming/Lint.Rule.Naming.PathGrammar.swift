@@ -149,7 +149,13 @@ internal func namingPathGrammarFindings(
     let collector = NamingPathGrammarPrimaryTypeCollector()
     collector.walk(tree)
     guard collector.declaresPrimaryType else { return records }
-    for segment in basename.split(separator: ".").map(Swift::String.init) {
+    // A file named exactly after a type it declares inherits that type's
+    // name: a compound in the declared leaf is `compound type name`'s
+    // finding, not the path's. Segments naming an outer type declared
+    // elsewhere are still checked here.
+    var segments = basename.split(separator: ".").map(Swift::String.init)
+    if collector.paths.contains(basename) { segments.removeLast() }
+    for segment in segments {
         if namingWordIsCompound(segment, words: words) {
             emit(
                 namingPathGrammarBasenameMessage(
@@ -164,8 +170,18 @@ internal func namingPathGrammarFindings(
 
 internal final class NamingPathGrammarPrimaryTypeCollector: SyntaxVisitor {
     var declaresPrimaryType: Swift::Bool = false
+    var paths: Swift::Set<Swift::String> = []
 
     init() { super.init(viewMode: .sourceAccurate) }
+
+    private func name(of decl: DeclSyntax) -> Swift::String? {
+        if let d = decl.as(StructDeclSyntax.self) { return d.name.text }
+        if let d = decl.as(EnumDeclSyntax.self) { return d.name.text }
+        if let d = decl.as(ClassDeclSyntax.self) { return d.name.text }
+        if let d = decl.as(ActorDeclSyntax.self) { return d.name.text }
+        if let d = decl.as(ProtocolDeclSyntax.self) { return d.name.text }
+        return nil
+    }
 
     private func isPrimary(_ decl: DeclSyntax) -> Swift::Bool {
         if let classDecl = decl.as(ClassDeclSyntax.self) {
@@ -181,15 +197,16 @@ internal final class NamingPathGrammarPrimaryTypeCollector: SyntaxVisitor {
         for item in Lint.Syntax.Conditional.statements(node.statements) {
             guard case .decl(let decl) = item.item else { continue }
             if let extensionDecl = decl.as(ExtensionDeclSyntax.self) {
+                let base = extensionDecl.extendedType.trimmedDescription
                 for member in extensionDecl.memberBlock.members where isPrimary(member.decl) {
                     declaresPrimaryType = true
-                    return .skipChildren
+                    if let name = name(of: member.decl) { paths.insert("\(base).\(name)") }
                 }
                 continue
             }
             if isPrimary(decl) {
                 declaresPrimaryType = true
-                return .skipChildren
+                if let name = name(of: decl) { paths.insert(name) }
             }
         }
         return .skipChildren

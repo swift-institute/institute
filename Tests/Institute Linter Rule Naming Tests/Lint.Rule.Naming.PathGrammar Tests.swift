@@ -82,6 +82,15 @@ extension `Lint.Rule Tests`.`path name grammar Tests`.Unit {
         #expect(findings.count == 1)
     }
 
+    @Test
+    func `file named after the compound type it declares is left to compound type name`() {
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
+            in: "struct PaymentMethods {}",
+            file: "Sources/Payments/PaymentMethods.swift"
+        )
+        #expect(findings.isEmpty)
+    }
+
     // Negative controls — current correct spellings.
     @Test
     func `spaced directory and dotted basename are permitted`() {
