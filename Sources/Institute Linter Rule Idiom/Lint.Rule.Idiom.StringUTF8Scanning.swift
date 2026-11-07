@@ -7,6 +7,12 @@ extension Lint.Rule {
         default: .warning,
         controls: [
             .init(
+                id: "string utf8 scanning scalar append",
+                source: "func build(_ text: inout String, _ scalar: Unicode.Scalar) { text.unicodeScalars.append(scalar) }",
+                path: "Sources/Idiom Consumer/Append.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "string utf8 scanning unicode scalars",
                 source: "func scan(content: String) { _ = content.unicodeScalars.firstIndex(of: \"x\") }",
                 path: "Sources/String Core/UnicodeScalars.swift",
@@ -93,6 +99,12 @@ internal final class IdiomStringUTF8ScanningVisitor: SyntaxVisitor {
 
     override func visit(_ node: MemberAccessExprSyntax) -> SyntaxVisitorContinueKind {
         guard node.declName.baseName.text == "unicodeScalars" else { return .visitChildren }
+        // `s.unicodeScalars.append(...)` writes; this rule is about scanning.
+        if let outer = node.parent?.as(MemberAccessExprSyntax.self),
+            ["append", "insert", "removeAll", "reserveCapacity"].contains(outer.declName.baseName.text)
+        {
+            return .visitChildren
+        }
         let location = converter.location(
             for: node.declName.baseName.positionAfterSkippingLeadingTrivia
         )
