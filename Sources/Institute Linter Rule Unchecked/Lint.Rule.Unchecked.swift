@@ -19,6 +19,24 @@ extension Lint.Rule {
                 expectation: .clean
             ),
             .init(
+                id: "unchecked call site own constant",
+                source: "extension Cardinal { static let zero = Self(__unchecked: (), 0); static let one = Cardinal(__unchecked: (), 1) }",
+                path: "Sources/Unchecked Consumer/Constants.swift",
+                expectation: .clean
+            ),
+            .init(
+                id: "unchecked call site foreign constant",
+                source: "extension Ordinal { static let zero = Cardinal(__unchecked: (), 0) }",
+                path: "Sources/Unchecked Consumer/ForeignConstant.swift",
+                expectation: .findings(1)
+            ),
+            .init(
+                id: "unchecked call site method label",
+                source: "func f() { buffer.take(__unchecked: index) }",
+                path: "Sources/Unchecked Consumer/MethodLabel.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "unchecked call site extension initializer bottom out",
                 source: "extension Cardinal { init(validated value: Int) { "
                     + "self.init(__unchecked: value) } }",
@@ -100,6 +118,59 @@ internal func uncheckedIsExtensionInitBottomOut(
     return uncheckedCalleeNames(owner, in: call.calledExpression)
 }
 
+/// A constructor or static factory: a type name, `.init`, `Self`, `X.Y`, or `Foo.make(...)`. `buffer.take(__unchecked:)`
+/// on an instance is a method whose label merely reads the same, not the brand's bypass.
+internal func uncheckedIsConstruction(_ callee: ExprSyntax) -> Swift::Bool {
+    if let specialized = callee.as(GenericSpecializationExprSyntax.self) {
+        return uncheckedIsConstruction(specialized.expression)
+    }
+    if let reference = callee.as(DeclReferenceExprSyntax.self) {
+        return reference.baseName.text.first?.isUppercase ?? false
+    }
+    if let member = callee.as(MemberAccessExprSyntax.self) {
+        let name = member.declName.baseName.text
+        if name == "init" || (name.first?.isUppercase ?? false) { return true }
+        guard let base = member.base else { return true }
+        return uncheckedIsConstruction(base)
+    }
+    return true
+}
+
+/// `static let zero = Self(__unchecked: 0)` in the type's own declaration or extension: a constant the brand
+/// defines for itself, the same bottom-out as its own initializer.
+internal func uncheckedIsOwnConstant(
+    call: FunctionCallExprSyntax,
+    at node: Syntax
+) -> Swift::Bool {
+    var current: Syntax? = node.parent
+    var inBinding = false
+    while let candidate = current {
+        if candidate.is(PatternBindingSyntax.self) { inBinding = true }
+        if candidate.is(ClosureExprSyntax.self)
+            || candidate.is(FunctionDeclSyntax.self)
+            || candidate.is(AccessorDeclSyntax.self)
+            || candidate.is(InitializerDeclSyntax.self)
+            || candidate.is(SubscriptDeclSyntax.self)
+        {
+            return false
+        }
+        var owner: Swift::String?
+        if let extensionDecl = candidate.as(ExtensionDeclSyntax.self) {
+            owner = uncheckedTypeNameTail(extensionDecl.extendedType.trimmedDescription)
+        } else if let decl = candidate.asProtocol((any NamedDeclSyntax).self),
+            candidate.is(StructDeclSyntax.self) || candidate.is(EnumDeclSyntax.self)
+                || candidate.is(ClassDeclSyntax.self) || candidate.is(ActorDeclSyntax.self)
+        {
+            owner = decl.name.text
+        }
+        if let owner {
+            return inBinding && uncheckedCalleeNames(owner, in: call.calledExpression)
+        }
+        current = candidate.parent
+    }
+    return false
+}
+
 internal func uncheckedTypeNameTail(_ written: Swift::String) -> Swift::String {
     let base = written.split(separator: "<", maxSplits: 1).first.map(Swift::String.init) ?? written
     return base.split(separator: ".").last.map(Swift::String.init) ?? base
@@ -146,6 +217,12 @@ internal final class UncheckedVisitor: SyntaxVisitor {
             return .visitChildren
         }
         if uncheckedIsExtensionInitBottomOut(call: call, at: Syntax(node)) {
+            return .visitChildren
+        }
+        if !uncheckedIsConstruction(call.calledExpression) {
+            return .visitChildren
+        }
+        if uncheckedIsOwnConstant(call: call, at: Syntax(node)) {
             return .visitChildren
         }
         let location = converter.location(for: label.positionAfterSkippingLeadingTrivia)

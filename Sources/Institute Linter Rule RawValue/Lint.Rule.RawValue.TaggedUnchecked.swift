@@ -13,6 +13,12 @@ extension Lint.Rule {
                 expectation: .findings(1)
             ),
             .init(
+                id: "tagged unchecked with typed alternative computed value",
+                source: "let value = Tagged<Tag, Int>(_unchecked: count + 1)",
+                path: "Sources/Raw Value Core/ComputedConstruction.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "tagged unchecked with typed alternative literal construction",
                 source: "let value: Tagged<Tag, Int> = 42",
                 path: "Sources/Raw Value Core/LiteralConstruction.swift",
@@ -84,7 +90,8 @@ internal final class RawValueTaggedUncheckedVisitor: SyntaxVisitor {
         for argument in node.arguments {
             guard
                 let label = argument.label,
-                label.tokenKind == .identifier("_unchecked")
+                label.tokenKind == .identifier("_unchecked"),
+                Self.isLiteral(argument.expression)
             else { continue }
             let location = converter.location(
                 for: argument.positionAfterSkippingLeadingTrivia
@@ -105,6 +112,14 @@ internal final class RawValueTaggedUncheckedVisitor: SyntaxVisitor {
             break
         }
         return .visitChildren
+    }
+
+    /// Only a literal has the typed alternative, `let x: Tagged<Tag, Int> = 42`; a computed value has none.
+    private static func isLiteral(_ expression: ExprSyntax) -> Swift::Bool {
+        if let prefix = expression.as(PrefixOperatorExprSyntax.self) { return isLiteral(prefix.expression) }
+        return expression.is(IntegerLiteralExprSyntax.self) || expression.is(FloatLiteralExprSyntax.self)
+            || expression.is(StringLiteralExprSyntax.self) || expression.is(BooleanLiteralExprSyntax.self)
+            || expression.is(ArrayExprSyntax.self) || expression.is(DictionaryExprSyntax.self)
     }
 
     private static func isInsideExemptOperation(_ node: Syntax) -> Swift::Bool {
