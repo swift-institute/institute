@@ -8,7 +8,7 @@ extension Lint.Rule {
         controls: [
             .init(
                 id: "result wrapper for rethrows shim map try",
-                source: "let output = values.map { try transform($0) }",
+                source: "func f() throws(Read.Error) { let output = values.map { try transform($0) } }",
                 path: "Sources/Throws Consumer/RethrowsMap.swift",
                 expectation: .findings(1)
             ),
@@ -23,6 +23,12 @@ extension Lint.Rule {
                 source: "let output = try values.map { value throws(Read.Error) in "
                     + "try transform(value) }",
                 path: "Sources/Throws Consumer/TypedThrowsMap.swift",
+                expectation: .clean
+            ),
+            .init(
+                id: "result wrapper for rethrows shim untyped context",
+                source: "func f() throws { let output = try values.map { try transform($0) } }",
+                path: "Sources/Throws Consumer/UntypedContext.swift",
                 expectation: .clean
             ),
         ],
@@ -51,6 +57,28 @@ internal let rethrowsMethodNames: Swift::Set<Swift::String> = [
     "drop", "prefix", "suffix", "split", "sorted",
 ]
 
+private func throwsRethrowsShimIsInTypedContext(_ node: Syntax) -> Swift::Bool {
+    var current = node.parent
+    while let candidate = current {
+        if let function = candidate.as(FunctionDeclSyntax.self) {
+            return throwsIsTypedThrows(function.signature.effectSpecifiers?.throwsClause)
+        }
+        if let initializer = candidate.as(InitializerDeclSyntax.self) {
+            return throwsIsTypedThrows(initializer.signature.effectSpecifiers?.throwsClause)
+        }
+        if let accessor = candidate.as(AccessorDeclSyntax.self) {
+            return throwsIsTypedThrows(accessor.effectSpecifiers?.throwsClause)
+        }
+        if let closure = candidate.as(ClosureExprSyntax.self),
+            let clause = closure.signature?.effectSpecifiers?.throwsClause
+        {
+            return throwsIsTypedThrows(clause)
+        }
+        current = candidate.parent
+    }
+    return false
+}
+
 internal final class ThrowsRethrowsResultShimVisitor: SyntaxVisitor {
     let source: Source.File
     let severity: Diagnostic.Severity
@@ -74,6 +102,8 @@ internal final class ThrowsRethrowsResultShimVisitor: SyntaxVisitor {
     override func visit(_ node: FunctionCallExprSyntax) -> SyntaxVisitorContinueKind {
         guard let name = calledMemberName(node.calledExpression) else { return .visitChildren }
         guard rethrowsMethodNames.contains(name) else { return .visitChildren }
+        // Only a typed-throws context has a typed error for the shim to keep.
+        guard throwsRethrowsShimIsInTypedContext(Syntax(node)) else { return .visitChildren }
         var closures: [ClosureExprSyntax] = []
         if let trailing = node.trailingClosure { closures.append(trailing) }
         for additional in node.additionalTrailingClosures { closures.append(additional.closure) }

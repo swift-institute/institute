@@ -42,7 +42,9 @@ extension `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.Unit {
     @Test
     func `try inside map closure is flagged`() {
         let source = """
-            let result = items.map { try transform($0) }
+            func f() throws(MyError) {
+                let result = items.map { try transform($0) }
+            }
             """
         let findings = `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.findings(in: source)
         #expect(findings.count == 1)
@@ -51,7 +53,9 @@ extension `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.Unit {
     @Test
     func `try inside compactMap closure is flagged`() {
         let source = """
-            let result = items.compactMap { try transform($0) }
+            func f() throws(MyError) {
+                let result = items.compactMap { try transform($0) }
+            }
             """
         let findings = `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.findings(in: source)
         #expect(findings.count == 1)
@@ -60,7 +64,9 @@ extension `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.Unit {
     @Test
     func `try inside filter closure is flagged`() {
         let source = """
-            let result = items.filter { try predicate($0) }
+            func f() throws(MyError) {
+                let result = items.filter { try predicate($0) }
+            }
             """
         let findings = `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.findings(in: source)
         #expect(findings.count == 1)
@@ -121,7 +127,9 @@ extension `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.`Edge Case`
     @Test
     func `forEach with try is flagged`() {
         let source = """
-            items.forEach { try doIt($0) }
+            func f() throws(MyError) {
+                items.forEach { try doIt($0) }
+            }
             """
         let findings = `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.findings(in: source)
         #expect(findings.count == 1)
@@ -151,11 +159,13 @@ extension `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.`Edge Case`
     @Test
     func `try inside do-catch with typed-only catch is still flagged (not materializing, #19)`() {
         let source = """
-            let results = items.map { input -> Result<Int, MyError> in
-                do {
-                    return .success(try transform(input))
-                } catch let error as MyError {
-                    return .failure(error)
+            func f() throws(MyError) {
+                let results = items.map { input -> Result<Int, MyError> in
+                    do {
+                        return .success(try transform(input))
+                    } catch let error as MyError {
+                        return .failure(error)
+                    }
                 }
             }
             """
@@ -172,11 +182,13 @@ extension `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.`Edge Case`
     @Test
     func `try inside do-catch that rethrows is still flagged (bug 3b boundary)`() {
         let source = """
-            let result = items.map { input -> Int in
-                do {
-                    return try transform(input)
-                } catch {
-                    throw error
+            func f() throws(MyError) {
+                let result = items.map { input -> Int in
+                    do {
+                        return try transform(input)
+                    } catch {
+                        throw error
+                    }
                 }
             }
             """
@@ -185,5 +197,17 @@ extension `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.`Edge Case`
         // propagate; not the Result-materialization pattern, the rule
         // should still fire.
         #expect(findings.count == 1)
+    }
+
+    @Test
+    func `try inside map closure in an untyped-throws function is not flagged`() {
+        let source = """
+            func f() throws {
+                let result = try items.map { try transform($0) }
+            }
+            """
+        let findings = `Lint.Rule Tests`.`result wrapper for rethrows shim Tests`.findings(in: source)
+        // No typed error in scope: a Result shim would keep nothing.
+        #expect(findings.isEmpty)
     }
 }
