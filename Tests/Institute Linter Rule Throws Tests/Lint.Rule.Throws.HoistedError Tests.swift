@@ -129,24 +129,24 @@ extension `Lint.Rule Tests`.`hoisted error in public throws Tests`.`Edge Case` {
     }
 
     @Test
-    func `internal func with hoisted error is flagged`() {
+    func `internal func with hoisted error is NOT flagged`() {
         let source = "func op() throws(__InternalError) {}"
         let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
-        #expect(findings.count == 1)
+        #expect(findings.isEmpty)
     }
 
     @Test
-    func `private func with hoisted error is flagged`() {
+    func `private func with hoisted error is NOT flagged`() {
         let source = "private func op() throws(__PrivateError) {}"
         let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
-        #expect(findings.count == 1)
+        #expect(findings.isEmpty)
     }
 
     @Test
-    func `package func with hoisted error is flagged`() {
+    func `package func with hoisted error is NOT flagged`() {
         let source = "package func op() throws(__PackageError) {}"
         let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
-        #expect(findings.count == 1)
+        #expect(findings.isEmpty)
     }
 
     @Test
@@ -186,15 +186,15 @@ extension `Lint.Rule Tests`.`hoisted error in public throws Tests`.`Edge Case` {
     }
 
     @Test
-    func `do throws with hoisted error is flagged`() {
+    func `do throws with hoisted error is NOT flagged`() {
         let source = "do throws(__ReadError) {} catch {}"
         let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
-        #expect(findings.count == 1)
+        #expect(findings.isEmpty)
     }
 
     @Test
-    func `closure type with hoisted error is flagged`() {
-        let source = "let read: () throws(__ReadError) -> Void"
+    func `public closure type with hoisted error is flagged`() {
+        let source = "public let read: () throws(__ReadError) -> Void"
         let findings = `Lint.Rule Tests`.`hoisted error in public throws Tests`.findings(in: source)
         #expect(findings.count == 1)
     }

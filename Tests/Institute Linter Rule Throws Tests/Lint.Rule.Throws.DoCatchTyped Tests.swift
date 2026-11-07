@@ -148,7 +148,7 @@ extension `Lint.Rule Tests`.`do throws for typed catch Tests`.`Edge Case` {
                     do throws(MyError) {
                         try x()
                     } catch {}
-                } catch {}
+                } catch { handle(error) }
             }
             """
         let findings = `Lint.Rule Tests`.`do throws for typed catch Tests`.findings(in: source)
@@ -210,9 +210,25 @@ extension `Lint.Rule Tests`.`do throws for typed catch Tests`.`Edge Case` {
         let source = """
             do {
                 try x()
-            } catch {}
+            } catch { handle(error) }
             """
         let findings = `Lint.Rule Tests`.`do throws for typed catch Tests`.findings(in: source)
         #expect(findings.count == 1)
+    }
+}
+
+extension `Lint.Rule Tests`.`do throws for typed catch Tests`.`Edge Case` {
+    @Test
+    func `catch that never reads error is NOT flagged`() {
+        let source = "do { try x() } catch { fallback() }"
+        let findings = `Lint.Rule Tests`.`do throws for typed catch Tests`.findings(in: source)
+        #expect(findings.isEmpty)
+    }
+
+    @Test
+    func `catch with a cast pattern is NOT flagged`() {
+        let source = "do { try x() } catch let failure as MyError { handle(failure) } catch { log(error) }"
+        let findings = `Lint.Rule Tests`.`do throws for typed catch Tests`.findings(in: source)
+        #expect(findings.isEmpty)
     }
 }

@@ -25,6 +25,18 @@ extension Lint.Rule {
                 path: "Sources/Throws Consumer/OptionalDoTry.swift",
                 expectation: .clean
             ),
+            .init(
+                id: "do throws for typed catch error unused",
+                source: "do { try load() } catch { fallback() }",
+                path: "Sources/Throws Consumer/UnusedErrorDoTry.swift",
+                expectation: .clean
+            ),
+            .init(
+                id: "do throws for typed catch cast pattern",
+                source: "do { try load() } catch let failure as Read.Error { handle(failure) } catch { log(error) }",
+                path: "Sources/Throws Consumer/CastPatternDoTry.swift",
+                expectation: .clean
+            ),
         ],
         observe: Lint.Rule.measured { source, severity in
             let visitor = ThrowsDoCatchTypedVisitor(
@@ -71,6 +83,12 @@ internal final class ThrowsDoCatchTypedVisitor: SyntaxVisitor {
         let finder = ThrowsDoCatchTryFinder(viewMode: .sourceAccurate)
         finder.walk(node.body)
         guard finder.found else { return .visitChildren }
+        // A catch that matches by pattern already names its types, and a
+        // catch that never reads `error` loses nothing to the erasure.
+        guard node.catchClauses.allSatisfy({ $0.catchItems.isEmpty }) else { return .visitChildren }
+        let reader = ThrowsDoCatchErrorReader(viewMode: .sourceAccurate)
+        for clause in node.catchClauses { reader.walk(clause.body) }
+        guard reader.found else { return .visitChildren }
         let location = converter.location(for: node.doKeyword.positionAfterSkippingLeadingTrivia)
         matches.append(
             Diagnostic.Record(
@@ -86,5 +104,14 @@ internal final class ThrowsDoCatchTypedVisitor: SyntaxVisitor {
             )
         )
         return .visitChildren
+    }
+}
+
+private final class ThrowsDoCatchErrorReader: SyntaxVisitor {
+    var found = false
+
+    override func visit(_ node: DeclReferenceExprSyntax) -> SyntaxVisitorContinueKind {
+        if node.baseName.text == "error" { found = true }
+        return .skipChildren
     }
 }

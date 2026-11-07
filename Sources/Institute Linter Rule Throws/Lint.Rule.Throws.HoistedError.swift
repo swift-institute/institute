@@ -22,6 +22,18 @@ extension Lint.Rule {
                 id: "hoisted error in public throws internal API",
                 source: "func read() throws(__ReadError) {}",
                 path: "Sources/Throws Consumer/InternalHoistedError.swift",
+                expectation: .clean
+            ),
+            .init(
+                id: "hoisted error in public throws do statement",
+                source: "public func read() { do throws(__ReadError) { try load() } catch { } }",
+                path: "Sources/Throws Consumer/DoHoistedError.swift",
+                expectation: .clean
+            ),
+            .init(
+                id: "hoisted error in public throws public initializer",
+                source: "public struct R { public init() throws(__ReadError) {} }",
+                path: "Sources/Throws Consumer/InitHoistedError.swift",
                 expectation: .findings(1)
             ),
         ],
@@ -50,6 +62,48 @@ private func hoistedLeafIdentifier(of type: TypeSyntax) -> Swift::String? {
     return nil
 }
 
+/// The throws clause belongs to a public or open function, initializer,
+/// subscript or property accessor: the only place the spelling is API.
+private func isPublicDeclarationThrows(_ clause: ThrowsClauseSyntax) -> Bool {
+    var node: Syntax? = clause.parent
+    while let current = node {
+        if current.is(DoStmtSyntax.self) || current.is(ClosureExprSyntax.self)
+            || current.is(CodeBlockSyntax.self)
+        {
+            return false
+        }
+        let modifiers: DeclModifierListSyntax?
+        if let decl = current.as(FunctionDeclSyntax.self) {
+            modifiers = decl.modifiers
+        } else if let decl = current.as(InitializerDeclSyntax.self) {
+            modifiers = decl.modifiers
+        } else if let decl = current.as(SubscriptDeclSyntax.self) {
+            modifiers = decl.modifiers
+        } else if let decl = current.as(VariableDeclSyntax.self) {
+            modifiers = decl.modifiers
+        } else {
+            node = current.parent
+            continue
+        }
+        let names = modifiers.map { $0.map(\.name.tokenKind) } ?? []
+        if names.contains(.keyword(.public)) || names.contains(.keyword(.open)) { return true }
+        let restricted: [TokenKind] = [
+            .keyword(.internal), .keyword(.package), .keyword(.fileprivate), .keyword(.private),
+        ]
+        if names.contains(where: restricted.contains) { return false }
+        // No access keyword of its own: public through a `public extension`.
+        var outer = current.parent
+        while let enclosing = outer {
+            if let ext = enclosing.as(ExtensionDeclSyntax.self) {
+                return ext.modifiers.contains { $0.name.tokenKind == .keyword(.public) }
+            }
+            outer = enclosing.parent
+        }
+        return false
+    }
+    return false
+}
+
 internal final class ThrowsHoistedErrorVisitor: SyntaxVisitor {
     let source: Source.File
     let severity: Diagnostic.Severity
@@ -70,6 +124,7 @@ internal final class ThrowsHoistedErrorVisitor: SyntaxVisitor {
 
     private func checkThrowsClause(_ clause: ThrowsClauseSyntax?) {
         guard let clause, let type = clause.type else { return }
+        guard isPublicDeclarationThrows(clause) else { return }
         guard let leaf = hoistedLeafIdentifier(of: type) else { return }
         guard leaf.hasPrefix("__") else { return }
         let location = converter.location(for: type.positionAfterSkippingLeadingTrivia)
