@@ -7,10 +7,10 @@ extension Lint.Rule {
         default: .warning,
         controls: [
             .init(
-                id: "trait consistency every import guarded",
+                id: "trait consistency every import guarded, dependency unconditional",
                 source: manifestTraitConsistencyFixture(condition: ""),
                 path: "Package.swift",
-                expectation: .findings(1),
+                expectation: .clean,
                 files: ["Sources/Owner/exports.swift": "#if Parser\n@_exported public import Parser\n#endif"]
             ),
             .init(
@@ -85,20 +85,6 @@ extension Lint.Rule {
             let coverage: Lint.Rule.Coverage =
                 analysis.unhandledSourceShape.map { .unmeasured(.unsupportedSourceShape($0)) } ?? .measured
             return Lint.Rule.Observation(findings: findings, coverage: coverage)
-        },
-        repair: { source in
-            guard manifestIsPackageManifest(source.file.filePath, path: source.path.underlying, text: source.tree.description) else {
-                return .unchanged
-            }
-            let analysis = ManifestTraitConsistency(tree: source.tree, path: source.path.underlying, index: source.index)
-            let insertions = analysis.issues.compactMap(\.insertion)
-            guard insertions.count == analysis.issues.count else { return .refused(.repairUnavailable) }
-            guard !insertions.isEmpty else { return .unchanged }
-            var bytes = Swift::Array(source.tree.description.utf8)
-            for insertion in insertions.sorted(by: { $0.offset > $1.offset }) {
-                bytes.insert(contentsOf: insertion.text.utf8, at: insertion.offset)
-            }
-            return .edits([.rewrite(path: source.path, contents: Swift::String(decoding: bytes, as: UTF8.self))])
         }
     )
 }
@@ -110,9 +96,11 @@ internal func manifestTraitConsistencyFixture(condition: Swift::String) -> Swift
         + ".product(name: \"Parser\", package: \"swift-parser\"\(condition))])])"
 }
 
-/// R1: a dependency whose every import in its target sits inside `#if T…`, where T is a
-/// declared trait, carries `condition: .when(traits: [T…])`. R2: a dependency conditioned on
-/// traits is never imported outside a guard that implies one of them.
+/// A dependency conditioned on traits is never imported outside a guard that implies one of them.
+///
+/// It never asks for a condition: SwiftPM doesn't resolve a product dependency required only under a
+/// transitively enabled trait, so integration code stays behind `#if T` while its product
+/// dependencies are unconditional (swift-institute/Issues#123).
 ///
 /// It reads the target's imports from the package facts, so it checks the files the run
 /// walked; a module the product vends under a name other than the product's is not seen.
@@ -121,7 +109,6 @@ internal struct ManifestTraitConsistency {
     struct Issue {
         let position: AbsolutePosition
         let message: Swift::String
-        let insertion: (offset: Swift::Int, text: Swift::String)?
     }
 
     private(set) var issues: [Issue] = []
@@ -147,36 +134,19 @@ internal struct ManifestTraitConsistency {
                 let module = Swift::String(dependency.name.map { $0 == " " || $0 == "-" ? "_" : $0 })
                 let uses = imports.filter { $0.import.module == module }
                 guard !uses.isEmpty else { continue }
-                if let conditioned = dependency.traits {
-                    let allowedTraits = names.filter { !Self.closure(of: $0, in: traits).isDisjoint(with: conditioned) }
-                    let allowedDefines = collector.defines.filter { !$0.value.isDisjoint(with: allowedTraits) }.keys
-                    let allowed = allowedTraits.union(allowedDefines)
-                    let guardNames = names.union(collector.defines.keys)
-                    for use in uses where !use.import.isGuarded(by: allowed, among: guardNames) {
-                        issues.append(
-                            Issue(
-                                position: dependency.position,
-                                message: "[trait consistency] [PACKAGE-TRAIT-GATED-IMPORT]: `\(dependency.name)` is "
-                                    + "conditioned on traits \(Self.list(conditioned)) in target `\(target.name)`, but "
-                                    + "`\(use.path):\(use.import.line)` imports `\(module)` outside a guard that implies "
-                                    + "one of them; with those traits off the import has no module to find.",
-                                insertion: nil
-                            )
-                        )
-                    }
-                } else {
-                    let guards = uses.map { $0.import.guards(among: names) }
-                    guard guards.allSatisfy({ !$0.isEmpty }) else { continue }
-                    let needed = guards.reduce(into: Swift::Set<Swift::String>()) { $0.formUnion($1) }
-                    let condition = "condition: .when(traits: \(Self.list(needed)))"
+                guard let conditioned = dependency.traits else { continue }
+                let allowedTraits = names.filter { !Self.closure(of: $0, in: traits).isDisjoint(with: conditioned) }
+                let allowedDefines = collector.defines.filter { !$0.value.isDisjoint(with: allowedTraits) }.keys
+                let allowed = allowedTraits.union(allowedDefines)
+                let guardNames = names.union(collector.defines.keys)
+                for use in uses where !use.import.isGuarded(by: allowed, among: guardNames) {
                     issues.append(
                         Issue(
                             position: dependency.position,
-                            message: "[trait consistency] [PACKAGE-TRAIT-GATED-IMPORT]: every import of "
-                                + "`\(module)` in target `\(target.name)` sits inside `#if \(needed.sorted().joined(separator: "/"))`; "
-                                + "add `\(condition)` so a consumer with those traits off does not resolve "
-                                + "`\(dependency.name)`.",
-                            insertion: dependency.insertionOffset.map { ($0, ", " + condition) }
+                            message: "[trait consistency] [PACKAGE-TRAIT-GATED-IMPORT]: `\(dependency.name)` is "
+                                + "conditioned on traits \(Self.list(conditioned)) in target `\(target.name)`, but "
+                                + "`\(use.path):\(use.import.line)` imports `\(module)` outside a guard that implies "
+                                + "one of them; with those traits off the import has no module to find."
                         )
                     )
                 }
@@ -206,9 +176,6 @@ internal final class ManifestTraitConsistencyCollector: SyntaxVisitor {
         let position: AbsolutePosition
         /// The traits of a `.when(traits:)` condition; nil when there is none.
         let traits: Swift::Set<Swift::String>?
-        /// Where `, condition: …` goes: right after the last argument of a `.product(…)` with
-        /// no condition. Nil when the dependency cannot be conditioned in place.
-        let insertionOffset: Swift::Int?
     }
 
     struct Target {
@@ -262,7 +229,7 @@ internal final class ManifestTraitConsistencyCollector: SyntaxVisitor {
         let position = expression.positionAfterSkippingLeadingTrivia
         if let literal = expression.as(StringLiteralExprSyntax.self) {
             return manifestStringLiteralText(literal).map {
-                Dependency(name: $0, position: position, traits: nil, insertionOffset: nil)
+                Dependency(name: $0, position: position, traits: nil)
             }
         }
         guard let call = expression.as(FunctionCallExprSyntax.self),
@@ -277,13 +244,7 @@ internal final class ManifestTraitConsistencyCollector: SyntaxVisitor {
         }
         let condition = call.arguments.first { $0.label?.text == "condition" }?.expression.as(FunctionCallExprSyntax.self)
         let traits = Self.strings(condition?.arguments.first { $0.label?.text == "traits" }?.expression).map(Swift::Set.init)
-        let insertable = callee == "product" && condition == nil
-        return Dependency(
-            name: name,
-            position: position,
-            traits: traits,
-            insertionOffset: insertable ? call.arguments.last.map { $0.expression.endPositionBeforeTrailingTrivia.utf8Offset } : nil
-        )
+        return Dependency(name: name, position: position, traits: traits)
     }
 
     private static func isInside(_ node: Syntax, call name: Swift::String) -> Swift::Bool {

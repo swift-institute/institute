@@ -53,38 +53,22 @@ extension `Lint.Rule Tests`.`trait consistency Tests` {
 
 extension `Lint.Rule Tests`.`trait consistency Tests`.Unit {
     @Test
-    func `guarded imports want the union of their guards, and the repair adds it`() throws {
+    func `an unconditional dependency imported only under its traits is the interim, not a finding`() {
         let files = [
             "Sources/Owner/A.swift": "#if Coder\nimport Checkpoint\n#endif",
             "Sources/Owner/B.swift": "#if Parser && os(Linux)\nimport Checkpoint\n#endif",
         ]
         let observation = Lint.Rule.`trait consistency`.observe(`Lint.Rule Tests`.`trait consistency Tests`.parsed(files), .warning)
-        #expect(observation.findings.count == 1)
-        #expect(observation.findings[0].message.contains("condition: .when(traits: [\"Coder\", \"Parser\"])"))
-        guard case .edits(let edits) = Lint.Rule.`trait consistency`.repair(`Lint.Rule Tests`.`trait consistency Tests`.parsed(files)),
-            case .rewrite(_, let contents) = edits.first
-        else {
-            Issue.record("expected a rewrite")
-            return
-        }
-        let expected =
-            ".product(name: \"Checkpoint\", package: \"swift-checkpoint\", condition: .when(traits: [\"Coder\", \"Parser\"]))"
-        #expect(contents.contains(expected))
-        let repaired = Lint.Rule.`trait consistency`.observe(
-            `Lint.Rule Tests`.`trait consistency Tests`.parsed(files, manifest: contents),
-            .warning
-        )
-        #expect(repaired.findings.isEmpty)
+        #expect(observation.findings.isEmpty)
     }
 
     @Test
-    func `a conditioned dependency imported outside its guard is flagged and not repaired`() {
+    func `a conditioned dependency imported outside its guard is flagged`() {
         let files = ["Sources/Owner/A.swift": "#if Serializer\nimport Serializer\n#endif"]
         let parsed = `Lint.Rule Tests`.`trait consistency Tests`.parsed(files)
         let observation = Lint.Rule.`trait consistency`.observe(parsed, .warning)
         #expect(observation.findings.count == 1)
         #expect(observation.findings[0].message.contains("Sources/Owner/A.swift:2"))
-        #expect(Lint.Rule.`trait consistency`.repair(`Lint.Rule Tests`.`trait consistency Tests`.parsed(files)) == .refused(.repairUnavailable))
     }
 }
 
