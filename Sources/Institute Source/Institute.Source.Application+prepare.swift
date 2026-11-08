@@ -14,7 +14,7 @@ extension Institute.Source.Application {
     }
 
     public func prepare(
-        subject: Source_Repair.Source.Subject,
+        subject: Source_Repair::Source.Subject,
         xcodeApplication: Swift.String? = nil,
         swiftLint swiftLintSelection: Executable = .published,
         linter linterSelection: Executable = .published
@@ -110,7 +110,7 @@ extension Institute.Source.Application {
         } catch { throw .filesystem("cannot render \(swiftLintConfiguration): \(error)") }
 
         let instituteProfile = Institute.Source.Profile(policy: policy)
-        var profiles: [Swift.String: Source_Profile.Source.Profile.Digest] = [:]
+        var profiles: [Swift.String: Source_Profile::Source.Profile.Digest] = [:]
         var verifiedProfiles: [Swift.String] = []
         for bundle in policy.bundles {
             let rules = instituteProfile.rules(for: bundle)
@@ -165,7 +165,7 @@ extension Institute.Source.Application {
         bundle: Institute.Source.Bundle,
         linterExecutable: Swift.String,
         directory: Swift.String,
-        process: Source_Profile.Source.Engine.Process
+        process: Source_Profile::Source.Engine.Process
     ) async throws(Institute.Error) {
         let result = await process.run(
             linterExecutable,
@@ -213,7 +213,7 @@ extension Institute.Source.Application {
     static func digest(
         file path: Swift.String
     ) throws(Institute.Error)
-        -> Source_Profile.Source.Profile.Digest
+        -> Source_Profile::Source.Profile.Digest
     {
         let file: File
         do throws(File.Path.Error) { file = File(try .init(path)) } catch {
@@ -233,7 +233,7 @@ extension Institute.Source.Application {
 
     static func matches(
         file path: Swift.String,
-        digest expected: Source_Profile.Source.Profile.Digest
+        digest expected: Source_Profile::Source.Profile.Digest
     ) -> Swift.Bool {
         do throws(Institute.Error) { return try Self.digest(file: path) == expected } catch {
             return false

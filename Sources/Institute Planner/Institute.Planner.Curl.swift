@@ -5,6 +5,8 @@ import Process
 extension Institute.Planner {
     /// Public GitHub content, read through `curl` without any credential, so
     /// a developer machine and a clean hosted runner read it the same way.
+    /// Retries span up to 10 minutes: when the whole fleet starts CI at once,
+    /// GitHub answers with 503 and 504 for longer than a few quick retries.
     enum Curl {
         /// The response body at `address`; a non-success status is refused.
         static func get(_ address: Swift.String) throws(Institute.Planner.Error) -> [Byte] {
@@ -15,7 +17,7 @@ extension Institute.Planner {
                         executable: "/usr/bin/env",
                         arguments: [
                             "curl", "--fail", "--silent", "--show-error", "--location",
-                            "--retry", "3", address,
+                            "--retry", "10", "--retry-max-time", "600", address,
                         ],
                         stdout: .pipe,
                         stderr: .pipe

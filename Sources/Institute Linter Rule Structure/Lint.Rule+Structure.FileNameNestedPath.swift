@@ -51,6 +51,12 @@ extension Lint.Rule {
                 expectation: .clean
             ),
             .init(
+                id: "file name nested path fuller path",
+                source: "extension DateTime { public struct Error {} }",
+                path: "Sources/Calendar Gregorian/Gregorian.DateTime.Error.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "file name nested path test scope",
                 source: "enum Array { struct Dynamic {} }",
                 path: "Tests/Structure Tests/Array.swift",
@@ -141,6 +147,10 @@ private func structureFileNameNestedPathFindings(
     // A backticked name is spelled without its backticks in a file name.
     dottedPath = Swift::String(dottedPath.filter { $0 != "`" })
     guard basename != dottedPath else { return [] }
+    // A file named by the type's fuller path, `Gregorian.DateTime.Error` for an
+    // `extension DateTime { struct Error }` that reaches `DateTime` through a
+    // shorter spelling, already names it; only a shorter name is a mismatch.
+    if basename.hasSuffix(".\(dottedPath)") { return [] }
     // A `__`-hoisted type is filed under its public typealias's path,
     // which this file alone can't resolve.
     if dottedPath.split(separator: ".").contains(where: { $0.hasPrefix("__") }) { return [] }

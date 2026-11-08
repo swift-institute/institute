@@ -154,6 +154,24 @@ extension `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable` {
         )
     }
 
+    /// Asserts the rule doesn't fire at all: the counter loop is the lawful
+    /// spelling there (result-builder content, or a `borrowing`/`consuming`
+    /// binding a closure can't capture), so a warning would only invite the
+    /// rewrite that breaks the build.
+    static func exempts(
+        _ source: String,
+        sourceLocation: Testing.SourceLocation = #_sourceLocation
+    ) {
+        #expect(
+            `Lint.Rule Tests`.`counter loop iteration fix Tests`.findings(in: source).isEmpty,
+            sourceLocation: sourceLocation
+        )
+        #expect(
+            `Lint.Rule Tests`.`counter loop iteration fix Tests`.fixed(source) == nil,
+            sourceLocation: sourceLocation
+        )
+    }
+
     @Test
     func `a body containing break is left alone`() {
         Self.declines(
@@ -290,7 +308,7 @@ extension `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Round Trip` {
 
 extension `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable` {
     @Test
-    func `a loop in a builder-attributed body is not rewritten`() {
+    func `a loop in a builder-attributed body is exempt`() {
         let source = """
             struct Page {
                 @ViewBuilder
@@ -301,11 +319,11 @@ extension `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable` {
                 }
             }
             """
-        `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable`.declines(source)
+        `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable`.exempts(source)
     }
 
     @Test
-    func `a loop in an opaque-result body is not rewritten`() {
+    func `a loop in an opaque-result body is exempt`() {
         let source = """
             struct Page {
                 var body: some View {
@@ -315,7 +333,7 @@ extension `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable` {
                 }
             }
             """
-        `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable`.declines(source)
+        `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable`.exempts(source)
     }
 
     @Test
@@ -350,10 +368,10 @@ extension `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable` {
         `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable`.declines(source)
     }
 
-    /// The accepted false refusal that pays for the fixture above: a closure
-    /// that plainly is a function value keeps its loop as a finding.
+    /// The accepted false exemption that pays for builder bodies: a closure
+    /// inside one that plainly is a function value is exempt with them.
     @Test
-    func `a loop in a plain closure inside a builder body is refused too`() {
+    func `a loop in a plain closure inside a builder body is exempt too`() {
         let source = """
             struct Page {
                 @ViewBuilder
@@ -366,7 +384,7 @@ extension `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable` {
                 }
             }
             """
-        `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable`.declines(source)
+        `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable`.exempts(source)
     }
 
     @Test
@@ -491,11 +509,11 @@ extension `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable` {
     /// closure — a distinct activation frame a `borrowing` parameter is
     /// guaranteed not to escape — and fails at typecheck with `'rhs' is
     /// borrowed and cannot be consumed`, which the fix pipeline's re-parse
-    /// guard cannot catch. The diagnostic still fires; only the rewrite
-    /// declines.
+    /// guard cannot catch. The loop is the lawful spelling there, so the
+    /// rule doesn't fire either.
     @Test
-    func `a borrowing parameter referenced in the body blocks the rewrite`() {
-        Self.declines(
+    func `a borrowing parameter referenced in the body exempts the loop`() {
+        Self.exempts(
             """
             func op(lhs: [Int], rhs: borrowing [Int]) -> [Int] {
                 var result = lhs
@@ -513,8 +531,8 @@ extension `Lint.Rule Tests`.`counter loop iteration fix Tests`.`Not Fixable` {
     /// binding may be captured by the `forEach` closure the rewrite would
     /// introduce.
     @Test
-    func `a consuming parameter referenced in the body blocks the rewrite`() {
-        Self.declines(
+    func `a consuming parameter referenced in the body exempts the loop`() {
+        Self.exempts(
             """
             func op(_ n: Int, extra: consuming [Int]) {
                 for i in 0..<n {

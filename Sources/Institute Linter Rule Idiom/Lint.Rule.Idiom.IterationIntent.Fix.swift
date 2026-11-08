@@ -23,7 +23,7 @@ internal func idiomIterationIntentIsFixable(_ loop: ForStmtSyntax) -> Swift::Boo
     return !idiomIterationIntentBodyEscapes(Syntax(loop.body))
 }
 
-private func idiomIterationIntentReferencesOwnershipAnnotatedBinding(
+internal func idiomIterationIntentReferencesOwnershipAnnotatedBinding(
     _ loop: ForStmtSyntax
 ) -> Swift::Bool {
     let names = idiomEnclosingOwnershipAnnotatedParameterNames(Syntax(loop))
@@ -118,6 +118,21 @@ private func idiomIterationIntentProducesContent(_ loop: ForStmtSyntax) -> Swift
     var node: Syntax? = Syntax(loop).parent
     while let current = node {
         if current.is(ClosureExprSyntax.self) { return true }
+        if let attributes = idiomDeclarationAttributes(current) {
+            return idiomAttributesNameABuilder(attributes)
+                || idiomDeclarationResultIsOpaque(current)
+        }
+        node = current.parent
+    }
+    return false
+}
+
+/// The loop is result-builder content: the nearest enclosing declaration, past any closures, names a
+/// result builder or has an opaque result (`var body: some View`), where a `for` statement builds content
+/// and `forEach` would produce `()`.
+internal func idiomLoopIsBuilderContent(_ loop: ForStmtSyntax) -> Swift::Bool {
+    var node: Syntax? = Syntax(loop).parent
+    while let current = node {
         if let attributes = idiomDeclarationAttributes(current) {
             return idiomAttributesNameABuilder(attributes)
                 || idiomDeclarationResultIsOpaque(current)

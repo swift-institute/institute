@@ -36,6 +36,20 @@ extension Lint.Rule {
                 path: "Sources/Structure Core/Value+Read.swift",
                 expectation: .clean
             ),
+            .init(
+                id: "minimal type body property wrapper",
+                source: "@propertyWrapper struct Box { var storage: Int; "
+                    + "var wrappedValue: Int { get { storage } set { storage = newValue } }; "
+                    + "var projectedValue: Box { self } }",
+                path: "Sources/Structure Core/Box.swift",
+                expectation: .clean
+            ),
+            .init(
+                id: "minimal type body property wrapper other member",
+                source: "@propertyWrapper struct Box { var wrappedValue: Int; var doubled: Int { wrappedValue * 2 } }",
+                path: "Sources/Structure Core/Box.swift",
+                expectation: .findings(1)
+            ),
         ],
         observe: Lint.Rule.measured { source, severity in
             if source.file.filePath.split(separator: "/", omittingEmptySubsequences: true).dropLast().contains("Tests") {
@@ -90,6 +104,31 @@ internal func structureMinimalTypeBodyIsComputedProperty(_ node: VariableDeclSyn
     return false
 }
 
+/// `wrappedValue` or `projectedValue` of a `@propertyWrapper` type: the compiler looks these up in the
+/// type's own declaration only, so they stay in its body even when computed.
+internal func structureMinimalTypeBodyIsPropertyWrapperRequirement(
+    _ variable: VariableDeclSyntax,
+    in block: MemberBlockSyntax
+) -> Swift::Bool {
+    guard !structureMinimalTypeBodyIsStaticOrClassMember(variable.modifiers) else { return false }
+    let attributes: AttributeListSyntax? =
+        block.parent?.as(StructDeclSyntax.self)?.attributes
+        ?? block.parent?.as(ClassDeclSyntax.self)?.attributes
+        ?? block.parent?.as(EnumDeclSyntax.self)?.attributes
+        ?? block.parent?.as(ActorDeclSyntax.self)?.attributes
+    guard let attributes,
+        attributes.contains(where: {
+            $0.as(AttributeSyntax.self)?.attributeName.trimmedDescription == "propertyWrapper"
+        })
+    else { return false }
+    return variable.bindings.contains { binding in
+        guard let name = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text else {
+            return false
+        }
+        return name == "wrappedValue" || name == "projectedValue"
+    }
+}
+
 internal func structureMinimalTypeBodyIsStaticOrClassMember(
     _ modifiers: DeclModifierListSyntax
 )
@@ -141,6 +180,9 @@ internal final class StructureMinimalTypeBodyVisitor: SyntaxVisitor {
         for member in Lint.Syntax.Conditional.members(block) {
             let decl = member.decl
             if let variable = decl.as(VariableDeclSyntax.self) {
+                if structureMinimalTypeBodyIsPropertyWrapperRequirement(variable, in: block) {
+                    continue
+                }
                 if structureMinimalTypeBodyIsStaticOrClassMember(variable.modifiers) {
                     emit(at: variable.bindingSpecifier.positionAfterSkippingLeadingTrivia)
                 } else if structureMinimalTypeBodyIsComputedProperty(variable) {

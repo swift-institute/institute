@@ -263,8 +263,8 @@ extension Institute.Source.Acquisition {
         let result = await process.run(
             "/usr/bin/curl",
             [
-                "--fail", "--silent", "--show-error", "--location", "--retry", "2",
-                "--output", destination.description, "\(base)/\(asset.name)",
+                "--fail", "--silent", "--show-error", "--location", "--retry", "10",
+                "--retry-max-time", "600", "--output", destination.description, "\(base)/\(asset.name)",
             ],
             directory.description,
             [:]

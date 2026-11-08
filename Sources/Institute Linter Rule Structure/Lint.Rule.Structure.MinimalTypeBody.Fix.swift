@@ -101,7 +101,9 @@ internal func structureMinimalTypeBodyPartition(
     for member in block.members {
         let decl = member.decl
         if let variable = decl.as(VariableDeclSyntax.self) {
-            if structureMinimalTypeBodyIsStaticOrClassMember(variable.modifiers)
+            if structureMinimalTypeBodyIsPropertyWrapperRequirement(variable, in: block) {
+                remaining.append(member)
+            } else if structureMinimalTypeBodyIsStaticOrClassMember(variable.modifiers)
                 || structureMinimalTypeBodyIsComputedProperty(variable)
             {
                 moved.append(member)

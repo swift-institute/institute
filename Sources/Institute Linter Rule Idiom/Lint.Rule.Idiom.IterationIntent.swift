@@ -37,6 +37,24 @@ extension Lint.Rule {
                 path: "Sources/Idiom Core/SpanLoop.swift",
                 expectation: .clean
             ),
+            .init(
+                id: "counter loop iteration builder body",
+                source: "struct Page: View { var body: some View { for index in 0..<3 { Row(index) } } }",
+                path: "Sources/Idiom Core/BuilderLoop.swift",
+                expectation: .clean
+            ),
+            .init(
+                id: "counter loop iteration builder attribute",
+                source: "@Builder func rows() -> [Row] { for index in 0..<3 { Row(index) } }",
+                path: "Sources/Idiom Core/BuilderAttributeLoop.swift",
+                expectation: .clean
+            ),
+            .init(
+                id: "counter loop iteration borrowing",
+                source: "func scan(items: borrowing Buffer) { for index in 0..<4 { use(items[index]) } }",
+                path: "Sources/Idiom Core/BorrowingLoop.swift",
+                expectation: .clean
+            ),
         ],
         observe: Lint.Rule.measured { source, severity in
             let visitor = IdiomIterationIntentVisitor(
@@ -68,7 +86,11 @@ internal let idiomIterationIntentMessage: Swift::String =
     + "a loop whose body performs a `try` inside a function declared with "
     + "typed throws (`throws(E)`) — `Sequence.forEach(_:)` is `rethrows` "
     + "and erases `throws(E)` to `any Error`, so the counter loop is the "
-    + "lawful spelling there, not mechanism."
+    + "lawful spelling there, not mechanism; result-builder content (a "
+    + "declaration with a builder attribute or an opaque result such as "
+    + "`var body: some View`), where `for` builds content and `forEach` "
+    + "produces `()`; and a loop whose body uses a `borrowing` or "
+    + "`consuming` parameter, which a closure can't capture."
 
 /// A range loop with no element-wise spelling: a triangular loop whose
 /// lower bound uses an enclosing loop's variable (`(i + 1)..<n`), or one
@@ -231,6 +253,8 @@ internal final class IdiomIterationIntentVisitor: SyntaxVisitor {
         guard idiomIsRangeExpression(node.sequence) else { return .visitChildren }
         if idiomLoopPreservesTypedThrows(node) { return .visitChildren }
         if idiomLoopHasNoElementwiseForm(node) { return .visitChildren }
+        if idiomLoopIsBuilderContent(node) { return .visitChildren }
+        if idiomIterationIntentReferencesOwnershipAnnotatedBinding(node) { return .visitChildren }
         let location = converter.location(for: node.forKeyword.positionAfterSkippingLeadingTrivia)
         matches.append(
             Diagnostic.Record(
