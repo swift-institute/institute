@@ -1876,6 +1876,32 @@ extension Institute.CI.Command.Source.Ratchet {
             swift-compositions/swift-posix|test function naming|1
             swift-compositions/swift-posix|typealiased namespace bridge|71
             swift-compositions/swift-posix|untyped throws|3
+            swift-compositions/swift-postgresql|architecture foundation type|5
+            swift-compositions/swift-postgresql|bool public parameter|16
+            swift-compositions/swift-postgresql|canonical settings tail|1
+            swift-compositions/swift-postgresql|comment in source|7
+            swift-compositions/swift-postgresql|compound identifier|234
+            swift-compositions/swift-postgresql|compound suite name|57
+            swift-compositions/swift-postgresql|compound type name|31
+            swift-compositions/swift-postgresql|configuration before content|4
+            swift-compositions/swift-postgresql|counter loop iteration|1
+            swift-compositions/swift-postgresql|do throws for typed catch|24
+            swift-compositions/swift-postgresql|existential parameter|3
+            swift-compositions/swift-postgresql|extension file naming|27
+            swift-compositions/swift-postgresql|foundation import|7
+            swift-compositions/swift-postgresql|int public parameter|51
+            swift-compositions/swift-postgresql|minimal type body|115
+            swift-compositions/swift-postgresql|optionset shell pattern|6
+            swift-compositions/swift-postgresql|package policy revision 1|1
+            swift-compositions/swift-postgresql|path name grammar|45
+            swift-compositions/swift-postgresql|raw concept|5
+            swift-compositions/swift-postgresql|raw value access|26
+            swift-compositions/swift-postgresql|single type per file|13
+            swift-compositions/swift-postgresql|swift protocol qualification|3
+            swift-compositions/swift-postgresql|task sleep|1
+            swift-compositions/swift-postgresql|throwing wrapper init|1
+            swift-compositions/swift-postgresql|try optional|7
+            swift-compositions/swift-postgresql|untyped throws|30
             swift-compositions/swift-process|callback result over throws thunk|1
             swift-compositions/swift-process|canonical settings tail|1
             swift-compositions/swift-process|compound suite name|1
