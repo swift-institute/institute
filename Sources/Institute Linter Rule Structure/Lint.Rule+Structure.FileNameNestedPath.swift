@@ -98,6 +98,14 @@ extension Lint.Rule {
     )
 }
 
+/// A backticked name is spelled without its backticks in a file name.
+///
+/// A file named by the type's fuller path, `Gregorian.DateTime.Error` for an
+/// `extension DateTime { struct Error }` that reaches `DateTime` through a shorter spelling,
+/// already names it; only a shorter name is a mismatch.
+///
+/// A `__`-hoisted type is filed under its public typealias's path, which this file alone can't
+/// resolve, so it isn't reported.
 private func structureFileNameNestedPathFindings(
     basename filename: Swift::String,
     source: Source.File,
@@ -144,15 +152,9 @@ private func structureFileNameNestedPathFindings(
         }
     }
 
-    // A backticked name is spelled without its backticks in a file name.
     dottedPath = Swift::String(dottedPath.filter { $0 != "`" })
     guard basename != dottedPath else { return [] }
-    // A file named by the type's fuller path, `Gregorian.DateTime.Error` for an
-    // `extension DateTime { struct Error }` that reaches `DateTime` through a
-    // shorter spelling, already names it; only a shorter name is a mismatch.
     if basename.hasSuffix(".\(dottedPath)") { return [] }
-    // A `__`-hoisted type is filed under its public typealias's path,
-    // which this file alone can't resolve.
     if dottedPath.split(separator: ".").contains(where: { $0.hasPrefix("__") }) { return [] }
 
     let wrappingPosition = primary.wrappingExtension?.position

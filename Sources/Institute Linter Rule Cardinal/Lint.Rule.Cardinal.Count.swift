@@ -74,6 +74,8 @@ internal final class CardinalCountVisitor: SyntaxVisitor {
         super.init(viewMode: .sourceAccurate)
     }
 
+    /// An equality `i + 1 == seq.count` tests for the last index and is reported; an ordering
+    /// `i + 1 < seq.count` is a lookahead bounds guard and isn't.
     override func visit(_ node: InfixOperatorExprSyntax) -> SyntaxVisitorContinueKind {
         guard let binOp = node.operator.as(BinaryOperatorExprSyntax.self) else {
             return .visitChildren
@@ -88,8 +90,6 @@ internal final class CardinalCountVisitor: SyntaxVisitor {
             return .visitChildren
         }
 
-        // `i + 1 == seq.count` tests for the last index; an ordering
-        // `i + 1 < seq.count` is a lookahead bounds guard and isn't reported.
         if opText == "==" || opText == "!=" {
             if Self.isIndexPlusOne(node.leftOperand),
                 Self.isCountDerivedExpression(node.rightOperand)

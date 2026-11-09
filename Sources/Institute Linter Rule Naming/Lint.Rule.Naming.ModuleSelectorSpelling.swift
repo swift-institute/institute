@@ -2,6 +2,9 @@ public import Lint
 internal import SwiftSyntax
 
 extension Lint.Rule {
+    /// A module with a same-named type resolves `M.Name` to the type, so the repair keeps that type
+    /// in the selector spelling, `M::M.Name`. The file shows that type when it spells `M::M.` or
+    /// extends `M`.
     public static let `module selector spelling` = Lint.Rule(
         id: "module selector spelling",
         default: .warning,
@@ -78,9 +81,6 @@ extension Lint.Rule {
             )
             visitor.walk(source.tree)
             guard !visitor.periods.isEmpty else { return .unchanged }
-            // A module with a same-named type resolves `M.Name` to the type:
-            // the selector spelling keeps it, `M::M.Name`. The file shows
-            // that type when it spells `M::M.` or extends `M`.
             let text = source.tree.description
             var bytes = Swift::Array(text.utf8)
             for (offset, module) in zip(visitor.periods, visitor.periodModules).sorted(by: { $0.0 > $1.0 }) {

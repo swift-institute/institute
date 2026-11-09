@@ -99,10 +99,10 @@ internal final class ThrowsRethrowsResultShimVisitor: SyntaxVisitor {
         return nil
     }
 
+    /// Only a typed-throws context has a typed error for the shim to keep.
     override func visit(_ node: FunctionCallExprSyntax) -> SyntaxVisitorContinueKind {
         guard let name = calledMemberName(node.calledExpression) else { return .visitChildren }
         guard rethrowsMethodNames.contains(name) else { return .visitChildren }
-        // Only a typed-throws context has a typed error for the shim to keep.
         guard throwsRethrowsShimIsInTypedContext(Syntax(node)) else { return .visitChildren }
         var closures: [ClosureExprSyntax] = []
         if let trailing = node.trailingClosure { closures.append(trailing) }

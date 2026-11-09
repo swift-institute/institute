@@ -93,6 +93,9 @@ internal func namingPathGrammarBasenameMessage(
         + "(e.g. `Institute.Architecture.CLI.swift`); rename the file"
 }
 
+/// A file named exactly after a type it declares inherits that type's name: a compound in the
+/// declared leaf is `compound type name`'s finding, not the path's. Segments naming an outer type
+/// declared elsewhere are still checked here.
 internal func namingPathGrammarFindings(
     source: Source.File,
     severity: Diagnostic.Severity,
@@ -149,10 +152,6 @@ internal func namingPathGrammarFindings(
     let collector = NamingPathGrammarPrimaryTypeCollector()
     collector.walk(tree)
     guard collector.declaresPrimaryType else { return records }
-    // A file named exactly after a type it declares inherits that type's
-    // name: a compound in the declared leaf is `compound type name`'s
-    // finding, not the path's. Segments naming an outer type declared
-    // elsewhere are still checked here.
     var segments = basename.split(separator: ".").map(Swift::String.init)
     if collector.paths.contains(basename) { segments.removeLast() }
     for segment in segments {

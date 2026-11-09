@@ -97,9 +97,10 @@ internal final class IdiomStringUTF8ScanningVisitor: SyntaxVisitor {
         super.init(viewMode: .sourceAccurate)
     }
 
+    /// `s.unicodeScalars.append(...)` and the other mutating members write rather than scan, so
+    /// they aren't reported.
     override func visit(_ node: MemberAccessExprSyntax) -> SyntaxVisitorContinueKind {
         guard node.declName.baseName.text == "unicodeScalars" else { return .visitChildren }
-        // `s.unicodeScalars.append(...)` writes; this rule is about scanning.
         if let outer = node.parent?.as(MemberAccessExprSyntax.self),
             ["append", "insert", "removeAll", "reserveCapacity"].contains(outer.declName.baseName.text)
         {

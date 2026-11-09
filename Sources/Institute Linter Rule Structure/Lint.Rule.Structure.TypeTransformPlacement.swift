@@ -110,11 +110,12 @@ internal final class StructureTypeTransformPlacementVisitor: SyntaxVisitor {
         super.init(viewMode: .sourceAccurate)
     }
 
+    /// The standard library's executor requirements fix the names `asUnownedSerialExecutor` and
+    /// `asUnownedTaskExecutor`, so they aren't reported.
     override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
         if structureTypeTransformPlacementHasStaticOrClassModifier(node.modifiers) {
             return .visitChildren
         }
-        // Standard library executor requirements fix these names.
         if ["asUnownedSerialExecutor", "asUnownedTaskExecutor"].contains(node.name.text) {
             return .visitChildren
         }

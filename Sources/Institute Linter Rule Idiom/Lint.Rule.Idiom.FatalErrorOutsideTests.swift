@@ -2,6 +2,7 @@ public import Lint
 internal import SwiftSyntax
 
 extension Lint.Rule {
+    /// A `* Test Support` target exists only for tests, so its sources aren't checked.
     public static let `fatal error outside tests` = Lint.Rule(
         id: "fatal error outside tests",
         default: .warning,
@@ -145,7 +146,6 @@ extension Lint.Rule {
             guard path.hasPrefix("Sources/") || path.contains("/Sources/") else {
                 return []
             }
-            // A '* Test Support' target exists only for tests.
             if path.split(separator: "/").contains(where: { $0.hasSuffix("Test Support") }) {
                 return []
             }

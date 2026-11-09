@@ -64,6 +64,9 @@ private func hoistedLeafIdentifier(of type: TypeSyntax) -> Swift::String? {
 
 /// The throws clause belongs to a public or open function, initializer,
 /// subscript or property accessor: the only place the spelling is API.
+///
+/// A declaration with no access keyword of its own can still be public through a
+/// `public extension`, so the enclosing scopes are checked too.
 private func isPublicDeclarationThrows(_ clause: ThrowsClauseSyntax) -> Bool {
     var node: Syntax? = clause.parent
     while let current = node {
@@ -91,7 +94,6 @@ private func isPublicDeclarationThrows(_ clause: ThrowsClauseSyntax) -> Bool {
             .keyword(.internal), .keyword(.package), .keyword(.fileprivate), .keyword(.private),
         ]
         if names.contains(where: restricted.contains) { return false }
-        // No access keyword of its own: public through a `public extension`.
         var outer = current.parent
         while let enclosing = outer {
             if let ext = enclosing.as(ExtensionDeclSyntax.self) {

@@ -77,14 +77,14 @@ internal final class ThrowsDoCatchTypedVisitor: SyntaxVisitor {
         super.init(viewMode: .sourceAccurate)
     }
 
+    /// A catch that matches by pattern already names its types, and a catch that never reads
+    /// `error` loses nothing to the erasure; neither is reported.
     override func visit(_ node: DoStmtSyntax) -> SyntaxVisitorContinueKind {
         if node.throwsClause != nil { return .visitChildren }
         guard !node.catchClauses.isEmpty else { return .visitChildren }
         let finder = ThrowsDoCatchTryFinder(viewMode: .sourceAccurate)
         finder.walk(node.body)
         guard finder.found else { return .visitChildren }
-        // A catch that matches by pattern already names its types, and a
-        // catch that never reads `error` loses nothing to the erasure.
         guard node.catchClauses.allSatisfy({ $0.catchItems.isEmpty }) else { return .visitChildren }
         let reader = ThrowsDoCatchErrorReader(viewMode: .sourceAccurate)
         for clause in node.catchClauses { reader.walk(clause.body) }

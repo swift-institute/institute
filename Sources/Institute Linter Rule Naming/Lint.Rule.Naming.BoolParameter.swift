@@ -111,6 +111,8 @@ internal final class NamingBoolParameterVisitor: SyntaxVisitor {
         return .visitChildren
     }
 
+    /// A memberwise parameter stored as the same-named property mirrors the record's field:
+    /// renaming it means renaming the field, so it isn't reported.
     override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
         guard Naming.hasPublicOrOpenEffective(Syntax(node), modifiers: node.modifiers) else {
             return .visitChildren
@@ -125,8 +127,6 @@ internal final class NamingBoolParameterVisitor: SyntaxVisitor {
         }
         for parameter in parameters {
             guard namingBoolParameterIsBoolType(parameter.type) else { continue }
-            // A memberwise parameter stored as the same-named property mirrors
-            // the record's field: renaming it means renaming the field.
             let internalName = parameter.secondName?.text ?? parameter.firstName.text
             if namingBoolParameterAssignsSelf(node.body, parameter: internalName) {
                 continue
