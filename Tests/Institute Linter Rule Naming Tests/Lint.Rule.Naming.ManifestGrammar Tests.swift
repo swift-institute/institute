@@ -226,6 +226,20 @@ extension `Lint.Rule Tests`.`manifest naming grammar Tests`.`Edge Case` {
         #expect(findings.count == 1)
     }
 
+    @Test
+    func `plural acronym in a spaced name is permitted`() {
+        let source = """
+            let package = Package(
+              name: "swift-llmstxt-org-llms-txt",
+              targets: [
+                .target(name: "LLMs Txt")
+              ]
+            )
+            """
+        let findings = `Lint.Rule Tests`.`manifest naming grammar Tests`.findings(in: source)
+        #expect(findings.isEmpty)
+    }
+
     // Near-miss — spaced overall, one word still concatenated.
     @Test
     func `spaced name with one concatenated word still fires`() {

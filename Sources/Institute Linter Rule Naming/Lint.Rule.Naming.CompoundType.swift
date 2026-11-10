@@ -217,7 +217,9 @@ internal func namingWordIsCompound(_ name: Swift::String, words: Swift::Set<Swif
         if curr.isUppercase {
             if previous.isLowercase {
                 words += 1
-            } else if previous.isUppercase, let next, next.isLowercase {
+            } else if previous.isUppercase, let next, next.isLowercase,
+                !namingWordIsPluralAcronym(chars, suffixAt: nextIndex)
+            {
                 words += 1
             }
         }
@@ -225,4 +227,10 @@ internal func namingWordIsCompound(_ name: Swift::String, words: Swift::Set<Swif
         i += 1
     }
     return false
+}
+
+private func namingWordIsPluralAcronym(_ chars: [Swift::Character], suffixAt index: Int) -> Bool {
+    guard chars[index] == "s" else { return false }
+    let after = chars.index(after: index)
+    return after == chars.endIndex || chars[after].isUppercase
 }

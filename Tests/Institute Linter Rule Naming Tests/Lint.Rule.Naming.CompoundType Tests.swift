@@ -143,6 +143,27 @@ extension `Lint.Rule Tests`.`compound type name Tests`.`Edge Case` {
     }
 
     @Test
+    func `plural acronym LLMs is NOT flagged`() {
+        let source = "public enum LLMs {}"
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
+        #expect(findings.isEmpty)
+    }
+
+    @Test
+    func `plural acronym run into another word is still flagged`() {
+        let source = "public struct URLsParser {}"
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
+        #expect(findings.count == 1)
+    }
+
+    @Test
+    func `acronym followed by a word starting with s is still flagged`() {
+        let source = "public struct URLSet {}"
+        let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
+        #expect(findings.count == 1)
+    }
+
+    @Test
     func `short acronym IO is NOT flagged`() {
         let source = "enum IO {}"
         let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
