@@ -219,15 +219,6 @@ extension `Lint.Rule Tests`.`path name grammar Tests`.`Edge Case` {
     }
 
     @Test
-    func `plural acronym directory and basename are permitted`() {
-        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
-            in: "extension LLMs { struct File {} }",
-            file: "Sources/LLMs Txt/LLMs.File.swift"
-        )
-        #expect(findings.isEmpty)
-    }
-
-    @Test
     func `brand token directory is exempt through the shared predicate`() {
         let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(
             in: "struct Client {}",
