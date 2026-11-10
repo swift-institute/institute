@@ -16,10 +16,11 @@ extension Institute.Repository.Policy.Manifest {
 
     /// Package identities with distinct canonical locations across the
     /// root manifests and `Package.resolved`. Repositories exempt from the
-    /// identity rule have none.
+    /// identity rule have none. A `Package.resolved` that is not a resolved
+    /// file throws rather than passing as having no pins.
     public func identityFindings(
         repository: GitHub_Standard::GitHub.Repository.Slug
-    ) -> [Package.Manifest.Identity.Conflict.Finding] {
+    ) throws(Package.Manifest.Identity.Conflict.Error) -> [Package.Manifest.Identity.Conflict.Finding] {
         guard !Self.identityExempt(repository: repository) else { return [] }
         var entries: [Package.Manifest.Identity.Conflict.Entry] = []
         for document in documents {
@@ -29,7 +30,7 @@ extension Institute.Repository.Policy.Manifest {
             )
         }
         if let resolved {
-            entries += Package.Manifest.Identity.Conflict.entries(inResolved: resolved)
+            entries += try Package.Manifest.Identity.Conflict.entries(inResolved: resolved)
         }
         return Package.Manifest.Identity.Conflict.findings(in: entries)
     }

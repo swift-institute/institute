@@ -51,7 +51,13 @@ extension Institute.CI.Command {
             )
         }
 
-        for finding in manifest.identityFindings(repository: repository) {
+        let identityFindings: [Package.Manifest.Identity.Conflict.Finding]
+        do throws(Package.Manifest.Identity.Conflict.Error) {
+            identityFindings = try manifest.identityFindings(repository: repository)
+        } catch {
+            refuse("package validate could not read Package.resolved: \(error)")
+        }
+        for finding in identityFindings {
             switch finding.disposition {
             case .fatal:
                 refused = true

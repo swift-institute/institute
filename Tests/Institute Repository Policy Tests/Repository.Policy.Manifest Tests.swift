@@ -2,6 +2,7 @@ import Foundation
 import GitHub_Standard
 import Institute_Model
 import Institute_Repository_Policy
+import Package_Manager
 import Testing
 
 @Suite
@@ -56,7 +57,7 @@ struct `Repository Policy Manifest Tests` {
     }
 
     @Test
-    func `swift-html-prism is exempt from the identity rule`() {
+    func `swift-html-prism is exempt from the identity rule`() throws {
         let manifest = Institute.Repository.Policy.Manifest(
             documents: [
                 .init(
@@ -71,7 +72,15 @@ struct `Repository Policy Manifest Tests` {
             resolved: nil
         )
 
-        #expect(!manifest.identityFindings(repository: "owner/swift-other").isEmpty)
-        #expect(manifest.identityFindings(repository: "owner/swift-html-prism").isEmpty)
+        #expect(try !manifest.identityFindings(repository: "owner/swift-other").isEmpty)
+        #expect(try manifest.identityFindings(repository: "owner/swift-html-prism").isEmpty)
+    }
+
+    @Test
+    func `an unreadable Package.resolved throws instead of passing with no pins`() {
+        let manifest = Institute.Repository.Policy.Manifest(documents: [], resolved: "not json")
+        #expect(throws: Package.Manifest.Identity.Conflict.Error.self) {
+            try manifest.identityFindings(repository: "owner/swift-other")
+        }
     }
 }

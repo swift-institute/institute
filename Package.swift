@@ -375,6 +375,7 @@ let package = Package(
                 .target(name: "Institute Repository Policy"),
                 .target(name: "Institute Model"),
                 .product(name: "JSON", package: "swift-json"),
+                .product(name: "Package Manager", package: "swift-package-manager"),
             ]
         ),
         .testTarget(
