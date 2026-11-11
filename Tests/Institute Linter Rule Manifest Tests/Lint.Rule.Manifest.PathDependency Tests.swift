@@ -150,3 +150,97 @@ extension `Lint.Rule Tests`.`path dependency Tests`.`Edge Case` {
         }
     }
 }
+
+extension `Lint.Rule Tests`.`path dependency Tests` {
+    struct Leaf {
+        let root: Swift::String
+
+        init(parent: Swift::String?) throws(Lint.Source.Fixture.Failure) {
+            self.root = try Lint.Source.Fixture.temporaryRoot(prefix: "linter-rule-path-dependency-")
+            if let parent {
+                try Lint.Source.Fixture.write(
+                    "// swift-tools-version: 6.4\nimport PackageDescription\n\nlet package = Package(name: \"\(parent)\")\n",
+                    to: root + "/Package.swift"
+                )
+            }
+        }
+    }
+}
+
+extension `Lint.Rule Tests`.`path dependency Tests`.Leaf {
+    func observation(_ dependency: Swift::String, at folder: Swift::String = "fixture-server") -> Lint.Rule.Observation {
+        let source = """
+            // swift-tools-version: 6.4
+            import PackageDescription
+
+            let package = Package(
+                name: "\(folder)",
+                dependencies: [
+                    \(dependency),
+                ]
+            )
+            """
+        return `Lint.Rule Tests`.`path dependency Tests`.observation(source, file: root + "/" + folder + "/Package.swift")
+    }
+
+    func tearDown() {
+        Lint.Source.Fixture.remove(root)
+    }
+}
+
+extension `Lint.Rule Tests`.`path dependency Tests`.Integration {
+    @Test
+    func `a leaf may name its parent package by path`() throws(Lint.Source.Fixture.Failure) {
+        let leaf = try `Lint.Rule Tests`.`path dependency Tests`.Leaf(parent: "fixture")
+        defer { leaf.tearDown() }
+        #expect(leaf.observation(#".package(name: "fixture", path: "..")"#).findings.isEmpty)
+    }
+
+    @Test
+    func `a leaf reaching its parent without the parent's name is flagged`() throws(Lint.Source.Fixture.Failure) {
+        let leaf = try `Lint.Rule Tests`.`path dependency Tests`.Leaf(parent: "fixture")
+        defer { leaf.tearDown() }
+        #expect(leaf.observation(#".package(path: "..")"#).findings.count == 1)
+    }
+
+    @Test
+    func `a leaf naming its parent by another name is flagged`() throws(Lint.Source.Fixture.Failure) {
+        let leaf = try `Lint.Rule Tests`.`path dependency Tests`.Leaf(parent: "fixture")
+        defer { leaf.tearDown() }
+        #expect(leaf.observation(#".package(name: "swift-owner", path: "..")"#).findings.count == 1)
+    }
+
+    @Test
+    func `a leaf naming its parent's package at any other path is flagged`() throws(Lint.Source.Fixture.Failure) {
+        let leaf = try `Lint.Rule Tests`.`path dependency Tests`.Leaf(parent: "fixture")
+        defer { leaf.tearDown() }
+        for path in ["../", "../..", "../fixture", "."] {
+            #expect(leaf.observation(".package(name: \"fixture\", path: \"\(path)\")").findings.count == 1, "\(path)")
+        }
+    }
+
+    @Test
+    func `a manifest whose parent folder holds no package may not name a parent by path`() throws(Lint.Source.Fixture.Failure) {
+        let leaf = try `Lint.Rule Tests`.`path dependency Tests`.Leaf(parent: nil)
+        defer { leaf.tearDown() }
+        #expect(leaf.observation(#".package(name: "fixture", path: "..")"#).findings.count == 1)
+    }
+
+    @Test
+    func `a root naming its nested package by path is flagged`() throws(Lint.Source.Fixture.Failure) {
+        let leaf = try `Lint.Rule Tests`.`path dependency Tests`.Leaf(parent: "fixture")
+        defer { leaf.tearDown() }
+        try Lint.Source.Fixture.write(
+            "// swift-tools-version: 6.4\nimport PackageDescription\n\nlet package = Package(name: \"fixture-server\")\n",
+            to: leaf.root + "/fixture-server/Package.swift"
+        )
+        let source = """
+            let package = Package(
+                name: "fixture",
+                dependencies: [.package(name: "fixture-server", path: "fixture-server")]
+            )
+            """
+        let observation = `Lint.Rule Tests`.`path dependency Tests`.observation(source, file: leaf.root + "/Package.swift")
+        #expect(observation.findings.count == 1)
+    }
+}

@@ -34,6 +34,13 @@ extension Lint.Rule {
                 expectation: .findings(1)
             ),
             .init(
+                id: "path dependency named parent without a parent manifest",
+                source: "let package = Package(name: \"fixture-server\", "
+                    + "dependencies: [.package(name: \"fixture\", path: \"..\")])",
+                path: "Package.swift",
+                expectation: .findings(1)
+            ),
+            .init(
                 id: "path dependency url",
                 source: "let package = Package(name: \"Fixture\", dependencies: ["
                     + ".package(url: \"https://github.com/swift-atoms/swift-owner.git\", branch: \"main\")])",
@@ -66,7 +73,8 @@ extension Lint.Rule {
                 source: source.file,
                 severity: severity,
                 converter: source.converter,
-                nestedTestManifest: manifestIsNestedTestManifest(source.file.filePath)
+                nestedTestManifest: manifestIsNestedTestManifest(source.file.filePath),
+                parentPackageName: manifestParentPackageName(source.file.filePath)
             )
             visitor.walk(source.tree)
             return Lint.Rule.Observation(findings: visitor.matches, coverage: .measured)
@@ -78,8 +86,10 @@ extension Lint.Rule {
 internal let manifestPathDependencyMessage: Swift::String =
     "[path dependency] [PACKAGE-PATH-DEPENDENCY]: a package dependency must be "
     + "declared by URL, never by `path:`; local checkouts are provided by the "
-    + "workspace, not by the manifest. The one exception is the nested test "
-    + "manifest, `Tests/Package.swift`, reaching its parent as `.package(path: \"..\")`."
+    + "workspace, not by the manifest. Two exceptions: the nested test manifest, "
+    + "`Tests/Package.swift`, reaching its parent as `.package(path: \"..\")`; and a "
+    + "leaf, a manifest whose parent folder holds a `Package.swift`, naming that parent "
+    + "as `.package(name: \"<the parent's package name>\", path: \"..\")`."
 
 internal func manifestIsNestedTestManifest(_ filePath: Swift::String) -> Swift::Bool {
     let components = filePath.split(separator: "/", omittingEmptySubsequences: true)
@@ -92,18 +102,21 @@ internal final class ManifestPathDependencyVisitor: SyntaxVisitor {
     let severity: Diagnostic.Severity
     let converter: SourceLocationConverter
     let nestedTestManifest: Swift::Bool
+    let parentPackageName: Swift::String?
     var matches: [Diagnostic.Record] = []
 
     init(
         source: Source.File,
         severity: Diagnostic.Severity,
         converter: SourceLocationConverter,
-        nestedTestManifest: Swift::Bool
+        nestedTestManifest: Swift::Bool,
+        parentPackageName: Swift::String?
     ) {
         self.source = source
         self.severity = severity
         self.converter = converter
         self.nestedTestManifest = nestedTestManifest
+        self.parentPackageName = parentPackageName
         super.init(viewMode: .sourceAccurate)
     }
 
@@ -111,7 +124,8 @@ internal final class ManifestPathDependencyVisitor: SyntaxVisitor {
         if let member = node.calledExpression.as(MemberAccessExprSyntax.self),
             member.declName.baseName.text == "package",
             let path = node.arguments.first(where: { $0.label?.text == "path" }),
-            !(nestedTestManifest && isParent(path.expression))
+            !(nestedTestManifest && isParent(path.expression)),
+            !(isParent(path.expression) && namesParent(node))
         {
             let location = converter.location(for: node.positionAfterSkippingLeadingTrivia)
             matches.append(
@@ -129,6 +143,14 @@ internal final class ManifestPathDependencyVisitor: SyntaxVisitor {
             )
         }
         return .visitChildren
+    }
+
+    private func namesParent(_ node: FunctionCallExprSyntax) -> Swift::Bool {
+        guard let parentPackageName,
+            let argument = node.arguments.first(where: { $0.label?.text == "name" }),
+            let literal = argument.expression.as(StringLiteralExprSyntax.self)
+        else { return false }
+        return manifestStringLiteralText(literal) == parentPackageName
     }
 
     private func isParent(_ expression: ExprSyntax) -> Swift::Bool {
