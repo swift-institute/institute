@@ -35,7 +35,7 @@ jobs:
       matrix:
         include:
           - platform: linux-x86_64
-            runner: ubuntu-latest
+            runner: ubuntu-24.04
           - platform: macos-arm64
             runner: xcode-27
     steps:
