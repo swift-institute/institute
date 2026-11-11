@@ -134,7 +134,7 @@ internal final class NamingUnificationTypealiasVisitor: SyntaxVisitor {
 
     /// Whether `type` conforms to a protocol this package does not declare, other than a standard one with no
     /// associated types. That protocol's associated types are unknown here, so a typealias on `type` may be the
-    /// witness of one, as `typealias Value = Agent.Sessions` is for a `Witness.Key` (coenttb/birdwatch#2).
+    /// witness of one, as `typealias Value = Agent.Sessions` is for a `Witness.Key`.
     private func conformsToProtocolDeclaredElsewhere(_ type: Swift::String) -> Swift::Bool {
         index.reachableProtocols(of: type).contains { name in
             index.associatedTypes[name] == nil && !Self.standardWithoutAssociatedTypes.contains(name)
