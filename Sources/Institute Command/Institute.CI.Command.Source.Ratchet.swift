@@ -5,7 +5,8 @@ import Source_Report
 extension Institute.CI.Command.Source {
     /// How many findings of each swift-linter rule a repository may have. A
     /// strict run fails when any rule goes over its limit, so warnings that
-    /// never fail on their own can't grow.
+    /// never fail on their own can't grow. Notes are review prompts and
+    /// aren't counted.
     ///
     /// A repository or rule not listed may have none. Limits are regenerated
     /// by `ratchet.py` in swift-institute/cloud-workspace, which refuses a rise
@@ -15,12 +16,20 @@ extension Institute.CI.Command.Source {
 
         /// The swift-linter findings in `report`, by rule.
         static func counts(_ report: Source_Report::Source.Report) -> [Swift.String: Swift.Int] {
-            var counts: [Swift.String: Swift.Int] = [:]
+            var findings: [Source_Report::Source.Finding] = []
             for measurement in report.measurements where measurement.engine.token == engine {
-                guard case .findings(let findings) = measurement.verdict else { continue }
-                for finding in findings {
-                    counts[finding.rule.token, default: 0] += 1
-                }
+                guard case .findings(let measured) = measurement.verdict else { continue }
+                findings += measured
+            }
+            return counts(findings)
+        }
+
+        /// `findings` by rule, leaving out notes. A rule whose findings are notes surfaces a review prompt, which
+        /// asks a person to look and says nothing is wrong, so it never counts (swift-institute/Issues#272).
+        static func counts(_ findings: [Source_Report::Source.Finding]) -> [Swift.String: Swift.Int] {
+            var counts: [Swift.String: Swift.Int] = [:]
+            for finding in findings where finding.diagnostic.severity != .note {
+                counts[finding.rule.token, default: 0] += 1
             }
             return counts
         }

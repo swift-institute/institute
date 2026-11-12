@@ -31,7 +31,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-algebra|file name nested path|2
         swift-atoms/swift-algebra|int public parameter|6
         swift-atoms/swift-algebra|minimal type body|104
-        swift-atoms/swift-algebra|namespace adoption typealias|1
         swift-atoms/swift-algebra|optionset shell pattern|3
         swift-atoms/swift-algebra|raw value access|3
         swift-atoms/swift-algebra|result wrapper for rethrows shim|22
@@ -41,7 +40,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-algebra|test function naming|32
         swift-atoms/swift-algebra|top level type owner|1
         swift-atoms/swift-algebra|try optional|1
-        swift-atoms/swift-algebra|typealiased namespace bridge|1
         swift-atoms/swift-algebra|untraited partial dependency|1
         swift-atoms/swift-algebra|untyped throws|65
         swift-atoms/swift-always|compound suite name|1
@@ -81,7 +79,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-ascii|extension file naming|20
         swift-atoms/swift-ascii|extension noncopyable constraint|2
         swift-atoms/swift-ascii|minimal type body|8
-        swift-atoms/swift-ascii|namespace adoption typealias|1
         swift-atoms/swift-ascii|path name grammar|3
         swift-atoms/swift-ascii|pointer advanced by|1
         swift-atoms/swift-ascii|raw value access|2
@@ -93,7 +90,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-ascii|throwing wrapper init|2
         swift-atoms/swift-ascii|trait consistency|6
         swift-atoms/swift-ascii|try optional|2
-        swift-atoms/swift-ascii|typealiased namespace bridge|1
         swift-atoms/swift-ascii|unchecked call site|6
         swift-atoms/swift-async|architecture import boundary|2
         swift-atoms/swift-async|bool public parameter|3
@@ -105,10 +101,8 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-async|exported import|2
         swift-atoms/swift-async|extension file naming|3
         swift-atoms/swift-async|fatal error outside tests|1
-        swift-atoms/swift-async|namespace adoption typealias|2
         swift-atoms/swift-async|test function naming|20
         swift-atoms/swift-async|try optional|2
-        swift-atoms/swift-async|typealiased namespace bridge|1
         swift-atoms/swift-async|unchecked sendable noncopyable|2
         swift-atoms/swift-async|undeclared module import|1
         swift-atoms/swift-async|unification typealias|1
@@ -235,7 +229,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-clock|exported import|2
         swift-atoms/swift-clock|extension file naming|3
         swift-atoms/swift-clock|minimal type body|13
-        swift-atoms/swift-clock|namespace adoption typealias|7
         swift-atoms/swift-clock|path name grammar|1
         swift-atoms/swift-clock|single type per file|3
         swift-atoms/swift-clock|untyped throws|12
@@ -252,7 +245,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-coder|int public parameter|1
         swift-atoms/swift-coder|manifest naming grammar|1
         swift-atoms/swift-coder|minimal type body|90
-        swift-atoms/swift-coder|namespace adoption typealias|1
         swift-atoms/swift-coder|path name grammar|11
         swift-atoms/swift-coder|raw value access|2
         swift-atoms/swift-coder|swift protocol qualification|3
@@ -260,7 +252,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-coder|test target naming|4
         swift-atoms/swift-coder|top level type owner|5
         swift-atoms/swift-coder|trait consistency|26
-        swift-atoms/swift-coder|typealiased namespace bridge|1
         swift-atoms/swift-coder|unlabeled lifecycle closure|4
         swift-atoms/swift-coder|untyped throws|3
         swift-atoms/swift-cofree|compound suite name|1
@@ -276,7 +267,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-collection|file name nested path|3
         swift-atoms/swift-collection|int public parameter|2
         swift-atoms/swift-collection|manifest naming grammar|2
-        swift-atoms/swift-collection|namespace adoption typealias|1
         swift-atoms/swift-collection|path name grammar|2
         swift-atoms/swift-collection|raw value access|1
         swift-atoms/swift-collection|tag suffix|1
@@ -385,7 +375,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-deque|extension file naming|5
         swift-atoms/swift-deque|manifest naming grammar|7
         swift-atoms/swift-deque|minimal type body|1
-        swift-atoms/swift-deque|namespace adoption typealias|1
         swift-atoms/swift-deque|nonisolated unsafe without invariant|3
         swift-atoms/swift-deque|path name grammar|13
         swift-atoms/swift-deque|undeclared module import|1
@@ -395,7 +384,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-difference|do throws for typed catch|6
         swift-atoms/swift-difference|extension file naming|12
         swift-atoms/swift-difference|int public parameter|3
-        swift-atoms/swift-difference|namespace adoption typealias|1
         swift-atoms/swift-difference|pointer advanced by|2
         swift-atoms/swift-difference|raw value access|16
         swift-atoms/swift-difference|single type per file|1
@@ -431,7 +419,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-effect|do throws for typed catch|1
         swift-atoms/swift-effect|extension file naming|3
         swift-atoms/swift-effect|file name nested path|1
-        swift-atoms/swift-effect|namespace adoption typealias|1
         swift-atoms/swift-effect|test display name string|2
         swift-atoms/swift-effect|test target naming|1
         swift-atoms/swift-effect|unification typealias|1
@@ -488,7 +475,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-fixed|do throws for typed catch|2
         swift-atoms/swift-fixed|extension file naming|2
         swift-atoms/swift-fixed|file name nested path|1
-        swift-atoms/swift-fixed|namespace adoption typealias|1
         swift-atoms/swift-fixed|nonisolated unsafe without invariant|2
         swift-atoms/swift-fixed|optimize suppression attribute|6
         swift-atoms/swift-fixed|test target naming|1
@@ -546,7 +532,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-geometry|foundation import|1
         swift-atoms/swift-geometry|int public parameter|9
         swift-atoms/swift-geometry|minimal type body|4
-        swift-atoms/swift-geometry|namespace adoption typealias|7
         swift-atoms/swift-geometry|redundant refinement|3
         swift-atoms/swift-geometry|single type per file|7
         swift-atoms/swift-geometry|test target naming|1
@@ -585,18 +570,15 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-indexed|extension file naming|14
         swift-atoms/swift-indexed|fatal error outside tests|5
         swift-atoms/swift-indexed|minimal type body|14
-        swift-atoms/swift-indexed|namespace adoption typealias|1
         swift-atoms/swift-indexed|pointer advanced by|2
         swift-atoms/swift-indexed|raw value access|2
         swift-atoms/swift-indexed|throwing wrapper init|1
-        swift-atoms/swift-indexed|typealiased namespace bridge|1
         swift-atoms/swift-indexed|unchecked call site|5
         swift-atoms/swift-infinite|compound identifier|1
         swift-atoms/swift-infinite|compound suite name|29
         swift-atoms/swift-infinite|extension file naming|9
         swift-atoms/swift-infinite|file name nested path|1
         swift-atoms/swift-infinite|int public parameter|1
-        swift-atoms/swift-infinite|namespace adoption typealias|2
         swift-atoms/swift-infinite|unchecked call site|2
         swift-atoms/swift-initialization|compound suite name|19
         swift-atoms/swift-initialization|extension file naming|1
@@ -634,7 +616,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-iterator|extension file naming|14
         swift-atoms/swift-iterator|file name nested path|1
         swift-atoms/swift-iterator|minimal type body|6
-        swift-atoms/swift-iterator|namespace adoption typealias|2
         swift-atoms/swift-iterator|path name grammar|1
         swift-atoms/swift-iterator|raw value access|8
         swift-atoms/swift-iterator|test target naming|1
@@ -654,7 +635,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-linear|extension noncopyable constraint|11
         swift-atoms/swift-linear|foundation import|1
         swift-atoms/swift-linear|int public parameter|4
-        swift-atoms/swift-linear|namespace adoption typealias|7
         swift-atoms/swift-linear|unification typealias|2
         swift-atoms/swift-link|compound identifier|2
         swift-atoms/swift-link|compound suite name|13
@@ -664,9 +644,7 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-link|unlabeled lifecycle closure|1
         swift-atoms/swift-list|compound suite name|2
         swift-atoms/swift-list|extension file naming|1
-        swift-atoms/swift-list|namespace adoption typealias|1
         swift-atoms/swift-list|test target naming|1
-        swift-atoms/swift-list|typealiased namespace bridge|1
         swift-atoms/swift-list|unification typealias|1
         swift-atoms/swift-logic|compound suite name|12
         swift-atoms/swift-logic|extension file naming|1
@@ -727,13 +705,11 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-numeric|extension file naming|10
         swift-atoms/swift-numeric|file name nested path|1
         swift-atoms/swift-numeric|int public parameter|3
-        swift-atoms/swift-numeric|namespace adoption typealias|3
         swift-atoms/swift-numeric|path name grammar|1
         swift-atoms/swift-numeric|statement where expression fits|1
         swift-atoms/swift-numeric|test display name string|2
         swift-atoms/swift-numeric|test target naming|2
         swift-atoms/swift-numeric|top level type owner|1
-        swift-atoms/swift-numeric|typealiased namespace bridge|3
         swift-atoms/swift-observer|compound identifier|1
         swift-atoms/swift-observer|compound suite name|11
         swift-atoms/swift-observer|counter loop iteration|1
@@ -786,12 +762,10 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-ordinal|count minus one|1
         swift-atoms/swift-ordinal|do throws for typed catch|7
         swift-atoms/swift-ordinal|extension file naming|32
-        swift-atoms/swift-ordinal|namespace adoption typealias|4
         swift-atoms/swift-ordinal|path name grammar|1
         swift-atoms/swift-ordinal|swift protocol qualification|1
         swift-atoms/swift-ordinal|test target naming|3
         swift-atoms/swift-ordinal|try optional|11
-        swift-atoms/swift-ordinal|typealiased namespace bridge|4
         swift-atoms/swift-orthant|compound suite name|18
         swift-atoms/swift-orthant|counter loop iteration|4
         swift-atoms/swift-orthant|extension file naming|7
@@ -839,7 +813,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-parser|int public parameter|7
         swift-atoms/swift-parser|manifest naming grammar|1
         swift-atoms/swift-parser|minimal type body|81
-        swift-atoms/swift-parser|namespace adoption typealias|5
         swift-atoms/swift-parser|path name grammar|20
         swift-atoms/swift-parser|raw value access|2
         swift-atoms/swift-parser|result wrapper for rethrows shim|2
@@ -851,7 +824,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-parser|top level type owner|14
         swift-atoms/swift-parser|trait consistency|56
         swift-atoms/swift-parser|try optional|2
-        swift-atoms/swift-parser|typealiased namespace bridge|5
         swift-atoms/swift-parser|unlabeled lifecycle closure|7
         swift-atoms/swift-parser|untyped throws|9
         swift-atoms/swift-parser|zero or one literal|2
@@ -863,14 +835,12 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-path|fatal error outside tests|1
         swift-atoms/swift-path|file name nested path|1
         swift-atoms/swift-path|int public parameter|11
-        swift-atoms/swift-path|namespace adoption typealias|6
         swift-atoms/swift-path|single type per file|5
         swift-atoms/swift-path|string utf8 scanning|4
         swift-atoms/swift-path|tag suffix|1
         swift-atoms/swift-path|test display name string|6
         swift-atoms/swift-path|test target naming|2
         swift-atoms/swift-path|throwing wrapper init|1
-        swift-atoms/swift-path|typealiased namespace bridge|4
         swift-atoms/swift-path|unchecked sendable categorization|1
         swift-atoms/swift-path|unchecked sendable noncopyable|1
         swift-atoms/swift-path|unsafe storage visibility|1
@@ -907,10 +877,8 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-pool|extension file naming|6
         swift-atoms/swift-pool|int public parameter|1
         swift-atoms/swift-pool|minimal type body|8
-        swift-atoms/swift-pool|namespace adoption typealias|4
         swift-atoms/swift-pool|statement where expression fits|1
         swift-atoms/swift-pool|trait consistency|3
-        swift-atoms/swift-pool|typealiased namespace bridge|4
         swift-atoms/swift-pool|upward layer edge|7
         swift-atoms/swift-predecessor|compound suite name|1
         swift-atoms/swift-predicate|bool public parameter|2
@@ -929,12 +897,10 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-product|extension file naming|12
         swift-atoms/swift-product|foundation import|1
         swift-atoms/swift-product|minimal type body|26
-        swift-atoms/swift-product|namespace adoption typealias|1
         swift-atoms/swift-product|path name grammar|1
         swift-atoms/swift-product|single type namespace|1
         swift-atoms/swift-product|single type per file|1
         swift-atoms/swift-product|test function naming|5
-        swift-atoms/swift-product|typealiased namespace bridge|1
         swift-atoms/swift-product|unification typealias|1
         swift-atoms/swift-product|untraited partial dependency|3
         swift-atoms/swift-product|untyped throws|12
@@ -958,10 +924,8 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-queue|compound suite name|6
         swift-atoms/swift-queue|extension file naming|8
         swift-atoms/swift-queue|file name nested path|1
-        swift-atoms/swift-queue|namespace adoption typealias|1
         swift-atoms/swift-queue|nonisolated unsafe without invariant|3
         swift-atoms/swift-queue|try optional|1
-        swift-atoms/swift-queue|typealiased namespace bridge|1
         swift-atoms/swift-queue|undeclared module import|1
         swift-atoms/swift-queue|upward layer edge|3
         swift-atoms/swift-radical|compound suite name|2
@@ -980,7 +944,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-ratio|exported import|50
         swift-atoms/swift-ratio|extension file naming|7
         swift-atoms/swift-ratio|int public parameter|2
-        swift-atoms/swift-ratio|namespace adoption typealias|1
         swift-atoms/swift-ratio|raw value access|9
         swift-atoms/swift-ratio|test target naming|4
         swift-atoms/swift-ratio|trait consistency|23
@@ -1062,9 +1025,7 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-search|compound suite name|1
         swift-atoms/swift-search|count minus one|1
         swift-atoms/swift-search|extension file naming|1
-        swift-atoms/swift-search|namespace adoption typealias|1
         swift-atoms/swift-search|test function naming|3
-        swift-atoms/swift-search|typealiased namespace bridge|1
         swift-atoms/swift-sector|architecture import boundary|2
         swift-atoms/swift-sector|compound suite name|3
         swift-atoms/swift-sector|exported import|2
@@ -1082,7 +1043,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-sequence|extension file naming|37
         swift-atoms/swift-sequence|file name nested path|2
         swift-atoms/swift-sequence|minimal type body|8
-        swift-atoms/swift-sequence|namespace adoption typealias|1
         swift-atoms/swift-sequence|path name grammar|3
         swift-atoms/swift-sequence|raw value access|31
         swift-atoms/swift-sequence|test display name string|9
@@ -1125,8 +1085,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-size|extension file naming|2
         swift-atoms/swift-size|int public parameter|1
         swift-atoms/swift-size|minimal type body|2
-        swift-atoms/swift-size|namespace adoption typealias|1
-        swift-atoms/swift-size|typealiased namespace bridge|1
         swift-atoms/swift-size|untyped throws|2
         swift-atoms/swift-skip|compound suite name|1
         swift-atoms/swift-slab|compound identifier|2
@@ -1151,12 +1109,10 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-span|exported import|1
         swift-atoms/swift-span|extension file naming|3
         swift-atoms/swift-span|file name nested path|5
-        swift-atoms/swift-span|namespace adoption typealias|4
         swift-atoms/swift-span|nonisolated unsafe without invariant|2
         swift-atoms/swift-span|test function naming|4
         swift-atoms/swift-span|test target naming|3
         swift-atoms/swift-span|trait consistency|6
-        swift-atoms/swift-span|typealiased namespace bridge|3
         swift-atoms/swift-span|unsafe storage visibility|4
         swift-atoms/swift-standard-library-extensions|associated type shadows namespace|1
         swift-atoms/swift-standard-library-extensions|canonical settings tail|1
@@ -1179,7 +1135,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-storage|extension file naming|1
         swift-atoms/swift-storage|fatal error outside tests|1
         swift-atoms/swift-storage|hoisted error in public throws|1
-        swift-atoms/swift-storage|namespace adoption typealias|1
         swift-atoms/swift-storage|nonisolated unsafe without invariant|2
         swift-atoms/swift-storage|raw value access|16
         swift-atoms/swift-storage|test target naming|3
@@ -1196,7 +1151,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-store|file name nested path|3
         swift-atoms/swift-store|int public parameter|2
         swift-atoms/swift-store|minimal type body|1
-        swift-atoms/swift-store|namespace adoption typealias|1
         swift-atoms/swift-store|nonisolated unsafe without invariant|2
         swift-atoms/swift-store|single type per file|1
         swift-atoms/swift-store|sli literal|6
@@ -1206,7 +1160,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-string|extension file naming|4
         swift-atoms/swift-string|fatal error outside tests|1
         swift-atoms/swift-string|int public parameter|5
-        swift-atoms/swift-string|namespace adoption typealias|1
         swift-atoms/swift-string|test display name string|2
         swift-atoms/swift-string|unsafe storage visibility|1
         swift-atoms/swift-subtraction|counter loop iteration|4
@@ -1256,13 +1209,11 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-time|file name nested path|1
         swift-atoms/swift-time|int public parameter|31
         swift-atoms/swift-time|minimal type body|3
-        swift-atoms/swift-time|namespace adoption typealias|4
         swift-atoms/swift-time|path name grammar|2
         swift-atoms/swift-time|raw value access|5
         swift-atoms/swift-time|redundant refinement|1
         swift-atoms/swift-time|tagged extension public init|1
         swift-atoms/swift-time|test target naming|1
-        swift-atoms/swift-time|typealiased namespace bridge|4
         swift-atoms/swift-tolerance|compound suite name|2
         swift-atoms/swift-translation|compound suite name|2
         swift-atoms/swift-translation|exported import|2
@@ -1278,11 +1229,9 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-atoms/swift-vector|exported import|2
         swift-atoms/swift-vector|extension file naming|6
         swift-atoms/swift-vector|int public parameter|1
-        swift-atoms/swift-vector|namespace adoption typealias|1
         swift-atoms/swift-vector|single type per file|1
         swift-atoms/swift-vector|test display name string|3
         swift-atoms/swift-vector|test target naming|3
-        swift-atoms/swift-vector|typealiased namespace bridge|1
         swift-atoms/swift-vector|untyped throws|1
         swift-atoms/swift-version|architecture import boundary|2
         swift-atoms/swift-version|compound identifier|6
@@ -1341,7 +1290,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-byte-channel|compound suite name|1
         swift-compositions/swift-byte-channel|do throws for typed catch|2
         swift-compositions/swift-byte-channel|minimal type body|14
-        swift-compositions/swift-byte-channel|namespace adoption typealias|1
         swift-compositions/swift-byte-channel|package policy revision 1|1
         swift-compositions/swift-byte-channel|redundant refinement|1
         swift-compositions/swift-byte-channel|single type per file|4
@@ -1373,9 +1321,7 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-css-html-layout-render|compound type name|3
         swift-compositions/swift-css-html-layout-render|extension file naming|1
         swift-compositions/swift-css-html-layout-render|module selector spelling|3
-        swift-compositions/swift-css-html-layout-render|namespace adoption typealias|4
         swift-compositions/swift-css-html-layout-render|path name grammar|3
-        swift-compositions/swift-css-html-layout-render|typealiased namespace bridge|3
         swift-compositions/swift-css-html-layout-render|unification typealias|1
         swift-compositions/swift-css-html-render|canonical settings tail|1
         swift-compositions/swift-css-html-render|compound identifier|444
@@ -1393,8 +1339,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-darwin|canonical settings tail|1
         swift-compositions/swift-darwin|compound suite name|1
         swift-compositions/swift-darwin|extension file naming|4
-        swift-compositions/swift-darwin|namespace adoption typealias|6
-        swift-compositions/swift-darwin|typealiased namespace bridge|6
         swift-compositions/swift-darwin|undeclared module import|1
         swift-compositions/swift-darwin|unification typealias|1
         swift-compositions/swift-dependencies|architecture foundation type|7
@@ -1411,14 +1355,12 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-dependencies|int public parameter|15
         swift-compositions/swift-dependencies|libc import in composition|3
         swift-compositions/swift-dependencies|minimal type body|12
-        swift-compositions/swift-dependencies|namespace adoption typealias|3
         swift-compositions/swift-dependencies|path name grammar|11
         swift-compositions/swift-dependencies|single type per file|1
         swift-compositions/swift-dependencies|test display name string|13
         swift-compositions/swift-dependencies|test target naming|1
         swift-compositions/swift-dependencies|trait consistency|2
         swift-compositions/swift-dependencies|try optional|3
-        swift-compositions/swift-dependencies|typealiased namespace bridge|2
         swift-compositions/swift-dependencies|unchecked call site|1
         swift-compositions/swift-dependencies|unification typealias|1
         swift-compositions/swift-dependencies|untyped throws|5
@@ -1498,7 +1440,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-file-system|file name nested path|6
         swift-compositions/swift-file-system|int public parameter|12
         swift-compositions/swift-file-system|minimal type body|4
-        swift-compositions/swift-file-system|namespace adoption typealias|6
         swift-compositions/swift-file-system|path name grammar|2
         swift-compositions/swift-file-system|pointer advanced by|7
         swift-compositions/swift-file-system|raw value access|6
@@ -1509,7 +1450,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-file-system|throwing wrapper init|2
         swift-compositions/swift-file-system|trait consistency|2
         swift-compositions/swift-file-system|try optional|16
-        swift-compositions/swift-file-system|typealiased namespace bridge|5
         swift-compositions/swift-file-system|unchecked call site|7
         swift-compositions/swift-file-system|undeclared module import|2
         swift-compositions/swift-file-system|untyped throws|29
@@ -1566,14 +1506,12 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-html-render|int public parameter|5
         swift-compositions/swift-html-render|minimal type body|6
         swift-compositions/swift-html-render|module selector spelling|3
-        swift-compositions/swift-html-render|namespace adoption typealias|3
         swift-compositions/swift-html-render|path name grammar|29
         swift-compositions/swift-html-render|raw value access|11
         swift-compositions/swift-html-render|single type per file|2
         swift-compositions/swift-html-render|string utf8 scanning|13
         swift-compositions/swift-html-render|test function naming|1
         swift-compositions/swift-html-render|try optional|3
-        swift-compositions/swift-html-render|typealiased namespace bridge|3
         swift-compositions/swift-html-render|undeclared module import|9
         swift-compositions/swift-imap|bool public parameter|1
         swift-compositions/swift-imap|compound identifier|1
@@ -1593,14 +1531,12 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-io-kernel|extension noncopyable constraint|1
         swift-compositions/swift-io-kernel|int public parameter|14
         swift-compositions/swift-io-kernel|minimal type body|4
-        swift-compositions/swift-io-kernel|namespace adoption typealias|2
         swift-compositions/swift-io-kernel|nonisolated unsafe without invariant|2
         swift-compositions/swift-io-kernel|path name grammar|2
         swift-compositions/swift-io-kernel|test display name string|6
         swift-compositions/swift-io-kernel|test target naming|1
         swift-compositions/swift-io-kernel|try optional|7
         swift-compositions/swift-io-kernel|type transform placement|1
-        swift-compositions/swift-io-kernel|typealiased namespace bridge|2
         swift-compositions/swift-io-kernel|unchecked sendable categorization|3
         swift-compositions/swift-io-kernel|untyped throws|1
         swift-compositions/swift-ip-address|canonical settings tail|1
@@ -1639,7 +1575,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-kernel|file name nested path|2
         swift-compositions/swift-kernel|int public parameter|14
         swift-compositions/swift-kernel|minimal type body|1
-        swift-compositions/swift-kernel|namespace adoption typealias|12
         swift-compositions/swift-kernel|nonisolated unsafe without invariant|1
         swift-compositions/swift-kernel|path name grammar|1
         swift-compositions/swift-kernel|pointer advanced by|1
@@ -1651,7 +1586,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-kernel|test display name string|1
         swift-compositions/swift-kernel|trait consistency|1
         swift-compositions/swift-kernel|try optional|18
-        swift-compositions/swift-kernel|typealiased namespace bridge|10
         swift-compositions/swift-kernel|undeclared module import|3
         swift-compositions/swift-kernel|unification typealias|2
         swift-compositions/swift-kernel|unlabeled lifecycle closure|1
@@ -1684,9 +1618,7 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-linux|do throws for typed catch|1
         swift-compositions/swift-linux|exported import|14
         swift-compositions/swift-linux|extension file naming|6
-        swift-compositions/swift-linux|namespace adoption typealias|6
         swift-compositions/swift-linux|pointer advanced by|1
-        swift-compositions/swift-linux|typealiased namespace bridge|6
         swift-compositions/swift-loader|canonical settings tail|1
         swift-compositions/swift-loader|compound suite name|2
         swift-compositions/swift-loader|compound type name|1
@@ -1717,11 +1649,9 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-markdown-html-render|file name nested path|1
         swift-compositions/swift-markdown-html-render|int public parameter|2
         swift-compositions/swift-markdown-html-render|manifest naming grammar|1
-        swift-compositions/swift-markdown-html-render|namespace adoption typealias|27
         swift-compositions/swift-markdown-html-render|path name grammar|18
         swift-compositions/swift-markdown-html-render|raw value access|1
         swift-compositions/swift-markdown-html-render|single type per file|24
-        swift-compositions/swift-markdown-html-render|typealiased namespace bridge|26
         swift-compositions/swift-markdown-html-render|undeclared module import|3
         swift-compositions/swift-mcp|bool public parameter|2
         swift-compositions/swift-mcp|extension file naming|2
@@ -1735,11 +1665,9 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-memory-mapping|exported import|2
         swift-compositions/swift-memory-mapping|extension file naming|6
         swift-compositions/swift-memory-mapping|int public parameter|11
-        swift-compositions/swift-memory-mapping|namespace adoption typealias|3
         swift-compositions/swift-memory-mapping|pointer advanced by|2
         swift-compositions/swift-memory-mapping|raw value access|7
         swift-compositions/swift-memory-mapping|single type per file|11
-        swift-compositions/swift-memory-mapping|typealiased namespace bridge|3
         swift-compositions/swift-memory-mapping|unsafe storage visibility|2
         swift-compositions/swift-motion|architecture foundation type|7
         swift-compositions/swift-motion|compound identifier|2
@@ -1833,10 +1761,8 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-pdf-render|extension file naming|5
         swift-compositions/swift-pdf-render|int public parameter|2
         swift-compositions/swift-pdf-render|minimal type body|3
-        swift-compositions/swift-pdf-render|namespace adoption typealias|1
         swift-compositions/swift-pdf-render|path name grammar|2
         swift-compositions/swift-pdf-render|string utf8 scanning|1
-        swift-compositions/swift-pdf-render|typealiased namespace bridge|1
         swift-compositions/swift-pdf-render|undeclared module import|6
         swift-compositions/swift-pdf-render|unification typealias|1
         swift-compositions/swift-plist|bool public parameter|10
@@ -1865,11 +1791,9 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-posix|exported import|19
         swift-compositions/swift-posix|extension file naming|50
         swift-compositions/swift-posix|int public parameter|17
-        swift-compositions/swift-posix|namespace adoption typealias|111
         swift-compositions/swift-posix|pointer advanced by|3
         swift-compositions/swift-posix|single type per file|7
         swift-compositions/swift-posix|test function naming|1
-        swift-compositions/swift-posix|typealiased namespace bridge|71
         swift-compositions/swift-posix|untyped throws|3
         swift-compositions/swift-postgresql|architecture foundation type|4
         swift-compositions/swift-postgresql|bool public parameter|16
@@ -1947,7 +1871,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-sql|intermediate binding then return|3
         swift-compositions/swift-sql|macro expansion short name|18
         swift-compositions/swift-sql|minimal type body|233
-        swift-compositions/swift-sql|namespace adoption typealias|1
         swift-compositions/swift-sql|package policy revision 1|1
         swift-compositions/swift-sql|path name grammar|38
         swift-compositions/swift-sql|raw value access|1
@@ -1956,7 +1879,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-sql|tagged extension public init|2
         swift-compositions/swift-sql|throwing wrapper init|1
         swift-compositions/swift-sql|type transform placement|1
-        swift-compositions/swift-sql|typealiased namespace bridge|1
         swift-compositions/swift-sql|unification typealias|1
         swift-compositions/swift-sql|unknown default|1
         swift-compositions/swift-sql|untraited partial dependency|1
@@ -2031,11 +1953,9 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-svg-render|extension file naming|7
         swift-compositions/swift-svg-render|minimal type body|5
         swift-compositions/swift-svg-render|module selector spelling|56
-        swift-compositions/swift-svg-render|namespace adoption typealias|1
         swift-compositions/swift-svg-render|path name grammar|2
         swift-compositions/swift-svg-render|raw value access|22
         swift-compositions/swift-svg-render|single type per file|3
-        swift-compositions/swift-svg-render|typealiased namespace bridge|1
         swift-compositions/swift-svg-render|undeclared module import|2
         swift-compositions/swift-synchronizers|canonical settings tail|1
         swift-compositions/swift-synchronizers|compound identifier|9
@@ -2060,7 +1980,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-tests|int public parameter|37
         swift-compositions/swift-tests|libc import in composition|4
         swift-compositions/swift-tests|minimal type body|25
-        swift-compositions/swift-tests|namespace adoption typealias|4
         swift-compositions/swift-tests|nonisolated unsafe without invariant|3
         swift-compositions/swift-tests|path name grammar|4
         swift-compositions/swift-tests|raw value access|22
@@ -2068,7 +1987,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-tests|statement where expression fits|14
         swift-compositions/swift-tests|string utf8 scanning|2
         swift-compositions/swift-tests|task sleep|1
-        swift-compositions/swift-tests|typealiased namespace bridge|3
         swift-compositions/swift-tests|unchecked sendable categorization|6
         swift-compositions/swift-tests|undeclared module import|3
         swift-compositions/swift-tests|unification typealias|1
@@ -2135,10 +2053,8 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-windows|extension file naming|32
         swift-compositions/swift-windows|file name nested path|1
         swift-compositions/swift-windows|int public parameter|1
-        swift-compositions/swift-windows|namespace adoption typealias|50
         swift-compositions/swift-windows|single type per file|1
         swift-compositions/swift-windows|string utf8 scanning|2
-        swift-compositions/swift-windows|typealiased namespace bridge|26
         swift-compositions/swift-windows|undeclared module import|2
         swift-compositions/swift-windows|untyped throws|3
         swift-compositions/swift-witness-context|canonical settings tail|1
@@ -2210,13 +2126,11 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-iec/swift-iec-61966|counter loop iteration|1
         swift-iec/swift-iec-61966|int public parameter|3
         swift-iec/swift-iec-61966|minimal type body|1
-        swift-iec/swift-iec-61966|namespace adoption typealias|18
         swift-iec/swift-iec-61966|path name grammar|1
         swift-iec/swift-iec-61966|single type namespace|1
         swift-iec/swift-iec-61966|single type per file|18
         swift-iec/swift-iec-61966|test display name string|1
         swift-iec/swift-iec-61966|throwing wrapper init|7
-        swift-iec/swift-iec-61966|typealiased namespace bridge|18
         swift-iec/swift-iec-61966|unification typealias|4
         swift-iec/swift-iec-80000-13|compound suite name|3
         swift-iec/swift-iec-80000-13|int public parameter|3
@@ -2231,27 +2145,21 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-ieee/swift-ieee-754|counter loop iteration|2
         swift-ieee/swift-ieee-754|do throws for typed catch|2
         swift-ieee/swift-ieee-754|int public parameter|12
-        swift-ieee/swift-ieee-754|namespace adoption typealias|1
         swift-ieee/swift-ieee-754|path name grammar|12
         swift-ieee/swift-ieee-754|single type per file|26
         swift-ieee/swift-ieee-754|statement where expression fits|6
         swift-ieee/swift-ieee-754|test display name string|173
-        swift-ieee/swift-ieee-754|typealiased namespace bridge|1
         swift-ietf/swift-bcp-47|architecture import boundary|1
         swift-ietf/swift-bcp-47|compound suite name|1
         swift-ietf/swift-bcp-47|exported import|1
-        swift-ietf/swift-bcp-47|namespace adoption typealias|2
         swift-ietf/swift-bcp-47|test display name string|1
-        swift-ietf/swift-bcp-47|typealiased namespace bridge|2
         swift-ietf/swift-rfc-1034|canonical settings tail|1
         swift-ietf/swift-rfc-1034|compound suite name|6
         swift-ietf/swift-rfc-1034|minimal type body|1
-        swift-ietf/swift-rfc-1034|namespace adoption typealias|3
         swift-ietf/swift-rfc-1034|package policy revision 1|1
         swift-ietf/swift-rfc-1034|path name grammar|1
         swift-ietf/swift-rfc-1034|single type per file|1
         swift-ietf/swift-rfc-1034|test display name string|6
-        swift-ietf/swift-rfc-1034|typealiased namespace bridge|3
         swift-ietf/swift-rfc-1034|unification typealias|1
         swift-ietf/swift-rfc-1035|chained rawvalue access|15
         swift-ietf/swift-rfc-1035|compound suite name|12
@@ -2292,13 +2200,11 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-ietf/swift-rfc-2046|do throws for typed catch|1
         swift-ietf/swift-rfc-2046|fatal error outside tests|1
         swift-ietf/swift-rfc-2046|minimal type body|28
-        swift-ietf/swift-rfc-2046|namespace adoption typealias|1
         swift-ietf/swift-rfc-2046|path name grammar|19
         swift-ietf/swift-rfc-2046|raw value access|9
         swift-ietf/swift-rfc-2046|single type per file|1
         swift-ietf/swift-rfc-2046|throwing wrapper init|1
         swift-ietf/swift-rfc-2046|trait consistency|2
-        swift-ietf/swift-rfc-2046|typealiased namespace bridge|1
         swift-ietf/swift-rfc-2046|unchecked call site|4
         swift-ietf/swift-rfc-2047|count minus one|2
         swift-ietf/swift-rfc-2047|path name grammar|3
@@ -2594,9 +2500,7 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-ietf/swift-rfc-8259|compound suite name|2
         swift-ietf/swift-rfc-8259|exported import|5
         swift-ietf/swift-rfc-8259|int public parameter|15
-        swift-ietf/swift-rfc-8259|namespace adoption typealias|3
         swift-ietf/swift-rfc-8259|test display name string|1
-        swift-ietf/swift-rfc-8259|typealiased namespace bridge|1
         swift-ietf/swift-rfc-8288|chained rawvalue access|5
         swift-ietf/swift-rfc-8288|compound suite name|2
         swift-ietf/swift-rfc-8288|raw value access|3
@@ -2663,19 +2567,15 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-ietf/swift-rfc-9557|test display name string|5
         swift-ietf/swift-rfc-9557|throwing wrapper init|3
         swift-ietf/swift-rfc-9557|unchecked call site|4
-        swift-ietf/swift-rfc-9562|namespace adoption typealias|1
-        swift-ietf/swift-rfc-9562|typealiased namespace bridge|1
         swift-incits/swift-incits-4-1986|compound suite name|158
         swift-incits/swift-incits-4-1986|count minus one|2
         swift-incits/swift-incits-4-1986|counter loop iteration|1
         swift-incits/swift-incits-4-1986|int public parameter|1
-        swift-incits/swift-incits-4-1986|namespace adoption typealias|8
         swift-incits/swift-incits-4-1986|path name grammar|21
         swift-incits/swift-incits-4-1986|result wrapper for rethrows shim|8
         swift-incits/swift-incits-4-1986|statement where expression fits|1
         swift-incits/swift-incits-4-1986|string utf8 scanning|1
         swift-incits/swift-incits-4-1986|try optional|3
-        swift-incits/swift-incits-4-1986|typealiased namespace bridge|8
         swift-institute/institute|bool public parameter|17
         swift-institute/institute|canonical settings tail|1
         swift-institute/institute|chained rawvalue access|9
@@ -2695,7 +2595,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-institute/institute|manifest naming grammar|3
         swift-institute/institute|minimal type body|687
         swift-institute/institute|module selector spelling|5
-        swift-institute/institute|namespace adoption typealias|7
         swift-institute/institute|package policy revision 1|2
         swift-institute/institute|path name grammar|208
         swift-institute/institute|raw value access|78
@@ -2755,7 +2654,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-iso/swift-iso-32000|int public parameter|94
         swift-iso/swift-iso-32000|minimal type body|7
         swift-iso/swift-iso-32000|module selector spelling|4
-        swift-iso/swift-iso-32000|namespace adoption typealias|90
         swift-iso/swift-iso-32000|path name grammar|16
         swift-iso/swift-iso-32000|property named flags|2
         swift-iso/swift-iso-32000|raw concept|4
@@ -2765,7 +2663,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-iso/swift-iso-32000|string utf8 scanning|14
         swift-iso/swift-iso-32000|throwing wrapper init|6
         swift-iso/swift-iso-32000|try optional|1
-        swift-iso/swift-iso-32000|typealiased namespace bridge|89
         swift-iso/swift-iso-32000|unchecked call site|1
         swift-iso/swift-iso-32000|unification typealias|24
         swift-iso/swift-iso-32000|untraited partial dependency|2
@@ -2795,7 +2692,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-iso/swift-iso-8825|do throws for typed catch|3
         swift-iso/swift-iso-8825|fatal error outside tests|1
         swift-iso/swift-iso-8825|minimal type body|23
-        swift-iso/swift-iso-8825|namespace adoption typealias|2
         swift-iso/swift-iso-8825|path name grammar|7
         swift-iso/swift-iso-8825|single type per file|16
         swift-iso/swift-iso-8825|statement where expression fits|1
@@ -2831,7 +2727,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-iso/swift-iso-9945|fatal error outside tests|1
         swift-iso/swift-iso-9945|int public parameter|44
         swift-iso/swift-iso-9945|minimal type body|8
-        swift-iso/swift-iso-9945|namespace adoption typealias|15
         swift-iso/swift-iso-9945|path name grammar|5
         swift-iso/swift-iso-9945|raw value access|130
         swift-iso/swift-iso-9945|result wrapper for rethrows shim|1
@@ -2841,7 +2736,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-iso/swift-iso-9945|test display name string|13
         swift-iso/swift-iso-9945|throwing wrapper init|1
         swift-iso/swift-iso-9945|try optional|8
-        swift-iso/swift-iso-9945|typealiased namespace bridge|15
         swift-iso/swift-iso-9945|unchecked sendable noncopyable|1
         swift-iso/swift-iso-9945|unification typealias|2
         swift-iso/swift-iso-9945|unsafe storage visibility|5
@@ -2856,7 +2750,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-linux-foundation/swift-linux-standard|exported import|5
         swift-linux-foundation/swift-linux-standard|int public parameter|12
         swift-linux-foundation/swift-linux-standard|minimal type body|179
-        swift-linux-foundation/swift-linux-standard|namespace adoption typealias|3
         swift-linux-foundation/swift-linux-standard|optionset shell pattern|46
         swift-linux-foundation/swift-linux-standard|path name grammar|1
         swift-linux-foundation/swift-linux-standard|pointer advanced by|7
@@ -2867,7 +2760,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-linux-foundation/swift-linux-standard|statement where expression fits|1
         swift-linux-foundation/swift-linux-standard|string utf8 scanning|1
         swift-linux-foundation/swift-linux-standard|test target naming|1
-        swift-linux-foundation/swift-linux-standard|typealiased namespace bridge|1
         swift-linux-foundation/swift-linux-standard|untyped throws|1
         swift-linux-foundation/swift-linux-standard|zero or one literal|4
         swift-linux-foundation/swift-model-context-protocol|bool public parameter|6
@@ -2887,7 +2779,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-microsoft/swift-windows-32|fatal error outside tests|2
         swift-microsoft/swift-windows-32|int public parameter|37
         swift-microsoft/swift-windows-32|minimal type body|3
-        swift-microsoft/swift-windows-32|namespace adoption typealias|7
         swift-microsoft/swift-windows-32|pointer advanced by|1
         swift-microsoft/swift-windows-32|property named flags|1
         swift-microsoft/swift-windows-32|raw value access|37
@@ -2897,7 +2788,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-microsoft/swift-windows-32|string utf8 scanning|3
         swift-microsoft/swift-windows-32|test display name string|1
         swift-microsoft/swift-windows-32|try optional|2
-        swift-microsoft/swift-windows-32|typealiased namespace bridge|6
         swift-microsoft/swift-windows-32|unchecked sendable noncopyable|1
         swift-microsoft/swift-windows-32|unification typealias|1
         swift-microsoft/swift-windows-32|unsafe storage visibility|2
@@ -2917,10 +2807,8 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-molecules/swift-array|do throws for typed catch|3
         swift-molecules/swift-array|extension file naming|10
         swift-molecules/swift-array|file name nested path|1
-        swift-molecules/swift-array|namespace adoption typealias|1
         swift-molecules/swift-array|nonisolated unsafe without invariant|1
         swift-molecules/swift-array|top level type owner|1
-        swift-molecules/swift-array|typealiased namespace bridge|1
         swift-molecules/swift-array|undeclared module import|1
         swift-molecules/swift-async-barrier|compound identifier|1
         swift-molecules/swift-async-barrier|compound suite name|1
@@ -2950,13 +2838,11 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-molecules/swift-async-channel|extension file naming|1
         swift-molecules/swift-async-channel|file name nested path|1
         swift-molecules/swift-async-channel|minimal type body|11
-        swift-molecules/swift-async-channel|namespace adoption typealias|1
         swift-molecules/swift-async-channel|optimize suppression attribute|11
         swift-molecules/swift-async-channel|path name grammar|2
         swift-molecules/swift-async-channel|redundant refinement|19
         swift-molecules/swift-async-channel|single type per file|27
         swift-molecules/swift-async-channel|try optional|28
-        swift-molecules/swift-async-channel|typealiased namespace bridge|1
         swift-molecules/swift-async-channel|unification typealias|4
         swift-molecules/swift-async-fanout|compound identifier|1
         swift-molecules/swift-async-fanout|compound suite name|4
@@ -2969,11 +2855,8 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-molecules/swift-async-semaphore|do throws for typed catch|8
         swift-molecules/swift-async-semaphore|extension file naming|4
         swift-molecules/swift-async-semaphore|int public parameter|1
-        swift-molecules/swift-async-semaphore|lifecycle typealias review|1
-        swift-molecules/swift-async-semaphore|namespace adoption typealias|1
         swift-molecules/swift-async-semaphore|task sleep|1
         swift-molecules/swift-async-semaphore|try optional|7
-        swift-molecules/swift-async-semaphore|typealiased namespace bridge|1
         swift-molecules/swift-async-sequence|compound suite name|6
         swift-molecules/swift-async-sequence|existential parameter|4
         swift-molecules/swift-async-sequence|extension file naming|4
@@ -2997,8 +2880,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-molecules/swift-async-waiter|do throws for typed catch|2
         swift-molecules/swift-async-waiter|extension file naming|2
         swift-molecules/swift-async-waiter|minimal type body|1
-        swift-molecules/swift-async-waiter|namespace adoption typealias|1
-        swift-molecules/swift-async-waiter|typealiased namespace bridge|1
         swift-molecules/swift-benchmark|compound suite name|3
         swift-molecules/swift-benchmark|extension file naming|2
         swift-molecules/swift-binary-parser|bitpattern rawvalue chain|1
@@ -3010,12 +2891,10 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-molecules/swift-binary-parser|fatal error outside tests|1
         swift-molecules/swift-binary-parser|file name nested path|2
         swift-molecules/swift-binary-parser|int public parameter|4
-        swift-molecules/swift-binary-parser|namespace adoption typealias|11
         swift-molecules/swift-binary-parser|single type per file|4
         swift-molecules/swift-binary-parser|test display name string|1
         swift-molecules/swift-binary-parser|test function naming|9
         swift-molecules/swift-binary-parser|trait consistency|2
-        swift-molecules/swift-binary-parser|typealiased namespace bridge|12
         swift-molecules/swift-binary-parser|unification typealias|1
         swift-molecules/swift-bit-vector|bitpattern rawvalue chain|1
         swift-molecules/swift-bit-vector|bool public parameter|8
@@ -3096,7 +2975,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-molecules/swift-calendar-gregorian|file name nested path|1
         swift-molecules/swift-calendar-gregorian|int public parameter|61
         swift-molecules/swift-calendar-gregorian|minimal type body|5
-        swift-molecules/swift-calendar-gregorian|namespace adoption typealias|3
         swift-molecules/swift-calendar-gregorian|path name grammar|7
         swift-molecules/swift-calendar-gregorian|raw value access|16
         swift-molecules/swift-calendar-gregorian|tagged extension public init|2
@@ -3105,7 +2983,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-molecules/swift-calendar-gregorian|throwing wrapper init|2
         swift-molecules/swift-calendar-gregorian|top level type owner|1
         swift-molecules/swift-calendar-gregorian|trait consistency|3
-        swift-molecules/swift-calendar-gregorian|typealiased namespace bridge|3
         swift-molecules/swift-calendar-gregorian|unification typealias|2
         swift-molecules/swift-calendar-gregorian|untyped throws|2
         swift-molecules/swift-copy-on-write|compound suite name|2
@@ -3132,10 +3009,8 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-molecules/swift-dictionary-ordered|compound suite name|7
         swift-molecules/swift-dictionary-ordered|extension file naming|5
         swift-molecules/swift-dictionary-ordered|extension noncopyable constraint|1
-        swift-molecules/swift-dictionary-ordered|namespace adoption typealias|1
         swift-molecules/swift-dictionary-ordered|nonisolated unsafe without invariant|2
         swift-molecules/swift-dictionary-ordered|sli literal|3
-        swift-molecules/swift-dictionary-ordered|typealiased namespace bridge|1
         swift-molecules/swift-foundation-extensions|architecture foundation type|11
         swift-molecules/swift-foundation-extensions|compound identifier|39
         swift-molecules/swift-foundation-extensions|compound suite name|18
@@ -3159,11 +3034,9 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-molecules/swift-graph|extension noncopyable constraint|1
         swift-molecules/swift-graph|file name nested path|1
         swift-molecules/swift-graph|minimal type body|22
-        swift-molecules/swift-graph|namespace adoption typealias|1
         swift-molecules/swift-graph|tag suffix|8
         swift-molecules/swift-graph|test display name string|1
         swift-molecules/swift-graph|trait consistency|14
-        swift-molecules/swift-graph|typealiased namespace bridge|1
         swift-molecules/swift-hash-table|bitpattern rawvalue chain|17
         swift-molecules/swift-hash-table|bool public parameter|2
         swift-molecules/swift-hash-table|compound identifier|4
@@ -3186,7 +3059,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-molecules/swift-layout|extension noncopyable constraint|1
         swift-molecules/swift-layout|file name nested path|1
         swift-molecules/swift-layout|int public parameter|2
-        swift-molecules/swift-layout|namespace adoption typealias|3
         swift-molecules/swift-layout|path name grammar|1
         swift-molecules/swift-layout|single type per file|12
         swift-molecules/swift-layout|test target naming|1
@@ -3268,11 +3140,9 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-molecules/swift-parser-machine|file name nested path|13
         swift-molecules/swift-parser-machine|int public parameter|6
         swift-molecules/swift-parser-machine|minimal type body|6
-        swift-molecules/swift-parser-machine|namespace adoption typealias|13
         swift-molecules/swift-parser-machine|single type per file|5
         swift-molecules/swift-parser-machine|test display name string|2
         swift-molecules/swift-parser-machine|test target naming|1
-        swift-molecules/swift-parser-machine|typealiased namespace bridge|16
         swift-molecules/swift-parser-machine|unlabeled lifecycle closure|1
         swift-molecules/swift-queue-linked|compound identifier|1
         swift-molecules/swift-queue-linked|compound suite name|5
@@ -3297,7 +3167,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-molecules/swift-slot-map|count minus one|1
         swift-molecules/swift-slot-map|extension file naming|3
         swift-molecules/swift-slot-map|manifest naming grammar|5
-        swift-molecules/swift-slot-map|namespace adoption typealias|1
         swift-molecules/swift-slot-map|nonisolated unsafe without invariant|2
         swift-molecules/swift-slot-map|path name grammar|12
         swift-molecules/swift-snapshot|compound suite name|1
@@ -3335,11 +3204,9 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-molecules/swift-test|existential parameter|2
         swift-molecules/swift-test|extension file naming|12
         swift-molecules/swift-test|int public parameter|8
-        swift-molecules/swift-test|namespace adoption typealias|1
         swift-molecules/swift-test|path name grammar|1
         swift-molecules/swift-test|single type per file|3
         swift-molecules/swift-test|statement where expression fits|4
-        swift-molecules/swift-test|typealiased namespace bridge|1
         swift-molecules/swift-test|unchecked sendable categorization|1
         swift-molecules/swift-test|undeclared module import|1
         swift-molecules/swift-test|untraited partial dependency|2
@@ -3351,12 +3218,10 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-molecules/swift-tree|extension file naming|2
         swift-molecules/swift-tree|hoisted error in public throws|7
         swift-molecules/swift-tree|int public parameter|3
-        swift-molecules/swift-tree|namespace adoption typealias|5
         swift-molecules/swift-tree|path name grammar|2
         swift-molecules/swift-tree|top level type owner|2
         swift-molecules/swift-tree|trait consistency|1
         swift-molecules/swift-tree|try optional|5
-        swift-molecules/swift-tree|typealiased namespace bridge|3
         swift-molecules/swift-tree|untyped throws|3
         swift-molecules/swift-tree-column|compound suite name|2
         swift-molecules/swift-tree-column|hoisted error in public throws|1
@@ -3371,9 +3236,7 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-molecules/swift-tree-keyed|hoisted error in public throws|5
         swift-molecules/swift-tree-keyed|int public parameter|1
         swift-molecules/swift-tree-keyed|minimal type body|16
-        swift-molecules/swift-tree-keyed|namespace adoption typealias|1
         swift-molecules/swift-tree-keyed|path name grammar|2
-        swift-molecules/swift-tree-keyed|typealiased namespace bridge|1
         swift-molecules/swift-tree-keyed|unification typealias|2
         swift-molecules/swift-tree-keyed|untyped throws|2
         swift-molecules/swift-tree-n|compound identifier|9
@@ -3397,9 +3260,7 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-standards/swift-css-standard|compound suite name|3
         swift-standards/swift-css-standard|exported import|3
         swift-standards/swift-css-standard|module selector spelling|1
-        swift-standards/swift-css-standard|namespace adoption typealias|1
         swift-standards/swift-css-standard|path name grammar|1
-        swift-standards/swift-css-standard|typealiased namespace bridge|1
         swift-standards/swift-css-standard|undeclared module import|3
         swift-standards/swift-css-standard|unification typealias|2
         swift-standards/swift-darwin-standard|architecture import boundary|5
@@ -3407,7 +3268,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-standards/swift-darwin-standard|counter loop iteration|4
         swift-standards/swift-darwin-standard|exported import|5
         swift-standards/swift-darwin-standard|int public parameter|6
-        swift-standards/swift-darwin-standard|namespace adoption typealias|4
         swift-standards/swift-darwin-standard|nonisolated unsafe without invariant|1
         swift-standards/swift-darwin-standard|path name grammar|1
         swift-standards/swift-darwin-standard|raw value access|15
@@ -3415,7 +3275,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-standards/swift-darwin-standard|statement where expression fits|2
         swift-standards/swift-darwin-standard|tagged extension public init|1
         swift-standards/swift-darwin-standard|try optional|1
-        swift-standards/swift-darwin-standard|typealiased namespace bridge|1
         swift-standards/swift-darwin-standard|undeclared module import|1
         swift-standards/swift-darwin-standard|unification typealias|1
         swift-standards/swift-darwin-standard|unsafe storage visibility|1
@@ -3461,23 +3320,17 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-standards/swift-html-standard|chained rawvalue access|4
         swift-standards/swift-html-standard|compound suite name|1
         swift-standards/swift-html-standard|exported import|15
-        swift-standards/swift-html-standard|namespace adoption typealias|1
         swift-standards/swift-html-standard|path name grammar|1
-        swift-standards/swift-html-standard|typealiased namespace bridge|1
         swift-standards/swift-html-standard|undeclared module import|1
         swift-standards/swift-html-standard|unification typealias|3
         swift-standards/swift-ipv4-standard|architecture import boundary|1
         swift-standards/swift-ipv4-standard|compound suite name|1
         swift-standards/swift-ipv4-standard|exported import|1
-        swift-standards/swift-ipv4-standard|namespace adoption typealias|1
         swift-standards/swift-ipv4-standard|path name grammar|2
-        swift-standards/swift-ipv4-standard|typealiased namespace bridge|1
         swift-standards/swift-ipv6-standard|architecture import boundary|3
         swift-standards/swift-ipv6-standard|compound suite name|1
         swift-standards/swift-ipv6-standard|exported import|3
-        swift-standards/swift-ipv6-standard|namespace adoption typealias|1
         swift-standards/swift-ipv6-standard|path name grammar|2
-        swift-standards/swift-ipv6-standard|typealiased namespace bridge|1
         swift-standards/swift-json-feed-standard|bool public parameter|1
         swift-standards/swift-json-feed-standard|int public parameter|3
         swift-standards/swift-json-feed-standard|path name grammar|8
@@ -3502,8 +3355,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-standards/swift-rss-standard|path name grammar|6
         swift-standards/swift-rss-standard|throwing wrapper init|2
         swift-standards/swift-rss-standard|try optional|2
-        swift-standards/swift-sockets-standard|namespace adoption typealias|18
-        swift-standards/swift-sockets-standard|typealiased namespace bridge|18
         swift-standards/swift-sockets-standard|unification typealias|1
         swift-standards/swift-spm-standard|compound suite name|2
         swift-standards/swift-spm-standard|count minus one|8
@@ -3529,8 +3380,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-standards/swift-uri-standard|compound suite name|2
         swift-standards/swift-uri-standard|exported import|2
         swift-standards/swift-uri-standard|fatal error outside tests|1
-        swift-standards/swift-uri-standard|namespace adoption typealias|11
-        swift-standards/swift-uri-standard|typealiased namespace bridge|11
         swift-standards/swift-uri-standard|unification typealias|2
         swift-standards/swift-xcode-standard|bool public parameter|2
         swift-standards/swift-xcode-standard|raw value access|2
@@ -3549,7 +3398,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-w3c/swift-w3c-css|int public parameter|125
         swift-w3c/swift-w3c-css|manifest naming grammar|21
         swift-w3c/swift-w3c-css|minimal type body|8
-        swift-w3c/swift-w3c-css|namespace adoption typealias|18
         swift-w3c/swift-w3c-css|path name grammar|706
         swift-w3c/swift-w3c-css|raw concept|4
         swift-w3c/swift-w3c-css|raw value access|178
@@ -3557,7 +3405,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-w3c/swift-w3c-css|single type per file|258
         swift-w3c/swift-w3c-css|statement where expression fits|45
         swift-w3c/swift-w3c-css|throwing wrapper init|3
-        swift-w3c/swift-w3c-css|typealiased namespace bridge|17
         swift-w3c/swift-w3c-css|unification typealias|2
         swift-w3c/swift-w3c-cssom|path name grammar|4
         swift-w3c/swift-w3c-cssom|string utf8 scanning|2
@@ -3579,12 +3426,10 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-w3c/swift-w3c-svg|bool public parameter|2
         swift-w3c/swift-w3c-svg|compound suite name|3
         swift-w3c/swift-w3c-svg|exported import|1
-        swift-w3c/swift-w3c-svg|namespace adoption typealias|25
         swift-w3c/swift-w3c-svg|path name grammar|16
         swift-w3c/swift-w3c-svg|single type per file|33
         swift-w3c/swift-w3c-svg|statement where expression fits|1
         swift-w3c/swift-w3c-svg|test display name string|24
-        swift-w3c/swift-w3c-svg|typealiased namespace bridge|25
         swift-w3c/swift-w3c-svg|unification typealias|2
         swift-w3c/swift-w3c-xml|bool public parameter|1
         swift-w3c/swift-w3c-xml|chained rawvalue access|1
@@ -3595,7 +3440,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-w3c/swift-w3c-xml|hoisted error in public throws|1
         swift-w3c/swift-w3c-xml|int public parameter|11
         swift-w3c/swift-w3c-xml|minimal type body|67
-        swift-w3c/swift-w3c-xml|namespace adoption typealias|1
         swift-w3c/swift-w3c-xml|path name grammar|1
         swift-w3c/swift-w3c-xml|raw value access|2
         swift-w3c/swift-w3c-xml|single type per file|22
@@ -3603,7 +3447,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-w3c/swift-w3c-xml|string utf8 scanning|4
         swift-w3c/swift-w3c-xml|tag suffix|1
         swift-w3c/swift-w3c-xml|test display name string|7
-        swift-w3c/swift-w3c-xml|typealiased namespace bridge|1
         swift-w3c/swift-w3c-xml|undeclared module import|3
         swift-whatwg/swift-whatwg-html|architecture import boundary|24
         swift-whatwg/swift-whatwg-html|bool public parameter|38
@@ -3615,14 +3458,12 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-whatwg/swift-whatwg-html|int public parameter|88
         swift-whatwg/swift-whatwg-html|manifest naming grammar|18
         swift-whatwg/swift-whatwg-html|minimal type body|1
-        swift-whatwg/swift-whatwg-html|namespace adoption typealias|2
         swift-whatwg/swift-whatwg-html|path name grammar|416
         swift-whatwg/swift-whatwg-html|raw value access|7
         swift-whatwg/swift-whatwg-html|single type per file|21
         swift-whatwg/swift-whatwg-html|statement where expression fits|2
         swift-whatwg/swift-whatwg-html|string utf8 scanning|1
         swift-whatwg/swift-whatwg-html|test display name string|12
-        swift-whatwg/swift-whatwg-html|typealiased namespace bridge|2
         swift-whatwg/swift-whatwg-html|unchecked call site|4
         swift-whatwg/swift-whatwg-html|unification typealias|1
         swift-whatwg/swift-whatwg-url|compound suite name|15

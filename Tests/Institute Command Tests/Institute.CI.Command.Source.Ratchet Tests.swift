@@ -46,6 +46,35 @@ import Testing
         #expect(advisory.code(status: .findings, errors: true) == 0)
     }
 
+    static func finding(_ rule: Swift.String, _ severity: Diagnostic.Severity) -> Source.Finding {
+        Source.Finding(
+            rule: Source.Rule.ID(engine: Source.Engine.ID("swift-linter"), token: rule),
+            diagnostic: .init(
+                location: .init(fileID: "F.swift", filePath: "Sources/M/F.swift", line: 1, column: 1),
+                severity: severity,
+                identifier: rule,
+                message: rule
+            ),
+            repair: .unavailable(.init(code: "fixture", detail: rule))
+        )
+    }
+
+    /// swift-institute/Issues#272: a note is a review prompt and never counts; warnings and errors do.
+    @Test func `a note is not counted, a warning and an error are`() {
+        let counts = Ratchet.counts([
+            Self.finding("namespace adoption typealias", .note),
+            Self.finding("typealiased namespace bridge", .note),
+            Self.finding("comment in source", .warning),
+            Self.finding("comment in source", .error),
+        ])
+        #expect(counts == ["comment in source": 2])
+    }
+
+    @Test func `a note over no limit is no overrun`() {
+        let counts = Ratchet.counts([Self.finding("namespace adoption typealias", .note)])
+        #expect(Ratchet.overruns(repository: "swift-atoms/swift-a", counts: counts, table: Self.table).isEmpty)
+    }
+
     @Test func `the shipped table parses`() {
         #expect(!Ratchet.allowed(for: "swift-compositions/swift-sqlite", in: Ratchet.limits).isEmpty)
     }
