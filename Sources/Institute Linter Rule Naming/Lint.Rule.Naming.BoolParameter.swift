@@ -2,9 +2,12 @@ public import Lint
 internal import SwiftSyntax
 
 extension Lint.Rule {
+    /// A public `Bool` a design keeps on purpose is suppressed with `swift-linter:disable:next` and a `REASON:` line
+    /// (swift-institute/Issues#273).
     public static let `bool public parameter` = Lint.Rule(
         id: "bool public parameter",
         default: .warning,
+        suppression: .next,
         controls: [
             .init(
                 id: "bool public parameter public bool",

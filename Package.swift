@@ -718,8 +718,10 @@ let linterRuleTargets: [Target] = [
         name: "Institute Linter Rule Naming Tests",
         dependencies: [
             .target(name: "Institute Linter Rule Naming"),
+            .product(name: "Linter", package: "swift-linter"),
             .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
             .product(name: "SwiftParser", package: "swift-syntax"),
+            .product(name: "Text", package: "swift-text"),
         ]
     ),
     .testTarget(

@@ -14,6 +14,8 @@ import Linter_Rules_Test_Support
 import SwiftParser
 import SwiftSyntax
 import Testing
+import Linter
+import Text
 
 @testable import Institute_Linter_Rule_Naming
 
@@ -306,5 +308,41 @@ extension `Lint.Rule Tests`.`bool public parameter Tests`.`Edge Case` {
             """
         let findings = `Lint.Rule Tests`.`bool public parameter Tests`.findings(in: source)
         #expect(findings.isEmpty)
+    }
+}
+
+extension `Lint.Rule Tests` {
+    /// A public `Bool` parameter a design keeps on purpose is suppressed by `disable:next` with a reason, which the
+    /// rule sanctions; before swift-institute/Issues#273 it sanctioned no directive, so the line was ignored.
+    @Suite struct `bool public parameter suppression Tests` {
+        static let rule = Lint.Rule.`bool public parameter`
+
+        static func suppression(_ source: Swift.String) -> Lint.Suppression {
+            let tree = Parser.parse(source: source)
+            return Lint.Suppression.scan(tree: tree, converter: SourceLocationConverter(fileName: "test.swift", tree: tree))
+        }
+
+        @Test func `a public Bool parameter with no directive is reported`() {
+            let suppression = Self.suppression("public func open(create: Bool) {}")
+            #expect(!suppression.suppresses(line: Text.Line.Number(1), rule: Self.rule.id, sanctioned: Self.rule.suppression))
+        }
+
+        @Test func `disable next with a reason is sanctioned`() {
+            let suppression = Self.suppression(
+                """
+                // swift-linter:disable:next bool public parameter
+                // REASON: mirrors the platform API's flag one to one.
+                public func open(create: Bool) {}
+                """
+            )
+            #expect(suppression.suppresses(line: Text.Line.Number(3), rule: Self.rule.id, sanctioned: Self.rule.suppression))
+        }
+
+        @Test func `disable line is not sanctioned`() {
+            let suppression = Self.suppression(
+                "public func open(create: Bool) {} // swift-linter:disable:line bool public parameter"
+            )
+            #expect(!suppression.suppresses(line: Text.Line.Number(1), rule: Self.rule.id, sanctioned: Self.rule.suppression))
+        }
     }
 }
