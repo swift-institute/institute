@@ -16,11 +16,11 @@ extension Institute.CI.Command {
         let deviation = Institute.Repository.Policy.Deviation.read(root: value("--workspace", in: rest))
         let timeout: Institute.CI.Timeout
         do {
-            timeout = try Institute.CI.Timeout(metadata: deviation.timeoutMinutes)
+            timeout = try Institute.CI.Timeout(metadata: deviation.timeout)
         } catch {
             refuse(
                 "plan refused: timeout-minutes in \(Institute.Repository.Policy.Deviation.path) is "
-                    + "'\(deviation.timeoutMinutes)'; it must be a whole number of minutes from 1 to "
+                    + "'\(deviation.timeout)'; it must be a whole number of minutes from 1 to "
                     + "\(Institute.CI.Timeout.maximum)."
             )
         }

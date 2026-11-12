@@ -11,53 +11,55 @@ extension Institute.CI.Command.Source {
     /// A repository or rule not listed may have none. Limits are regenerated
     /// by `ratchet.py` in swift-institute/cloud-workspace, which refuses a rise
     /// in a rule's total, so the table ships with the rules it was measured by.
-    enum Ratchet {
-        static let engine = "swift-linter"
+    enum Ratchet {}
+}
 
-        /// The swift-linter findings in `report`, by rule.
-        static func counts(_ report: Source_Report::Source.Report) -> [Swift.String: Swift.Int] {
-            var findings: [Source_Report::Source.Finding] = []
-            for measurement in report.measurements where measurement.engine.token == engine {
-                guard case .findings(let measured) = measurement.verdict else { continue }
-                findings += measured
-            }
-            return counts(findings)
-        }
+extension Institute.CI.Command.Source.Ratchet {
+    static let engine = "swift-linter"
 
-        /// `findings` by rule, leaving out notes. A rule whose findings are notes surfaces a review prompt, which
-        /// asks a person to look and says nothing is wrong, so it never counts (swift-institute/Issues#272).
-        static func counts(_ findings: [Source_Report::Source.Finding]) -> [Swift.String: Swift.Int] {
-            var counts: [Swift.String: Swift.Int] = [:]
-            for finding in findings where finding.diagnostic.severity != .note {
-                counts[finding.rule.token, default: 0] += 1
-            }
-            return counts
+    /// The swift-linter findings in `report`, by rule.
+    static func counts(_ report: Source_Report::Source.Report) -> [Swift.String: Swift.Int] {
+        var findings: [Source_Report::Source.Finding] = []
+        for measurement in report.measurements where measurement.engine.token == engine {
+            guard case .findings(let measured) = measurement.verdict else { continue }
+            findings += measured
         }
+        return counts(findings)
+    }
 
-        /// One line for each rule in `counts` over its limit in `table`, sorted by rule.
-        static func overruns(
-            repository: Swift.String,
-            counts: [Swift.String: Swift.Int],
-            table: Swift.String = limits
-        ) -> [Swift.String] {
-            let allowed = Self.allowed(for: repository, in: table)
-            return counts.keys.sorted().compactMap { rule in
-                let count = counts[rule] ?? 0
-                let limit = allowed[rule] ?? 0
-                guard count > limit else { return nil }
-                return "ratchet: \(repository) has \(count) `\(rule)` findings, limit \(limit). Fix them; a limit doesn't rise."
-            }
+    /// `findings` by rule, leaving out notes. A rule whose findings are notes surfaces a review prompt, which
+    /// asks a person to look and says nothing is wrong, so it never counts (swift-institute/Issues#272).
+    static func counts(_ findings: [Source_Report::Source.Finding]) -> [Swift.String: Swift.Int] {
+        var counts: [Swift.String: Swift.Int] = [:]
+        for finding in findings where finding.diagnostic.severity != .note {
+            counts[finding.rule.token, default: 0] += 1
         }
+        return counts
+    }
 
-        /// `repository`'s limits from `table`, whose lines are `owner/name|rule|limit`.
-        static func allowed(for repository: Swift.String, in table: Swift.String) -> [Swift.String: Swift.Int] {
-            var allowed: [Swift.String: Swift.Int] = [:]
-            for line in table.split(separator: "\n") {
-                let fields = line.split(separator: "|", omittingEmptySubsequences: false)
-                guard fields.count == 3, fields[0] == repository, let limit = Swift.Int(fields[2]) else { continue }
-                allowed[Swift.String(fields[1])] = limit
-            }
-            return allowed
+    /// One line for each rule in `counts` over its limit in `table`, sorted by rule.
+    static func overruns(
+        repository: Swift.String,
+        counts: [Swift.String: Swift.Int],
+        table: Swift.String = limits
+    ) -> [Swift.String] {
+        let allowed = Self.allowed(for: repository, in: table)
+        return counts.keys.sorted().compactMap { rule in
+            let count = counts[rule] ?? 0
+            let limit = allowed[rule] ?? 0
+            guard count > limit else { return nil }
+            return "ratchet: \(repository) has \(count) `\(rule)` findings, limit \(limit). Fix them; a limit doesn't rise."
         }
+    }
+
+    /// `repository`'s limits from `table`, whose lines are `owner/name|rule|limit`.
+    static func allowed(for repository: Swift.String, in table: Swift.String) -> [Swift.String: Swift.Int] {
+        var allowed: [Swift.String: Swift.Int] = [:]
+        for line in table.split(separator: "\n") {
+            let fields = line.split(separator: "|", omittingEmptySubsequences: false)
+            guard fields.count == 3, fields[0] == repository, let limit = Swift.Int(fields[2]) else { continue }
+            allowed[Swift.String(fields[1])] = limit
+        }
+        return allowed
     }
 }

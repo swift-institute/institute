@@ -6,12 +6,12 @@ extension Institute.Repository.Policy {
         public let embeddedTarget: Swift.String
         /// `timeout-minutes:` as written; empty when absent. Validated by
         /// `Institute.CI.Timeout` when the plan reads it.
-        public let timeoutMinutes: Swift.String
+        public let timeout: Swift.String
 
-        public init(platforms: Swift.String = "", embeddedTarget: Swift.String = "", timeoutMinutes: Swift.String = "") {
+        public init(platforms: Swift.String = "", embeddedTarget: Swift.String = "", timeout: Swift.String = "") {
             self.platforms = platforms
             self.embeddedTarget = embeddedTarget
-            self.timeoutMinutes = timeoutMinutes
+            self.timeout = timeout
         }
     }
 }
@@ -39,7 +39,7 @@ extension Institute.Repository.Policy.Deviation {
         self.init(
             platforms: values["platforms"] ?? "",
             embeddedTarget: values["embedded-target"] ?? "",
-            timeoutMinutes: values["timeout-minutes"] ?? ""
+            timeout: values["timeout-minutes"] ?? ""
         )
     }
 }

@@ -161,7 +161,8 @@ private func compoundSuiteIsSingleWordFallback(_ name: TokenSyntax) -> Swift::Bo
 /// `enum \`Foo Tests\`` namespace through `extension \`Foo Tests\``.
 private func compoundSuiteIsTestNamespace(_ container: Syntax) -> Swift::Bool {
     if let extensionDecl = container.as(ExtensionDeclSyntax.self) {
-        let last = extensionDecl.extendedType.as(MemberTypeSyntax.self)?.name
+        let last =
+            extensionDecl.extendedType.as(MemberTypeSyntax.self)?.name
             ?? extensionDecl.extendedType.as(IdentifierTypeSyntax.self)?.name
         guard let last else { return false }
         let unescaped = Lint.Syntax.Identifier.unescaped(last.text)

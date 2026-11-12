@@ -17,10 +17,10 @@ import Testing
         )
         #expect(deviation.platforms == "apple")
         #expect(deviation.embeddedTarget == "Core")
-        #expect(deviation.timeoutMinutes == "75")
+        #expect(deviation.timeout == "75")
     }
 
     @Test func `an absent timeout-minutes reads as empty`() {
-        #expect(Institute.Repository.Policy.Deviation(metadata: "platforms: linux\n").timeoutMinutes == "")
+        #expect(Institute.Repository.Policy.Deviation(metadata: "platforms: linux\n").timeout == "")
     }
 }

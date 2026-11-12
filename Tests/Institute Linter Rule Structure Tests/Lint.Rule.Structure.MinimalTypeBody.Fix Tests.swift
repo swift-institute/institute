@@ -496,4 +496,3 @@ extension `Lint.Rule Tests`.`minimal type body fix Tests`.`Not Fixable` {
         )
     }
 }
-
