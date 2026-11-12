@@ -14,6 +14,16 @@ extension Institute.CI.Command {
         let subjectRepository = value("--subject-repository", in: rest)
         let lintBundle = Institute.Organization.lintBundle(forRepository: GitHub_Standard::GitHub.Repository.Slug(subjectRepository))
         let deviation = Institute.Repository.Policy.Deviation.read(root: value("--workspace", in: rest))
+        let timeout: Institute.CI.Timeout
+        do {
+            timeout = try Institute.CI.Timeout(metadata: deviation.timeoutMinutes)
+        } catch {
+            refuse(
+                "plan refused: timeout-minutes in \(Institute.Repository.Policy.Deviation.path) is "
+                    + "'\(deviation.timeoutMinutes)'; it must be a whole number of minutes from 1 to "
+                    + "\(Institute.CI.Timeout.maximum)."
+            )
+        }
 
         let today = value("--today", in: rest)
         var deschedule: [Swift.String: Swift.String] = [:]
@@ -91,6 +101,7 @@ extension Institute.CI.Command {
             "linux-image": linuxImage.json,
             "lint-bundle": lintBundle.json,
             "embedded-target": deviation.embeddedTarget.json,
+            "timeout-minutes": Swift.String(timeout.minutes).json,
             "descheduled": plan.descheduled
                 .map { "\($0.leg.id)=\($0.reason)" }
                 .joined(separator: ",").json,

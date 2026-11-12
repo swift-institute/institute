@@ -4,10 +4,14 @@ extension Institute.Repository.Policy {
     public struct Deviation: Swift.Sendable, Swift.Equatable {
         public let platforms: Swift.String
         public let embeddedTarget: Swift.String
+        /// `timeout-minutes:` as written; empty when absent. Validated by
+        /// `Institute.CI.Timeout` when the plan reads it.
+        public let timeoutMinutes: Swift.String
 
-        public init(platforms: Swift.String = "", embeddedTarget: Swift.String = "") {
+        public init(platforms: Swift.String = "", embeddedTarget: Swift.String = "", timeoutMinutes: Swift.String = "") {
             self.platforms = platforms
             self.embeddedTarget = embeddedTarget
+            self.timeoutMinutes = timeoutMinutes
         }
     }
 }
@@ -32,6 +36,10 @@ extension Institute.Repository.Policy.Deviation {
             }
             values[key] = Swift.String(value)
         }
-        self.init(platforms: values["platforms"] ?? "", embeddedTarget: values["embedded-target"] ?? "")
+        self.init(
+            platforms: values["platforms"] ?? "",
+            embeddedTarget: values["embedded-target"] ?? "",
+            timeoutMinutes: values["timeout-minutes"] ?? ""
+        )
     }
 }
