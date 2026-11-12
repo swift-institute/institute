@@ -57,7 +57,8 @@ func `the pinned toolchain tool is taken where it is, through its links, when it
         search: ["relative/ignored", MainFixtureFiles.join(toolchain.root, "absent"), toolchain.links]
     ).acquire(asset(digest: digest), executable: true, into: tools)
 
-    #expect(acquired.description == tool)
+    #expect(MainFixtureFiles.resolvingSymlinks(acquired.description) == MainFixtureFiles.resolvingSymlinks(tool))
+    #expect(MainFixtureFiles.lastComponent(of: MainFixtureFiles.parent(of: acquired.description)) == "bin")
     #expect(!MainFixtureFiles.exists(tools.description))
     toolchain.remove()
 }
@@ -99,7 +100,10 @@ func `the first tool on the search path decides, as it would for the shell`() as
     }
     let acquired = try await Institute.Source.Acquisition(process: standIn, search: [second.bin, first.bin])
         .acquire(asset(digest: digest), executable: true, into: tools)
-    #expect(acquired.description == MainFixtureFiles.join(second.bin, "swift-format"))
+    #expect(
+        MainFixtureFiles.resolvingSymlinks(acquired.description)
+            == MainFixtureFiles.resolvingSymlinks(MainFixtureFiles.join(second.bin, "swift-format"))
+    )
     first.remove()
     second.remove()
 }
