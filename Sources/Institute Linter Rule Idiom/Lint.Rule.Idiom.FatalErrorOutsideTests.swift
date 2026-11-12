@@ -2,7 +2,9 @@ public import Lint
 internal import SwiftSyntax
 
 extension Lint.Rule {
-    /// A `* Test Support` target exists only for tests, so its sources aren't checked.
+    /// A `* Test Support` target exists only for tests, so its sources aren't checked. A `fatalError` that is the only
+    /// statement of the body of a function returning `Never`, or of a computed property or subscript of type `Never`,
+    /// isn't counted: the type already says the body never returns (swift-institute/Issues#271).
     public static let `fatal error outside tests` = Lint.Rule(
         id: "fatal error outside tests",
         default: .warning,
@@ -10,93 +12,51 @@ extension Lint.Rule {
         controls: [
             .init(
                 id: "fatal error outside tests source",
-                source: "func f() -> Never { fatalError(\"unreachable\") }",
+                source: "func f() { fatalError(\"unreachable\") }",
                 path: "Sources/Idiom Consumer/Trap.swift",
                 expectation: .findings(1)
             ),
             .init(
                 id: "fatal error outside tests qualified",
-                source: "func f() -> Never { Swift.fatalError() }",
+                source: "func f() { Swift.fatalError() }",
                 path: "Sources/Idiom Consumer/Trap.swift",
                 expectation: .findings(1)
             ),
             .init(
                 id: "fatal error outside tests test",
-                source: "func f() -> Never { fatalError(\"unreachable\") }",
+                source: "func f() { fatalError(\"unreachable\") }",
                 path: "Tests/Idiom Consumer Tests/Trap.swift",
                 expectation: .clean
             ),
             .init(
-                id: "fatal error outside tests parsing leaf witness",
+                id: "fatal error outside tests Never function body",
+                source: "func f() -> Never { fatalError(\"unreachable\") }",
+                path: "Sources/Idiom Consumer/Trap.swift",
+                expectation: .clean
+            ),
+            .init(
+                id: "fatal error outside tests returned in a Swift Never function",
+                source: "func f() -> Swift.Never { return Swift.fatalError() }",
+                path: "Sources/Idiom Consumer/Trap.swift",
+                expectation: .clean
+            ),
+            .init(
+                id: "fatal error outside tests Never property body",
                 source: "struct Leaf: Parsing { var body: Never { fatalError(\"leaf\") } }",
                 path: "Sources/Idiom Consumer/Leaf.swift",
-                expectation: .findings(1)
+                expectation: .clean
             ),
             .init(
-                id: "fatal error outside tests qualified generic coding leaf witness",
+                id: "fatal error outside tests Never borrowing getter",
                 source: "extension Example { struct Coder: Library.Utility.Coding<Int, Failure> { var body: Never { borrowing get { return fatalError(\"leaf\") } } } }",
                 path: "Sources/Idiom Consumer/Leaf.swift",
-                expectation: .findings(1)
+                expectation: .clean
             ),
             .init(
-                id: "fatal error outside tests same-file conforming extension",
-                source: "struct Leaf {}\nextension Leaf: Serializing { var body: Swift.Never { get { fatalError() } } }",
+                id: "fatal error outside tests Never subscript body",
+                source: "struct S { subscript(index: Int) -> Never { fatalError() } }",
                 path: "Sources/Idiom Consumer/Leaf.swift",
-                expectation: .findings(1)
-            ),
-            .init(
-                id: "fatal error outside tests declaration conformance with extension witness",
-                source: "struct Leaf: Parsing {}\nextension Leaf { var body: Never { fatalError() } }",
-                path: "Sources/Idiom Consumer/Leaf.swift",
-                expectation: .findings(1)
-            ),
-            .init(
-                id: "fatal error outside tests qualified extension conformance with extension witness",
-                source: "enum A { struct Leaf {} }\nextension A.Leaf: Parsing {}\nextension A.Leaf { var body: Never { fatalError() } }",
-                path: "Sources/Idiom Consumer/Leaf.swift",
-                expectation: .findings(1)
-            ),
-            .init(
-                id: "fatal error outside tests same name in another namespace",
-                source: "enum A { struct Leaf {} }\nenum B { struct Leaf {} }\nextension A.Leaf: Parsing {}\nextension B.Leaf { var body: Never { fatalError() } }",
-                path: "Sources/Idiom Consumer/Leaf.swift",
-                expectation: .findings(1)
-            ),
-            .init(
-                id: "fatal error outside tests top-level same name",
-                source: "enum A { struct Leaf {} }\nextension A.Leaf: Parsing {}\nstruct Leaf { var body: Never { fatalError() } }",
-                path: "Sources/Idiom Consumer/Leaf.swift",
-                expectation: .findings(1)
-            ),
-            .init(
-                id: "fatal error outside tests nested conformer same name",
-                source: "enum A { struct Leaf: Parsing {} }\nextension Leaf { var body: Never { fatalError() } }",
-                path: "Sources/Idiom Consumer/Leaf.swift",
-                expectation: .findings(1)
-            ),
-            .init(
-                id: "fatal error outside tests nonconforming never body",
-                source: "struct Leaf { var body: Never { fatalError() } }",
-                path: "Sources/Idiom Consumer/Leaf.swift",
-                expectation: .findings(1)
-            ),
-            .init(
-                id: "fatal error outside tests leaf body of another type",
-                source: "struct Leaf: Parsing { var body: Int { fatalError() } }",
-                path: "Sources/Idiom Consumer/Leaf.swift",
-                expectation: .findings(1)
-            ),
-            .init(
-                id: "fatal error outside tests leaf never property not named body",
-                source: "struct Leaf: Parsing { var other: Never { fatalError() } }",
-                path: "Sources/Idiom Consumer/Leaf.swift",
-                expectation: .findings(1)
-            ),
-            .init(
-                id: "fatal error outside tests leaf never body with more statements",
-                source: "struct Leaf: Parsing { var body: Never { log(); fatalError() } }",
-                path: "Sources/Idiom Consumer/Leaf.swift",
-                expectation: .findings(1)
+                expectation: .clean
             ),
             .init(
                 id: "fatal error outside tests leaf protocol default",
@@ -105,21 +65,45 @@ extension Lint.Rule {
                 expectation: .clean
             ),
             .init(
-                id: "fatal error outside tests module-qualified leaf protocol default",
-                source: "extension Coder::Coding where Body == Swift.Never { var body: Never { fatalError() } }",
-                path: "Sources/Idiom Consumer/Coding.swift",
-                expectation: .clean
-            ),
-            .init(
-                id: "fatal error outside tests protocol default without Never body constraint",
-                source: "extension Parsing { var body: Never { fatalError() } }",
-                path: "Sources/Idiom Consumer/Parsing.swift",
+                id: "fatal error outside tests Never function with more statements",
+                source: "func f() -> Never { log(); fatalError() }",
+                path: "Sources/Idiom Consumer/Trap.swift",
                 expectation: .findings(1)
             ),
             .init(
-                id: "fatal error outside tests Never body default of another protocol",
-                source: "extension Rendering where Body == Never { var body: Never { fatalError() } }",
-                path: "Sources/Idiom Consumer/Rendering.swift",
+                id: "fatal error outside tests Never property with more statements",
+                source: "struct Leaf: Parsing { var body: Never { log(); fatalError() } }",
+                path: "Sources/Idiom Consumer/Leaf.swift",
+                expectation: .findings(1)
+            ),
+            .init(
+                id: "fatal error outside tests branch in a Never function",
+                source: "func f(_ c: Bool) -> Never { if c { fatalError(\"a\") } else { fatalError(\"b\") } }",
+                path: "Sources/Idiom Consumer/Trap.swift",
+                expectation: .findings(2)
+            ),
+            .init(
+                id: "fatal error outside tests closure in a Never function",
+                source: "func f() -> Never { run { fatalError() } }",
+                path: "Sources/Idiom Consumer/Trap.swift",
+                expectation: .findings(1)
+            ),
+            .init(
+                id: "fatal error outside tests body of another type",
+                source: "struct Leaf: Parsing { var body: Int { fatalError() } }",
+                path: "Sources/Idiom Consumer/Leaf.swift",
+                expectation: .findings(1)
+            ),
+            .init(
+                id: "fatal error outside tests optional Never function",
+                source: "func f() -> Never? { fatalError() }",
+                path: "Sources/Idiom Consumer/Trap.swift",
+                expectation: .findings(1)
+            ),
+            .init(
+                id: "fatal error outside tests Never closure",
+                source: "let trap: () -> Never = { fatalError() }",
+                path: "Sources/Idiom Consumer/Trap.swift",
                 expectation: .findings(1)
             ),
             .init(
@@ -130,7 +114,7 @@ extension Lint.Rule {
             ),
             .init(
                 id: "fatal error outside tests test support target",
-                source: "func f() -> Never { fatalError() }",
+                source: "func f() { fatalError() }",
                 path: "Sources/Idiom Test Support/Trap.swift",
                 expectation: .clean
             ),
@@ -217,7 +201,7 @@ internal final class IdiomFatalErrorOutsideTestsVisitor: SyntaxVisitor {
             } else {
                 false
             }
-        guard isFatalError, !isLeafProtocolDefaultBody(node), !isInsideUnavailableDecl(Syntax(node))
+        guard isFatalError, !isSoleStatementOfNeverBody(node), !isInsideUnavailableDecl(Syntax(node))
         else { return .visitChildren }
         let location = converter.location(for: node.positionAfterSkippingLeadingTrivia)
         matches.append(
@@ -236,49 +220,45 @@ internal final class IdiomFatalErrorOutsideTestsVisitor: SyntaxVisitor {
         return .visitChildren
     }
 
-    private func isLeafProtocolDefaultBody(_ node: FunctionCallExprSyntax) -> Swift::Bool {
-        let statement: Syntax? =
+    /// swift-institute/Issues#271: the call, or a `return` of it, is the only statement of the body of a function
+    /// returning `Never`, or of the getter of a computed property or subscript of type `Never`. The type already
+    /// says the body never returns, and the call is all the body does.
+    private func isSoleStatementOfNeverBody(_ node: FunctionCallExprSyntax) -> Swift::Bool {
+        let statement: Syntax =
             if let returned = node.parent?.as(ReturnStmtSyntax.self) {
                 Syntax(returned)
             } else {
                 Syntax(node)
             }
-        guard let item = statement?.parent?.as(CodeBlockItemSyntax.self),
+        guard let item = statement.parent?.as(CodeBlockItemSyntax.self),
             let items = item.parent?.as(CodeBlockItemListSyntax.self),
-            items.count == 1
+            items.count == 1,
+            let container = items.parent
         else { return false }
-        let block: AccessorBlockSyntax? =
-            if let block = items.parent?.as(AccessorBlockSyntax.self) {
-                block
-            } else if let body = items.parent?.as(CodeBlockSyntax.self),
-                let accessor = body.parent?.as(AccessorDeclSyntax.self),
-                accessor.accessorSpecifier.tokenKind == .keyword(.get),
-                let list = accessor.parent?.as(AccessorDeclListSyntax.self),
-                list.count == 1
-            {
-                list.parent?.as(AccessorBlockSyntax.self)
-            } else {
-                nil
-            }
-        guard let binding = block?.parent?.as(PatternBindingSyntax.self),
-            binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text == "body",
-            let type = binding.typeAnnotation?.type,
-            idiomIsNever(type)
+        if let block = container.as(AccessorBlockSyntax.self) {
+            return idiomIsNeverTyped(block)
+        }
+        guard let body = container.as(CodeBlockSyntax.self) else { return false }
+        if let function = body.parent?.as(FunctionDeclSyntax.self) {
+            return function.signature.returnClause.map { idiomIsNever($0.type) } ?? false
+        }
+        guard let accessor = body.parent?.as(AccessorDeclSyntax.self),
+            accessor.accessorSpecifier.tokenKind == .keyword(.get),
+            let block = accessor.parent?.as(AccessorDeclListSyntax.self)?.parent?.as(AccessorBlockSyntax.self)
         else { return false }
-        return idiomIsLeafProtocolNeverDefault(enclosing: Syntax(binding))
+        return idiomIsNeverTyped(block)
     }
 }
 
-internal let idiomLeafProtocols: Swift::Set<Swift::String> = ["Parsing", "Serializing", "Coding"]
-
-internal func idiomLastTypeName(_ type: TypeSyntax) -> Swift::String? {
-    if let member = type.as(MemberTypeSyntax.self) {
-        member.name.text
-    } else if let identifier = type.as(IdentifierTypeSyntax.self) {
-        identifier.name.text
-    } else {
-        nil
+/// The accessor block is that of a computed property or subscript of type `Never`.
+internal func idiomIsNeverTyped(_ block: AccessorBlockSyntax) -> Swift::Bool {
+    if let binding = block.parent?.as(PatternBindingSyntax.self) {
+        return binding.typeAnnotation.map { idiomIsNever($0.type) } ?? false
     }
+    if let subscriptDecl = block.parent?.as(SubscriptDeclSyntax.self) {
+        return idiomIsNever(subscriptDecl.returnClause.type)
+    }
+    return false
 }
 
 internal func idiomIsNever(_ type: TypeSyntax) -> Swift::Bool {
@@ -291,30 +271,4 @@ internal func idiomIsNever(_ type: TypeSyntax) -> Swift::Bool {
     } else {
         false
     }
-}
-
-internal func idiomIsLeafProtocolNeverDefault(enclosing node: Syntax) -> Swift::Bool {
-    var current = node.parent
-    while let candidate = current {
-        if let extensionDecl = candidate.as(ExtensionDeclSyntax.self) {
-            guard let name = idiomLastTypeName(extensionDecl.extendedType), idiomLeafProtocols.contains(name) else {
-                return false
-            }
-            return extensionDecl.genericWhereClause?.requirements.contains { element in
-                guard let sameType = element.requirement.as(SameTypeRequirementSyntax.self),
-                    let left = sameType.leftType.as(TypeSyntax.self),
-                    let right = sameType.rightType.as(TypeSyntax.self)
-                else { return false }
-                return idiomLastTypeName(left) == "Body" && idiomIsNever(right)
-            } ?? false
-        }
-        if candidate.is(StructDeclSyntax.self) || candidate.is(EnumDeclSyntax.self)
-            || candidate.is(ClassDeclSyntax.self) || candidate.is(ActorDeclSyntax.self)
-            || candidate.is(ProtocolDeclSyntax.self)
-        {
-            return false
-        }
-        current = candidate.parent
-    }
-    return false
 }

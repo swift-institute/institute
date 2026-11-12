@@ -317,7 +317,6 @@ extension Institute.CI.Command.Source.Ratchet {
             swift-atoms/swift-coproduct|count minus one|1
             swift-atoms/swift-coproduct|do throws for typed catch|1
             swift-atoms/swift-coproduct|extension file naming|11
-            swift-atoms/swift-coproduct|fatal error outside tests|1
             swift-atoms/swift-coproduct|int public parameter|2
             swift-atoms/swift-coproduct|minimal type body|1
             swift-atoms/swift-coproduct|result wrapper for rethrows shim|2
@@ -1022,7 +1021,6 @@ extension Institute.CI.Command.Source.Ratchet {
             swift-atoms/swift-renderer|compound type name|26
             swift-atoms/swift-renderer|do throws for typed catch|4
             swift-atoms/swift-renderer|exported import|2
-            swift-atoms/swift-renderer|fatal error outside tests|7
             swift-atoms/swift-renderer|file name nested path|1
             swift-atoms/swift-renderer|int public parameter|2
             swift-atoms/swift-renderer|minimal type body|33
@@ -1564,7 +1562,6 @@ extension Institute.CI.Command.Source.Ratchet {
             swift-compositions/swift-html-render|exported import|12
             swift-compositions/swift-html-render|extension file naming|274
             swift-compositions/swift-html-render|extension noncopyable constraint|2
-            swift-compositions/swift-html-render|fatal error outside tests|6
             swift-compositions/swift-html-render|file name nested path|1
             swift-compositions/swift-html-render|int public parameter|5
             swift-compositions/swift-html-render|minimal type body|6
@@ -1694,7 +1691,6 @@ extension Institute.CI.Command.Source.Ratchet {
             swift-compositions/swift-loader|compound suite name|2
             swift-compositions/swift-loader|compound type name|1
             swift-compositions/swift-loader|extension file naming|1
-            swift-compositions/swift-loader|fatal error outside tests|1
             swift-compositions/swift-loader|path name grammar|1
             swift-compositions/swift-manifests|canonical settings tail|1
             swift-compositions/swift-manifests|compound identifier|8
@@ -1835,7 +1831,6 @@ extension Institute.CI.Command.Source.Ratchet {
             swift-compositions/swift-pdf-render|count minus one|4
             swift-compositions/swift-pdf-render|counter loop iteration|4
             swift-compositions/swift-pdf-render|extension file naming|5
-            swift-compositions/swift-pdf-render|fatal error outside tests|11
             swift-compositions/swift-pdf-render|int public parameter|2
             swift-compositions/swift-pdf-render|minimal type body|3
             swift-compositions/swift-pdf-render|namespace adoption typealias|1
@@ -1947,7 +1942,7 @@ extension Institute.CI.Command.Source.Ratchet {
             swift-compositions/swift-sql|count minus one|1
             swift-compositions/swift-sql|counter loop iteration|2
             swift-compositions/swift-sql|do throws for typed catch|6
-            swift-compositions/swift-sql|fatal error outside tests|16
+            swift-compositions/swift-sql|fatal error outside tests|7
             swift-compositions/swift-sql|int public parameter|9
             swift-compositions/swift-sql|intermediate binding then return|3
             swift-compositions/swift-sql|macro expansion short name|18
@@ -2034,7 +2029,6 @@ extension Institute.CI.Command.Source.Ratchet {
             swift-compositions/swift-svg-render|existential parameter|1
             swift-compositions/swift-svg-render|exported import|5
             swift-compositions/swift-svg-render|extension file naming|7
-            swift-compositions/swift-svg-render|fatal error outside tests|10
             swift-compositions/swift-svg-render|minimal type body|5
             swift-compositions/swift-svg-render|module selector spelling|56
             swift-compositions/swift-svg-render|namespace adoption typealias|1
@@ -2107,7 +2101,7 @@ extension Institute.CI.Command.Source.Ratchet {
             swift-compositions/swift-translating|counter loop iteration|1
             swift-compositions/swift-translating|exported import|5
             swift-compositions/swift-translating|extension file naming|20
-            swift-compositions/swift-translating|fatal error outside tests|7
+            swift-compositions/swift-translating|fatal error outside tests|5
             swift-compositions/swift-translating|file name nested path|2
             swift-compositions/swift-translating|foundation import|7
             swift-compositions/swift-translating|int public parameter|5
@@ -2400,7 +2394,6 @@ extension Institute.CI.Command.Source.Ratchet {
             swift-ietf/swift-rfc-4007|path name grammar|5
             swift-ietf/swift-rfc-4122|bool public parameter|1
             swift-ietf/swift-rfc-4122|compound suite name|1
-            swift-ietf/swift-rfc-4122|fatal error outside tests|2
             swift-ietf/swift-rfc-4122|int public parameter|1
             swift-ietf/swift-rfc-4122|path name grammar|2
             swift-ietf/swift-rfc-4122|statement where expression fits|1
@@ -3014,7 +3007,7 @@ extension Institute.CI.Command.Source.Ratchet {
             swift-molecules/swift-binary-parser|compound suite name|7
             swift-molecules/swift-binary-parser|compound type name|1
             swift-molecules/swift-binary-parser|extension file naming|13
-            swift-molecules/swift-binary-parser|fatal error outside tests|2
+            swift-molecules/swift-binary-parser|fatal error outside tests|1
             swift-molecules/swift-binary-parser|file name nested path|2
             swift-molecules/swift-binary-parser|int public parameter|4
             swift-molecules/swift-binary-parser|namespace adoption typealias|11
@@ -3072,7 +3065,7 @@ extension Institute.CI.Command.Source.Ratchet {
             swift-molecules/swift-buffer-slab|compound type name|1
             swift-molecules/swift-buffer-slab|counter loop iteration|3
             swift-molecules/swift-buffer-slab|extension file naming|8
-            swift-molecules/swift-buffer-slab|fatal error outside tests|2
+            swift-molecules/swift-buffer-slab|fatal error outside tests|1
             swift-molecules/swift-buffer-slab|frozen tower type|5
             swift-molecules/swift-buffer-slab|raw value access|6
             swift-molecules/swift-buffer-slab|single type per file|4
@@ -3396,7 +3389,6 @@ extension Institute.CI.Command.Source.Ratchet {
             swift-molecules/swift-tree-n|path name grammar|1
             swift-molecules/swift-tree-n|unification typealias|1
             swift-standards/swift-color-standard|compound suite name|1
-            swift-standards/swift-color-standard|fatal error outside tests|2
             swift-standards/swift-color-standard|path name grammar|2
             swift-standards/swift-color-standard|raw value access|1
             swift-standards/swift-color-standard|single type per file|5
