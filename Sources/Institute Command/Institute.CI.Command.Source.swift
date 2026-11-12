@@ -47,12 +47,17 @@ extension Institute.CI.Command {
 
               institute ci -- source --repository <owner/name> --revision <commit>
                 --root <package-root>
-                --xcode-application </Applications/Xcode.app>
+                [--xcode-application </Applications/Xcode.app>]
                 [--jobs <positive-count>] [--exit-policy <advisory|strict>]
 
-            --revision is an exact lowercase 40-character commit, --root an
-            absolute path, and --xcode-application an application under
-            /Applications. --exit-policy defaults to advisory.
+            --revision is an exact lowercase 40-character commit and --root an
+            absolute path. --exit-policy defaults to advisory.
+            The tools are the ones the source policy pins for this platform,
+            each checked against its digest. On macOS swift-format is copied
+            out of the pinned Xcode; --xcode-application, accepted on macOS
+            only, names another application under /Applications that carries
+            the same pinned Xcode. On Linux swift-format is the one of the
+            pinned Swift toolchain, found on PATH.
             The lint bundle follows the repository's organization; a repository
             outside the Institute's organizations gets the institute bundle.
 
@@ -119,12 +124,8 @@ extension Institute.CI.Command {
             guard root.hasPrefix("/") else {
                 throw .validationFailed(reason: "--root must be an absolute package path")
             }
-            guard xcodeApplication.hasPrefix("/Applications/"),
-                xcodeApplication.hasSuffix(".app")
-            else {
-                throw .validationFailed(
-                    reason: "--xcode-application must name an application under /Applications"
-                )
+            if let reason = Self.refusal(xcodeApplication: xcodeApplication, on: .host) {
+                throw .validationFailed(reason: reason)
             }
             guard jobs.map({ $0 > 0 }) ?? true else {
                 throw .validationFailed(reason: "--jobs must be positive")
@@ -149,7 +150,7 @@ extension Institute.CI.Command {
             let application = Institute.Source.Application()
             let preparation = try await application.prepare(
                 subject: subject,
-                xcodeApplication: xcodeApplication
+                xcodeApplication: xcodeApplication.isEmpty ? nil : xcodeApplication
             )
             let measured = try await application.measure(
                 subject: subject,
@@ -207,6 +208,23 @@ extension Institute.CI.Command {
 }
 
 extension Institute.CI.Command.Source {
+    /// Why `--xcode-application` cannot be taken on `platform`, or `nil`
+    /// when it can. Omitted, it is accepted everywhere; given, it must be
+    /// an application under /Applications, and the platform must be macOS.
+    static func refusal(
+        xcodeApplication: Swift.String,
+        on platform: Institute.Source.Policy.Platform?
+    ) -> Swift.String? {
+        guard !xcodeApplication.isEmpty else { return nil }
+        guard platform == .macOSARM64 else {
+            return "--xcode-application is accepted on macOS only"
+        }
+        guard xcodeApplication.hasPrefix("/Applications/"), xcodeApplication.hasSuffix(".app") else {
+            return "--xcode-application must name an application under /Applications"
+        }
+        return nil
+    }
+
     static func rerun(with planner: File) throws(Institute.Error) -> Never {
         let output: Process.Output
         do throws(Process.Error) {

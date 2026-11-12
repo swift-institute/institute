@@ -99,9 +99,20 @@ extension Institute.Source.Acquisition {
     ) async throws(Institute.Error) -> File {
         let component = try Self.component(asset.name)
         let destination = directory[file: component]
+        if case .toolchain(let release, let distribution, let executable) = asset.origin {
+            guard xcodeApplication == nil else {
+                throw .configuration("Xcode selection supplied for a toolchain source asset")
+            }
+            return try locate(
+                asset,
+                release: release,
+                distribution: distribution,
+                executable: executable
+            )
+        }
         let reuse =
             switch asset.origin {
-            case .xcode: false
+            case .xcode, .toolchain: false
             case .release, .releaseArchive: xcodeApplication == nil
             }
         if reuse, destination.stat.isFile,
@@ -163,6 +174,8 @@ extension Institute.Source.Acquisition {
                 to: staging,
                 under: directory
             )
+        case .toolchain:
+            throw .configuration("a toolchain source asset is run in place, not staged")
         }
         let actual = try Institute.Source.Application.digest(file: staging.description)
         guard actual == asset.digest else {
@@ -185,6 +198,57 @@ extension Institute.Source.Acquisition {
 }
 
 extension Institute.Source.Acquisition {
+    /// The pinned toolchain tool on this machine: the first `executable` on
+    /// the search path, resolved through its symbolic links, accepted only
+    /// when it hashes to the pinned digest. It is returned where it is.
+    func locate(
+        _ asset: Institute.Source.Policy.Asset,
+        release: Swift.String,
+        distribution: Swift.String,
+        executable: Swift.String
+    ) throws(Institute.Error) -> File {
+        let component = try Self.component(executable)
+        let pinned = "the source policy pins \(asset.digest.hex), the \(executable) of \(release) for \(distribution) from swift.org"
+        for entry in search where entry.hasPrefix("/") {
+            let candidate: File
+            do throws(File.Path.Error) {
+                candidate = File.Directory(try .init(entry))[file: component]
+            } catch { continue }
+            guard candidate.stat.isFile else { continue }
+            let resolved: File
+            do throws(File.System.Canonical.Error) {
+                resolved = File(try File.System.Canonical.resolve(candidate.path))
+            } catch {
+                throw .filesystem("cannot resolve \(candidate): \(error)")
+            }
+            let actual = try Institute.Source.Application.digest(file: resolved.description)
+            guard actual == asset.digest else {
+                throw .configuration(
+                    "\(executable) on PATH at \(resolved) hashes to \(actual.hex); \(pinned). "
+                        + "Install that toolchain and put its usr/bin first on PATH."
+                )
+            }
+            return resolved
+        }
+        throw .configuration(
+            "no \(executable) on PATH; \(pinned). Install that toolchain and put its usr/bin on PATH."
+        )
+    }
+
+    /// The command that extracts `member` of the zip `archive` into
+    /// `directory`: `ditto` on macOS, `unzip` elsewhere.
+    static func unarchive(
+        _ archive: Swift.String,
+        member: Swift.String,
+        into directory: Swift.String
+    ) -> (executable: Swift.String, arguments: [Swift.String]) {
+        #if os(macOS)
+            ("/usr/bin/ditto", ["-x", "-k", archive, directory])
+        #else
+            ("/usr/bin/unzip", ["-q", "-o", archive, member, "-d", directory])
+        #endif
+    }
+
     private func extract(
         asset: Institute.Source.Policy.Asset,
         base: Swift.String,
@@ -234,9 +298,10 @@ extension Institute.Source.Acquisition {
         } catch {
             throw .filesystem("cannot create source archive extraction directory: \(error)")
         }
+        let unarchive = Self.unarchive(archiveFile.description, member: member, into: extracted.description)
         let result = await process.run(
-            "/usr/bin/ditto",
-            ["-x", "-k", archiveFile.description, extracted.description],
+            unarchive.executable,
+            unarchive.arguments,
             directory.description,
             [:]
         )

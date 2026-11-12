@@ -73,7 +73,7 @@ extension `Institute.Application.CLI Tests`.Test.`Edge Case` {
         ["certification", "snapshot"],
         ["architecture", "validate"],
         ["source", "measure"],
-        ["lint"],
+        ["lint", "run"],
     ])
     func `retired command surfaces are rejected`(arguments: [Swift.String]) {
         #expect(throws: Command.Error.self) {

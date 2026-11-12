@@ -16,6 +16,12 @@ extension Institute.Source {
     public struct Application: Sendable {
         public let process: Source_Measurement::Source.Engine.Process
 
+        /// An application whose engines run through `process`, for a caller
+        /// that stands in for the tools.
+        init(process: Source_Measurement::Source.Engine.Process) {
+            self.process = process
+        }
+
         public init(timeout: Duration = .seconds(300)) {
             self.process = .init { executable, arguments, directory, environment in
                 let workingDirectory: File.Path

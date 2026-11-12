@@ -116,6 +116,74 @@ extension Institute.Source {
                     inventory: nil,
                     checksums: nil
                 ),
+                .init(
+                    id: .init("swift-format"),
+                    platform: .linuxX86_64,
+                    version: "6.4.2",
+                    revision: "swift-6.4.2-RELEASE",
+                    toolchain: "Swift 6.4.2 (swift-6.4.2-RELEASE), swift.org ubuntu24.04 x86_64",
+                    schema: "swift-format:main",
+                    executable: .init(
+                        name: "swift-format",
+                        digest: .init(
+                            "50a1cb95ded4d8f4ac934649fe2b61b5ccabddace84848b9ffda0b4d9f915883"
+                        ),
+                        origin: .toolchain(
+                            release: "swift-6.4.2-RELEASE",
+                            distribution: "ubuntu24.04",
+                            executable: "swift-format"
+                        )
+                    ),
+                    manifest: nil,
+                    inventory: nil,
+                    checksums: nil
+                ),
+                .init(
+                    id: swiftLintID,
+                    platform: .linuxX86_64,
+                    version: "0.65.1",
+                    revision: "0.65.1",
+                    toolchain: "SwiftLint release, Linux amd64",
+                    schema: "swiftlint-json:0.65.1",
+                    executable: .init(
+                        name: "swiftlint",
+                        digest: .init(
+                            "3384e7a44d6f2b6f9820404111e2a777b08ba99de087979ed40f6832efc073f5"
+                        ),
+                        origin: .releaseArchive(
+                            base: "https://github.com/realm/SwiftLint/releases/download/0.65.1",
+                            archive: "swiftlint_linux_amd64.zip",
+                            digest: .init(
+                                "caeed6f4a679c35539ffaf124f6c4ab4a8416917f7d8796279dc52b74026059d"
+                            ),
+                            member: "swiftlint"
+                        )
+                    ),
+                    manifest: nil,
+                    inventory: nil,
+                    checksums: nil
+                ),
+                .init(
+                    id: .init("swift-linter"),
+                    platform: .linuxX86_64,
+                    version: "ci-binaries",
+                    revision: "2d6a4f5dbc54fe9fb183b6c40a3b31608f67ed92",
+                    toolchain: "Swift 6.4.2 (swift-6.4.2-RELEASE), x86_64-unknown-linux-gnu",
+                    schema: "swift-linter-structured:2",
+                    executable: .init(
+                        name: "institute-linter-runner-linux-x86_64-0f2cae97638b9f9d23d5acd8b8c26696fbb604a57dc6fb3bdd982e7d86bc3fb5",
+                        digest: .init(
+                            "0f2cae97638b9f9d23d5acd8b8c26696fbb604a57dc6fb3bdd982e7d86bc3fb5"
+                        ),
+                        origin: .release(
+                            base:
+                                "https://github.com/swift-institute/institute/releases/download/ci-binaries"
+                        )
+                    ),
+                    manifest: nil,
+                    inventory: nil,
+                    checksums: nil
+                ),
             ]
             self.bundles = Bundle.allCases
             self.externallyStandardizedTargets = [.init("CSS")]
@@ -281,7 +349,8 @@ extension Institute.Source {
             bundle: Bundle,
             linterRules: [Source_Profile::Source.Rule.ID],
             repository: Institute.Repository.Coordinate? = nil,
-            repair: Swift.Bool = false
+            repair: Swift.Bool = false,
+            linterEnvironment: [Swift.String: Swift.String] = [:]
         ) -> Source_Profile::Source.Profile {
             let (swiftFormatExecutable, swiftFormatTool, swiftFormatConfigurationPath) = formatInstallation
             let (swiftLintExecutable, swiftLintTool, swiftLintConfigurationPath) = lintInstallation
@@ -320,12 +389,25 @@ extension Institute.Source {
                         environment: ["SWIFT_LINTER_BUNDLE": bundle.token].merging(
                             repository.map { [Institute.Repository.Coordinate.variable: $0.description] } ?? [:],
                             uniquingKeysWith: { bundle, _ in bundle }
-                        ),
+                        ).merging(linterEnvironment, uniquingKeysWith: { policy, _ in policy }),
                         artifactKinds: [.swift],
                         rules: linterRules
                     ),
                 ]
             )
         }
+    }
+}
+
+extension Institute.Source.Policy {
+    /// The one pinned engine `id` for `platform`, or `nil` when the policy
+    /// declares none, or more than one, for that pair.
+    public func engine(
+        _ id: Source_Profile::Source.Engine.ID,
+        on platform: Platform
+    ) -> Engine? {
+        let matches = engines.filter { $0.id == id && $0.platform == platform }
+        guard matches.count == 1 else { return nil }
+        return matches.first
     }
 }

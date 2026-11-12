@@ -14,6 +14,7 @@ extension Institute.Application {
     /// grammar's first token.
     public enum CLI: Sendable, Command_Schema::Command.`Protocol` {
         case install(Institute.Application.Install)
+        case lint(Institute.Application.Lint)
         case ci(Institute.CI.Command)
         case planner(Institute.Planner.Command)
         case repository(Institute.Repository.Policy.Command)
@@ -36,6 +37,12 @@ extension Institute.Application {
                         help: .init(abstract: "Install the published planner pinned by the CI policy."),
                         initial: { .init() },
                         map: Self.install
+                    )
+                    Command_Schema::Command.Subcommand.Case(
+                        "lint",
+                        help: .init(abstract: "Lint the package in the current directory as Quality · source does."),
+                        initial: { .init() },
+                        map: Self.lint
                     )
                     Command_Schema::Command.Subcommand.Case(
                         "ci",
@@ -82,6 +89,9 @@ extension Institute.Application {
             case .install(var command):
                 try await command.run()
                 self = .install(command)
+            case .lint(var command):
+                try await command.run()
+                self = .lint(command)
             case .ci(var command):
                 try await command.run()
                 self = .ci(command)

@@ -50,6 +50,39 @@ enum MainFixtureFiles {
         try FileManager.default.removeItem(atPath: path)
     }
 
+    /// Creates `path` and its missing parents; `false` when it could not.
+    @discardableResult
+    static func makeDirectory(_ path: Swift.String) -> Swift.Bool {
+        do {
+            try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true)
+            return true
+        } catch {
+            return false
+        }
+    }
+
+    /// Makes `path` a symbolic link to `destination`; `false` when it could not.
+    @discardableResult
+    static func link(_ path: Swift.String, to destination: Swift.String) -> Swift.Bool {
+        do {
+            try FileManager.default.createSymbolicLink(atPath: path, withDestinationPath: destination)
+            return true
+        } catch {
+            return false
+        }
+    }
+
+    /// Removes `path` and what is under it; `false` when it could not.
+    @discardableResult
+    static func discard(_ path: Swift.String) -> Swift.Bool {
+        do {
+            try FileManager.default.removeItem(atPath: path)
+            return true
+        } catch {
+            return false
+        }
+    }
+
     static func exists(_ path: Swift.String) -> Swift.Bool {
         FileManager.default.fileExists(atPath: path)
     }

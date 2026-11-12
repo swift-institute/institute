@@ -15,5 +15,15 @@ extension Institute.Source.Policy.Asset {
             version: Swift.String,
             relativePath: Swift.String
         )
+        /// A tool of the Swift toolchain installed on the machine, found on
+        /// `PATH` and run where it is: it loads the toolchain's runtime
+        /// libraries from beside itself, so it cannot be copied out.
+        /// `release` and `distribution` name the swift.org download the
+        /// pinned digest was taken from.
+        case toolchain(
+            release: Swift.String,
+            distribution: Swift.String,
+            executable: Swift.String
+        )
     }
 }

@@ -306,6 +306,7 @@ let package = Package(
         .target(
             name: "Institute Source",
             dependencies: [
+                .product(name: "Environment", package: "swift-environment"),
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "JSON", package: "swift-json"),
@@ -470,12 +471,14 @@ let package = Package(
                 .target(name: "Institute Source Policy"),
                 .target(name: "Institute Source Workspace"),
                 .target(name: "Institute Version"),
+                .target(name: "Source Measurement"),
                 .target(name: "Source Report"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "Calendar Gregorian", package: "swift-calendar-gregorian"),
                 .product(name: "Command", package: "swift-arguments"),
                 .product(name: "Command Schema", package: "swift-arguments"),
                 .product(name: "Console", package: "swift-console"),
+                .product(name: "Environment", package: "swift-environment"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),
                 .product(name: "File System", package: "swift-file-system"),
                 .product(name: "Git", package: "swift-git"),
@@ -485,6 +488,7 @@ let package = Package(
                 .product(name: "Path", package: "swift-path"),
                 .product(name: "Process", package: "swift-process"),
                 .product(name: "RFC 3339", package: "swift-rfc-3339"),
+                .product(name: "Thread Pool", package: "swift-threads"),
                 .product(name: "Time", package: "swift-time"),
             ]
         ),
@@ -523,6 +527,7 @@ let package = Package(
                 .target(name: "Institute Command"),
                 .target(name: "Institute Model"),
                 .target(name: "Institute Repository Policy"),
+                .target(name: "Institute Source Policy"),
                 .target(name: "Institute Version"),
                 .target(name: "Source Report"),
                 .product(name: "Byte", package: "swift-byte"),

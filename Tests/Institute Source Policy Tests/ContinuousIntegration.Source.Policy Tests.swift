@@ -23,16 +23,129 @@ struct `Institute source policy` {
         #expect(policy.swiftLintRules.contains { $0.token == "typed_throws_required" })
         #expect(!policy.swiftLintRules.contains { $0.token == "custom_rules" })
         #expect(policy.bundles == [.primitives, .standards, .institute])
-        #expect(
-            policy.engines.map(\.id.token)
-                == ["swift-format", "swiftlint", "swift-linter"]
+        for platform in Institute.Source.Policy.Platform.allCases {
+            #expect(
+                policy.engines.filter { $0.platform == platform }.map(\.id.token)
+                    == ["swift-format", "swiftlint", "swift-linter"]
+            )
+        }
+        #expect(policy.engines.count == 6)
+    }
+
+    @Test(arguments: Institute.Source.Policy.Platform.allCases)
+    func `each platform pins one engine per required engine by a SHA-256 digest`(
+        platform: Institute.Source.Policy.Platform
+    ) throws {
+        let policy = Institute.Source.Policy.current
+        for id in policy.requiredEngines {
+            let engine = try #require(policy.engine(id, on: platform))
+            #expect(engine.platform == platform)
+            #expect(engine.executable.digest.hex.utf8.count == 64)
+            #expect(
+                engine.executable.digest.hex.utf8.allSatisfy {
+                    ($0 >= 48 && $0 <= 57) || ($0 >= 97 && $0 <= 102)
+                }
+            )
+        }
+        #expect(policy.engine(.init("no-such-engine"), on: platform) == nil)
+    }
+
+    @Test
+    func `Linux swift-format is the pinned Swift toolchain's own, found on the machine`() throws {
+        let engine = try #require(
+            Institute.Source.Policy.current.engine(.init("swift-format"), on: .linuxX86_64)
         )
+        #expect(engine.version == "6.4.2")
+        #expect(engine.revision == "swift-6.4.2-RELEASE")
+        guard case .toolchain(let release, let distribution, let executable) = engine.executable.origin else {
+            Issue.record("Linux swift-format is not the toolchain's")
+            return
+        }
+        #expect(release == "swift-6.4.2-RELEASE")
+        #expect(distribution == "ubuntu24.04")
+        #expect(executable == "swift-format")
+        #expect(
+            engine.executable.digest
+                == .init("50a1cb95ded4d8f4ac934649fe2b61b5ccabddace84848b9ffda0b4d9f915883")
+        )
+    }
+
+    @Test
+    func `Linux SwiftLint is the same release as macOS, from its Linux archive`() throws {
+        let policy = Institute.Source.Policy.current
+        let linux = try #require(policy.engine(.init("swiftlint"), on: .linuxX86_64))
+        let macOS = try #require(policy.engine(.init("swiftlint"), on: .macOSARM64))
+        #expect(linux.version == "0.65.1")
+        #expect(linux.version == macOS.version)
+        #expect(linux.schema == macOS.schema)
+        guard case .releaseArchive(let base, let archive, let digest, let member) = linux.executable.origin,
+            case .releaseArchive(let macOSBase, _, _, _) = macOS.executable.origin
+        else {
+            Issue.record("SwiftLint is not acquired from a release archive")
+            return
+        }
+        #expect(base == macOSBase)
+        #expect(base.hasSuffix("/0.65.1"))
+        #expect(archive == "swiftlint_linux_amd64.zip")
+        #expect(member == "swiftlint")
+        #expect(digest == .init("caeed6f4a679c35539ffaf124f6c4ab4a8416917f7d8796279dc52b74026059d"))
+        #expect(
+            linux.executable.digest
+                == .init("3384e7a44d6f2b6f9820404111e2a777b08ba99de087979ed40f6832efc073f5")
+        )
+    }
+
+    @Test
+    func `the linter runner is one revision's build on both platforms, named by its digest`() throws {
+        let policy = Institute.Source.Policy.current
+        let linux = try #require(policy.engine(.init("swift-linter"), on: .linuxX86_64))
+        let macOS = try #require(policy.engine(.init("swift-linter"), on: .macOSARM64))
+        #expect(linux.revision == macOS.revision)
+        #expect(linux.schema == macOS.schema)
+        for engine in [linux, macOS] {
+            #expect(
+                engine.executable.name
+                    == "institute-linter-runner-\(engine.platform.token)-\(engine.executable.digest.hex)"
+            )
+        }
+        #expect(
+            linux.executable.digest
+                == .init("0f2cae97638b9f9d23d5acd8b8c26696fbb604a57dc6fb3bdd982e7d86bc3fb5")
+        )
+    }
+
+    @Test
+    func `the linter's runtime environment joins its profile without replacing the bundle`() {
+        let policy = Institute.Source.Policy.current
+        func profile(_ environment: [Swift.String: Swift.String]) -> Source.Profile {
+            policy.profile(
+                swiftFormat: (executable: "/swift-format", tool: .init("format-tool"), configurationPath: "/.swift-format"),
+                swiftLint: (executable: "/swiftlint", tool: .init("swiftlint-tool"), configurationPath: "/.swiftlint.yml"),
+                linter: (executable: "/swift-linter", tool: .init("linter-tool"), configurationPath: "/source-linter-profile.json"),
+                bundle: .institute,
+                linterRules: [],
+                linterEnvironment: environment
+            )
+        }
+        func linter(_ profile: Source.Profile) -> [Swift.String: Swift.String]? {
+            profile.engines.first { $0.id.token == "swift-linter" }?.environment
+        }
+        #expect(linter(profile([:])) == ["SWIFT_LINTER_BUNDLE": "institute"])
+        #expect(
+            linter(profile(["LD_LIBRARY_PATH": "/toolchain/usr/lib/swift/linux", "SWIFT_LINTER_BUNDLE": "other"]))
+                == ["SWIFT_LINTER_BUNDLE": "institute", "LD_LIBRARY_PATH": "/toolchain/usr/lib/swift/linux"]
+        )
+        for other in ["swift-format", "swiftlint"] {
+            #expect(
+                profile(["LD_LIBRARY_PATH": "/x"]).engines.first { $0.id.token == other }?.environment == [:]
+            )
+        }
     }
 
     @Test
     func `swift format binds the hosted Xcode version and its digest`() throws {
         let engine = try #require(
-            Institute.Source.Policy.current.engines.first { $0.id.token == "swift-format" }
+            Institute.Source.Policy.current.engine(.init("swift-format"), on: .macOSARM64)
         )
         #expect(engine.revision == "27B52")
         #expect(engine.toolchain == "Xcode 27.2 (27B52)")
@@ -205,7 +318,7 @@ extension `Institute source policy` {
             (.primitives, 137, "6ff3427a4a0c2d6303652b3482b8936103946612f555a9b9981a7c2afe229391"),
             (.standards, 130, "ddbbe0a0126d2102d2c3837d113f5ef8b0409a049330f4a232f42769774e2c46"),
         ]
-        let engine = policy.engines.first { $0.id.token == "swift-linter" }
+        let engine = policy.engine(.init("swift-linter"), on: .macOSARM64)
         #expect(engine?.revision == "2d6a4f5dbc54fe9fb183b6c40a3b31608f67ed92")
         #expect(engine?.executable.digest == .init("256fce641e16c2bf03a6296bba0aa1101498073c77997ca47f805d64c3462219"))
         for (bundle, count, digest) in expected {

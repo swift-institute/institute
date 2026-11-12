@@ -2,6 +2,7 @@ import Command
 import File_System
 import Institute_CI_Model
 import Institute_Model
+import Institute_Source_Policy
 import Source_Report
 import Testing
 
@@ -17,7 +18,6 @@ func `CI source parses one exact package subject`() throws {
             "--repository", "swift-standards/swift-iso-639",
             "--revision", String(repeating: "a", count: 40),
             "--root", "/work/swift-iso-639",
-            "--xcode-application", "/Applications/Xcode_27.0.app",
             "--jobs", "3",
         ],
         initial: .init()
@@ -26,8 +26,33 @@ func `CI source parses one exact package subject`() throws {
     #expect(command.repository == "swift-standards/swift-iso-639")
     #expect(command.revision == String(repeating: "a", count: 40))
     #expect(command.root == "/work/swift-iso-639")
-    #expect(command.xcodeApplication == "/Applications/Xcode_27.0.app")
+    #expect(command.xcodeApplication.isEmpty)
     #expect(command.jobs == 3)
+}
+
+@Test
+func `CI source takes an Xcode application on macOS only, and needs none anywhere`() {
+    typealias Source = Institute.CI.Command.Source
+    #expect(Source.refusal(xcodeApplication: "", on: .macOSARM64) == nil)
+    #expect(Source.refusal(xcodeApplication: "", on: .linuxX86_64) == nil)
+    #expect(Source.refusal(xcodeApplication: "", on: nil) == nil)
+    #expect(Source.refusal(xcodeApplication: "/Applications/Xcode_27.2.app", on: .macOSARM64) == nil)
+    #expect(
+        Source.refusal(xcodeApplication: "/Applications/Xcode_27.2.app", on: .linuxX86_64)
+            == "--xcode-application is accepted on macOS only"
+    )
+    #expect(
+        Source.refusal(xcodeApplication: "/Applications/Xcode_27.2.app", on: nil)
+            == "--xcode-application is accepted on macOS only"
+    )
+    #expect(
+        Source.refusal(xcodeApplication: "/tmp/Xcode.app", on: .macOSARM64)
+            == "--xcode-application must name an application under /Applications"
+    )
+    #expect(
+        Source.refusal(xcodeApplication: "/Applications/Xcode", on: .macOSARM64)
+            == "--xcode-application must name an application under /Applications"
+    )
 }
 
 @Test(arguments: [
@@ -35,7 +60,6 @@ func `CI source parses one exact package subject`() throws {
         "--repository", "swift-standards/swift-iso-639",
         "--revision", "not-a-commit",
         "--root", "/work/swift-iso-639",
-        "--xcode-application", "/Applications/Xcode_27.0.app",
     ],
     [
         "--repository", "swift-standards/swift-iso-639",
@@ -48,13 +72,11 @@ func `CI source parses one exact package subject`() throws {
         "--revision", String(repeating: "a", count: 40),
         "--root", "/work/swift-iso-639",
         "--bundle", "standards",
-        "--xcode-application", "/Applications/Xcode_27.0.app",
     ],
     [
         "--repository", "swift-standards/swift-iso-639",
         "--revision", String(repeating: "a", count: 40),
         "--root", "relative/swift-iso-639",
-        "--xcode-application", "/Applications/Xcode_27.0.app",
     ],
 ])
 func `CI source refuses inexact policy inputs`(_ arguments: [String]) {
@@ -73,7 +95,6 @@ func `CI source exit policy defaults to advisory and parses strict`() throws {
         "--repository", "swift-standards/swift-iso-639",
         "--revision", String(repeating: "a", count: 40),
         "--root", "/work/swift-iso-639",
-        "--xcode-application", "/Applications/Xcode_27.0.app",
     ]
     let advisory = try Command.parse(Institute.CI.Command.Source.self, from: base, initial: .init())
     let strict = try Command.parse(
@@ -321,4 +342,97 @@ func `CI source help documents the one command and its exit statuses`() {
     #expect(usage.contains("2 when the report is incomplete (unmeasured)"))
     #expect(usage.contains("Invalid arguments exit 64"))
     #expect(usage.contains("standard error"))
+}
+
+@Test
+func `a clean report is one line that says CI would pass`() {
+    let lines = Institute.Application.Lint.lines(
+        PolicyReport.report(),
+        root: PolicyReport.root,
+        overruns: [],
+        subject: "swift-standards/swift-iso-639@aaaaaaaaaaaa",
+        exitCode: 0
+    )
+    #expect(
+        lines == [
+            "institute lint: swift-standards/swift-iso-639@aaaaaaaaaaaa: clean; Quality · source would pass (exit 0)"
+        ]
+    )
+}
+
+@Test
+func `each finding is location, severity, rule and message, with errors last`() {
+    let report = PolicyReport.report(findings: [
+        PolicyReport.finding(.error, line: 1),
+        PolicyReport.finding(.warning, line: 2),
+        PolicyReport.finding(.note, line: 3),
+        PolicyReport.finding(.warning, line: 10),
+    ])
+    let lines = Institute.Application.Lint.lines(
+        report,
+        root: PolicyReport.root,
+        overruns: [],
+        subject: "swift-standards/swift-iso-639@aaaaaaaaaaaa, working tree",
+        exitCode: 1
+    )
+    #expect(
+        lines == [
+            "Sources/ISO639.swift:2:1: warning: [swift-format AlwaysUseLowerCamelCase] fixture finding",
+            "Sources/ISO639.swift:3:1: note: [swift-format AlwaysUseLowerCamelCase] fixture finding",
+            "Sources/ISO639.swift:10:1: warning: [swift-format AlwaysUseLowerCamelCase] fixture finding",
+            "Sources/ISO639.swift:1:1: error: [swift-format AlwaysUseLowerCamelCase] fixture finding",
+            "institute lint: swift-standards/swift-iso-639@aaaaaaaaaaaa, working tree: 1 errors, 2 warnings, 1 notes, "
+                + "0 rules over their limit; Quality · source would fail (exit 1)",
+        ]
+    )
+}
+
+@Test
+func `a rule over its limit is listed and fails, though every finding is a warning`() {
+    let overrun = "ratchet: swift-standards/swift-iso-639 has 1 `fixture` findings, limit 0. Fix them; a limit doesn't rise."
+    let lines = Institute.Application.Lint.lines(
+        PolicyReport.report(findings: [PolicyReport.finding(.warning)]),
+        root: PolicyReport.root,
+        overruns: [overrun],
+        subject: "swift-standards/swift-iso-639@aaaaaaaaaaaa",
+        exitCode: 1
+    )
+    #expect(lines.count == 3)
+    #expect(lines[1] == overrun)
+    #expect(lines[2].hasSuffix("0 errors, 1 warnings, 0 notes, 1 rules over their limit; Quality · source would fail (exit 1)"))
+}
+
+@Test
+func `artifact and control findings are errors of their own`() {
+    let lines = Institute.Application.Lint.lines(
+        PolicyReport.report(artifactFinding: true, controlFinding: true),
+        root: PolicyReport.root,
+        overruns: [],
+        subject: "swift-standards/swift-iso-639@aaaaaaaaaaaa",
+        exitCode: 1
+    )
+    #expect(lines.count == 3)
+    #expect(lines[0] == "Sources/ISO639.swift: error: [PolicyIdentity] fixture: fixture finding")
+    #expect(lines[1] == "control fixture-control: error: fixture: fixture finding")
+    #expect(lines[2].contains("2 errors, 0 warnings, 0 notes"))
+}
+
+@Test
+func `an incomplete report says so, never that CI would pass`() {
+    let report = PolicyReport.report(
+        unmeasured: [Source.Reason(code: "malformed-output", detail: "Package.swift:83:23: expected value")]
+    )
+    let lines = Institute.Application.Lint.lines(
+        report,
+        root: PolicyReport.root,
+        overruns: [],
+        subject: "swift-standards/swift-iso-639@aaaaaaaaaaaa",
+        exitCode: 2
+    )
+    #expect(
+        lines.first
+            == "institute lint: swift-standards/swift-iso-639@aaaaaaaaaaaa: UNMEASURED, the report is incomplete (exit 2)"
+    )
+    #expect(lines.contains("unmeasured: swift-format: malformed-output: Package.swift:83:23: expected value"))
+    #expect(!lines.contains { $0.contains("would pass") })
 }

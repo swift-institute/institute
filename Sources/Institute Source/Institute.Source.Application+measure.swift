@@ -141,7 +141,8 @@ extension Institute.Source.Application {
                 linter: (executable: preparation.linterExecutable, tool: preparation.linterTool, configurationPath: linterConfiguration),
                 bundle: bundle,
                 linterRules: rules,
-                repository: subject.repository.flatMap { Institute.Repository.Coordinate($0) }
+                repository: subject.repository.flatMap { Institute.Repository.Coordinate($0) },
+                linterEnvironment: Self.runtime(swiftFormat: preparation.swiftFormatExecutable)
             )
             guard preparation.profiles[bundle.rawValue] == profile.digest else {
                 return profile.engines.map {
