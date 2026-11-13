@@ -1,5 +1,4 @@
 import Byte
-import File_System
 import Institute_GitHub
 public import Institute_Model
 import JSON
@@ -78,8 +77,7 @@ extension Institute.Version.Client {
                         let suite = Swift.Int(run["check_suite_id"]),
                         let event = Swift.String(run["event"] as JSON?),
                         let branch = Swift.String(run["head_branch"] as JSON?),
-                        let workflow = Swift.String(run["path"] as JSON?),
-                        let path = try? File.Path(workflow),
+                        let path = Swift.String(run["path"] as JSON?),
                         let status = Swift.String(run["status"] as JSON?)
                     else {
                         throw .malformed("\(runsPath) lists a run it cannot read")

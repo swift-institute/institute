@@ -1,4 +1,3 @@
-import File_System
 import Institute_Model
 import Institute_Repository_Policy
 import Testing
@@ -22,7 +21,7 @@ extension `Institute.Version.Gate Tests`.Test {
         _ suite: Swift.Int,
         event: Swift.String = "push",
         branch: Swift.String = "main",
-        path: File.Path = Gate.workflow,
+        path: Swift.String = Gate.workflow,
         completed: Swift.Bool = true
     ) -> Gate.Run {
         .init(suite: suite, event: event, branch: branch, path: path, completed: completed)

@@ -105,7 +105,7 @@ extension Institute.Source.Application {
             let bundle = entry.bundle
             let rules = Institute.Source.Profile(policy: policy).rules(for: bundle)
             let linterConfiguration =
-                "\(preparation.directory)/\(bundle.rawValue)-source-linter-profile.json"
+                preparation.location(of: "\(bundle.rawValue)-source-linter-profile.json")
             let linterArtifact = policy.linter(bundle: bundle, rules: rules)
             guard preparation.verifiedProfiles.contains(bundle.rawValue) else {
                 return policy.requiredEngines.map {
@@ -136,8 +136,8 @@ extension Institute.Source.Application {
                 }
             }
             let profile = policy.profile(
-                swiftFormat: (executable: preparation.swiftFormatExecutable, tool: preparation.swiftFormatTool, configurationPath: "\(preparation.directory)/.swift-format"),
-                swiftLint: (executable: preparation.swiftLintExecutable, tool: preparation.swiftLintTool, configurationPath: "\(preparation.directory)/.swiftlint.yml"),
+                swiftFormat: (executable: preparation.swiftFormatExecutable, tool: preparation.swiftFormatTool, configurationPath: preparation.location(of: ".swift-format")),
+                swiftLint: (executable: preparation.swiftLintExecutable, tool: preparation.swiftLintTool, configurationPath: preparation.location(of: ".swiftlint.yml")),
                 linter: (executable: preparation.linterExecutable, tool: preparation.linterTool, configurationPath: linterConfiguration),
                 bundle: bundle,
                 linterRules: rules,
@@ -291,11 +291,11 @@ extension Institute.Source.Application {
         }
         guard
             Self.matches(
-                file: "\(preparation.directory)/.swift-format",
+                file: preparation.location(of: ".swift-format"),
                 digest: policy.swiftFormat.digest
             ),
             Self.matches(
-                file: "\(preparation.directory)/.swiftlint.yml",
+                file: preparation.location(of: ".swiftlint.yml"),
                 digest: policy.swiftLint.digest
             )
         else {

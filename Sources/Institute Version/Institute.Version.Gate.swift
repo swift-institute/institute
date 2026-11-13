@@ -1,4 +1,3 @@
-public import File_System
 public import Institute_Model
 
 extension Institute.Version {
@@ -23,7 +22,7 @@ extension Institute.Version {
 
 extension Institute.Version.Gate {
     /// The workflow file every package's generated caller lives in.
-    public static let workflow: File.Path = ".github/workflows/ci.yml"
+    public static let workflow: Swift.String = ".github/workflows/ci.yml"
     /// The check name of `ci-ok` as the generated caller's `ci / matrix`
     /// job reports it.
     public static let check = "ci / matrix / ci-ok"
@@ -35,14 +34,18 @@ extension Institute.Version.Gate {
         public let suite: Swift.Int
         public let event: Swift.String
         public let branch: Swift.String
-        public let path: File.Path
+        // swift-linter:disable:next raw concept
+        // REASON: a path inside a repository as GitHub and Git name it, with / on every platform, compared as text and put into API routes; looked at File.Path, which Win32 spells with \ and which adds a parse that can fail.
+        public let path: Swift.String
         public let completed: Swift.Bool
 
         public init(
             suite: Swift.Int,
             event: Swift.String,
             branch: Swift.String,
-            path: File.Path,
+            // swift-linter:disable:next raw concept
+            // REASON: a path inside a repository as GitHub and Git name it, with / on every platform, compared as text and put into API routes; looked at File.Path, which Win32 spells with \ and which adds a parse that can fail.
+            path: Swift.String,
             completed: Swift.Bool
         ) {
             self.suite = suite

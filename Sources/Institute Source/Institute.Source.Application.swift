@@ -38,15 +38,15 @@ extension Institute.Source.Application {
         let profile = policy.profile(
             swiftFormat: (
                 executable: preparation.swiftFormatExecutable, tool: preparation.swiftFormatTool,
-                configurationPath: "\(preparation.directory)/\(policy.swiftFormatRepair.path)"
+                configurationPath: preparation.location(of: policy.swiftFormatRepair.path)
             ),
             swiftLint: (
                 executable: preparation.swiftLintExecutable, tool: preparation.swiftLintTool,
-                configurationPath: "\(preparation.directory)/\(policy.swiftLint.path)"
+                configurationPath: preparation.location(of: policy.swiftLint.path)
             ),
             linter: (
                 executable: preparation.linterExecutable, tool: preparation.linterTool,
-                configurationPath: "\(preparation.directory)/\(bundle.token)-source-linter-profile.json"
+                configurationPath: preparation.location(of: "\(bundle.token)-source-linter-profile.json")
             ),
             bundle: bundle,
             linterRules: Institute.Source.Profile(policy: policy).rules(for: bundle),

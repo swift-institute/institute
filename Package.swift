@@ -413,7 +413,6 @@ let package = Package(
         .target(
             name: "Institute Version",
             dependencies: [
-                .product(name: "File System", package: "swift-file-system"),
                 .target(name: "Institute GitHub"),
                 .target(name: "Institute Model"),
                 .product(name: "Byte", package: "swift-byte"),
@@ -423,7 +422,6 @@ let package = Package(
         .testTarget(
             name: "Institute Version Tests",
             dependencies: [
-                .product(name: "File System", package: "swift-file-system"),
                 .target(name: "Institute Model"),
                 .target(name: "Institute Repository Policy"),
                 .target(name: "Institute Version"),

@@ -2,8 +2,10 @@ public import Lint
 
 extension Lint {
     /// The concept map (coenttb/work#239): which type owns a concept, so the rules can tell a raw value or a second
-    /// implementation from the owner's. A name here is only a candidate: a value that really is something else, such as
-    /// a URL's path, keeps its `String` under a suppression that says so.
+    /// implementation from the owner's. A name here is only a candidate: a value that really is something else keeps its
+    /// `String` under a suppression that says so. A URL's path is one. So is a path inside a repository, as Git lists
+    /// it and GitHub's API names it: it is written with `/` on every platform, where `File.Path` is the platform's own
+    /// spelling, `\` on Windows, so typing it as `File.Path` breaks every comparison there.
     public enum Concept {}
 }
 

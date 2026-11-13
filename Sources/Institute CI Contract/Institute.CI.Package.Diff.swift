@@ -167,15 +167,13 @@ extension Institute.CI.Package {
                 }
                 for record in records {
                     guard record.isObject,
-                        let filename = Swift.String(record["filename"] as JSON?),
-                        let path = try? File.Path(filename)
+                        let path = Swift.String(record["filename"] as JSON?), !path.isEmpty
                     else { throw .response }
-                    let previousPath: File.Path?
+                    let previousPath: Swift.String?
                     if !record["previous_filename"].isNull {
-                        guard let previous = Swift.String(record["previous_filename"] as JSON?),
-                            let parsed = try? File.Path(previous)
+                        guard let previous = Swift.String(record["previous_filename"] as JSON?), !previous.isEmpty
                         else { throw .response }
-                        previousPath = parsed
+                        previousPath = previous
                     } else {
                         previousPath = nil
                     }

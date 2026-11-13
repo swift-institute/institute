@@ -151,8 +151,8 @@ private final class RawConceptVisitor: SyntaxVisitor {
                 severity: severity,
                 identifier: "raw concept",
                 message: "[raw concept]: `\(name)` is a raw value in a public signature, and \(owner) owns what it holds. "
-                    + "Fix: take \(owner), converting at the leaf. If it is something else, as a URL's path is, suppress "
-                    + "this with a reason."
+                    + "Fix: take \(owner), converting at the leaf. If it is something else, as a URL's path is, or a path "
+                    + "inside a repository, which is written with / on every platform, suppress this with a reason."
             )
         )
     }

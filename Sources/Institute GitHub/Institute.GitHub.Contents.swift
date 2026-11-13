@@ -1,5 +1,4 @@
 public import Byte
-public import File_System
 public import GitHub_Standard
 public import Institute_Model
 import JSON
@@ -17,7 +16,9 @@ extension Institute.GitHub.Contents {
     /// The bytes of the regular file at `path` in `repository` at `ref`.
     public static func read(
         repository: GitHub_Standard::GitHub.Repository.Slug,
-        path: File.Path,
+        // swift-linter:disable:next raw concept
+        // REASON: a path inside a repository as GitHub and Git name it, with / on every platform, compared as text and put into API routes; looked at File.Path, which Win32 spells with \ and which adds a parse that can fail.
+        path: Swift.String,
         ref: Swift.String
     ) throws(Institute.GitHub.Release.Error) -> [Byte] {
         let location = "/repos/\(repository)/contents/\(path)?ref=\(ref)"

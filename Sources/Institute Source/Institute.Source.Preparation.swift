@@ -198,3 +198,17 @@ extension Institute.Source.Preparation.Tool {
         }
     }
 }
+
+extension Institute.Source.Preparation {
+    /// Where the file `name` of this preparation is: the directory and the
+    /// name joined as the platform joins them, which is how `prepare`
+    /// names the same file.
+    func location(of name: Swift.String) -> Swift.String {
+        do throws(File.Path.Component.Error) {
+            let component = try File.Path.Component(name)
+            return directory[file: component].description
+        } catch {
+            return "\(directory)/\(name)"
+        }
+    }
+}

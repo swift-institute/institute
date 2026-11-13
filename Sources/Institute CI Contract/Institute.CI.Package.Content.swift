@@ -1,4 +1,3 @@
-public import File_System
 public import Institute_CI_Model
 public import Institute_Model
 
@@ -14,15 +13,21 @@ extension Institute.CI {
     public enum Package {
         public struct Content: Sendable, Equatable {
             public struct Change: Sendable, Equatable, Hashable {
-                public let path: File.Path
-                public let previousPath: File.Path?
+                // swift-linter:disable:next raw concept
+                // REASON: a path inside a repository as GitHub and Git name it, with / on every platform, compared as text and put into API routes; looked at File.Path, which Win32 spells with \ and which adds a parse that can fail.
+                public let path: String
+                // swift-linter:disable:next raw concept
+                // REASON: a path inside a repository as GitHub and Git name it, with / on every platform, compared as text and put into API routes; looked at File.Path, which Win32 spells with \ and which adds a parse that can fail.
+                public let previousPath: String?
 
-                public init(path: File.Path, previousPath: File.Path? = nil) {
+                // swift-linter:disable:next raw concept
+                // REASON: a path inside a repository as GitHub and Git name it, with / on every platform, compared as text and put into API routes; looked at File.Path, which Win32 spells with \ and which adds a parse that can fail.
+                public init(path: String, previousPath: String? = nil) {
                     self.path = path
                     self.previousPath = previousPath
                 }
 
-                var paths: [String] { [path, previousPath].compactMap { $0?.string } }
+                var paths: [String] { [path, previousPath].compactMap { $0 } }
             }
 
             public let declaredRoots: Set<String>
