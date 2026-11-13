@@ -149,8 +149,10 @@ func `repair rewrites each file whose rewrite leaves no finding, and only those`
     #expect(package.text("Sources/B.swift") == "let b = 1\n")
     #expect(package.text("Sources/C.swift") == "let c = \"STUCK BAD\"\n")
     #expect(!MainFixtureFiles.exists(MainFixtureFiles.join(package.root, ".source/repair")))
-    let configurations = Set(format.commands.withLock { $0 }.map { $0[$0.count > 3 && $0[0] == "lint" ? 3 : 2] })
-    #expect(configurations == [MainFixtureFiles.join(package.root, ".source/.swift-format-repair")])
+    let configurations = Set(
+        try format.commands.withLock { $0 }.map { try File.Path($0[$0.count > 3 && $0[0] == "lint" ? 3 : 2]) }
+    )
+    #expect(configurations == [try File.Path(MainFixtureFiles.join(package.root, ".source/.swift-format-repair"))])
     package.remove()
 }
 
