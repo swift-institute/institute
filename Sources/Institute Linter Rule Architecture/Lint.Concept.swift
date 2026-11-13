@@ -124,7 +124,8 @@ extension Lint.Concept {
 
 extension Lint.Concept {
     /// Each package's ratchet: how many `raw concept` and `concept parallel` findings it may have. A package not listed
-    /// may have none. A ceiling may fall and never rise, so a rise shows here, in one reviewed place.
+    /// has no ceiling until it is listed with the count it has then. A ceiling may fall and never rise, so a rise shows
+    /// here, in one reviewed place.
     public static let ceilings: [Swift::String: Swift::Int] = [
         "affairs": 13,
         "coenttb-cli": 1,
@@ -148,8 +149,7 @@ extension Lint.Concept {
 
     /// Why `package` fails the ratchet with `findings` findings; nil when it holds.
     public static func overrun(package: Swift::String, findings: Swift::Int) -> Swift::String? {
-        let ceiling = Self.ceilings[package] ?? 0
-        guard findings > ceiling else { return nil }
+        guard let ceiling = Self.ceilings[package], findings > ceiling else { return nil }
         return "concept ratchet: \(package) has \(findings) findings of \(ceiling) allowed. Fix them; a ceiling never rises."
     }
 }

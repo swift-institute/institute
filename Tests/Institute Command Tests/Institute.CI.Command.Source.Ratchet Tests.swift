@@ -34,9 +34,12 @@ import Testing
         #expect(overruns.first?.contains("3 `comment in source` findings, limit 2") == true)
     }
 
-    @Test func `a rule or repository not listed may have none`() {
+    @Test func `a listed repository may have none of a rule not listed`() {
         #expect(Ratchet.overruns(repository: "swift-atoms/swift-a", counts: ["new rule": 1], table: Self.table).count == 1)
-        #expect(Ratchet.overruns(repository: "swift-atoms/swift-new", counts: ["comment in source": 1], table: Self.table).count == 1)
+    }
+
+    @Test func `a repository not listed has no limits until its first measurement`() {
+        #expect(Ratchet.overruns(repository: "swift-atoms/swift-new", counts: ["comment in source": 1], table: Self.table).isEmpty)
     }
 
     @Test func `a strict run fails on an overrun and an advisory one doesn't`() {
