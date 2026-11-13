@@ -271,12 +271,11 @@ extension Source.Repair {
             root: Swift.String
         ) throws(Source.Reason) -> Swift.String {
             let relative: Swift.String
-            if path.hasPrefix("/") {
-                let prefix = root.hasSuffix("/") ? root : root + "/"
-                guard path.hasPrefix(prefix) else {
-                    throw .init(code: "path-escape", detail: path)
-                }
+            let prefix = root.hasSuffix("/") ? root : root + "/"
+            if path.hasPrefix(prefix) {
                 relative = Swift.String(path.dropFirst(prefix.count))
+            } else if path.hasPrefix("/") {
+                throw .init(code: "path-escape", detail: path)
             } else {
                 relative = path
             }
