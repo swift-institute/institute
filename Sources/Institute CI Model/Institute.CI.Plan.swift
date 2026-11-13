@@ -188,9 +188,9 @@ extension Institute.CI {
 
         /// Legs that compile, cross-compile or measure the package, beyond
         /// the release build legs ``Leg/buildLeg`` names. A run that selected
-        /// no package work schedules none of them: `source` measures the same
-        /// sources as the last run, and needs a macOS runner to do it. The
-        /// Plan job still validates the repository, its README included.
+        /// no package work schedules none of them: `source` would measure the
+        /// same sources as the last run. The Plan job still validates the
+        /// repository, its README included.
         static let packageWorkLegs: Set<String> = [
             "source", "linux-6-4", "linux-nightly", "apple-simulator-build", "embedded",
             "embedded-wasm-sdk", "android-build", "static-linux-musl-build",
