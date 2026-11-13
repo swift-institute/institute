@@ -126,7 +126,7 @@ private func sourceSwiftFormatFinding(
     files: [Swift.String],
     rules: [Source.Rule.ID]
 ) -> Source.Finding? {
-    let fields = line.split(separator: ":", maxSplits: 4, omittingEmptySubsequences: false)
+    let fields = sourceSwiftFormatFields(Swift.Substring(line))
     guard fields.count == 5,
         let lineNumber = Swift.Int(fields[1]), lineNumber > 0,
         let column = Swift.Int(fields[2]), column > 0
@@ -156,20 +156,38 @@ private func sourceSwiftFormatFinding(
     )
 }
 
+/// A record's five fields: file, line, column, severity and the rest.
+///
+/// The file ends at the first colon that a line and a column follow, so a
+/// file with a colon of its own, `C:/…` on Windows, stays whole. A record
+/// with no such colon is split at its first four.
+private func sourceSwiftFormatFields(_ record: Swift.Substring) -> [Swift.Substring] {
+    var start = record.startIndex
+    while let colon = record[start...].firstIndex(of: ":") {
+        let rest = record[record.index(after: colon)...]
+            .split(separator: ":", maxSplits: 3, omittingEmptySubsequences: false)
+        if rest.count == 4, Swift.Int(rest[0]) != nil, Swift.Int(rest[1]) != nil {
+            return [record[..<colon]] + rest
+        }
+        start = record.index(after: colon)
+    }
+    return record.split(separator: ":", maxSplits: 4, omittingEmptySubsequences: false)
+}
+
 private func sourceSwiftFormatQuoteIsOpen(_ record: Swift.String) -> Swift.Bool {
-    let fields = record.split(separator: ":", maxSplits: 4, omittingEmptySubsequences: false)
+    let fields = sourceSwiftFormatFields(Swift.Substring(record))
     guard fields.count == 5 else { return false }
     return fields[4].count(where: { $0 == "'" }) % 2 == 1
 }
 
 private func sourceSwiftFormatIsHeader<S: Swift.StringProtocol>(_ line: S) -> Swift.Bool {
-    let fields = line.split(separator: ":", maxSplits: 4, omittingEmptySubsequences: false)
+    let fields = sourceSwiftFormatFields(Swift.Substring(line))
     return fields.count == 5 && Swift.Int(fields[1]) != nil && Swift.Int(fields[2]) != nil
         && sourceSwiftFormatTrim(fields[4]).first == "["
 }
 
 private func sourceSwiftFormatIsContext(_ record: Swift.String) -> Swift.Bool {
-    let fields = record.split(separator: ":", maxSplits: 4, omittingEmptySubsequences: false)
+    let fields = sourceSwiftFormatFields(Swift.Substring(record))
     guard fields.count == 5, Swift.Int(fields[1]) != nil, Swift.Int(fields[2]) != nil else {
         return false
     }

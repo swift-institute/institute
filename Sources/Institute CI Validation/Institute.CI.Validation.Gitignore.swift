@@ -66,10 +66,14 @@ extension Institute.CI.Validation {
         /// slash — `**/.*/` — never matches a path git does not know to
         /// be one.
         public struct Probe: Sendable, Equatable {
-            public let path: File.Path
+            // swift-linter:disable:next raw concept
+            // REASON: a pathname as Git matches it against the ignore file, with / on every platform, joined to the root as text and handed to git check-ignore; looked at File.Path, which Win32 spells with \ and which adds a parse that can fail.
+            public let path: String
             public let isDirectory: Bool
 
-            public init(_ path: File.Path, isDirectory: Bool = false) {
+            // swift-linter:disable:next raw concept
+            // REASON: a pathname as Git matches it against the ignore file, with / on every platform, joined to the root as text and handed to git check-ignore; looked at File.Path, which Win32 spells with \ and which adds a parse that can fail.
+            public init(_ path: String, isDirectory: Bool = false) {
                 self.path = path
                 self.isDirectory = isDirectory
             }
@@ -287,7 +291,7 @@ extension Institute.CI.Validation {
                 under: text,
                 probes: work + Self.junk + Self.unadmitted
             )
-            for probe in work where ignored.contains(probe.path.string) {
+            for probe in work where ignored.contains(probe.path) {
                 findings.append(
                     Finding(
                         repository: subject.repository,
@@ -297,7 +301,7 @@ extension Institute.CI.Validation {
                     )
                 )
             }
-            let tracked = Self.junk.filter { !ignored.contains($0.path.string) }
+            let tracked = Self.junk.filter { !ignored.contains($0.path) }
             if !tracked.isEmpty {
                 findings.append(
                     Finding(
@@ -309,7 +313,7 @@ extension Institute.CI.Validation {
                     )
                 )
             }
-            for probe in Self.unadmitted where !ignored.contains(probe.path.string) {
+            for probe in Self.unadmitted where !ignored.contains(probe.path) {
                 findings.append(
                     Finding(
                         repository: subject.repository,
@@ -522,11 +526,11 @@ extension Institute.CI.Validation.Gitignore {
         }
         var ignored: Set<String> = []
         for probe in probes {
-            let verdict = try git(["check-ignore", "-q", "--", probe.path.string], in: root).status
+            let verdict = try git(["check-ignore", "-q", "--", probe.path], in: root).status
             guard verdict <= 1 else {
                 throw .missingSupportFile(path: "git check-ignore \(probe.path)")
             }
-            if verdict == 0 { ignored.insert(probe.path.string) }
+            if verdict == 0 { ignored.insert(probe.path) }
         }
         return ignored
     }

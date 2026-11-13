@@ -106,7 +106,11 @@ extension `target import edge Tests`.Unit {
         if findings.count == 1 {
             #expect(findings[0].identifier == "target import edge")
             #expect(findings[0].message.contains("target 'A' imports 'B'"))
-            #expect(findings[0].message.contains("Sources/A/File.swift:1"))
+            #if os(Windows)
+                #expect(findings[0].message.contains("Sources\\A\\File.swift:1"))
+            #else
+                #expect(findings[0].message.contains("Sources/A/File.swift:1"))
+            #endif
         }
     }
 

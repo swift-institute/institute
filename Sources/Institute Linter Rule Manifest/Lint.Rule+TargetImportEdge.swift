@@ -158,10 +158,13 @@ package func packageTargetImportEdgeFindings(
             let converter = SourceLocationConverter(fileName: swiftFile, tree: tree)
             let importVisitor = PackageTargetImportEdgeImportVisitor(converter: converter)
             importVisitor.walk(tree)
-            var relative = swiftFile
-            if relative.hasPrefix(root + "/") {
-                relative = Swift::String(relative.dropFirst(root.count + 1))
+            let inside: File.Path?
+            do throws(File.Path.Error) {
+                inside = try File.Path(swiftFile).relative(to: try File.Path(root))
+            } catch {
+                inside = nil
             }
+            let relative = inside?.string ?? swiftFile
             for (module, line) in importVisitor.imports where sightings[module] == nil {
                 sightings[module] = (relative, line)
             }

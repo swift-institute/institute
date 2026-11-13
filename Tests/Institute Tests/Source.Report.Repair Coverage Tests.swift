@@ -438,6 +438,27 @@ func `An apostrophe in a one-line formatter message does not absorb the next dia
     #expect(findings[0].diagnostic.message == "don't document this")
 }
 
+@Test
+func `A formatter diagnostic for a file with a colon of its own is a finding`() {
+    let subject = repairCoverageSubject()
+    let root = "C:/subjects/example"
+    let measurement = Source.Measurement.swiftFormat(
+        engine: swiftFormatEngine,
+        subject: .init(identity: subject.identity, root: root, artifacts: subject.artifacts),
+        rules: swiftFormatRules,
+        status: 1,
+        output: "",
+        diagnostics: "\(root)/Sources/A.swift:3:1: error: [Indentation] indent by 4 spaces"
+    )
+
+    guard case .findings(let findings) = measurement.verdict else {
+        Issue.record("expected formatter findings, got \(measurement.verdict)")
+        return
+    }
+    #expect(findings.map(\.diagnostic.location.filePath) == ["\(root)/Sources/A.swift"])
+    #expect(findings.map(\.diagnostic.location.line) == [3])
+}
+
 enum `Source.Measurement Tests` {}
 
 extension `Source.Measurement Tests` {

@@ -107,7 +107,12 @@ enum MainFixtureFiles {
 
     @discardableResult
     static func createFile(_ path: Swift.String, contents: [Swift.UInt8]?) -> Swift.Bool {
-        FileManager.default.createFile(atPath: path, contents: contents.map { Data($0) })
+        do {
+            try Data(contents ?? []).write(to: URL(fileURLWithPath: path))
+            return true
+        } catch {
+            return false
+        }
     }
 
     static func readBytes(_ path: Swift.String) throws -> [Swift.UInt8] {
