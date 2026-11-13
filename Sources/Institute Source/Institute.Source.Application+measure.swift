@@ -251,7 +251,7 @@ extension Institute.Source.Application {
                 predicateRequirements: [
                     .init(
                         subject: configuration.subject.identity,
-                        artifacts: configuration.subject.artifacts.map { $0.path.string },
+                        artifacts: configuration.subject.artifacts.map { $0.path },
                         predicates: [policy.configuration.predicate]
                     )
                 ]

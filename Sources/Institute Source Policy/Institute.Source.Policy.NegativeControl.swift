@@ -1,6 +1,5 @@
 public import GitHub_Standard
 public import Institute_Model
-public import Path
 public import Source_Profile
 
 extension Institute.Source.Policy {
@@ -20,7 +19,9 @@ extension Institute.Source.Policy {
         /// The owning repository, `owner/name`.
         public let repository: GitHub_Standard::GitHub.Repository.Slug
         /// The fixture's path relative to the repository root.
-        public let path: Path::Path
+        // swift-linter:disable:next raw concept
+        // REASON: a path inside the repository as Git lists it, with / on every platform, compared whole and written to the report's JSON; looked at Path and File.Path, which Win32 spells with \ and which add a parse that can fail.
+        public let path: Swift.String
         /// The rule the fixture violates.
         public let rule: Source.Rule.ID
         /// How many findings of `rule` the fixture must produce; at least one.
@@ -28,7 +29,9 @@ extension Institute.Source.Policy {
 
         public init(
             repository: GitHub_Standard::GitHub.Repository.Slug,
-            path: Path::Path,
+            // swift-linter:disable:next raw concept
+            // REASON: a path inside the repository as Git lists it, with / on every platform, compared whole and written to the report's JSON; looked at Path and File.Path, which Win32 spells with \ and which add a parse that can fail.
+            path: Swift.String,
             rule: Source.Rule.ID,
             findings: Swift.Int = 1
         ) {
@@ -49,7 +52,7 @@ extension Institute.Source.Policy {
     ) -> [Swift.String: NegativeControl] {
         var controls: [Swift.String: NegativeControl] = [:]
         for control in negativeControls where control.repository == repository {
-            controls[control.path.string] = control
+            controls[control.path] = control
         }
         return controls
     }

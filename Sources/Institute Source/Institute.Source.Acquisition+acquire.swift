@@ -209,11 +209,11 @@ extension Institute.Source.Acquisition {
     ) throws(Institute.Error) -> File {
         let component = try Self.component(executable)
         let pinned = "the source policy pins \(asset.digest.hex), the \(executable) of \(release) for \(distribution) from swift.org"
-        for entry in search where entry.hasPrefix("/") {
-            let candidate: File
-            do throws(File.Path.Error) {
-                candidate = File.Directory(try .init(entry))[file: component]
-            } catch { continue }
+        for entry in search {
+            let directory: File.Path
+            do throws(File.Path.Error) { directory = try .init(entry) } catch { continue }
+            guard directory.isAbsolute else { continue }
+            let candidate = File.Directory(directory)[file: component]
             guard candidate.stat.isFile else { continue }
             let resolved: File
             do throws(File.System.Canonical.Error) {

@@ -17,11 +17,11 @@ private func renderedConfigurationPreparation(
     try MainFixtureFiles.createDirectory(root)
     try MainFixtureFiles.write(
         bytes: Array(policy.swiftFormat.contents.utf8),
-        to: MainFixtureFiles.join(root, policy.swiftFormat.path.string)
+        to: MainFixtureFiles.join(root, policy.swiftFormat.path)
     )
     try MainFixtureFiles.write(
         bytes: Array(policy.swiftLint.contents.utf8),
-        to: MainFixtureFiles.join(root, policy.swiftLint.path.string)
+        to: MainFixtureFiles.join(root, policy.swiftLint.path)
     )
     for bundle in policy.bundles {
         let artifact = policy.linter(
@@ -115,7 +115,7 @@ private func configurationReport(
         predicateRequirements: [
             .init(
                 subject: configuration.subject.identity,
-                artifacts: configuration.subject.artifacts.map { $0.path.string },
+                artifacts: configuration.subject.artifacts.map { $0.path },
                 predicates: [policy.configuration.predicate]
             )
         ]

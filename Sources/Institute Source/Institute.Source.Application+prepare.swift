@@ -104,15 +104,15 @@ extension Institute.Source.Application {
         let swiftFormatTool = swiftFormatAsset.digest
         let swiftLintTool = swiftLint.digest
         let linterTool = linter.digest
-        let format = directory[file: try Self.component(policy.swiftFormat.path.string)]
+        let format = directory[file: try Self.component(policy.swiftFormat.path)]
         do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
             try await format.write.atomic(policy.swiftFormat.contents)
         } catch { throw .filesystem("cannot render \(format): \(error)") }
-        let formatRepair = directory[file: try Self.component(policy.swiftFormatRepair.path.string)]
+        let formatRepair = directory[file: try Self.component(policy.swiftFormatRepair.path)]
         do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
             try await formatRepair.write.atomic(policy.swiftFormatRepair.contents)
         } catch { throw .filesystem("cannot render \(formatRepair): \(error)") }
-        let swiftLintConfiguration = directory[file: try Self.component(policy.swiftLint.path.string)]
+        let swiftLintConfiguration = directory[file: try Self.component(policy.swiftLint.path)]
         do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
             try await swiftLintConfiguration.write.atomic(policy.swiftLint.contents)
         } catch { throw .filesystem("cannot render \(swiftLintConfiguration): \(error)") }

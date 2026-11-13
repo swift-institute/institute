@@ -1,5 +1,3 @@
-import Path
-
 extension Source.Repair {
     public struct Staging: Sendable {
         public let subject: Source.Subject
@@ -28,11 +26,11 @@ extension Source.Repair {
                 }
                 switch fileSystem.read(relative) {
                 case .success(let contents):
-                    staged[relative] = try Self.stagedFile(relative, contents: contents)
+                    staged[relative] = .init(path: relative, contents: contents)
                 case .failure(let reason): throw reason
                 }
             }
-            let initial = staged.values.sorted(by: { $0.path.string < $1.path.string })
+            let initial = staged.values.sorted(by: { $0.path < $1.path })
             guard Source.SourceSet.digest(initial) == sources else {
                 throw .init(code: "stale-sources", detail: sources.hex)
             }
@@ -134,7 +132,7 @@ extension Source.Repair {
             self.binding = subject.binding
             self.profile = profile
             self.sources = sources
-            self.files = staged.values.sorted(by: { $0.path.string < $1.path.string })
+            self.files = staged.values.sorted(by: { $0.path < $1.path })
             self.operations = operations
             self.refusals = refusals
             self.engines = engines
@@ -199,9 +197,9 @@ extension Source.Repair {
             }
             let postconditions = files.map { file -> Postcondition in
                 if let contents = file.contents {
-                    return .file(path: file.path.string, digest: Self.digest(contents))
+                    return .file(path: file.path, digest: Self.digest(contents))
                 }
-                return .absent(path: file.path.string)
+                return .absent(path: file.path)
             }
             return Plan(
                 subject: binding,
@@ -227,14 +225,14 @@ extension Source.Repair {
                     throw .init(code: "malformed-rewrite", detail: path)
                 }
                 let replacement = [UInt8](contents.utf8)
-                files[path] = try stagedFile(path, contents: replacement)
+                files[path] = .init(path: path, contents: replacement)
                 return .rewrite(path: path, expected: digest(original), replacement: replacement)
             case .create(let path, let contents):
                 let path = try relative(path, root: root)
                 try reserve(path, affected: &affected)
                 guard files[path] == nil else { throw .init(code: "create-collision", detail: path) }
                 let bytes = [UInt8](contents.utf8)
-                files[path] = try stagedFile(path, contents: bytes)
+                files[path] = .init(path: path, contents: bytes)
                 return .create(path: path, contents: bytes)
             case .move(let from, let to):
                 let from = try relative(from, root: root)
@@ -245,8 +243,8 @@ extension Source.Repair {
                     throw .init(code: "move-source", detail: from)
                 }
                 guard files[to] == nil else { throw .init(code: "move-collision", detail: to) }
-                files[from] = try stagedFile(from, contents: nil)
-                files[to] = try stagedFile(to, contents: contents)
+                files[from] = .init(path: from, contents: nil)
+                files[to] = .init(path: to, contents: contents)
                 return .move(from: from, to: to, expected: digest(contents))
             case .delete(let path):
                 let path = try relative(path, root: root)
@@ -254,19 +252,8 @@ extension Source.Repair {
                 guard let contents = files[path]?.contents else {
                     throw .init(code: "delete-source", detail: path)
                 }
-                files[path] = try stagedFile(path, contents: nil)
+                files[path] = .init(path: path, contents: nil)
                 return .delete(path: path, expected: digest(contents))
-            }
-        }
-
-        private static func stagedFile(
-            _ path: Swift.String,
-            contents: [UInt8]?
-        ) throws(Source.Reason) -> Staged.File {
-            do throws(Path::Path.Error) {
-                return .init(path: try Path::Path(validating: path), contents: contents)
-            } catch {
-                throw .init(code: "path-escape", detail: path)
             }
         }
 

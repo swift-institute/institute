@@ -1,15 +1,17 @@
-public import Path
-
 extension Source {
     public struct Artifact: Hashable, Sendable {
-        public let path: Path::Path
+        // swift-linter:disable:next raw concept
+        // REASON: a path inside the repository as Git lists it, with / on every platform, compared whole and written to the report's JSON; looked at Path and File.Path, which Win32 spells with \ and which add a parse that can fail.
+        public let path: Swift.String
         public let kind: Kind
         public let purpose: Purpose
         public let provenance: Provenance
         public let digest: Digest
 
         public init(
-            path: Path::Path,
+            // swift-linter:disable:next raw concept
+            // REASON: a path inside the repository as Git lists it, with / on every platform, compared whole and written to the report's JSON; looked at Path and File.Path, which Win32 spells with \ and which add a parse that can fail.
+            path: Swift.String,
             kind: Kind,
             purpose: Purpose,
             provenance: Provenance,
@@ -27,7 +29,7 @@ extension Source {
 extension Source.Artifact: JSON.Serializable {
     public static func serialize(_ value: Self) -> JSON {
         [
-            "path": value.path.string.json,
+            "path": value.path.json,
             "kind": value.kind.json,
             "purpose": value.purpose.json,
             "provenance": value.provenance.json,
@@ -49,15 +51,8 @@ extension Source.Artifact: JSON.Serializable {
             throw .missingKey("provenance")
         }
         guard let digest = object["digest"] else { throw .missingKey("digest") }
-        let text = try Swift.String(json: path)
-        let parsed: Path::Path
-        do throws(Path::Path.Error) {
-            parsed = try Path::Path(validating: text)
-        } catch {
-            throw .typeMismatch(expected: "source artifact path", got: "invalid path")
-        }
         return try Self(
-            path: parsed,
+            path: Swift.String(json: path),
             kind: Kind(json: kind),
             purpose: Purpose(json: purpose),
             provenance: Provenance(json: provenance),

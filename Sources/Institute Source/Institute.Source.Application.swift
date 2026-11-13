@@ -4,7 +4,6 @@ public import File_System
 public import Institute_Model
 public import Institute_Source_Policy
 internal import Institute_Source_Profile
-import Path
 import Source_Execution
 public import Source_Measurement
 internal import Source_Profile
@@ -77,8 +76,8 @@ extension Institute.Source.Application {
         let prefix = subject.root.hasSuffix("/") ? subject.root : subject.root + "/"
         let proposal = await driver.repair(subject.governed, engine)
         var proposed: [Swift.String: [Swift.UInt8]] = [:]
-        for edit in proposal.edits where edit.path.string.hasPrefix(prefix) {
-            proposed[Swift.String(edit.path.string.dropFirst(prefix.count))] = edit.replacement
+        for edit in proposal.edits where edit.path.hasPrefix(prefix) {
+            proposed[Swift.String(edit.path.dropFirst(prefix.count))] = edit.replacement
         }
         var declined: [Swift.String: Swift.String] = [:]
         for refusal in proposal.refusals {
@@ -166,13 +165,7 @@ extension Institute.Source.Application {
             )
         )
         let sources = Source_Repair::Source.SourceSet.digest(
-            try originals.map { path, contents throws(Institute.Error) in
-                do throws(Path::Path.Error) {
-                    return .init(path: try .init(validating: path), contents: contents)
-                } catch {
-                    throw .configuration("invalid source artifact path \(path)")
-                }
-            }
+            originals.map { path, contents in .init(path: path, contents: contents) }
         )
         let plan: Source_Repair::Source.Repair.Plan
         do throws(Source_Measurement::Source.Reason) {
@@ -233,7 +226,7 @@ extension Institute.Source.Application {
                     purpose: artifact.purpose,
                     provenance: artifact.provenance,
                     digest: .init(
-                        FIPS_180_4.SHA256.digest((contents[artifact.path.string] ?? []).map(Byte.init(_:))).hex
+                        FIPS_180_4.SHA256.digest((contents[artifact.path] ?? []).map(Byte.init(_:))).hex
                     )
                 )
             }
@@ -412,16 +405,23 @@ extension Institute.Source.Application {
     /// `$HOME/.cache/institute/source-tools`, else `nil`, and each package
     /// keeps its own.
     public static func tools(cache: Swift.String?, home: Swift.String?) -> File.Directory? {
-        let base: Swift.String
-        if let cache, cache.hasPrefix("/") {
-            base = cache
-        } else if let home, home.hasPrefix("/") {
-            base = (home.hasSuffix("/") ? Swift.String(home.dropLast()) : home) + "/.cache"
-        } else {
+        do throws(File.Path.Error) {
+            let kept = try File.Path("institute/source-tools")
+            if let cache = absolute(cache) { return File.Directory(cache / kept) }
+            if let home = absolute(home) { return File.Directory(home / (try File.Path(".cache")) / kept) }
+            return nil
+        } catch {
             return nil
         }
+    }
+
+    /// `text` as a path, when it is one and names its root: what the
+    /// platform calls absolute, `/…` on POSIX and `C:\…` on Windows.
+    private static func absolute(_ text: Swift.String?) -> File.Path? {
+        guard let text else { return nil }
         do throws(File.Path.Error) {
-            return try File.Directory(validating: (base.hasSuffix("/") ? Swift.String(base.dropLast()) : base) + "/institute/source-tools")
+            let path = try File.Path(text)
+            return path.isAbsolute ? path : nil
         } catch {
             return nil
         }

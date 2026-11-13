@@ -20,8 +20,8 @@ extension Institute.Source.Application {
         let directory = preparation.directory
         let declared: [(artifact: Institute.Source.Artifact, path: Swift.String)] =
             [
-                (policy.swiftFormat, policy.swiftFormat.path.string),
-                (policy.swiftLint, policy.swiftLint.path.string),
+                (policy.swiftFormat, policy.swiftFormat.path),
+                (policy.swiftLint, policy.swiftLint.path),
             ]
             + policy.bundles.map { bundle in
                 let artifact = policy.linter(
@@ -42,10 +42,6 @@ extension Institute.Source.Application {
             do throws(File.Path.Component.Error) { component = try .init(path) } catch {
                 throw .configuration("invalid source configuration artifact path \(path): \(error)")
             }
-            let artifactPath: File.Path
-            do throws(File.Path.Error) { artifactPath = try .init(path) } catch {
-                throw .configuration("invalid source configuration artifact path \(path): \(error)")
-            }
             let file = directory[file: component]
             let actual: Source.Profile.Digest
             let readReason: Source.Reason?
@@ -57,7 +53,7 @@ extension Institute.Source.Application {
                 readReason = .init(code: "configuration-read", detail: "\(error)")
             }
             let artifact = Source.Artifact(
-                path: artifactPath,
+                path: path,
                 kind: .configuration,
                 purpose: .generatedPolicy,
                 provenance: .generated(

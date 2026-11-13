@@ -144,7 +144,7 @@ private enum PolicyReport {
     static let control = "fixture-control"
     static let reason = Source.Reason(code: "fixture", detail: "fixture finding")
     static let artifact = Source.Artifact(
-        path: .init(stringLiteral: path),
+        path: path,
         kind: .swift,
         purpose: .governedSource,
         provenance: .authored,

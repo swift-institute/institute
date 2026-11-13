@@ -122,7 +122,7 @@ extension Institute.Source.Workspace {
             }
             artifacts.append(
                 .init(
-                    path: parsed,
+                    path: path,
                     kind: .swift,
                     purpose: controls[path].map {
                         .control(

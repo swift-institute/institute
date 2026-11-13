@@ -92,7 +92,6 @@ let package = Package(
         .target(
             name: "Source Measurement",
             dependencies: [
-                .product(name: "Path", package: "swift-path"),
                 .product(name: "Source", package: "swift-source"),
                 .product(name: "Diagnostic", package: "swift-diagnostic"),
                 .product(name: "JSON", package: "swift-json"),
@@ -113,7 +112,6 @@ let package = Package(
             dependencies: [
                 .target(name: "Source Measurement"),
                 .target(name: "Source Profile"),
-                .product(name: "Path", package: "swift-path"),
             ],
             swiftSettings: vendoredSourceSettings
         ),
@@ -138,7 +136,6 @@ let package = Package(
         .target(
             name: "Source Execution",
             dependencies: [
-                .product(name: "Path", package: "swift-path"),
                 .target(name: "Source Measurement"),
                 .target(name: "Source Profile"),
                 .target(name: "Source Swift Format"),
@@ -151,14 +148,12 @@ let package = Package(
             name: "Source Report",
             dependencies: [
                 .target(name: "Source Measurement"), .target(name: "Source Profile"), .product(name: "JSON", package: "swift-json"),
-                .product(name: "Path", package: "swift-path"),
             ],
             swiftSettings: vendoredSourceSettings
         ),
         .target(
             name: "Source Repair",
             dependencies: [
-                .product(name: "Path", package: "swift-path"),
                 .product(name: "Source", package: "swift-source"),
                 .target(name: "Source Measurement"),
                 .target(name: "Source Profile"),
@@ -204,8 +199,6 @@ let package = Package(
             name: "Institute Source Policy",
             dependencies: [
                 .product(name: "GitHub Standard", package: "swift-github-standard"),
-                .product(name: "Path", package: "swift-path"),
-                .product(name: "File System", package: "swift-file-system"),
                 .target(name: "Institute Model"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "FIPS 180-4", package: "swift-fips-180-4"),

@@ -1,5 +1,3 @@
-import Path
-
 extension Source {
     public struct Subject: Hashable, Sendable {
         public let identity: Swift.String
@@ -9,7 +7,7 @@ extension Source {
         public init(identity: Swift.String, root: Swift.String, artifacts: [Artifact]) {
             self.identity = identity
             self.root = root
-            self.artifacts = artifacts.sorted { $0.path.string < $1.path.string }
+            self.artifacts = artifacts.sorted { $0.path < $1.path }
         }
 
         /// The subject without its control artifacts: what engines measure
@@ -26,7 +24,7 @@ extension Source {
         }
 
         public func paths(of kind: Artifact.Kind) -> [Swift.String] {
-            artifacts.lazy.filter { $0.kind == kind }.map { $0.path.string }
+            artifacts.lazy.filter { $0.kind == kind }.map { $0.path }
         }
     }
 }

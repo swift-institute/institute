@@ -13,7 +13,7 @@ private func repairCoverageSubject() -> Source.Subject {
         root: repairCoverageRoot,
         artifacts: ["Sources/A.swift", "Sources/B.swift"].map {
             .init(
-                path: .init(stringLiteral: $0),
+                path: $0,
                 kind: .swift,
                 purpose: .governedSource,
                 provenance: .authored,

@@ -26,13 +26,15 @@ func `a URL that names no owner and name gives no repository`(remote: String) {
 }
 
 @Test
-func `the pinned tools are kept once per account, under the cache directory`() {
+func `the pinned tools are kept once per account, under the cache directory`() throws {
     typealias Lint = Institute.Source.Application
-    #expect(
-        Lint.tools(cache: "/var/cache", home: "/home/coen")?.description == "/var/cache/institute/source-tools"
-    )
-    #expect(Lint.tools(cache: nil, home: "/home/coen")?.description == "/home/coen/.cache/institute/source-tools")
-    #expect(Lint.tools(cache: "", home: "/home/coen/")?.description == "/home/coen/.cache/institute/source-tools")
+    let cache = MainFixtureFiles.temporaryPath("cache")
+    let home = MainFixtureFiles.temporaryPath("home")
+    let underCache = try File.Directory(validating: MainFixtureFiles.join(cache, "institute/source-tools"))
+    let underHome = try File.Directory(validating: MainFixtureFiles.join(home, ".cache/institute/source-tools"))
+    #expect(Lint.tools(cache: cache, home: home) == underCache)
+    #expect(Lint.tools(cache: nil, home: home) == underHome)
+    #expect(Lint.tools(cache: "", home: home + "/") == underHome)
     #expect(Lint.tools(cache: "relative", home: nil) == nil)
     #expect(Lint.tools(cache: nil, home: nil) == nil)
 }
