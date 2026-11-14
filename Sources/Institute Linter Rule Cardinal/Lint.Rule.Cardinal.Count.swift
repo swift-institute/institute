@@ -6,6 +6,7 @@ extension Lint.Rule {
     public static let `count minus one` = Lint.Rule(
         id: "count minus one",
         default: .warning,
+        suppression: .next,
         controls: [
             .init(
                 id: "count minus one member access",

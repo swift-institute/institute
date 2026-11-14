@@ -5,6 +5,7 @@ extension Lint.Rule {
     public static let `raw value access` = Lint.Rule(
         id: "raw value access",
         default: .warning,
+        suppression: .next,
         controls: [
             .init(
                 id: "raw value access consumer",

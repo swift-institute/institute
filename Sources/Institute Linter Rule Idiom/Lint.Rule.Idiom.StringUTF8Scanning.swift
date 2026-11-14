@@ -5,6 +5,7 @@ extension Lint.Rule {
     public static let `string utf8 scanning` = Lint.Rule(
         id: "string utf8 scanning",
         default: .warning,
+        suppression: .next,
         controls: [
             .init(
                 id: "string utf8 scanning scalar append",

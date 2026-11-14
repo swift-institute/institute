@@ -5,6 +5,7 @@ extension Lint.Rule {
     public static let `unchecked call site` = Lint.Rule(
         id: "unchecked call site",
         default: .warning,
+        suppression: .next,
         controls: [
             .init(
                 id: "unchecked call site consumer bypass",

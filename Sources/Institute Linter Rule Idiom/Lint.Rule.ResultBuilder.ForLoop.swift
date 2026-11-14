@@ -13,6 +13,7 @@ extension Lint.Rule {
         Lint.Rule(
             id: "for loop in result builder",
             default: .warning,
+            suppression: .next,
             controls: [
                 .init(
                     id: "for loop in result builder array",

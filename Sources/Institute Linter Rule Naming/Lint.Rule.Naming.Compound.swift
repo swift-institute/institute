@@ -5,6 +5,7 @@ extension Lint.Rule {
     public static let `compound identifier` = Lint.Rule(
         id: "compound identifier",
         default: .warning,
+        suppression: .next,
         controls: [
             .init(
                 id: "compound identifier standard library witness",

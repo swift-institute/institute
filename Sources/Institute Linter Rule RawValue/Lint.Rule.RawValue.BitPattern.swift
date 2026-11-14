@@ -5,6 +5,7 @@ extension Lint.Rule {
     public static let `bitpattern rawvalue chain` = Lint.Rule(
         id: "bitpattern rawvalue chain",
         default: .warning,
+        suppression: .next,
         controls: [
             .init(
                 id: "bitpattern rawvalue chain labeled raw value",
@@ -53,7 +54,8 @@ private let bitpatternRawvalueChainMessage: Swift::String =
     + "pass the typed value directly: `Int(bitPattern: foo)` not "
     + "`Int(bitPattern: foo.rawValue)`. If this site IS the [INFRA-002] integration "
     + "overload definition itself, escalate to supervisor and apply "
-    + "`// swift-linter:disable:next bitpattern rawvalue chain  // reason: <citation>`."
+    + "`// swift-linter:disable:next bitpattern rawvalue chain` with a "
+    + "`// REASON: <citation>` continuation."
 
 internal final class RawValueBitPatternVisitor: SyntaxVisitor {
     let source: Source.File

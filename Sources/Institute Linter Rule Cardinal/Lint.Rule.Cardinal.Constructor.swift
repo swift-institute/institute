@@ -5,6 +5,7 @@ extension Lint.Rule {
     public static let `zero or one literal` = Lint.Rule(
         id: "zero or one literal",
         default: .warning,
+        suppression: .next,
         controls: [
             .init(
                 id: "zero or one literal cardinal zero",

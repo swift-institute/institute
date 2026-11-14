@@ -368,3 +368,51 @@ extension Lint.Source.Index {
         self.license = control.license
     }
 }
+
+// A rule whose message tells the author to suppress a site with `swift-linter:disable:next` sanctions that directive:
+// with the default policy the linter ignores it and the finding stays (swift-institute/institute#285).
+extension `Lint Rule Bundle institute Tests` {
+    @Suite struct `Suppression` {}
+}
+
+extension `Lint Rule Bundle institute Tests`.`Suppression` {
+    @Test(arguments: [
+        "zero or one literal",
+        "count minus one",
+        "string utf8 scanning",
+        "for loop in result builder",
+        "compound identifier",
+        "optimize suppression attribute",
+        "bitpattern rawvalue chain",
+        "chained rawvalue access",
+        "raw value access",
+        "unchecked call site",
+    ])
+    func `a rule that documents disable next sanctions it`(id: Swift::String) {
+        let rule = Lint.Rule.Bundle.institute.first { $0.rule.id.underlying == id }?.rule
+        #expect(rule?.suppression.sanctions(.next) == true, "\(id)")
+    }
+
+    @Test
+    func `every rule whose message advertises disable next sanctions it`() {
+        for entry in Lint.Rule.Bundle.institute {
+            for control in entry.rule.controls where control.applicability == .applicable {
+                let observation = entry.rule.observe(
+                    Lint.Source.parsed(
+                        from: control.source,
+                        file: control.path.underlying,
+                        types: Lint.Brand.types(in: Parser.parse(source: control.source)),
+                        index: Lint.Source.Index(control: control)
+                    ),
+                    .warning
+                )
+                let directive = "swift-linter:disable:next \(entry.rule.id.underlying)"
+                guard observation.findings.contains(where: { $0.message.contains(directive) }) else { continue }
+                #expect(
+                    entry.rule.suppression.sanctions(.next),
+                    "\(entry.rule.id.underlying): its message tells the author to write swift-linter:disable:next, which the rule does not sanction"
+                )
+            }
+        }
+    }
+}

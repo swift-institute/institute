@@ -5,6 +5,7 @@ extension Lint.Rule {
     public static let `chained rawvalue access` = Lint.Rule(
         id: "chained rawvalue access",
         default: .warning,
+        suppression: .next,
         controls: [
             .init(
                 id: "chained rawvalue access member chain",
@@ -44,7 +45,8 @@ private let chainedRawvalueAccessMessage: Swift::String =
     + "the typed system. Prefer `.retag()` (Tier 1) / `.map()` (Tier 2) / `Type.min(a, b)` "
     + "/ a typed accessor exposed by the wrapper, per [INFRA-103]. If the wrapper IS "
     + "what this site implements (typed-system bottom-out), escalate to supervisor and "
-    + "apply `// swift-linter:disable:next chained rawvalue access  // reason: <citation>`."
+    + "apply `// swift-linter:disable:next chained rawvalue access` with a "
+    + "`// REASON: <citation>` continuation."
 
 internal final class RawValueChainVisitor: SyntaxVisitor {
     let source: Source.File

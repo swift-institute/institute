@@ -5,6 +5,7 @@ extension Lint.Rule {
     public static let `optimize suppression attribute` = Lint.Rule(
         id: "optimize suppression attribute",
         default: .warning,
+        suppression: .next,
         controls: [
             .init(
                 id: "optimize suppression attribute optimize none",
