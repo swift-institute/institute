@@ -1,5 +1,8 @@
 internal import SwiftSyntax
 
+/// An attribute the compiler defines, such as `@storageRestrictions`, `@inlinable` or `@_spi`, starts lowercase or
+/// with an underscore and cannot be qualified, so its name is no type reference; an attribute naming a macro or a
+/// property wrapper is one (swift-institute/Issues#276).
 internal final class NamingMacroExpansionShortNameTypeFinder: SyntaxVisitor {
     var matches: [Swift::String] = []
     private var genericParameters: Swift::Set<Swift::String> = []
@@ -19,6 +22,12 @@ internal final class NamingMacroExpansionShortNameTypeFinder: SyntaxVisitor {
         }
         if let member = node.parent?.as(MemberTypeSyntax.self),
             member.baseType.id == node.id
+        {
+            return .visitChildren
+        }
+        if let attribute = node.parent?.as(AttributeSyntax.self),
+            attribute.attributeName.id == node.id,
+            name.first?.isUppercase != true
         {
             return .visitChildren
         }

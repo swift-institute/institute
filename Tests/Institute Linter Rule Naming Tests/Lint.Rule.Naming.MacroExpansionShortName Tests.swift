@@ -125,3 +125,37 @@ extension `Lint.Rule Tests`.`macro expansion short name Tests`.`Edge Case` {
         #expect(findings.isEmpty)
     }
 }
+
+// An attribute the compiler defines cannot be qualified, so its name is no short type name; an attribute naming a
+// macro or a property wrapper is a type reference and is still checked (swift-institute/Issues#276).
+extension `Lint.Rule Tests`.`macro expansion short name Tests`.`Edge Case` {
+    @Test(arguments: [
+        "@storageRestrictions(initializes: _value) init(initialValue) { _value = initialValue }",
+        "@inlinable @usableFromInline func value() {}",
+        "@available(*, deprecated) @discardableResult @_spi(Internal) func value() {}",
+    ])
+    func `a compiler-defined attribute is not a short type name`(generated: Swift::String) {
+        let source = """
+            struct ValueMacro: AccessorMacro {
+                static func expansion() -> [AccessorDeclSyntax] {
+                    ["\(generated)"]
+                }
+            }
+            """
+        let findings = `Lint.Rule Tests`.`macro expansion short name Tests`.findings(in: source)
+        #expect(findings.isEmpty, "\(generated)")
+    }
+
+    @Test
+    func `an unqualified property wrapper attribute still fires`() {
+        let source = """
+            struct ValueMacro: MemberMacro {
+                static func expansion() -> [DeclSyntax] {
+                    ["@Wrapper var x = 0"]
+                }
+            }
+            """
+        let findings = `Lint.Rule Tests`.`macro expansion short name Tests`.findings(in: source)
+        #expect(findings.map(\.message) == [namingMacroExpansionShortNameMessage("Wrapper")])
+    }
+}
