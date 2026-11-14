@@ -34,6 +34,13 @@ extension Lint.Rule {
                 path: "Sources/Naming Consumer/MemberwiseRecord.swift",
                 expectation: .clean
             ),
+            .init(
+                id: "bool public parameter boolean literal witness",
+                source: "public struct Flag {}; extension Flag: ExpressibleByBooleanLiteral { "
+                    + "public init(booleanLiteral value: Bool) {} }",
+                path: "Sources/Naming Consumer/BooleanLiteral.swift",
+                expectation: .clean
+            ),
         ],
         observe: Lint.Rule.measured { source, severity in
             let visitor = NamingBoolParameterVisitor(
@@ -115,12 +122,20 @@ internal final class NamingBoolParameterVisitor: SyntaxVisitor {
     }
 
     /// A memberwise parameter stored as the same-named property mirrors the record's field:
-    /// renaming it means renaming the field, so it isn't reported.
+    /// renaming it means renaming the field, so it isn't reported. The `init(booleanLiteral:)` witness of
+    /// `ExpressibleByBooleanLiteral` takes the type the protocol fixes, however it is spelled, so it isn't either
+    /// (swift-institute/Issues#274).
     override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
         guard Naming.hasPublicOrOpenEffective(Syntax(node), modifiers: node.modifiers) else {
             return .visitChildren
         }
         let parameters = node.signature.parameterClause.parameters
+        if parameters.count == 1,
+            parameters.first?.firstName.text == "booleanLiteral",
+            namingBoolParameterConformsToBooleanLiteral(Syntax(node))
+        {
+            return .visitChildren
+        }
         if parameters.count == 1,
             let only = parameters.first,
             only.firstName.tokenKind == .wildcard,
@@ -207,4 +222,40 @@ private func namingBoolParameterIsSelfMember(_ expr: ExprSyntax, named name: Swi
 private func namingBoolParameterIsReference(_ expr: ExprSyntax, named name: Swift::String) -> Bool {
     guard let reference = expr.as(DeclReferenceExprSyntax.self) else { return false }
     return reference.baseName.text == name
+}
+
+/// Whether the type or extension declaring `node` lists `ExpressibleByBooleanLiteral` in its inheritance clause.
+private func namingBoolParameterConformsToBooleanLiteral(_ node: Syntax) -> Bool {
+    var current = node.parent
+    while let candidate = current {
+        let clause: InheritanceClauseSyntax?
+        if let declaration = candidate.as(ExtensionDeclSyntax.self) {
+            clause = declaration.inheritanceClause
+        } else if let declaration = candidate.as(StructDeclSyntax.self) {
+            clause = declaration.inheritanceClause
+        } else if let declaration = candidate.as(EnumDeclSyntax.self) {
+            clause = declaration.inheritanceClause
+        } else if let declaration = candidate.as(ClassDeclSyntax.self) {
+            clause = declaration.inheritanceClause
+        } else if let declaration = candidate.as(ActorDeclSyntax.self) {
+            clause = declaration.inheritanceClause
+        } else {
+            current = candidate.parent
+            continue
+        }
+        guard let clause else { return false }
+        return clause.inheritedTypes.contains { inherited in
+            var type = inherited.type
+            while let attributed = type.as(AttributedTypeSyntax.self) { type = attributed.baseType }
+            if let identifier = type.as(IdentifierTypeSyntax.self) {
+                return identifier.name.text == "ExpressibleByBooleanLiteral"
+            }
+            if let member = type.as(MemberTypeSyntax.self) {
+                return member.name.text == "ExpressibleByBooleanLiteral"
+                    && member.baseType.as(IdentifierTypeSyntax.self)?.name.text == "Swift"
+            }
+            return false
+        }
+    }
+    return false
 }

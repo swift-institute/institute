@@ -346,3 +346,30 @@ extension `Lint.Rule Tests` {
         }
     }
 }
+
+// The witness of `ExpressibleByBooleanLiteral` takes the type the protocol fixes, so there is no enum to use instead,
+// whichever way the parameter is spelled (swift-institute/Issues#274).
+extension `Lint.Rule Tests`.`bool public parameter Tests`.`Edge Case` {
+    @Test(arguments: [
+        "extension Tristate: ExpressibleByBooleanLiteral { public init(booleanLiteral value: Bool) {} }",
+        "extension Tristate: ExpressibleByBooleanLiteral { public init(booleanLiteral value: Swift.Bool) {} }",
+        "extension Tristate: ExpressibleByBooleanLiteral { public init(booleanLiteral value: BooleanLiteralType) {} }",
+        "extension Tristate: Swift.ExpressibleByBooleanLiteral { public init(booleanLiteral value: Bool) {} }",
+        "public struct Flag: Sendable, ExpressibleByBooleanLiteral { public init(booleanLiteral value: Bool) {} }",
+    ])
+    func `a Boolean literal witness is NOT flagged, however its parameter is spelled`(source: String) {
+        let findings = `Lint.Rule Tests`.`bool public parameter Tests`.findings(in: source)
+        #expect(findings.isEmpty, "\(source)")
+    }
+
+    @Test(arguments: [
+        "public struct Flag { public init(booleanLiteral value: Bool) {} }",
+        "extension Flag: Sendable { public init(booleanLiteral value: Bool) {} }",
+        "extension Flag: ExpressibleByBooleanLiteral { public init(booleanLiteral value: Bool, strict: Bool) {} }",
+        "extension Flag: ExpressibleByBooleanLiteral { public init(flag value: Bool) {} }",
+    ])
+    func `an initializer that is not the Boolean literal witness is still flagged`(source: String) {
+        let findings = `Lint.Rule Tests`.`bool public parameter Tests`.findings(in: source)
+        #expect(!findings.isEmpty, "\(source)")
+    }
+}
