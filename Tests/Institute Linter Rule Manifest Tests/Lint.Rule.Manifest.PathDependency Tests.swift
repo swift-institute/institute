@@ -244,3 +244,42 @@ extension `Lint.Rule Tests`.`path dependency Tests`.Integration {
         #expect(observation.findings.count == 1)
     }
 }
+
+// A leaf linted by a relative root is the same leaf: its parent's manifest is found from a relative path too
+// (swift-institute/institute#286).
+extension `Lint.Rule Tests`.`path dependency Tests`.Unit {
+    @Test(arguments: [
+        ("Package.swift", "../Package.swift"),
+        ("./Package.swift", "../Package.swift"),
+        ("leaf/Package.swift", "Package.swift"),
+        ("./leaf/Package.swift", "Package.swift"),
+        ("root/leaf/Package.swift", "root/Package.swift"),
+        ("../Package.swift", "../../Package.swift"),
+        ("../leaf/Package.swift", "../Package.swift"),
+        ("/workspace/root/leaf/Package.swift", "/workspace/root/Package.swift"),
+        ("/workspace/root/leaf/./Package.swift", "/workspace/root/Package.swift"),
+        ("/leaf/Package.swift", "/Package.swift"),
+    ])
+    func `the parent's manifest is found from a relative or an absolute path`(
+        manifest: Swift::String,
+        parent: Swift::String
+    ) {
+        #expect(manifestParentManifestPath(manifest) == parent, "\(manifest)")
+    }
+
+    @Test
+    func `a manifest in the file system's root has no parent`() {
+        #expect(manifestParentManifestPath("/Package.swift") == nil)
+    }
+}
+
+extension `Lint.Rule Tests`.`path dependency Tests`.Integration {
+    @Test
+    func `a leaf whose path is not written from the root in one piece may name its parent`()
+        throws(Lint.Source.Fixture.Failure)
+    {
+        let leaf = try `Lint.Rule Tests`.`path dependency Tests`.Leaf(parent: "fixture")
+        defer { leaf.tearDown() }
+        #expect(leaf.observation(#".package(name: "fixture", path: "..")"#, at: "fixture-server/.").findings.isEmpty)
+    }
+}
