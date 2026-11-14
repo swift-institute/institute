@@ -393,9 +393,10 @@ extension `Lint Rule Bundle institute Tests`.`Suppression` {
         #expect(rule?.suppression.sanctions(.next) == true, "\(id)")
     }
 
+    /// Only the rules this package declares: a universal-tier rule is declared, and fixed, in swift-linter-rules.
     @Test
-    func `every rule whose message advertises disable next sanctions it`() {
-        for entry in Lint.Rule.Bundle.institute {
+    func `every institute rule whose message advertises disable next sanctions it`() {
+        for entry in Lint.Rule.Bundle.institute where allDeclaredRuleIDs.contains(entry.rule.id.underlying) {
             for control in entry.rule.controls where control.applicability == .applicable {
                 let observation = entry.rule.observe(
                     Lint.Source.parsed(
