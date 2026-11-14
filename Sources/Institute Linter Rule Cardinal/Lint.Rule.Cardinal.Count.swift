@@ -31,6 +31,12 @@ extension Lint.Rule {
                 path: "Sources/Cardinal Consumer/Lookahead.swift",
                 expectation: .clean
             ),
+            .init(
+                id: "count minus one sum of literals",
+                source: "let whole = values.count == 1 + 2 + 1",
+                path: "Sources/Cardinal Consumer/LiteralSum.swift",
+                expectation: .clean
+            ),
         ],
         observe: Lint.Rule.measured { source, severity in
             let folded = OperatorTable.standardOperators.foldAll(
@@ -148,12 +154,24 @@ internal final class CardinalCountVisitor: SyntaxVisitor {
             binOp.operator.text == "+"
         else { return false }
         if isLiteralOne(infix.rightOperand) {
-            return !isCountDerivedExpression(infix.leftOperand)
+            return !isCountDerivedExpression(infix.leftOperand) && !isLiteralSum(infix.leftOperand)
         }
         if isLiteralOne(infix.leftOperand) {
-            return !isCountDerivedExpression(infix.rightOperand)
+            return !isCountDerivedExpression(infix.rightOperand) && !isLiteralSum(infix.rightOperand)
         }
         return false
+    }
+
+    /// An integer literal, or a sum of them such as `1 + 2`: a total written out, with no index in it
+    /// (swift-institute/Issues#284).
+    static func isLiteralSum(_ expr: ExprSyntax) -> Bool {
+        let unwrapped = peelCountWrappers(expr)
+        if unwrapped.is(IntegerLiteralExprSyntax.self) { return true }
+        guard let infix = unwrapped.as(InfixOperatorExprSyntax.self),
+            let binOp = infix.operator.as(BinaryOperatorExprSyntax.self),
+            binOp.operator.text == "+"
+        else { return false }
+        return isLiteralSum(infix.leftOperand) && isLiteralSum(infix.rightOperand)
     }
 
     static func isCountDerivedExpression(_ expr: ExprSyntax) -> Bool {

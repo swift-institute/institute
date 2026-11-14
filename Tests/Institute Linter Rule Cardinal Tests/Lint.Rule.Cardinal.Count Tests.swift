@@ -302,3 +302,26 @@ extension `Lint.Rule Tests`.`count minus one Tests`.`Edge Case` {
         #expect(findings.count == 1)
     }
 }
+
+// A sum of integer literals compared with a count is a total written out, not index arithmetic
+// (swift-institute/Issues#284).
+extension `Lint.Rule Tests`.`count minus one Tests`.`Negative` {
+    @Test(arguments: [
+        "#expect(parts.count == 1 + 2 + 1)",
+        "#expect(parts.count == 3 + 1)",
+        "#expect(parts.count == 1 + 2)",
+        "#expect(1 + 3 == parts.count)",
+        "#expect(parts.count != (1 + 2) + 1)",
+        "#expect(parts.count == 4)",
+    ])
+    func `a count compared with a sum of literals is NOT flagged`(source: Swift::String) {
+        let findings = `Lint.Rule Tests`.`count minus one Tests`.findings(in: source)
+        #expect(findings.isEmpty, "\(source)")
+    }
+
+    @Test
+    func `a sum with one non-literal operand compared with a count is still flagged`() {
+        let findings = `Lint.Rule Tests`.`count minus one Tests`.findings(in: "let ok = seq.count == 1 + i + 1")
+        #expect(findings.count == 1)
+    }
+}
