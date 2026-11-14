@@ -254,3 +254,26 @@ extension `Lint.Rule Tests`.`path name grammar Tests`.`Edge Case` {
         #expect(!Lint.Rule.`path name grammar`(words: ["SwiftUI"]).observe(parsed, .warning).findings.isEmpty)
     }
 }
+
+// A file named after a standard library type keeps the library's name for it (swift-institute/Issues#281).
+extension `Lint.Rule Tests`.`path name grammar Tests`.`Edge Case` {
+    @Test(arguments: [
+        "Tests/Random Tests/Swift.RandomNumberGenerator Tests.swift",
+        "Tests/Collection Tests/Swift.ArraySlice Tests.swift",
+        "Sources/Random/Swift.SystemRandomNumberGenerator.swift",
+    ])
+    func `the segment after Swift names a standard library type and reads as one word`(file: Swift::String) {
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(in: "struct Fixture {}", file: file)
+        #expect(findings.isEmpty, "\(file)")
+    }
+
+    @Test(arguments: [
+        "Tests/Random Tests/RandomNumberGenerator Tests.swift",
+        "Tests/Random Tests/Swift.Array.RandomNumberGenerator Tests.swift",
+        "Tests/Random Tests/Domain.RandomNumberGenerator Tests.swift",
+    ])
+    func `a compound segment that does not follow Swift is still flagged`(file: Swift::String) {
+        let findings = `Lint.Rule Tests`.`path name grammar Tests`.findings(in: "struct Fixture {}", file: file)
+        #expect(findings.count == 1, "\(file)")
+    }
+}

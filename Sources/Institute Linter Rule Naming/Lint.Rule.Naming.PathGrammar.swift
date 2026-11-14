@@ -29,6 +29,12 @@ extension Lint.Rule {
                     path: "Plugins/BadPluginName/Plugin.swift",
                     expectation: .clean
                 ),
+                .init(
+                    id: "path name grammar standard library type",
+                    source: "struct Fixture {}",
+                    path: "Tests/Random Tests/Swift.RandomNumberGenerator Tests.swift",
+                    expectation: .clean
+                ),
             ],
             observe: Lint.Rule.measured { source, severity in
                 namingPathGrammarFindings(
@@ -95,7 +101,8 @@ internal func namingPathGrammarBasenameMessage(
 
 /// A file named exactly after a type it declares inherits that type's name: a compound in the
 /// declared leaf is `compound type name`'s finding, not the path's. Segments naming an outer type
-/// declared elsewhere are still checked here.
+/// declared elsewhere are still checked here. The segment after `Swift.` names a standard library type, whose name is
+/// the library's own, so it reads as one word (swift-institute/Issues#281).
 internal func namingPathGrammarFindings(
     source: Source.File,
     severity: Diagnostic.Severity,
@@ -154,7 +161,8 @@ internal func namingPathGrammarFindings(
     guard collector.declaresPrimaryType else { return records }
     var segments = basename.split(separator: ".").map(Swift::String.init)
     if collector.paths.contains(basename) { segments.removeLast() }
-    for segment in segments {
+    for (index, segment) in segments.enumerated() {
+        if index > 0, segments[index - 1] == "Swift" { continue }
         if namingWordIsCompound(segment, words: words) {
             emit(
                 namingPathGrammarBasenameMessage(
