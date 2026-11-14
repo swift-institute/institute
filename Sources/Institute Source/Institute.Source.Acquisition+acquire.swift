@@ -270,7 +270,7 @@ extension Institute.Source.Acquisition {
         } catch { throw .filesystem("cannot allocate source archive directory: \(error)") }
         let temporary = File.Directory(temporaryPath)
         do throws(Either<Kernel.Thread.Pool.Error, File.System.Create.Directory.Error>) {
-            try await temporary.create.recursive()
+            try await temporary.create.recursive(on: .shared)
         } catch {
             throw .filesystem("cannot create source archive directory: \(error)")
         }
@@ -294,7 +294,7 @@ extension Institute.Source.Acquisition {
         }
         let extracted = temporary[directory: "contents"]
         do throws(Either<Kernel.Thread.Pool.Error, File.System.Create.Directory.Error>) {
-            try await extracted.create.recursive()
+            try await extracted.create.recursive(on: .shared)
         } catch {
             throw .filesystem("cannot create source archive extraction directory: \(error)")
         }

@@ -47,7 +47,7 @@ extension Institute.Source.Application {
     ) async throws(Institute.Error) -> Institute.Source.Preparation {
         let policy = Institute.Source.Policy.current
         do throws(Either<Kernel.Thread.Pool.Error, File.System.Create.Directory.Error>) {
-            try await directory.create.recursive()
+            try await directory.create.recursive(on: .shared)
         } catch {
             throw .filesystem("cannot create source profile directory \(directory): \(error)")
         }
@@ -106,15 +106,15 @@ extension Institute.Source.Application {
         let linterTool = linter.digest
         let format = directory[file: try Self.component(policy.swiftFormat.path)]
         do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
-            try await format.write.atomic(policy.swiftFormat.contents)
+            try await format.write.atomic(policy.swiftFormat.contents, on: .shared)
         } catch { throw .filesystem("cannot render \(format): \(error)") }
         let formatRepair = directory[file: try Self.component(policy.swiftFormatRepair.path)]
         do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
-            try await formatRepair.write.atomic(policy.swiftFormatRepair.contents)
+            try await formatRepair.write.atomic(policy.swiftFormatRepair.contents, on: .shared)
         } catch { throw .filesystem("cannot render \(formatRepair): \(error)") }
         let swiftLintConfiguration = directory[file: try Self.component(policy.swiftLint.path)]
         do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
-            try await swiftLintConfiguration.write.atomic(policy.swiftLint.contents)
+            try await swiftLintConfiguration.write.atomic(policy.swiftLint.contents, on: .shared)
         } catch { throw .filesystem("cannot render \(swiftLintConfiguration): \(error)") }
 
         let instituteProfile = Institute.Source.Profile(policy: policy)
@@ -127,7 +127,7 @@ extension Institute.Source.Application {
                 file: try Self.component("\(bundle.token)-\(artifact.path)")
             ]
             do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
-                try await linter.write.atomic(artifact.contents)
+                try await linter.write.atomic(artifact.contents, on: .shared)
             } catch { throw .filesystem("cannot render \(linter): \(error)") }
             try await Self.verify(
                 profile: linter.description,
@@ -165,7 +165,7 @@ extension Institute.Source.Application {
         )
         let receipt = directory[file: "receipt.json"]
         do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
-            try await receipt.write.atomic(preparation.jsonString(sortKeys: true) + "\n")
+            try await receipt.write.atomic(preparation.jsonString(sortKeys: true) + "\n", on: .shared)
         } catch { throw .filesystem("cannot write source preparation receipt \(receipt): \(error)") }
         return preparation
     }
