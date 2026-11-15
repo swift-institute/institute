@@ -308,6 +308,7 @@ extension `target import edge Tests`.Exemption {
                 import AppKit
                 import Security
                 import CoreGraphics
+                import CoreImage
                 """
             ]
         )

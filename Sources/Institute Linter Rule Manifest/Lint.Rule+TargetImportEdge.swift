@@ -39,7 +39,7 @@ package let packageTargetImportEdgeToolchainModules: Swift::Set<Swift::String> =
     "StringProcessing", "CoreFoundation", "ObjectiveC", "simd", "Accelerate",
     "FoundationNetworking", "FoundationXML", "FoundationInternationalization",
     "SwiftUI", "AppKit", "UIKit", "WebKit", "Network", "Security", "CryptoKit",
-    "CoreGraphics", "ImageIO", "UniformTypeIdentifiers", "AVFoundation", "Combine",
+    "CoreGraphics", "CoreImage", "ImageIO", "UniformTypeIdentifiers", "AVFoundation", "Combine",
     "CoreText", "QuartzCore", "CoreServices", "OSLog", "SystemConfiguration",
 ]
 
