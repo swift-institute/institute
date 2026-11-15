@@ -150,7 +150,7 @@ extension Institute.Application.Lint {
                 throw .configuration("--report \(report) is not a path: \(error)")
             }
             do throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
-                try await file.write.atomic(bytes + "\n")
+                try await file.write.atomic(bytes + "\n", on: .shared)
             } catch {
                 throw .filesystem("cannot write the report to \(report): \(error)")
             }

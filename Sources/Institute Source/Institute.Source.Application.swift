@@ -208,7 +208,7 @@ extension Institute.Source.Application {
         execution: Source_Execution::Source.Execution
     ) async throws(Institute.Error) -> Source_Measurement::Source.Measurement {
         do throws(Either<Kernel.Thread.Pool.Error, File.System.Delete.Error>) {
-            if scratch.stat.exists { try await scratch.delete.recursive() }
+            if scratch.stat.exists { try await scratch.delete.recursive(on: .shared) }
         } catch { throw .filesystem("cannot clear \(scratch): \(error)") }
         let files = files(root: scratch.description)
         for (path, bytes) in contents {
