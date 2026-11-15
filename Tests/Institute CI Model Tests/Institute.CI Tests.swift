@@ -12,7 +12,7 @@ struct ContinuousIntegrationPlanTests {
             lintBundle: "standards"
         )
         #expect(plan.tier == .build)
-        #expect(plan.legs.map(\.id) == ["source", "linux-release", "linux-6-4"])
+        #expect(plan.legs.map(\.id) == ["source", "linux-release"])
         #expect(plan.gating.map(\.id) == ["source", "linux-release"])
     }
 
@@ -127,8 +127,7 @@ struct ContinuousIntegrationPlanTests {
         #expect(!plan.legs.map(\.id).contains("macos-release"))
         #expect(!plan.legs.map(\.id).contains("windows-release"))
         #expect(plan.legs.map(\.id).contains("linux-release"))
-        #expect(plan.legs.map(\.id).contains("linux-6-4"))
-    }
+            }
 
     @Test
     func theExhaustiveTierIsPlatformFilteredLikeAnyOther() throws {
@@ -257,7 +256,7 @@ struct ContinuousIntegrationPlanTests {
         #expect(!plan.packageContentChanged)
         let ids = Set(plan.legs.map(\.id))
         for dropped in [
-            "source", "linux-release", "macos-release", "windows-release", "linux-6-4",
+            "source", "linux-release", "macos-release", "windows-release",
             "linux-nightly", "apple-simulator-build", "embedded",
             "embedded-wasm-sdk", "android-build", "static-linux-musl-build",
         ] {

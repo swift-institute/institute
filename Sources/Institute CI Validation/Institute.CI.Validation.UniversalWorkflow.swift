@@ -22,7 +22,7 @@ extension Institute.CI.Validation {
         /// Every job the planner can select, plus its two orchestration jobs.
         public static let catalogue: [String] = [
             "plan",
-            "linux-release", "linux-6-4", "linux-nightly",
+            "linux-release", "linux-nightly",
             "embedded", "embedded-wasm-sdk", "android-build",
             "static-linux-musl-build", "macos-release",
             "apple-simulator-build", "windows-release",

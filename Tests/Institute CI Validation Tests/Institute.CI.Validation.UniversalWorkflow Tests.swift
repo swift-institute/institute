@@ -18,7 +18,7 @@ struct CIValidationUniversalWorkflowTests {
         ],
         skippedGating: String? = nil,
         advisoryNeeds: [String] = [
-            "plan", "linux-6-4", "linux-nightly", "apple-simulator-build",
+            "plan", "linux-nightly", "apple-simulator-build",
             "embedded", "embedded-wasm-sdk", "android-build",
             "static-linux-musl-build",
         ]

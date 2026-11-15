@@ -22,7 +22,7 @@ extension Institute.CI {
         public var family: Family? {
             switch id {
             case "macos-release", "apple-simulator-build": .apple
-            case "linux-release", "linux-nightly", "linux-6-4": .linux
+            case "linux-release", "linux-nightly": .linux
             case "windows-release": .windows
             default: nil
             }

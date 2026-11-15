@@ -60,7 +60,7 @@ extension Institute.CI {
 
         static let fullTierLegs = [
             "source", "linux-release",
-            "macos-release", "windows-release", "linux-6-4",
+            "macos-release", "windows-release",
             "advisory-summary",
         ]
 
@@ -150,7 +150,7 @@ extension Institute.CI {
                 } else {
                     throw .noRecognizedPlatformFamily(platformSupport)
                 }
-                legIds = ["source", primary, "linux-6-4"]
+                legIds = ["source", primary]
 
             case .full:
                 legIds = Self.fullTierLegs
@@ -192,7 +192,7 @@ extension Institute.CI {
         /// same sources as the last run. The Plan job still validates the
         /// repository, its README included.
         static let packageWorkLegs: Set<String> = [
-            "source", "linux-6-4", "linux-nightly", "apple-simulator-build", "embedded",
+            "source", "linux-nightly", "apple-simulator-build", "embedded",
             "embedded-wasm-sdk", "android-build", "static-linux-musl-build",
         ]
 
