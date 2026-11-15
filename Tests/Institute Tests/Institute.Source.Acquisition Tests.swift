@@ -178,3 +178,27 @@ func `an archive member is extracted by the platform's own tool`() {
         #expect(command.arguments == ["-q", "-o", "/work/archive.zip", "swiftlint", "-d", "/work/contents"])
     #endif
 }
+
+@Test
+func `without a named Xcode, a missing pinned path falls to the installed Xcode whose tool has the pinned digest`() async throws {
+    let root = MainFixtureFiles.resolvedTemporaryPath("applications-\(MainFixtureFiles.uniqueName())")
+    for (name, contents) in [("Xcode-a.app", "another build"), ("Xcode-b.app", "pinned"), ("Other.app", "pinned")] {
+        let folder = MainFixtureFiles.join(root, "\(name)/Contents/bin")
+        #expect(MainFixtureFiles.makeDirectory(folder))
+        #expect(MainFixtureFiles.createFile(MainFixtureFiles.join(folder, "swift-format"), contents: Swift.Array(contents.utf8)))
+    }
+    let digest = try Institute.Source.Application.digest(file: MainFixtureFiles.join(root, "Xcode-b.app/Contents/bin/swift-format"))
+    let pinned = Institute.Source.Policy.Asset(
+        name: "swift-format",
+        digest: digest,
+        origin: .xcode(application: MainFixtureFiles.join(root, "Xcode_missing.app"), version: "27.2", relativePath: "Contents/bin/swift-format")
+    )
+    let listing = Source.Engine.Process { _, _, _, _ in
+        .init(status: 0, output: "Other.app\nXcode-a.app\nXcode-b.app\n", diagnostics: "")
+    }
+    let tools = try File.Directory(validating: MainFixtureFiles.join(root, "tools"))
+    let acquisition = Institute.Source.Acquisition(process: listing)
+    #expect(try await acquisition.application(for: pinned, given: nil, in: root, under: tools) == MainFixtureFiles.join(root, "Xcode-b.app"))
+    #expect(try await acquisition.application(for: pinned, given: "/Applications/Named.app", in: root, under: tools) == "/Applications/Named.app")
+    MainFixtureFiles.discard(root)
+}

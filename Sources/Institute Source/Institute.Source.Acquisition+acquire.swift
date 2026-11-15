@@ -376,6 +376,32 @@ extension Institute.Source.Acquisition {
         }
     }
 
+    /// The Xcode to copy a pinned Xcode asset from: the one given, else the pinned path when it exists, else
+    /// the installed Xcode under /Applications whose copy of the asset has the pinned digest.
+    func application(
+        for asset: Institute.Source.Policy.Asset,
+        given: Swift.String?,
+        in folder: Swift.String = "/Applications",
+        under directory: File.Directory
+    ) async throws(Institute.Error) -> Swift.String? {
+        guard case .xcode(let pinned, _, let relativePath) = asset.origin, given == nil else { return given }
+        if Self.isFile("\(pinned)/\(relativePath)") { return nil }
+        let listing = await process.run("/bin/ls", ["-1", folder], directory.description, [:])
+        guard listing.status == 0 else { return nil }
+        for name in listing.output.split(separator: "\n") where name.hasPrefix("Xcode") && name.hasSuffix(".app") {
+            let candidate = "\(folder)/\(name)"
+            let file = "\(candidate)/\(relativePath)"
+            guard Self.isFile(file) else { continue }
+            if try Institute.Source.Application.digest(file: file) == asset.digest { return candidate }
+        }
+        return nil
+    }
+
+    private static func isFile(_ path: Swift.String) -> Swift.Bool {
+        guard let path = try? File.Path(path) else { return false }
+        return File(path).stat.isFile
+    }
+
     func observedXcodeBuild(
         of asset: Institute.Source.Policy.Asset,
         xcodeApplication: Swift.String? = nil,

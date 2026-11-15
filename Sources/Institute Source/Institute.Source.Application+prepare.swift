@@ -55,15 +55,16 @@ extension Institute.Source.Application {
         let tools = shared ?? directory[directory: "tools"]
         let acquisition = Institute.Source.Acquisition(process: process)
         let swiftFormatAsset = try Self.engine("swift-format", policy: policy).executable
+        let swiftFormatXcode = try await acquisition.application(for: swiftFormatAsset, given: xcodeApplication, under: tools)
         let swiftFormat = try await acquisition.acquire(
             swiftFormatAsset,
             executable: true,
-            xcodeApplication: xcodeApplication,
+            xcodeApplication: swiftFormatXcode,
             into: tools
         )
         let swiftFormatXcodeBuild = try await acquisition.observedXcodeBuild(
             of: swiftFormatAsset,
-            xcodeApplication: xcodeApplication,
+            xcodeApplication: swiftFormatXcode,
             under: tools
         )
         let swiftLintToolFile: File
