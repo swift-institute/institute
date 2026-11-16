@@ -13,7 +13,6 @@ internal final class ManifestPackagePolicyInspection: SyntaxVisitor {
     ]
 
     private let sourceText: Swift::String
-    private let isL1: Swift::Bool
     private var packageCalls = 0
     private var languageModeArgumentSeen = false
     private var languageModeValid = false
@@ -22,12 +21,10 @@ internal final class ManifestPackagePolicyInspection: SyntaxVisitor {
     private var recognizedSettingsLoop: Swift::String?
     private var wrongApplePlatforms: Swift::Set<Swift::String> = []
     private var platformShapeUnhandled = false
-    private var l1MacroTarget = false
     private let mentionsSwiftSettings: Swift::Bool
 
-    internal init(_ tree: SourceFileSyntax, filePath: Swift::String) {
+    internal init(_ tree: SourceFileSyntax) {
         self.sourceText = tree.description
-        self.isL1 = filePath.contains("/swift-atoms/") || filePath.contains("/swift-molecules/")
         self.mentionsSwiftSettings = tree.tokens(viewMode: .sourceAccurate).contains { $0.text == "swiftSettings" }
         super.init(viewMode: .sourceAccurate)
         walk(tree)
@@ -48,8 +45,6 @@ internal final class ManifestPackagePolicyInspection: SyntaxVisitor {
     }
 
     internal var hasOrdinaryTargets: Swift::Bool { ordinaryTargetCount > 0 }
-
-    internal var hasL1MacroTarget: Swift::Bool { isL1 && l1MacroTarget }
 
     internal var missingOrdinaryTargetSettings: [Swift::String] {
         guard let loop = recognizedSettingsLoop else { return Self.requiredSettings }
@@ -89,9 +84,6 @@ internal final class ManifestPackagePolicyInspection: SyntaxVisitor {
             !isNestedInsideDependenciesArgument(Syntax(node))
         {
             ordinaryTargetCount += 1
-        }
-        if name == "macro", !isNestedInsideDependenciesArgument(Syntax(node)) {
-            l1MacroTarget = true
         }
         return .visitChildren
     }

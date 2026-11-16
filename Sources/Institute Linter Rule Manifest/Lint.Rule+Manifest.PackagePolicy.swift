@@ -71,10 +71,7 @@ extension Lint.Rule {
                 )
             }
 
-            let inspection = ManifestPackagePolicyInspection(
-                source.tree,
-                filePath: source.file.filePath
-            )
+            let inspection = ManifestPackagePolicyInspection(source.tree)
             if let reason = inspection.unmeasuredReason {
                 return Lint.Rule.Observation(
                     findings: [],
@@ -124,10 +121,6 @@ extension Lint.Rule {
                     )
                 }
             }
-            require(
-                !inspection.hasL1MacroTarget,
-                "an L1 primitives package must not declare a macro target."
-            )
 
             return Lint.Rule.Observation(findings: findings, coverage: .measured)
         }
