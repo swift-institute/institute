@@ -4,8 +4,8 @@
 *~
 .DS_Store
 
-Package.resolved
 DerivedData/
+xcuserdata/
 Thumbs.db
 
 # Top-level entries (opt-in only)
@@ -21,7 +21,9 @@ Thumbs.db
 !/Scripts/
 !/.github/
 !/Package.swift
+!/Package.resolved
 !/Hosts/
+!/*.xcodeproj/
 !/Package@swift-*.swift
 !/Lint.swift
 !/Lint/
@@ -36,34 +38,29 @@ Thumbs.db
 !/.swiftlint.yml
 !/.swiftlint/
 
-# Deployment surface (application class only).
+# A product ships something built (product class only): its release
+# script, its deployment surface, and its leaves. A leaf is a nested
+# package named for the repository plus -app, -server, -film or -cli;
+# it carries this same document as its own .gitignore, so it is held to
+# the same whitelist, and like the root it tracks its Package.resolved.
+!/release.sh
 !/Public/
 !/Resources/
 !/Configuration/
-!/.env.example
 !/Dockerfile
 !/.dockerignore
+!/*-app/
+!/*-server/
+!/*-film/
+!/*-cli/
 
-# Documentation (opt-in for whitelisted .md files and .docc catalogs only)
-# Blocks all .md files by default to prevent AI-generated content from being committed
+# Prose: one README.md per package, LICENSE.md, DocC catalogs and test
+# fixtures, and no other Markdown (the organization page's Prose rule).
 *.md
 !README.md
-!LICENSE
 !LICENSE.md
-!CHANGELOG.md
-!CONTRIBUTING.md
-!CODE_OF_CONDUCT.md
-!SECURITY.md
-!CLAUDE.md
 !**/*.docc/**/*.md
-!**/Research/**/*.md
-!**/Experiments/**/*.md
-!**/Skills/**/*.md
-!**/.github/**/*.md
-
-# Package insights are non-normative working logs accumulating through
-# reflections-processing. They stay on disk for the author but do not ship.
-**/_Package-Insights.md
+!**/[Tt]ests/**/[Ff]ixtures/**/*.md
 
 # Research working-artifact prevention: underscore-prefixed and prompt dirs
 # are non-canonical and must not ship. _archived/ is the one allowed

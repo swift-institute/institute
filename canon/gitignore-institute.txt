@@ -55,32 +55,13 @@ Thumbs.db
 /institute control.xcworkspace/*
 !/institute control.xcworkspace/contents.xcworkspacedata
 
-# Documentation (opt-in for whitelisted .md files and .docc catalogs only)
-# Blocks all .md files by default to prevent AI-generated content from being committed
+# Prose: one README.md per package, LICENSE.md, DocC catalogs and test
+# fixtures, and no other Markdown (the organization page's Prose rule).
 *.md
 !README.md
-!LICENSE
 !LICENSE.md
-!CHANGELOG.md
-!CONTRIBUTING.md
-!CODE_OF_CONDUCT.md
-!SECURITY.md
-!CLAUDE.md
-!AGENTS.md
 !**/*.docc/**/*.md
-!**/Research/**/*.md
-!**/Experiments/**/*.md
-!**/Skills/**/*.md
-!**/.github/**/*.md
-
-# Root documents are the control plane's work product (rulings,
-# programmes, receipts); the fleet-wide .md deny does not apply at the
-# root of an institute repository.
-!/*.md
-
-# Package insights are non-normative working logs accumulating through
-# reflections-processing. They stay on disk for the author but do not ship.
-**/_Package-Insights.md
+!**/[Tt]ests/**/[Ff]ixtures/**/*.md
 
 # Research working-artifact prevention: underscore-prefixed and prompt dirs
 # are non-canonical and must not ship. _archived/ is the one allowed
@@ -123,6 +104,5 @@ Thumbs.db
 
 # Repository-policy fixtures preserve hidden subject trees as corpus data.
 !/Tests/**/Fixtures/**/.*/
-!/Tests/**/Fixtures/**/*.md
 
 # ========== END CANONICAL ==========

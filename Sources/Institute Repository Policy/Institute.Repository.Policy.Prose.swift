@@ -11,8 +11,11 @@ extension Institute.Repository.Policy.Prose {
     public static func findings(in tracked: [Swift.String], repository: GitHub_Standard::GitHub.Repository.Slug) -> [Swift.String] {
         guard !Admitted.repositories.contains(repository.description) else { return [] }
         let communityHealth = repository.description.split(separator: "/").last == ".github"
+        let readmes = Swift.Set(
+            tracked.filter { $0.hasSuffix("/Package.swift") }.map { Swift.String($0.dropLast("Package.swift".count)) + "README.md" }
+        )
         return tracked.filter { path in
-            isProse(path) && !isAdmitted(path, communityHealth: communityHealth)
+            isProse(path) && !readmes.contains(path) && !isAdmitted(path, communityHealth: communityHealth)
         }
         .sorted()
     }
@@ -20,8 +23,8 @@ extension Institute.Repository.Policy.Prose {
     // swift-linter:disable:next raw concept
     // REASON: a tracked entry as the git index lists it, only quoted back; git admits names with control characters, which File.Path refuses, and such a file must still be reported.
     public static func message(_ path: Swift.String) -> Swift.String {
-        "`\(path)` is prose outside README.md. A repository's prose is its README.md, written for agents to read "
-            + "first; fold this into it or delete it. Admitted besides: LICENSE.md, an organization's community-health "
+        "`\(path)` is prose outside README.md. A repository's prose is one README.md per package, the root's and each "
+            + "nested package's, written for agents to read first; fold this into it or delete it. Admitted besides: LICENSE.md, an organization's community-health "
             + "files in its .github repository, DocC catalogs, and test fixtures under a tests directory's fixtures."
     }
 

@@ -34,12 +34,15 @@ extension Institute.CI.Canon.Gitignore {
         /// documents, which are the control plane's work product.
         case institute
 
-        /// An application package: the package shape plus deployment
-        /// surface (`Public/`, `Resources/`, `Configuration/`, an
-        /// `.env.example` template). Membership is assigned, never
-        /// inferred: no manifest fact separates an application from a
-        /// library with an executable.
-        case application
+        /// A repository outside the Institute that ships something built:
+        /// an app, a server or a command line. The package shape plus its
+        /// `Package.resolved`, its release script, its deployment surface
+        /// and its leaves, nested packages named for the repository plus
+        /// `-app`, `-server`, `-film` or `-cli`, each carrying this same
+        /// document as its own `.gitignore`. Membership is assigned, never
+        /// inferred: by `assignments`, or by the caller's `--class`, since
+        /// no manifest fact separates a product from a library.
+        case product
 
         /// A generator-based standards package — the typed exception
         /// class: the package shape plus `!/Generation/` for the
@@ -58,7 +61,7 @@ extension Institute.CI.Canon.Gitignore.Class {
     /// The central typed exception list: repositories whose class is
     /// assigned rather than derived, keyed by full `owner/name`.
     ///
-    /// Only `application` and `generator` need assignment — `package`,
+    /// Only `product` and `generator` need assignment — `package`,
     /// `scaffold`, and `institute` are derived from checkout facts.
     /// Empty today: no repository is yet ruled into either class, and
     /// an unruled member would flip a conformant repository divergent.

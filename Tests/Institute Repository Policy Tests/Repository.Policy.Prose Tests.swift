@@ -68,6 +68,16 @@ extension `Institute.Repository.Policy.Prose Tests` {
         }
 
         @Test
+        func `each nested package has its own README, and a folder without a manifest has none`() {
+            let tracked = [
+                "README.md", "Package.swift", "example-app/Package.swift", "example-app/README.md",
+                "example-app/NOTES.md", "example-film/README.md",
+            ]
+            let findings = Institute.Repository.Policy.Prose.findings(in: tracked, repository: "coenttb/example")
+            #expect(findings == ["example-app/NOTES.md", "example-film/README.md"])
+        }
+
+        @Test
         func `swift-institute Issues is exempt: its reproducer folders are the issue record`() {
             let tracked = ["README.md", "swift-issue-borrowing-actor-closure/README.md", "Tooling/NOTES.md"]
             let findings = Institute.Repository.Policy.Prose.findings(in: tracked, repository: "swift-institute/Issues")

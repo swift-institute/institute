@@ -25,11 +25,10 @@ Thumbs.db
 !/.swiftlint.yml
 !/.swiftlint/
 
-# Documentation: README only. A scaffold has no work to document.
+# Prose: README.md and LICENSE.md only. A scaffold has no work to document.
 *.md
 !README.md
 !LICENSE.md
-!**/.github/**/*.md
 
 # Tool state: dot-directories are denied at EVERY depth, not just the
 # root. /.github is the sole legitimate dot-directory and is

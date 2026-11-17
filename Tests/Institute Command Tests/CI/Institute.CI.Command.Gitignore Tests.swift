@@ -46,6 +46,27 @@ extension `Institute.CI.Command.Gitignore Tests` {
                 )
             }
 
+            @Test func `validator command takes an assigned class`() throws {
+                #expect(
+                    try Institute.CI.Command.Gitignore.parse([
+                        "validate-gitignore", "--repository", "coenttb/example",
+                        "--root", "/tmp/subject", "--class", "product",
+                    ])
+                        == .validate(
+                            repository: "coenttb/example",
+                            root: "/tmp/subject",
+                            canon: nil,
+                            assigned: .product
+                        )
+                )
+                #expect(throws: Institute.CI.Command.Gitignore.Error.invalidClass("application")) {
+                    _ = try Institute.CI.Command.Gitignore.parse([
+                        "validate-gitignore", "--repository", "coenttb/example",
+                        "--root", "/tmp/subject", "--class", "application",
+                    ])
+                }
+            }
+
             @Test func `renderer emits only complete canonical bytes`() throws {
                 let rendered = try Institute.CI.Command.Gitignore.render(
                     canon: `Institute.CI.Command.Gitignore Tests`.Test.canon,

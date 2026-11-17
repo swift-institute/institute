@@ -96,7 +96,7 @@ extension Institute.CI.Validation {
             Probe("Tests/Core Tests/Type Tests.swift"),
             Probe("Tests/Core Tests/Fixtures/case.json"),
             Probe("Benchmarks/bench/main.swift"),
-            Probe("Research/paper.md"),
+            Probe("Research/probe/main.swift"),
             Probe("Experiments/probe/main.swift"),
             Probe("Package.swift"),
             Probe("Lint.swift"),
@@ -119,16 +119,26 @@ extension Institute.CI.Validation {
                     Probe("Policy/ruleset.json"),
                     Probe("Tools/tool/Package.swift"),
                     Probe("profile/README.md"),
-                    Probe("RULINGS.md"),
                     Probe("institute control.xcworkspace/contents.xcworkspacedata"),
                 ]
 
-            case .application:
+            case .product:
                 floor + packageWork + [
+                    Probe("Package.resolved"),
+                    Probe("release.sh"),
+                    Probe("Hosts/App.swift"),
+                    Probe("Example.xcodeproj/project.pbxproj"),
                     Probe("Public/favicon.ico"),
                     Probe("Resources/Views/page.html"),
                     Probe("Configuration/production.json"),
                     Probe(".env.example"),
+                    Probe("example-app/Package.swift"),
+                    Probe("example-app/Package.resolved"),
+                    Probe("example-app/README.md"),
+                    Probe("example-app/Sources/Example SwiftUI/View.swift"),
+                    Probe("example-server/Package.swift"),
+                    Probe("example-film/Package.swift"),
+                    Probe("example-cli/Package.swift"),
                 ]
 
             case .generator:
@@ -159,6 +169,9 @@ extension Institute.CI.Validation {
         public static let unadmitted: [Probe] = [
             Probe("Unadmitted-GH-IGNORE-003/probe.txt"),
             Probe("unadmitted-gh-ignore-003.txt"),
+            Probe("CLAUDE.md"),
+            Probe("CHANGELOG.md"),
+            Probe("Sources/Core/NOTES.md"),
         ]
 
         public let rules: [Rule] = [
@@ -181,8 +194,13 @@ extension Institute.CI.Validation {
         /// for a developer running from anywhere inside the checkout.
         public let canon: String?
 
-        public init(canon: String? = nil) {
+        /// The class the caller assigns, outranking `Class.of`: how a
+        /// product outside the fleet names itself without being listed.
+        public let assigned: Class?
+
+        public init(canon: String? = nil, assigned: Class? = nil) {
             self.canon = canon
+            self.assigned = assigned
         }
 
         public func findings(in subject: Subject) throws(EnvironmentDefect) -> [Finding] {
@@ -190,10 +208,12 @@ extension Institute.CI.Validation {
             else { return [] }
             try Self.validateRepositoryEnvironment(subject.root)
 
-            let `class` = Class.of(
-                repository: subject.repository,
-                manifest: Self.read(subject.path("Package.swift"))
-            )
+            let `class` =
+                assigned
+                ?? Class.of(
+                    repository: subject.repository,
+                    manifest: Self.read(subject.path("Package.swift"))
+                )
             let path = canon ?? Self.resolvedCanonPath ?? Self.canonPath
             let classPath = Self.siblingCanonPath(of: path, for: `class`)
             guard let canonText = Self.read(classPath) else {
@@ -273,7 +293,20 @@ extension Institute.CI.Validation {
                     )
                 }
             }
-            let lawfulPolicyPaths = Set([".gitignore"] + declaredNested.map { "\($0)/.gitignore" })
+            let leaves = `class` == .product ? try Self.leaves(in: subject) : []
+            for leaf in leaves where Self.read(subject.path("\(leaf)/.gitignore")) != canonText {
+                findings.append(
+                    Finding(
+                        repository: subject.repository,
+                        rule: conformance,
+                        message: "leaf package `\(leaf)/Package.swift` requires the complete \(`class`.canonPath) "
+                            + "as its own `\(leaf)/.gitignore`"
+                    )
+                )
+            }
+            let lawfulPolicyPaths = Set(
+                [".gitignore"] + declaredNested.map { "\($0)/.gitignore" } + leaves.map { "\($0)/.gitignore" }
+            )
             for policyPath in try Self.policyPaths(in: subject.root)
             where !lawfulPolicyPaths.contains(policyPath) {
                 findings.append(
@@ -582,6 +615,25 @@ extension Institute.CI.Validation.Gitignore {
     }
 
     /// Every effective per-directory policy input outside Git's own metadata.
+    static func leaves(
+        in subject: Institute.CI.Validation.Subject
+    ) throws(Institute.CI.Validation.EnvironmentDefect) -> [String] {
+        let names: [String]
+        do {
+            names = try Self.retryingTransientWindowsFailures {
+                try File.Directory.Contents.list(at: .init(File.Path(subject.root))).compactMap { entry in
+                    entry.type == .directory ? Swift.String(lossy: entry.name) : nil
+                }
+            }
+        } catch {
+            throw .unreadableSubject(root: subject.root)
+        }
+        return names.filter { name in
+            Institute.CI.Canon.Gitignore.Nested.isLeaf(name) && Self.read(subject.path("\(name)/Package.swift")) != nil
+        }
+        .sorted()
+    }
+
     static func policyPaths(
         in root: String
     ) throws(Institute.CI.Validation.EnvironmentDefect) -> [String] {

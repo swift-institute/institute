@@ -42,13 +42,14 @@ extension Institute.CI.Command {
             }
             print(rendered, terminator: "")
 
-        case .validate(let repository, let root, let canon):
+        case .validate(let repository, let root, let canon, let assigned):
             let findings: [Institute.CI.Validation.Finding]
             do throws(Institute.CI.Validation.EnvironmentDefect) {
                 findings = try Gitignore.findings(
                     repository: repository,
                     root: root,
-                    canon: canon
+                    canon: canon,
+                    assigned: assigned
                 )
             } catch {
                 throw .environment(error)

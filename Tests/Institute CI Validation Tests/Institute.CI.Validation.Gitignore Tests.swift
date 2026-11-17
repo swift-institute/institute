@@ -252,6 +252,38 @@ struct CIValidationGitignoreTests {
             #expect(!findings.contains { $0.rule == "GH-IGNORE-001" })
         }
 
+        @Test func `a product leaf requires the product canon as its own policy`() throws {
+            let repository = try CIValidationGitignoreTests.repository()
+            let canon = try CIValidationGitignoreTests.canon(for: .product)
+            repository.write("// swift-tools-version: 6.3", to: "Package.swift")
+            repository.write(canon, to: ".gitignore")
+            repository.write("// swift-tools-version: 6.3", to: "example-app/Package.swift")
+            repository.write("// swift-tools-version: 6.3", to: "example-docs/Package.swift")
+            let validator = Gitignore(assigned: .product)
+            var findings = try validator.findings(in: repository.subject)
+            #expect(
+                findings.contains {
+                    $0.rule == "GH-IGNORE-001" && $0.message.contains("example-app/.gitignore")
+                }
+            )
+            #expect(!findings.contains { $0.message.contains("example-docs") })
+            repository.write(canon, to: "example-app/.gitignore")
+            findings = try validator.findings(in: repository.subject)
+            #expect(!findings.contains { $0.rule == "GH-IGNORE-001" })
+        }
+
+        @Test func `the product class is assigned by the caller, never derived`() throws {
+            let repository = try CIValidationGitignoreTests.repository()
+            repository.write("// swift-tools-version: 6.3", to: "Package.swift")
+            repository.write(try CIValidationGitignoreTests.canon(for: .product), to: ".gitignore")
+            #expect(try Gitignore(assigned: .product).findings(in: repository.subject).isEmpty)
+            #expect(
+                try Gitignore().findings(in: repository.subject).contains {
+                    $0.rule == "GH-IGNORE-001" && $0.message.contains("class: package")
+                }
+            )
+        }
+
         @Test func `a handwritten tail fires complete policy conformance`() throws {
             let repository = try CIValidationGitignoreTests.repository()
             repository.write("// swift-tools-version: 6.3", to: "Package.swift")
@@ -410,10 +442,10 @@ struct CIValidationGitignoreTests {
         @Test func `wider classes contain every package admission`() throws {
             // The exception classes widen the package whitelist; they
             // never narrow it. Every path the package class keeps, the
-            // institute, application, and generator classes keep too —
+            // institute, product, and generator classes keep too —
             // measured through git, not read off the patterns.
             let packageWork = Gitignore.work(for: .package)
-            for `class`: Class in [.institute, .application, .generator] {
+            for `class`: Class in [.institute, .product, .generator] {
                 let ignored = try Gitignore.ignored(
                     under: CIValidationGitignoreTests.canon(for: `class`),
                     probes: packageWork

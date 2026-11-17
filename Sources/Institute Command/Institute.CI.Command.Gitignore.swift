@@ -1,5 +1,5 @@
 public import GitHub_Standard
-import Institute_CI_Canon
+public import Institute_CI_Canon
 public import Institute_CI_Model
 public import Institute_CI_Validation
 public import Institute_Model
@@ -12,7 +12,12 @@ extension Institute.CI.Command {
     public enum Gitignore {
         public enum Action: Sendable, Equatable {
             case render(canon: String, target: String?)
-            case validate(repository: GitHub_Standard::GitHub.Repository.Slug, root: String, canon: String?)
+            case validate(
+                repository: GitHub_Standard::GitHub.Repository.Slug,
+                root: String,
+                canon: String?,
+                assigned: Institute.CI.Canon.Gitignore.Class? = nil
+            )
             case fixtures(corpus: String)
         }
 
@@ -25,6 +30,7 @@ extension Institute.CI.Command {
             case missingRequiredArgument(String)
             case invalidRepository(String)
             case invalidCanon(String)
+            case invalidClass(String)
 
             public var message: String {
                 switch self {
@@ -51,6 +57,11 @@ extension Institute.CI.Command {
 
                 case .invalidCanon(let message):
                     message
+
+                case .invalidClass(let value):
+                    "--class must be one of "
+                        + Institute.CI.Canon.Gitignore.Class.allCases.map(\.rawValue).joined(separator: ", ")
+                        + ", got `\(value)`"
                 }
             }
         }
@@ -70,14 +81,20 @@ extension Institute.CI.Command {
             case "validate-gitignore":
                 let values = try values(
                     arguments.dropFirst(),
-                    admitting: ["--repository", "--root", "--canon"]
+                    admitting: ["--repository", "--root", "--canon", "--class"]
                 )
                 guard let name = values["--repository"] else {
                     throw .missingRequiredArgument("--repository")
                 }
                 guard let root = values["--root"] else { throw .missingRequiredArgument("--root") }
                 guard let repository = GitHub_Standard::GitHub.Repository.Slug(name) else { throw .invalidRepository(name) }
-                return .validate(repository: repository, root: root, canon: values["--canon"])
+                let assigned = try values["--class"].map { value throws(Error) in
+                    guard let assigned = Institute.CI.Canon.Gitignore.Class(rawValue: value) else {
+                        throw .invalidClass(value)
+                    }
+                    return assigned
+                }
+                return .validate(repository: repository, root: root, canon: values["--canon"], assigned: assigned)
 
             case "validate-gitignore-fixtures":
                 let values = try values(arguments.dropFirst(), admitting: ["--corpus"])
@@ -108,11 +125,12 @@ extension Institute.CI.Command {
         public static func findings(
             repository: GitHub_Standard::GitHub.Repository.Slug,
             root: String,
-            canon: String?
+            canon: String?,
+            assigned: Institute.CI.Canon.Gitignore.Class? = nil
         ) throws(Institute.CI.Validation.EnvironmentDefect)
             -> [Institute.CI.Validation.Finding]
         {
-            try Institute.CI.Validation.Gitignore(canon: canon)
+            try Institute.CI.Validation.Gitignore(canon: canon, assigned: assigned)
                 .findings(in: .init(repository: repository, root: root))
         }
 
