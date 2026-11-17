@@ -309,6 +309,9 @@ extension `target import edge Tests`.Exemption {
                 import Security
                 import CoreGraphics
                 import CoreImage
+                import ScreenCaptureKit
+                import CoreVideo
+                import CoreMedia
                 """
             ]
         )
