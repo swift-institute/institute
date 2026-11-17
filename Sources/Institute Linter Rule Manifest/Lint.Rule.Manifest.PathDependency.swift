@@ -41,6 +41,13 @@ extension Lint.Rule {
                 expectation: .findings(1)
             ),
             .init(
+                id: "path dependency film leaf without a parent manifest",
+                source: "let package = Package(name: \"fixture-film\", "
+                    + "dependencies: [.package(name: \"fixture-app\", path: \"../fixture-app\")])",
+                path: "fixture-film/Package.swift",
+                expectation: .findings(1)
+            ),
+            .init(
                 id: "path dependency url",
                 source: "let package = Package(name: \"Fixture\", dependencies: ["
                     + ".package(url: \"https://github.com/swift-atoms/swift-owner.git\", branch: \"main\")])",
@@ -69,12 +76,14 @@ extension Lint.Rule {
                     applicability: .inapplicable
                 )
             }
+            let parentPackageName = manifestParentPackageName(source.file.filePath)
             let visitor = ManifestPathDependencyVisitor(
                 source: source.file,
                 severity: severity,
                 converter: source.converter,
                 nestedTestManifest: manifestIsNestedTestManifest(source.file.filePath),
-                parentPackageName: manifestParentPackageName(source.file.filePath)
+                parentPackageName: parentPackageName,
+                filmSiblingName: manifestFilmSiblingName(tree: source.tree, parentPackageName: parentPackageName)
             )
             visitor.walk(source.tree)
             return Lint.Rule.Observation(findings: visitor.matches, coverage: .measured)
@@ -89,7 +98,19 @@ internal let manifestPathDependencyMessage: Swift::String =
     + "workspace, not by the manifest. Two exceptions: the nested test manifest, "
     + "`Tests/Package.swift`, reaching its parent as `.package(path: \"..\")`; and a "
     + "leaf, a manifest whose parent folder holds a `Package.swift`, naming that parent "
-    + "as `.package(name: \"<the parent's package name>\", path: \"..\")`."
+    + "as `.package(name: \"<the parent's package name>\", path: \"..\")`; a film leaf, "
+    + "a leaf named `<parent>-film`, may also name its sibling app leaf as "
+    + "`.package(name: \"<parent>-app\", path: \"../<parent>-app\")`."
+
+/// The sibling a film leaf may name, `<parent>-app`, when the manifest is a leaf whose package is named
+/// `<parent>-film` after its parent's package; `nil` for any other manifest (swift-institute/institute#297).
+internal func manifestFilmSiblingName(tree: SourceFileSyntax, parentPackageName: Swift::String?) -> Swift::String? {
+    guard let parentPackageName else { return nil }
+    let visitor = ManifestPackageNameVisitor(viewMode: .sourceAccurate)
+    visitor.walk(tree)
+    guard visitor.name == parentPackageName + "-film" else { return nil }
+    return parentPackageName + "-app"
+}
 
 internal func manifestIsNestedTestManifest(_ filePath: Swift::String) -> Swift::Bool {
     let components = filePath.split(separator: "/", omittingEmptySubsequences: true)
@@ -103,6 +124,7 @@ internal final class ManifestPathDependencyVisitor: SyntaxVisitor {
     let converter: SourceLocationConverter
     let nestedTestManifest: Swift::Bool
     let parentPackageName: Swift::String?
+    let filmSiblingName: Swift::String?
     var matches: [Diagnostic.Record] = []
 
     init(
@@ -110,13 +132,15 @@ internal final class ManifestPathDependencyVisitor: SyntaxVisitor {
         severity: Diagnostic.Severity,
         converter: SourceLocationConverter,
         nestedTestManifest: Swift::Bool,
-        parentPackageName: Swift::String?
+        parentPackageName: Swift::String?,
+        filmSiblingName: Swift::String?
     ) {
         self.source = source
         self.severity = severity
         self.converter = converter
         self.nestedTestManifest = nestedTestManifest
         self.parentPackageName = parentPackageName
+        self.filmSiblingName = filmSiblingName
         super.init(viewMode: .sourceAccurate)
     }
 
@@ -125,7 +149,8 @@ internal final class ManifestPathDependencyVisitor: SyntaxVisitor {
             member.declName.baseName.text == "package",
             let path = node.arguments.first(where: { $0.label?.text == "path" }),
             !(nestedTestManifest && isParent(path.expression)),
-            !(isParent(path.expression) && namesParent(node))
+            !(isParent(path.expression) && namesParent(node)),
+            !namesFilmSibling(node, path: path.expression)
         {
             let location = converter.location(for: node.positionAfterSkippingLeadingTrivia)
             matches.append(
@@ -151,6 +176,16 @@ internal final class ManifestPathDependencyVisitor: SyntaxVisitor {
             let literal = argument.expression.as(StringLiteralExprSyntax.self)
         else { return false }
         return manifestStringLiteralText(literal) == parentPackageName
+    }
+
+    private func namesFilmSibling(_ node: FunctionCallExprSyntax, path: ExprSyntax) -> Swift::Bool {
+        guard let filmSiblingName,
+            let argument = node.arguments.first(where: { $0.label?.text == "name" }),
+            let name = argument.expression.as(StringLiteralExprSyntax.self),
+            let path = path.as(StringLiteralExprSyntax.self)
+        else { return false }
+        return manifestStringLiteralText(name) == filmSiblingName
+            && manifestStringLiteralText(path) == "../" + filmSiblingName
     }
 
     private func isParent(_ expression: ExprSyntax) -> Swift::Bool {

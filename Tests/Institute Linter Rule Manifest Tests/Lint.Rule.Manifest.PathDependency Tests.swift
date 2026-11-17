@@ -283,3 +283,76 @@ extension `Lint.Rule Tests`.`path dependency Tests`.Integration {
         #expect(leaf.observation(#".package(name: "fixture", path: "..")"#, at: "fixture-server/.").findings.isEmpty)
     }
 }
+
+// A product's film leaf, `<parent>-film`, may name its sibling app leaf, `<parent>-app`, and nothing else
+// (swift-institute/institute#297).
+extension `Lint.Rule Tests`.`path dependency Tests`.Integration {
+    @Test
+    func `a film leaf may name its sibling app leaf by path`() throws(Lint.Source.Fixture.Failure) {
+        let leaf = try `Lint.Rule Tests`.`path dependency Tests`.Leaf(parent: "fixture")
+        defer { leaf.tearDown() }
+        let observation = leaf.observation(
+            #".package(name: "fixture", path: ".."), .package(name: "fixture-app", path: "../fixture-app")"#,
+            at: "fixture-film"
+        )
+        #expect(observation.findings.isEmpty)
+    }
+
+    @Test
+    func `a film leaf naming another sibling is flagged`() throws(Lint.Source.Fixture.Failure) {
+        let leaf = try `Lint.Rule Tests`.`path dependency Tests`.Leaf(parent: "fixture")
+        defer { leaf.tearDown() }
+        for dependency in [
+            #".package(name: "fixture-server", path: "../fixture-server")"#,
+            #".package(name: "fixture-film", path: "../fixture-film")"#,
+            #".package(name: "other-app", path: "../other-app")"#,
+        ] {
+            #expect(leaf.observation(dependency, at: "fixture-film").findings.count == 1, "\(dependency)")
+        }
+    }
+
+    @Test
+    func `a film leaf naming its app leaf in any other form is flagged`() throws(Lint.Source.Fixture.Failure) {
+        let leaf = try `Lint.Rule Tests`.`path dependency Tests`.Leaf(parent: "fixture")
+        defer { leaf.tearDown() }
+        for dependency in [
+            #".package(path: "../fixture-app")"#,
+            #".package(name: "fixture-app", path: "../fixture-app/")"#,
+            #".package(name: "fixture-app", path: "../../fixture-app")"#,
+            #".package(name: "fixture-app", path: "fixture-app")"#,
+            #".package(name: "fixture-app", path: "../other-app")"#,
+            #".package(name: "other-app", path: "../fixture-app")"#,
+            #".package(name: "Fixture-app", path: "../Fixture-app")"#,
+        ] {
+            #expect(leaf.observation(dependency, at: "fixture-film").findings.count == 1, "\(dependency)")
+        }
+    }
+
+    @Test
+    func `another leaf kind naming the app leaf is flagged`() throws(Lint.Source.Fixture.Failure) {
+        let leaf = try `Lint.Rule Tests`.`path dependency Tests`.Leaf(parent: "fixture")
+        defer { leaf.tearDown() }
+        for folder in ["fixture-server", "fixture-films", "fixture-film-media", "film", "fixture-app"] {
+            let observation = leaf.observation(#".package(name: "fixture-app", path: "../fixture-app")"#, at: folder)
+            #expect(observation.findings.count == 1, "\(folder)")
+        }
+    }
+
+    @Test
+    func `a film leaf named after another product is flagged`() throws(Lint.Source.Fixture.Failure) {
+        let leaf = try `Lint.Rule Tests`.`path dependency Tests`.Leaf(parent: "fixture")
+        defer { leaf.tearDown() }
+        let observation = leaf.observation(#".package(name: "other-app", path: "../other-app")"#, at: "other-film")
+        #expect(observation.findings.count == 1)
+    }
+
+    @Test
+    func `a film manifest whose parent folder holds no package may not name an app by path`()
+        throws(Lint.Source.Fixture.Failure)
+    {
+        let leaf = try `Lint.Rule Tests`.`path dependency Tests`.Leaf(parent: nil)
+        defer { leaf.tearDown() }
+        let observation = leaf.observation(#".package(name: "fixture-app", path: "../fixture-app")"#, at: "fixture-film")
+        #expect(observation.findings.count == 1)
+    }
+}
