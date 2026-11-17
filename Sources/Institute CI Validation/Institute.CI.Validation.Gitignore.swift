@@ -307,8 +307,9 @@ extension Institute.CI.Validation {
             let lawfulPolicyPaths = Set(
                 [".gitignore"] + declaredNested.map { "\($0)/.gitignore" } + leaves.map { "\($0)/.gitignore" }
             )
-            for policyPath in try Self.policyPaths(in: subject.root)
-            where !lawfulPolicyPaths.contains(policyPath) {
+            let strayPolicyPaths = try Self.policyPaths(in: subject.root).filter { !lawfulPolicyPaths.contains($0) }
+            let ignoredPolicyPaths = Set(try Self.ignoredIndexedPaths(strayPolicyPaths, in: subject.root))
+            for policyPath in strayPolicyPaths where !ignoredPolicyPaths.contains(policyPath) {
                 findings.append(
                     Finding(
                         repository: subject.repository,

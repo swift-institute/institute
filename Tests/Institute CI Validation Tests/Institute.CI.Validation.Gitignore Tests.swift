@@ -299,6 +299,14 @@ struct CIValidationGitignoreTests {
             )
         }
 
+        @Test func `a policy file inside what the repository ignores is not a policy location`() throws {
+            let repository = try CIValidationGitignoreTests.repository()
+            repository.write("// swift-tools-version: 6.3", to: "Package.swift")
+            repository.write(try CIValidationGitignoreTests.canon(for: .package), to: ".gitignore")
+            repository.write("*.tmp\n", to: ".build/checkouts/swift-syntax/.gitignore")
+            #expect(try Gitignore().findings(in: repository.subject).isEmpty)
+        }
+
         @Test func `undeclared nested policy fires complete policy conformance`() throws {
             let repository = try CIValidationGitignoreTests.repository()
             repository.write("// swift-tools-version: 6.3", to: "Package.swift")
