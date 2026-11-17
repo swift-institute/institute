@@ -127,7 +127,7 @@ struct ContinuousIntegrationPlanTests {
         #expect(!plan.legs.map(\.id).contains("macos-release"))
         #expect(!plan.legs.map(\.id).contains("windows-release"))
         #expect(plan.legs.map(\.id).contains("linux-release"))
-            }
+    }
 
     @Test
     func theExhaustiveTierIsPlatformFilteredLikeAnyOther() throws {
