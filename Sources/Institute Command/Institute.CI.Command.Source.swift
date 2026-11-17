@@ -28,7 +28,7 @@ extension Institute.CI.Command {
             root: Swift.String = "",
             xcodeApplication: Swift.String = "",
             jobs: Swift.Int? = nil,
-            exitPolicy: Swift.String = Policy.advisory.rawValue
+            exitPolicy: Swift.String = Policy.strict.rawValue
         ) {
             self.repository = repository
             self.revision = revision
@@ -51,7 +51,8 @@ extension Institute.CI.Command {
                 [--jobs <positive-count>] [--exit-policy <advisory|strict>]
 
             --revision is an exact lowercase 40-character commit and --root an
-            absolute path. --exit-policy defaults to advisory.
+            absolute path. --exit-policy defaults to strict, the policy CI's
+            Quality · source job runs with, so the exit code is CI's verdict.
             The tools are the ones the source policy pins for this platform,
             each checked against its digest. On macOS swift-format is copied
             out of the pinned Xcode; --xcode-application, accepted on macOS
@@ -166,7 +167,7 @@ extension Institute.CI.Command {
                 throw .configuration("source report serialization did not parse: \(error)")
             }
             let overruns = Ratchet.overruns(repository: repository, counts: Ratchet.counts(report))
-            let code = (Policy(rawValue: exitPolicy) ?? .advisory).code(
+            let code = (Policy(rawValue: exitPolicy) ?? .strict).code(
                 status: Source_Report::Source.Report.Status(report, expected: report.commitment),
                 errors: report.errors || !overruns.isEmpty
             )

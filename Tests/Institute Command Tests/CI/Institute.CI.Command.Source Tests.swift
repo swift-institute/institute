@@ -90,16 +90,16 @@ func `CI source refuses inexact policy inputs`(_ arguments: [String]) {
 }
 
 @Test
-func `CI source exit policy defaults to advisory and parses strict`() throws {
+func `CI source exit policy defaults to strict as CI runs it and parses advisory`() throws {
     let base = [
         "--repository", "swift-standards/swift-iso-639",
         "--revision", String(repeating: "a", count: 40),
         "--root", "/work/swift-iso-639",
     ]
-    let advisory = try Command.parse(Institute.CI.Command.Source.self, from: base, initial: .init())
-    let strict = try Command.parse(
+    let strict = try Command.parse(Institute.CI.Command.Source.self, from: base, initial: .init())
+    let advisory = try Command.parse(
         Institute.CI.Command.Source.self,
-        from: base + ["--exit-policy", "strict"],
+        from: base + ["--exit-policy", "advisory"],
         initial: .init()
     )
 
