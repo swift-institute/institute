@@ -23,7 +23,7 @@ extension Lint.Rule {
                     source: source.file,
                     severity: severity,
                     converter: source.converter,
-                    package: repository?.name,
+                    repository: repository,
                     packageRoots: source.index.roots
                 )
                 visitor.walk(source.tree)
@@ -46,7 +46,6 @@ private let architectureCapabilityCatalog: Swift::Set<Swift::String> = [
     "Store",
     "Client",
     "Cache",
-    "Machine",
 ]
 
 private let architectureCapabilitySupportNames: Swift::Set<Swift::String> = [
@@ -112,7 +111,7 @@ internal final class ArchitectureCapabilityBeforeNounVisitor: SyntaxVisitor {
     let source: Source.File
     let severity: Diagnostic.Severity
     let converter: SourceLocationConverter
-    let package: Swift::String?
+    let repository: Institute.Repository.Coordinate?
     var ownedTopLevelTypes: Swift::Set<Swift::String> = []
     var matches: [Diagnostic.Record] = []
 
@@ -120,13 +119,13 @@ internal final class ArchitectureCapabilityBeforeNounVisitor: SyntaxVisitor {
         source: Source.File,
         severity: Diagnostic.Severity,
         converter: SourceLocationConverter,
-        package: Swift::String?,
+        repository: Institute.Repository.Coordinate?,
         packageRoots: Swift::Set<Swift::String>
     ) {
         self.source = source
         self.severity = severity
         self.converter = converter
-        self.package = package
+        self.repository = repository
         self.ownedTopLevelTypes = packageRoots
         super.init(viewMode: .sourceAccurate)
     }
@@ -222,11 +221,21 @@ internal final class ArchitectureCapabilityBeforeNounVisitor: SyntaxVisitor {
             !architectureCapabilitySupportNames.contains(leaf),
             !ownedTopLevelTypes.contains(root)
         else { return }
-        if let package,
-            architectureCapabilityNormalizedKey(package: package)
-                == architectureCapabilityNormalizedKey(type: root)
-        {
-            return
+        if let repository {
+            let packageKey = architectureCapabilityNormalizedKey(package: repository.name)
+            let rootKey = architectureCapabilityNormalizedKey(type: root)
+            if packageKey == rootKey {
+                return
+            }
+            if repository.organization.layer <= .molecules {
+                let stem =
+                    repository.name.hasPrefix("swift-")
+                    ? Swift::String(repository.name.dropFirst("swift-".count))
+                    : repository.name
+                if stem.split(separator: "-").first?.lowercased() == rootKey {
+                    return
+                }
+            }
         }
         emit(
             position: position,

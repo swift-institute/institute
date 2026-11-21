@@ -163,6 +163,24 @@ private func architectureSpliceOwns(
         case .`swift-w3c`:
             if ["w3c", "css", "png", "svg", "dom"].contains(rootKey) { return true }
 
+        case .`swift-iso`:
+            if rootKey == "iso" { return true }
+
+        case .`swift-ietf`:
+            if rootKey == "ietf" || rootKey == "rfc" || rootKey == "bcp" { return true }
+
+        case .`swift-iec`:
+            if rootKey == "iec" { return true }
+
+        case .`swift-ieee`:
+            if rootKey == "ieee" { return true }
+
+        case .`swift-ecma`:
+            if rootKey == "ecma" { return true }
+
+        case .`swift-incits`:
+            if rootKey == "incits" { return true }
+
         case .`swift-bipm`:
             if rootKey == "si" || rootKey == "bipm" { return true }
 

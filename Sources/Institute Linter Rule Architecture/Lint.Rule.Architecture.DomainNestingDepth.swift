@@ -84,6 +84,16 @@ private let architectureDepthLeadingRoots: Swift::Set<Swift::String> = [
     "POSIX",
     "WHATWG",
     "W3C",
+    "ISO",
+    "IETF",
+    "IEC",
+    "IEEE",
+    "ECMA",
+    "BIPM",
+    "INCITS",
+    "NIST",
+    "ITU",
+    "SMPTE",
 ]
 
 private func architectureDepthIsStandardRoot(_ segment: Swift::String) -> Swift::Bool {
