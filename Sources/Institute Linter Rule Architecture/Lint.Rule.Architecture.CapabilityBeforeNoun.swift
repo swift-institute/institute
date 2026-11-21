@@ -23,7 +23,8 @@ extension Lint.Rule {
                     source: source.file,
                     severity: severity,
                     converter: source.converter,
-                    package: repository?.name
+                    package: repository?.name,
+                    packageRoots: source.index.roots
                 )
                 visitor.walk(source.tree)
                 return Lint.Rule.Observation(findings: visitor.matches, coverage: .measured)
@@ -119,12 +120,14 @@ internal final class ArchitectureCapabilityBeforeNounVisitor: SyntaxVisitor {
         source: Source.File,
         severity: Diagnostic.Severity,
         converter: SourceLocationConverter,
-        package: Swift::String?
+        package: Swift::String?,
+        packageRoots: Swift::Set<Swift::String>
     ) {
         self.source = source
         self.severity = severity
         self.converter = converter
         self.package = package
+        self.ownedTopLevelTypes = packageRoots
         super.init(viewMode: .sourceAccurate)
     }
 

@@ -24,7 +24,8 @@ extension Lint.Rule {
                     source: source.file,
                     severity: severity,
                     converter: source.converter,
-                    repository: repository
+                    repository: repository,
+                    packageRoots: source.index.roots
                 )
                 visitor.walk(source.tree)
                 return Lint.Rule.Observation(findings: visitor.matches, coverage: .measured)
@@ -205,12 +206,14 @@ internal final class ArchitectureCrossPackageTypeSpliceVisitor: SyntaxVisitor {
         source: Source.File,
         severity: Diagnostic.Severity,
         converter: SourceLocationConverter,
-        repository: Institute.Repository.Coordinate
+        repository: Institute.Repository.Coordinate,
+        packageRoots: Swift::Set<Swift::String>
     ) {
         self.source = source
         self.severity = severity
         self.converter = converter
         self.repository = repository
+        self.declaredTopLevelTypes = packageRoots
         super.init(viewMode: .sourceAccurate)
     }
 
