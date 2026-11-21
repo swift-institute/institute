@@ -10,6 +10,9 @@ extension Array where Element == Lint.Rule.Configuration {
             Lint.Rule.`upward layer edge`.id: .`upward layer edge`(in: repository),
             Lint.Rule.`libc import in composition`.id: .`libc import in composition`(in: repository),
             Lint.Rule.`top level type owner`.id: .`top level type owner`(in: repository),
+            Lint.Rule.`capability before noun`.id: .`capability before noun`(in: repository),
+            Lint.Rule.`cross package type splice`.id: .`cross package type splice`(in: repository),
+            Lint.Rule.`domain nesting depth`.id: .`domain nesting depth`(in: repository),
         ]
         return map { configuration in
             guard let rule = located[configuration.rule.id] else { return configuration }
