@@ -160,7 +160,7 @@ extension `Lint.Rule Tests`.`compound type name Tests`.`Edge Case` {
     }
 
     @Test
-    func `spec namespace RFC_4122 is NOT flagged`() {
+    func `spec namespace IETF.RFC.4122 is NOT flagged`() {
         let source = "enum RFC_4122 {}"
         let findings = `Lint.Rule Tests`.`compound type name Tests`.findings(in: source)
         #expect(findings.isEmpty)
