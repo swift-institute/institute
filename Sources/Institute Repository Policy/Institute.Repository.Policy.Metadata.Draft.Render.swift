@@ -14,9 +14,9 @@ extension Institute.Repository.Policy.Metadata.Draft {
         /// The date the header stamps, `YYYY-MM-DD`. Supplied rather than
         /// read from the clock so a re-run of the same wave renders the
         /// same bytes and the caller's byte-compare stays meaningful.
-        public let date: ISO_8601.CalendarDate
+        public let date: ISO.`8601`.CalendarDate
 
-        public init(generatedOn date: ISO_8601.CalendarDate) {
+        public init(generatedOn date: ISO.`8601`.CalendarDate) {
             self.date = date
         }
     }

@@ -129,7 +129,7 @@ extension Institute.Repository.Policy.Command {
         } catch {
             throw .metadata(error)
         }
-        guard let stamp = ISO_8601.CalendarDate(extended: date ?? Self.today) else {
+        guard let stamp = ISO.`8601`.CalendarDate(extended: date ?? Self.today) else {
             throw configuration("draft-metadata --date must be YYYY-MM-DD")
         }
         let render = Institute.Repository.Policy.Metadata.Draft.Render(generatedOn: stamp)
