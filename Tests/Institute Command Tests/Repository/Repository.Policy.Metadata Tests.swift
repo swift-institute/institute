@@ -50,7 +50,7 @@ struct `Repository Policy Metadata Tests` {
             let draft = try `Repository Policy Metadata Tests`.draft("swift-institute/.github")
             #expect(draft.kind == .organizationDefaults)
             #expect(draft.metadata.homepage.isEmpty)
-            let rendered = Institute.Repository.Policy.Metadata.Draft.Render(generatedOn: try ISO_8601.CalendarDate(year: 2026, month: 8, day: 7))(draft)
+            let rendered = Institute.Repository.Policy.Metadata.Draft.Render(generatedOn: try ISO.`8601`.CalendarDate(year: 2026, month: 8, day: 7))(draft)
             #expect(!rendered.contains("homepage"))
             #expect(rendered.contains("topics: []"))
         }
@@ -67,7 +67,7 @@ struct `Repository Policy Metadata Tests` {
         @Test func `the rendered draft carries the review instruction`() throws {
             // What makes a draft a draft. Without it a heuristic seed
             // reads as an authored document.
-            let rendered = Institute.Repository.Policy.Metadata.Draft.Render(generatedOn: try ISO_8601.CalendarDate(year: 2026, month: 8, day: 7))(
+            let rendered = Institute.Repository.Policy.Metadata.Draft.Render(generatedOn: try ISO.`8601`.CalendarDate(year: 2026, month: 8, day: 7))(
                 try `Repository Policy Metadata Tests`.draft("swift-ietf/swift-rfc-3986")
             )
             #expect(rendered.contains("# REVIEW BEFORE MERGE"))
