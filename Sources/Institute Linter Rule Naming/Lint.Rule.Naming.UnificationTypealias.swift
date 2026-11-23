@@ -84,6 +84,24 @@ extension Lint.Rule {
                 expectation: .findings(1)
             ),
             .init(
+                id: "unification typealias element name",
+                source: "public typealias linearGradient = SVG.Paint.Gradient.Linear\npublic typealias g = SVG.Document.Group",
+                path: "Sources/Naming Core/ElementName.swift",
+                expectation: .clean
+            ),
+            .init(
+                id: "unification typealias unlisted compound",
+                source: "public typealias linearRamp = SVG.Paint.Gradient.Linear",
+                path: "Sources/Naming Core/UnlistedCompound.swift",
+                expectation: .findings(1)
+            ),
+            .init(
+                id: "unification typealias nested element name",
+                source: "extension Sample { public typealias linearGradient = SVG.Paint.Gradient.Linear }",
+                path: "Sources/Naming Core/NestedElementName.swift",
+                expectation: .findings(1)
+            ),
+            .init(
                 id: "unification typealias swift bridge",
                 source: "public typealias Protocol = Swift.Equatable",
                 path: "Sources/Naming Core/SwiftBridge.swift",
@@ -182,6 +200,75 @@ internal final class NamingUnificationTypealiasVisitor: SyntaxVisitor {
         return false
     }
 
+    /// The element names of SVG 2 (W3C), verbatim. A file-scope alias that spells one of them names the element a DSL writes, as
+    /// `typealias linearGradient = SVG.Paint.Gradient.Linear` does, not a second name for the type.
+    private static let elementNames: Set<Swift::String> = [
+        "a",
+        "animate",
+        "animateMotion",
+        "animateTransform",
+        "circle",
+        "clipPath",
+        "defs",
+        "desc",
+        "discard",
+        "ellipse",
+        "feBlend",
+        "feColorMatrix",
+        "feComponentTransfer",
+        "feComposite",
+        "feConvolveMatrix",
+        "feDiffuseLighting",
+        "feDisplacementMap",
+        "feDistantLight",
+        "feDropShadow",
+        "feFlood",
+        "feFuncA",
+        "feFuncB",
+        "feFuncG",
+        "feFuncR",
+        "feGaussianBlur",
+        "feImage",
+        "feMerge",
+        "feMergeNode",
+        "feMorphology",
+        "feOffset",
+        "fePointLight",
+        "feSpecularLighting",
+        "feSpotLight",
+        "feTile",
+        "feTurbulence",
+        "filter",
+        "foreignObject",
+        "g",
+        "image",
+        "line",
+        "linearGradient",
+        "marker",
+        "mask",
+        "metadata",
+        "mpath",
+        "path",
+        "pattern",
+        "polygon",
+        "polyline",
+        "radialGradient",
+        "rect",
+        "script",
+        "set",
+        "stop",
+        "style",
+        "svg",
+        "switch",
+        "symbol",
+        "text",
+        "textPath",
+        "title",
+        "tspan",
+        "use",
+        "view",
+    ]
+
     /// Whether `leaf` is a standard's designation, such as `32000` in `ISO.\`32000\``: a number, not a type's name.
     private static func isDesignation(_ leaf: Swift::String) -> Swift::Bool {
         let name = Lint.Syntax.Identifier.unescaped(leaf)
@@ -222,6 +309,9 @@ internal final class NamingUnificationTypealiasVisitor: SyntaxVisitor {
             return .visitChildren
         }
         if Self.isDesignation(rhsLeaf), Self.isFileScope(Syntax(node)) {
+            return .visitChildren
+        }
+        if Self.elementNames.contains(Lint.Syntax.Identifier.unescaped(lhsName)), Self.isFileScope(Syntax(node)) {
             return .visitChildren
         }
         let location = converter.location(

@@ -221,3 +221,29 @@ extension `Lint.Rule Tests`.`unification typealias Tests`.`Edge Case` {
         #expect(`Lint.Rule Tests`.`unification typealias Tests`.findings(in: source).count == 1)
     }
 }
+
+extension `Lint.Rule Tests`.`unification typealias Tests`.`Edge Case` {
+    @Test(arguments: ["linearGradient", "radialGradient", "clipPath", "foreignObject", "rect", "g"])
+    func `a file-scope alias spelling an SVG element name is not a rename bridge`(element: String) {
+        let findings = `Lint.Rule Tests`.`unification typealias Tests`.findings(
+            in: "public typealias \(element) = SVG.Paint.Gradient.Linear"
+        )
+        #expect(findings.isEmpty)
+    }
+
+    @Test
+    func `an unlisted compound alias is still a rename bridge`() {
+        let findings = `Lint.Rule Tests`.`unification typealias Tests`.findings(
+            in: "public typealias linearRamp = SVG.Paint.Gradient.Linear"
+        )
+        #expect(findings.count == 1)
+    }
+
+    @Test
+    func `an element name nested in a type is still a rename bridge`() {
+        let findings = `Lint.Rule Tests`.`unification typealias Tests`.findings(
+            in: "extension Sample { public typealias linearGradient = SVG.Paint.Gradient.Linear }"
+        )
+        #expect(findings.count == 1)
+    }
+}
