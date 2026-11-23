@@ -2018,7 +2018,6 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-svg|exported import|2
         swift-compositions/swift-svg|module selector spelling|24
         swift-compositions/swift-svg|undeclared module import|1
-        swift-compositions/swift-svg|unification typealias|2
         swift-compositions/swift-svg-render|canonical settings tail|1
         swift-compositions/swift-svg-render|compound identifier|57
         swift-compositions/swift-svg-render|compound suite name|8
