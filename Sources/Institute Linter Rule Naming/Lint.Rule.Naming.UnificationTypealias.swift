@@ -72,6 +72,18 @@ extension Lint.Rule {
                 expectation: .clean
             ),
             .init(
+                id: "unification typealias standard designation",
+                source: "public typealias PDF = ISO.`32000`\ntypealias HTTP = IETF.RFC.`9110`",
+                path: "Sources/Naming Core/Designation.swift",
+                expectation: .clean
+            ),
+            .init(
+                id: "unification typealias nested designation",
+                source: "extension Sample { public typealias PDF = ISO.`32000` }",
+                path: "Sources/Naming Core/NestedDesignation.swift",
+                expectation: .findings(1)
+            ),
+            .init(
                 id: "unification typealias swift bridge",
                 source: "public typealias Protocol = Swift.Equatable",
                 path: "Sources/Naming Core/SwiftBridge.swift",
@@ -159,6 +171,23 @@ internal final class NamingUnificationTypealiasVisitor: SyntaxVisitor {
         return false
     }
 
+    /// Whether `syntax` is declared at file scope, outside any type or extension.
+    private static func isFileScope(_ syntax: Syntax) -> Swift::Bool {
+        var current = syntax.parent
+        while let candidate = current {
+            if candidate.is(MemberBlockSyntax.self) || candidate.is(CodeBlockSyntax.self) { return false }
+            if candidate.is(SourceFileSyntax.self) { return true }
+            current = candidate.parent
+        }
+        return false
+    }
+
+    /// Whether `leaf` is a standard's designation, such as `32000` in `ISO.\`32000\``: a number, not a type's name.
+    private static func isDesignation(_ leaf: Swift::String) -> Swift::Bool {
+        let name = Lint.Syntax.Identifier.unescaped(leaf)
+        return !name.isEmpty && name.allSatisfy(\.isNumber)
+    }
+
     override func visit(_ node: TypeAliasDeclSyntax) -> SyntaxVisitorContinueKind {
         let lhsName = node.name.text
         guard let member = node.initializer.value.as(MemberTypeSyntax.self) else {
@@ -190,6 +219,11 @@ internal final class NamingUnificationTypealiasVisitor: SyntaxVisitor {
             return .visitChildren
         }
         if Naming.isProtocolSentinel(rhsLeaf) {
+            return .visitChildren
+        }
+        // A file-scope alias that names a standard by its designation (`typealias PDF = ISO.\`32000\``) gives the
+        // standard its common name; there is no member type it renames.
+        if Self.isDesignation(rhsLeaf), Self.isFileScope(Syntax(node)) {
             return .visitChildren
         }
         let location = converter.location(

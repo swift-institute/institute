@@ -81,6 +81,23 @@ extension `Lint.Rule Tests`.`unification typealias Tests`.`Edge Case` {
         #expect(findings.allSatisfy { $0.identifier == "unification typealias" })
     }
 
+    @Test(arguments: [
+        "public typealias PDF = ISO.`32000`",
+        "typealias HTTP = IETF.RFC.`9110`",
+        "public typealias sRGB = IEC.`61966`.`2`.`1`",
+    ])
+    func `a file-scope alias naming a standard's designation is NOT flagged`(source: String) {
+        #expect(`Lint.Rule Tests`.`unification typealias Tests`.findings(in: source).isEmpty)
+    }
+
+    @Test(arguments: [
+        "extension Sample { public typealias PDF = ISO.`32000` }",
+        "public typealias Page = ISO.`32000`.Viewer",
+    ])
+    func `a nested designation alias or a named leaf IS flagged`(source: String) {
+        #expect(`Lint.Rule Tests`.`unification typealias Tests`.findings(in: source).count == 1)
+    }
+
     @Test
     func `same-leaf typealias is NOT flagged`() {
         // Handled by [API-NAME-004a] NamespaceAdoption instead.
