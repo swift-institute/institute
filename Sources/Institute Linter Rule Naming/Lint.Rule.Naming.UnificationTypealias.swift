@@ -221,8 +221,6 @@ internal final class NamingUnificationTypealiasVisitor: SyntaxVisitor {
         if Naming.isProtocolSentinel(rhsLeaf) {
             return .visitChildren
         }
-        // A file-scope alias that names a standard by its designation (`typealias PDF = ISO.\`32000\``) gives the
-        // standard its common name; there is no member type it renames.
         if Self.isDesignation(rhsLeaf), Self.isFileScope(Syntax(node)) {
             return .visitChildren
         }
