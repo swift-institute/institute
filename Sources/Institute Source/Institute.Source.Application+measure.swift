@@ -211,7 +211,7 @@ extension Institute.Source.Application {
         let profileBytes = preparation.profiles.keys.sorted()
             .compactMap { preparation.profiles[$0]?.hex }
             .joined(separator: ":").utf8.map(Byte.init(_:))
-        let digest = Source_Profile::Source.Profile.Digest(FIPS_180_4.SHA256.digest(profileBytes).hex)
+        let digest = Source_Profile::Source.Profile.Digest(NIST.FIPS.`180`.`4`.SHA256.digest(profileBytes).hex)
         return .init(
             scope: scope,
             profile: digest,

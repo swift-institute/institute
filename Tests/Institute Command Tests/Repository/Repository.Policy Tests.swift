@@ -171,7 +171,7 @@ struct `Repository Policy Tests` {
             try Institute.Repository.Policy.Issue.CompactionCheckpoint(
                 grammarVersion: 2,
                 source: "https://github.com/swift-institute/.github/issues/173",
-                digest: FIPS_180_4.SHA1.digest([])
+                digest: NIST.FIPS.`180`.`4`.SHA1.digest([])
             )
         }
         #expect(throws: Institute.Repository.Policy.Issue.Error.self) {
@@ -313,7 +313,7 @@ struct `Repository Policy Tests` {
         )
         let staleDigest = try Institute.Repository.Policy.Issue.Guard(
             revision: snapshot.revision,
-            digest: try #require(FIPS_180_4.Digest(hex: "a9993e364706816aba3e25717850c26c9cd0d89d"))
+            digest: try #require(NIST.FIPS.`180`.`4`.Digest(hex: "a9993e364706816aba3e25717850c26c9cd0d89d"))
         )
 
         #expect(throws: Institute.Repository.Policy.Issue.Error.self) {

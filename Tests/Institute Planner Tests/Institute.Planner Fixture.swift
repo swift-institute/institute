@@ -36,7 +36,7 @@ extension Institute.Planner {
         }
 
         static func hex(_ bytes: [Byte]) -> String {
-            FIPS_180_4.SHA256.digest(bytes).hex
+            NIST.FIPS.`180`.`4`.SHA256.digest(bytes).hex
         }
 
         /// Publishes `revision` as run `run`, returning the PIN lines.

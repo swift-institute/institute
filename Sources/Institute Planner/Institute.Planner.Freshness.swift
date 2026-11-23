@@ -20,7 +20,7 @@ extension Institute.Planner.Freshness {
     /// Refuses unless `running` is published for `platform` at or after the
     /// revision `consumer` pins.
     public static func verify(
-        running: FIPS_180_4.Digest,
+        running: NIST.FIPS.`180`.`4`.Digest,
         platform: Institute.Planner.Platform,
         consumer: Institute.Planner.Consumer,
         release: Institute.Planner.Release
@@ -45,7 +45,7 @@ extension Institute.Planner.Freshness {
     /// development build, is refused, because replacing it would silently run
     /// other code than was asked for; so is any failure to compare it.
     static func replaced(
-        running: FIPS_180_4.Digest,
+        running: NIST.FIPS.`180`.`4`.Digest,
         platform: Institute.Planner.Platform,
         consumer: Institute.Planner.Consumer,
         release: Institute.Planner.Release,

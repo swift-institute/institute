@@ -50,7 +50,7 @@ extension Institute.CI.Bootstrap.Identity {
             ("workspaceRevision", workspaceRevision),
             ("sourcesRevision", sourcesRevision),
         ] {
-            guard FIPS_180_4.SHA1.isDigestHex(value.lowercased()) else {
+            guard NIST.FIPS.`180`.`4`.SHA1.isDigestHex(value.lowercased()) else {
                 throw .revisionNotFullSha(field: field, value: value)
             }
         }
@@ -79,7 +79,7 @@ extension Institute.CI.Bootstrap.Identity {
 
     /// The cache key: lowercase hex SHA-256 of the canonical tuple
     /// bytes, through the R37 witness.
-    public var digest: FIPS_180_4.Digest {
-        FIPS_180_4.SHA256.digest(canonicalBytes)
+    public var digest: NIST.FIPS.`180`.`4`.Digest {
+        NIST.FIPS.`180`.`4`.SHA256.digest(canonicalBytes)
     }
 }

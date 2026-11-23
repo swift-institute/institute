@@ -1,9 +1,9 @@
 extension Source.Subject {
     public struct Binding: Hashable, Sendable {
         public let identity: Swift.String
-        public let digest: FIPS_180_4.Digest
+        public let digest: NIST.FIPS.`180`.`4`.Digest
 
-        public init(identity: Swift.String, digest: FIPS_180_4.Digest) {
+        public init(identity: Swift.String, digest: NIST.FIPS.`180`.`4`.Digest) {
             self.identity = identity
             self.digest = digest
         }
@@ -24,7 +24,7 @@ extension Source.Subject.Binding: JSON.Serializable {
         }
         guard let identity = object["identity"] else { throw .missingKey("identity") }
         guard let digest = object["digest"] else { throw .missingKey("digest") }
-        guard let parsed = FIPS_180_4.Digest(hex: try Swift.String(json: digest)) else {
+        guard let parsed = NIST.FIPS.`180`.`4`.Digest(hex: try Swift.String(json: digest)) else {
             throw .typeMismatch(expected: "lowercase hex digest", got: "other")
         }
         return try Self(

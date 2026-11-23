@@ -19,7 +19,7 @@ extension Institute.Source {
             self.contents = contents
             self.schema = schema
             self.digest = .init(
-                FIPS_180_4.SHA256.digest(contents.utf8.map(Byte.init(_:))).hex
+                NIST.FIPS.`180`.`4`.SHA256.digest(contents.utf8.map(Byte.init(_:))).hex
             )
         }
     }

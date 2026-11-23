@@ -73,7 +73,7 @@ extension Institute.CI.Bootstrap.Manifest {
             guard let restored = bytes(executable.path) else {
                 throw .executableMissing(path: executable.path.string)
             }
-            let observed = FIPS_180_4.SHA256.digest(restored)
+            let observed = NIST.FIPS.`180`.`4`.SHA256.digest(restored)
             guard observed == executable.digest else {
                 throw .executableDigestMismatch(
                     path: executable.path.string,

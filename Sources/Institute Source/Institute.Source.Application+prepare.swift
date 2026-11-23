@@ -263,7 +263,7 @@ extension Institute.Source.Application {
                 return result
             }
         } catch { throw .filesystem("cannot read source tool \(path): \(error)") }
-        return .init(FIPS_180_4.SHA256.digest(bytes).hex)
+        return .init(NIST.FIPS.`180`.`4`.SHA256.digest(bytes).hex)
     }
 
     static func matches(

@@ -295,7 +295,7 @@ extension Institute.Repository.Policy.Census.Generator {
     /// Excerpt SHA-256 composed onto the Institute FIPS 180-4 witness
     /// (R37): a pure, in-process digest.
     static func digest(_ bytes: [Byte]) -> Swift.String {
-        FIPS_180_4.SHA256.digest(bytes).hex
+        NIST.FIPS.`180`.`4`.SHA256.digest(bytes).hex
     }
 
     static func digest(_ text: Swift.String) -> Swift.String {

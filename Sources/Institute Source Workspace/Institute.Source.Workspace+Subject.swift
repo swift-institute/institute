@@ -176,7 +176,7 @@ extension Institute.Source.Workspace {
                 return result
             }
         } catch { throw .filesystem("cannot read source artifact \(file): \(error)") }
-        return .init(FIPS_180_4.SHA256.digest(bytes).hex)
+        return .init(NIST.FIPS.`180`.`4`.SHA256.digest(bytes).hex)
     }
 
     private static func valid(_ path: Swift.String) -> Swift.Bool {

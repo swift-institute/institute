@@ -104,7 +104,7 @@ extension Institute.CI.Command {
                 guard let path = Swift.String(executable["path"] as JSON?),
                     let filePath = try? File.Path(path),
                     let hex = Swift.String(executable["digest"] as JSON?),
-                    let digest = FIPS_180_4.Digest(hex: hex)
+                    let digest = NIST.FIPS.`180`.`4`.Digest(hex: hex)
                 else { refuse("bootstrap-verify: malformed manifest") }
                 executables.append(.init(path: filePath, digest: digest))
             }

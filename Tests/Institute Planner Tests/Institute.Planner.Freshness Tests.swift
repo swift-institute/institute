@@ -46,7 +46,7 @@ extension `Institute.Planner.Freshness Tests`.Test {
         func refusal(running: [Byte]) -> Institute.Planner.Error? {
             do throws(Institute.Planner.Error) {
                 try Institute.Planner.Freshness.verify(
-                    running: FIPS_180_4.SHA256.digest(running),
+                    running: NIST.FIPS.`180`.`4`.SHA256.digest(running),
                     platform: .macos,
                     consumer: fixture.consumer,
                     release: fixture.release
@@ -129,7 +129,7 @@ extension `Institute.Planner.Freshness Tests`.Test.`Edge Case` {
 extension `Institute.Planner.Freshness Tests`.Test {
     func replaced(_ scenario: Scenario, running: [Byte], installed: Bool) throws(Institute.Planner.Error) -> Bool {
         try Institute.Planner.Freshness.replaced(
-            running: FIPS_180_4.SHA256.digest(running),
+            running: NIST.FIPS.`180`.`4`.SHA256.digest(running),
             platform: .macos,
             consumer: scenario.fixture.consumer,
             release: scenario.fixture.release,

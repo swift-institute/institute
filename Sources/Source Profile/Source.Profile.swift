@@ -12,7 +12,7 @@ extension Source {
 
         public var digest: Digest {
             let bytes = jsonString(sortKeys: true).utf8.map(Byte.init(_:))
-            return Digest(FIPS_180_4.SHA256.digest(bytes).hex)
+            return Digest(NIST.FIPS.`180`.`4`.SHA256.digest(bytes).hex)
         }
 
         public static func serialize(_ value: Self) -> JSON {

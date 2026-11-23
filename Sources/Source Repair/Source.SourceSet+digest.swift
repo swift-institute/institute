@@ -5,13 +5,13 @@ extension Source.SourceSet {
             bytes.append(contentsOf: file.path.utf8.map(Byte.init(_:)))
             bytes.append(Byte(0))
             if let contents = file.contents {
-                let hex = FIPS_180_4.SHA256.digest(contents.map(Byte.init(_:))).hex
+                let hex = NIST.FIPS.`180`.`4`.SHA256.digest(contents.map(Byte.init(_:))).hex
                 bytes.append(contentsOf: hex.utf8.map(Byte.init(_:)))
             } else {
                 bytes.append(contentsOf: "absent".utf8.map(Byte.init(_:)))
             }
             bytes.append(Byte(10))
         }
-        return .init(FIPS_180_4.SHA256.digest(bytes).hex)
+        return .init(NIST.FIPS.`180`.`4`.SHA256.digest(bytes).hex)
     }
 }

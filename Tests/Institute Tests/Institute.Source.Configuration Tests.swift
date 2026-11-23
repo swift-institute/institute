@@ -36,7 +36,7 @@ private func renderedConfigurationPreparation(
     return Institute.Source.Preparation(
         policyRevision: policy.revision,
         binding: .package(
-            .init(identity: "swift-institute/swift-example@revision", digest: FIPS_180_4.SHA256.digest([]))
+            .init(identity: "swift-institute/swift-example@revision", digest: NIST.FIPS.`180`.`4`.SHA256.digest([]))
         ),
         swiftFormatExecutable: "/tools/swift-format",
         swiftFormatTool: .init("format-tool"),

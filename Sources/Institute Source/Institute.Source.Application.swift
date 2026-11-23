@@ -226,7 +226,7 @@ extension Institute.Source.Application {
                     purpose: artifact.purpose,
                     provenance: artifact.provenance,
                     digest: .init(
-                        FIPS_180_4.SHA256.digest((contents[artifact.path] ?? []).map(Byte.init(_:))).hex
+                        NIST.FIPS.`180`.`4`.SHA256.digest((contents[artifact.path] ?? []).map(Byte.init(_:))).hex
                     )
                 )
             }

@@ -7,9 +7,9 @@ extension Institute.Planner {
     /// record by its binary's); PIN and SHA256SUMS assets by the revision
     /// and the publishing run.
     public enum Asset: Hashable, Sendable {
-        case binary(Platform, FIPS_180_4.Digest)
-        case graph(Platform, FIPS_180_4.Digest)
-        case toolchain(Platform, FIPS_180_4.Digest)
+        case binary(Platform, NIST.FIPS.`180`.`4`.Digest)
+        case graph(Platform, NIST.FIPS.`180`.`4`.Digest)
+        case toolchain(Platform, NIST.FIPS.`180`.`4`.Digest)
         case ancestry(Revision, run: Swift.String)
         case pin(Revision, run: Swift.String)
         case sums(Revision, run: Swift.String)

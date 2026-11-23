@@ -11,8 +11,8 @@ extension Institute.Planner {
     public struct Row: Hashable, Sendable {
         public let revision: Revision
         public let platform: Platform
-        public let binary: FIPS_180_4.Digest
-        public let graph: FIPS_180_4.Digest
+        public let binary: NIST.FIPS.`180`.`4`.Digest
+        public let graph: NIST.FIPS.`180`.`4`.Digest
         public let line: Swift.String
 
         public init(line: some StringProtocol) throws(Institute.Planner.Error) {

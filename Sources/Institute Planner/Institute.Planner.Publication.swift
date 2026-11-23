@@ -10,7 +10,7 @@ extension Institute.Planner {
         public let run: Swift.String
         /// The PIN asset's rows in published order.
         public let rows: [Row]
-        public let checksums: [Swift.String: FIPS_180_4.Digest]
+        public let checksums: [Swift.String: NIST.FIPS.`180`.`4`.Digest]
         public let ancestors: Swift.Set<Revision>?
         let linux: Row
         let macos: Row

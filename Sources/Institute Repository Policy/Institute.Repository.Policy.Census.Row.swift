@@ -18,7 +18,7 @@ extension Institute.Repository.Policy.Census {
         public var line: Int
         public var engine: String
         // swift-linter:disable:next raw concept
-        // REASON: a census row's excerpt digest as the wire format spells it; sentinel rows write it empty, which FIPS_180_4.Digest refuses; looked at FIPS_180_4.Digest.
+        // REASON: a census row's excerpt digest as the wire format spells it; sentinel rows write it empty, which NIST.FIPS.`180`.`4`.Digest refuses; looked at NIST.FIPS.`180`.`4`.Digest.
         public var excerptSha256: String
         public var family: String
         public var intendedOwner: String
@@ -44,7 +44,7 @@ extension Institute.Repository.Policy.Census {
             line: Int,
             engine: String,
             // swift-linter:disable:next raw concept
-            // REASON: a census row's excerpt digest as the wire format spells it; sentinel rows write it empty, which FIPS_180_4.Digest refuses; looked at FIPS_180_4.Digest.
+            // REASON: a census row's excerpt digest as the wire format spells it; sentinel rows write it empty, which NIST.FIPS.`180`.`4`.Digest refuses; looked at NIST.FIPS.`180`.`4`.Digest.
             excerptSha256: String,
             family: String,
             intendedOwner: String,

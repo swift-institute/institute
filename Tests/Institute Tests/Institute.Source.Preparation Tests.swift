@@ -16,7 +16,7 @@ import Testing
 func `Institute source preparation round trips its parse receipt`() throws {
     let preparation = Institute.Source.Preparation(
         policyRevision: "source-enforcement-v3",
-        binding: .package(.init(identity: "swift-atoms/swift-example@revision", digest: FIPS_180_4.SHA256.digest([]))),
+        binding: .package(.init(identity: "swift-atoms/swift-example@revision", digest: NIST.FIPS.`180`.`4`.SHA256.digest([]))),
         swiftFormatExecutable: "/tools/swift-format",
         swiftFormatTool: .init("format-tool"),
         swiftLintExecutable: "/tools/swiftlint",
@@ -59,7 +59,7 @@ func `Institute source preparation round trips its parse receipt`() throws {
 @Test
 func `Institute source preparation binds one exact package subject`() throws {
     let binding = Institute.Source.Preparation.Binding.package(
-        .init(identity: "swift-standards/swift-iso-639@revision", digest: FIPS_180_4.SHA256.digest([]))
+        .init(identity: "swift-standards/swift-iso-639@revision", digest: NIST.FIPS.`180`.`4`.SHA256.digest([]))
     )
     let preparation = Institute.Source.Preparation(
         policyRevision: "source-enforcement-v3",
@@ -86,7 +86,7 @@ func `Institute source preparation binds one exact package subject`() throws {
 func `Institute source preparation rejects receipts without a parse verdict`() throws {
     let preparation = Institute.Source.Preparation(
         policyRevision: "source-enforcement-v3",
-        binding: .package(.init(identity: "swift-atoms/swift-example@revision", digest: FIPS_180_4.SHA256.digest([]))),
+        binding: .package(.init(identity: "swift-atoms/swift-example@revision", digest: NIST.FIPS.`180`.`4`.SHA256.digest([]))),
         swiftFormatExecutable: "/tools/swift-format",
         swiftFormatTool: .init("format-tool"),
         swiftLintExecutable: "/tools/swiftlint",
@@ -284,7 +284,7 @@ func `Xcode source acquisition succeeds across build changes and records the obs
     #expect(observed == build)
     let preparation = Institute.Source.Preparation(
         policyRevision: "source-enforcement-v3",
-        binding: .package(.init(identity: "swift-atoms/swift-example@revision", digest: FIPS_180_4.SHA256.digest([]))),
+        binding: .package(.init(identity: "swift-atoms/swift-example@revision", digest: NIST.FIPS.`180`.`4`.SHA256.digest([]))),
         swiftFormatExecutable: tool.description,
         swiftFormatTool: digest,
         swiftLintExecutable: "/tools/swiftlint",
@@ -360,7 +360,7 @@ func `Local source linter snapshot is content addressed and omits its input path
     )
     let preparation = Institute.Source.Preparation(
         policyRevision: "source-enforcement-v3",
-        binding: .package(.init(identity: "swift-atoms/swift-example@revision", digest: FIPS_180_4.SHA256.digest([]))),
+        binding: .package(.init(identity: "swift-atoms/swift-example@revision", digest: NIST.FIPS.`180`.`4`.SHA256.digest([]))),
         swiftFormatExecutable: "/tools/swift-format",
         swiftFormatTool: .init("format-tool"),
         swiftLintExecutable: "/tools/swiftlint",

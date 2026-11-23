@@ -10,9 +10,9 @@ extension Institute.CI.Bootstrap.Manifest {
         /// Path relative to the cache-entry root.
         public let path: File.Path
         /// Lowercase hex SHA-256 of the executable bytes.
-        public let digest: FIPS_180_4.Digest
+        public let digest: NIST.FIPS.`180`.`4`.Digest
 
-        public init(path: File.Path, digest: FIPS_180_4.Digest) {
+        public init(path: File.Path, digest: NIST.FIPS.`180`.`4`.Digest) {
             self.path = path
             self.digest = digest
         }
@@ -21,7 +21,7 @@ extension Institute.CI.Bootstrap.Manifest {
         /// producers never hash outside this seam.
         public init(path: File.Path, bytes: [Byte]) {
             self.path = path
-            self.digest = FIPS_180_4.SHA256.digest(bytes)
+            self.digest = NIST.FIPS.`180`.`4`.SHA256.digest(bytes)
         }
     }
 }

@@ -6,7 +6,7 @@ extension Institute.Planner {
     /// space, a mode marker (space for text, `*` for binary), and the
     /// asset name.
     public struct Checksum: Hashable, Sendable {
-        public let digest: FIPS_180_4.Digest
+        public let digest: NIST.FIPS.`180`.`4`.Digest
         public let name: Swift.String
 
         public init(line: some StringProtocol) throws(Institute.Planner.Error) {
@@ -30,8 +30,8 @@ extension Institute.Planner.Checksum {
     /// Every line of a SHA256SUMS asset, refusing a name listed twice.
     public static func checksums(
         in text: Swift.String
-    ) throws(Institute.Planner.Error) -> [Swift.String: FIPS_180_4.Digest] {
-        var checksums: [Swift.String: FIPS_180_4.Digest] = [:]
+    ) throws(Institute.Planner.Error) -> [Swift.String: NIST.FIPS.`180`.`4`.Digest] {
+        var checksums: [Swift.String: NIST.FIPS.`180`.`4`.Digest] = [:]
         for line in text.split(separator: "\n") {
             let checksum = try Self(line: line)
             guard checksums.updateValue(checksum.digest, forKey: checksum.name) == nil else {

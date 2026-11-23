@@ -91,7 +91,7 @@ extension Institute.Planner.Release {
     /// `digest`.
     public func verified(
         _ name: Swift.String,
-        digest: FIPS_180_4.Digest
+        digest: NIST.FIPS.`180`.`4`.Digest
     ) throws(Institute.Planner.Error) -> [Byte] {
         let bytes = try fetch(name)
         let actual = Institute.Planner.digest(of: bytes)
@@ -135,7 +135,7 @@ extension Institute.Planner.Release {
 
     private func verified(
         _ asset: Institute.Planner.Asset,
-        digest: FIPS_180_4.Digest,
+        digest: NIST.FIPS.`180`.`4`.Digest,
         in publication: Institute.Planner.Publication
     ) throws(Institute.Planner.Error) -> [Byte] {
         guard let recorded = publication.checksums[asset.name] else {
