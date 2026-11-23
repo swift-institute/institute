@@ -3426,7 +3426,7 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-w3c/swift-w3c-svg|bool public parameter|2
         swift-w3c/swift-w3c-svg|compound suite name|3
         swift-w3c/swift-w3c-svg|exported import|1
-        swift-w3c/swift-w3c-svg|path name grammar|16
+        swift-w3c/swift-w3c-svg|path name grammar|15
         swift-w3c/swift-w3c-svg|single type per file|33
         swift-w3c/swift-w3c-svg|statement where expression fits|1
         swift-w3c/swift-w3c-svg|test display name string|24

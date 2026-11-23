@@ -98,13 +98,13 @@ extension Institute.Source {
                     id: .init("swift-linter"),
                     platform: .macOSARM64,
                     version: "ci-binaries",
-                    revision: "2d6a4f5dbc54fe9fb183b6c40a3b31608f67ed92",
+                    revision: "f0b13da998a5b85eddf7142cc1bc16272c9e8a77",
                     toolchain: "Apple Swift 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)",
                     schema: "swift-linter-structured:2",
                     executable: .init(
-                        name: "institute-linter-runner-macos-arm64-256fce641e16c2bf03a6296bba0aa1101498073c77997ca47f805d64c3462219",
+                        name: "institute-linter-runner-macos-arm64-38b03816734e715a34bb96b1746bc02bd7d2ff88f5151777caf2737ef19e36ec",
                         digest: .init(
-                            "256fce641e16c2bf03a6296bba0aa1101498073c77997ca47f805d64c3462219"
+                            "38b03816734e715a34bb96b1746bc02bd7d2ff88f5151777caf2737ef19e36ec"
                         ),
                         origin: .release(
                             base:
@@ -166,13 +166,13 @@ extension Institute.Source {
                     id: .init("swift-linter"),
                     platform: .linuxX86_64,
                     version: "ci-binaries",
-                    revision: "2d6a4f5dbc54fe9fb183b6c40a3b31608f67ed92",
-                    toolchain: "Swift 6.4.2 (swift-6.4.2-RELEASE), x86_64-unknown-linux-gnu",
+                    revision: "f0b13da998a5b85eddf7142cc1bc16272c9e8a77",
+                    toolchain: "Swift 6.4.3 (swift-6.4.3-RELEASE), x86_64-unknown-linux-gnu",
                     schema: "swift-linter-structured:2",
                     executable: .init(
-                        name: "institute-linter-runner-linux-x86_64-0f2cae97638b9f9d23d5acd8b8c26696fbb604a57dc6fb3bdd982e7d86bc3fb5",
+                        name: "institute-linter-runner-linux-x86_64-4c900f35f0b8d7c78fe4f7b5bbc177e008a429e902b4aa411f6c59dfac6ddf4e",
                         digest: .init(
-                            "0f2cae97638b9f9d23d5acd8b8c26696fbb604a57dc6fb3bdd982e7d86bc3fb5"
+                            "4c900f35f0b8d7c78fe4f7b5bbc177e008a429e902b4aa411f6c59dfac6ddf4e"
                         ),
                         origin: .release(
                             base:
