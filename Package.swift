@@ -55,6 +55,7 @@ let package = Package(
         .package(url: "https://github.com/swift-atoms/swift-byte.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-cardinal.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-text.git", branch: "main", traits: ["Byte"]),
+        .package(url: "https://github.com/swift-compositions/swift-shader-compiler.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-linter.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-linter-rules.git", branch: "main"),
         .package(url: "https://github.com/swiftlang/swift-syntax.git", "604.0.0"..<"605.0.0"),
@@ -72,6 +73,7 @@ let package = Package(
         .package(url: "https://github.com/swift-ietf/swift-rfc-4648.git", branch: "main"),
         .package(url: "https://github.com/swift-iso/swift-iso-8601.git", branch: "main"),
         .package(url: "https://github.com/swift-standards/swift-fips-180-4.git", branch: "main"),
+        .package(url: "https://github.com/swift-w3c/swift-w3c-webassembly.git", branch: "main"),
         .package(url: "https://github.com/swift-standards/swift-github-standard.git", branch: "main"),
         .package(url: "https://github.com/swift-standards/swift-spm-standard.git", branch: "main"),
         .package(url: "https://github.com/swift-standards/swift-xcode-standard.git", branch: "main"),
@@ -411,6 +413,18 @@ let package = Package(
             ]
         ),
         .target(
+            name: "Institute Shader",
+            dependencies: [
+                .target(name: "Institute Model"),
+                .product(name: "Byte", package: "swift-byte"),
+                .product(name: "File System", package: "swift-file-system"),
+                .product(name: "Git", package: "swift-git"),
+                .product(name: "Process", package: "swift-process"),
+                .product(name: "Shader Compiler", package: "swift-shader-compiler"),
+                .product(name: "W3C WebAssembly", package: "swift-w3c-webassembly"),
+            ]
+        ),
+        .target(
             name: "Institute Version",
             dependencies: [
                 .target(name: "Institute GitHub"),
@@ -458,6 +472,7 @@ let package = Package(
                 .target(name: "Institute Model"),
                 .target(name: "Institute Planner"),
                 .target(name: "Institute Repository Policy"),
+                .target(name: "Institute Shader"),
                 .target(name: "Institute Source"),
                 .target(name: "Institute Source Policy"),
                 .target(name: "Institute Source Workspace"),

@@ -20,6 +20,7 @@ extension Institute.Application {
         case repository(Institute.Repository.Policy.Command)
         case github(Institute.GitHub.Command)
         case version(Institute.Version.Command)
+        case shader(Institute.Application.Shader)
         case organizations(Institute.Application.Organizations)
 
         public static var configuration: Command_Schema::Command.Configuration {
@@ -75,6 +76,12 @@ extension Institute.Application {
                         map: Self.version
                     )
                     Command_Schema::Command.Subcommand.Case(
+                        "shader",
+                        help: .init(abstract: "Write the package's kernels in a GPU's language."),
+                        initial: { .init() },
+                        map: Self.shader
+                    )
+                    Command_Schema::Command.Subcommand.Case(
                         "organizations",
                         help: .init(abstract: "Print the Institute's organizations as one JSON array."),
                         initial: { .init() },
@@ -107,6 +114,9 @@ extension Institute.Application {
             case .version(var command):
                 try await command.run()
                 self = .version(command)
+            case .shader(var command):
+                try await command.run()
+                self = .shader(command)
             case .organizations(var command):
                 try await command.run()
                 self = .organizations(command)
