@@ -77,6 +77,10 @@ extension Institute.Shader.Package {
                 "build", "--swift-sdk", "swift-\(Institute.Shader.release)-RELEASE_wasm-embedded", "--build-system", "native",
                 "-c", "release", "--target", target, "-Xswiftc", "-Ounchecked", "-Xswiftc", "-DSHADER",
                 "-Xswiftc", "-Wwarning", "-Xswiftc", "StrictMemorySafety",
+                "-Xswiftc", "-Xfrontend", "-Xswiftc", "-disable-stack-protector",
+                // A buffer's number must stay a constant: no branches merged that read different buffers.
+                "-Xswiftc", "-Xllvm", "-Xswiftc", "-sink-common-insts=false", "-Xswiftc", "-Xllvm", "-Xswiftc", "-hoist-common-insts=false",
+                "-Xswiftc", "-Xllvm", "-Xswiftc", "-enable-tail-merge=false",
             ],
             as: "compile \(target)"
         )
