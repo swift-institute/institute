@@ -20,6 +20,13 @@ extension Lint.Rule {
                 expectation: .findings(1)
             ),
             .init(
+                id: "path dependency by URL",
+                source: "let package = Package(name: \"Fixture\", dependencies: ["
+                    + ".package(url: \"https://github.com/swift-atoms/swift-owner.git\", branch: \"main\")])",
+                path: "Package.swift",
+                expectation: .clean
+            ),
+            .init(
                 id: "path dependency nested test manifest parent",
                 source: "let package = Package(name: \"testing\", "
                     + "dependencies: [.package(path: \"..\")])",

@@ -15,7 +15,17 @@ extension Lint.Rule {
                     """,
                 path: "Controls/SuppressionReasonRequired.swift",
                 expectation: .findings(1)
-            )
+            ),
+            .init(
+                id: "suppression reason required reason given",
+                source: """
+                    // swift-linter:disable:next malformed suppression directive
+                    // REASON: the directive below is the subject of this file.
+                    let value = compute()
+                    """,
+                path: "Controls/SuppressionReasonGiven.swift",
+                expectation: .clean
+            ),
         ],
         observe: Lint.Rule.measured { source, severity in
             reasonless(

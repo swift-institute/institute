@@ -19,7 +19,25 @@ extension Lint.Rule {
                     """,
                 path: "Controls/CloneLessBox.swift",
                 expectation: .findings(1)
-            )
+            ),
+            .init(
+                id: "clone-less box pinned pair",
+                source: """
+                    extension Dictionary where S: ~Copyable {
+                        public mutating func removeAll<K: Swift.Hashable, V>()
+                        where S == Shared<Hash.Entry<K, V>, Engine<K, V>> {
+                            self.store = Shared(Engine<K, V>())
+                        }
+
+                        public mutating func removeAll<K: Swift.Hashable & ~Copyable, V: ~Copyable>()
+                        where S == Shared<Hash.Entry<K, V>, Engine<K, V>> {
+                            self.store = Shared(Engine<K, V>())
+                        }
+                    }
+                    """,
+                path: "Controls/CloneLessBoxPinnedPair.swift",
+                expectation: .clean
+            ),
         ],
         observe: Lint.Rule.measured { source, severity in
             let visitor = CloneLessBoxVisitor(

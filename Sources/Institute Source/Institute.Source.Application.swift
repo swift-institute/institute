@@ -427,3 +427,47 @@ extension Institute.Source.Application {
         }
     }
 }
+
+extension Institute.Source.Application {
+    /// The rules of `bundle` as the pinned swift-linter states them: for each
+    /// rule its id, the first sentence of the message it gives a finding
+    /// with, and one of its own controls that it passes; only the rules that
+    /// give findings in a file of `kind`, when one is named.
+    ///
+    /// The text is the runner's, made from the rules it lints with, so it is
+    /// the lint of `measure` and no copy of it. A runner published before it
+    /// could print them refuses the request, and that is an error here.
+    public func rules(
+        subject: Source_Measurement::Source.Subject,
+        bundle: Institute.Source.Bundle,
+        kind: Institute.Source.Kind? = nil,
+        preparation: Institute.Source.Preparation
+    ) async throws(Institute.Error) -> Swift.String {
+        guard preparation.binding == .package(subject.binding) else {
+            throw .configuration("source preparation is for another subject than \(subject.identity)")
+        }
+        if let reason = Self.staleness(of: preparation) {
+            throw .configuration("source preparation is stale: \(reason.code): \(reason.detail)")
+        }
+        var environment = Self.runtime(swiftFormat: preparation.swiftFormatExecutable)
+        if let repository = subject.repository.flatMap({ Institute.Repository.Coordinate($0) }) {
+            environment[Institute.Repository.Coordinate.variable] = repository.description
+        }
+        let result = await process.run(
+            preparation.linterExecutable,
+            ["--catalog", bundle.token] + (kind.map { ["\($0)"] } ?? []),
+            subject.root,
+            environment
+        )
+        guard result.status == 0, !result.output.isEmpty else {
+            let said = (result.diagnostics.isEmpty ? result.output : result.diagnostics)
+                .split(whereSeparator: \.isNewline)
+                .joined(separator: " ")
+            throw .process(
+                "the pinned swift-linter did not list its rules (exit \(result.status)): \(said); "
+                    + "the list needs a runner published with --catalog and pinned in the source policy"
+            )
+        }
+        return result.output
+    }
+}

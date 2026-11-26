@@ -16,7 +16,17 @@ extension Lint.Rule {
                     """,
                 path: "Controls/UnsafeStorageVisibility.swift",
                 expectation: .findings(1)
-            )
+            ),
+            .init(
+                id: "unsafe storage visibility private pointer",
+                source: """
+                    struct Buffer {
+                      private let storage: UnsafeMutablePointer<UInt8>
+                    }
+                    """,
+                path: "Controls/UnsafeStorageVisibilityPrivate.swift",
+                expectation: .clean
+            ),
         ],
         observe: Lint.Rule.measured { source, severity in
             let visitor = MemoryPrivateUnsafeStorageVisitor(

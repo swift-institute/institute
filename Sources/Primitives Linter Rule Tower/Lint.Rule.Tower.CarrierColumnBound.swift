@@ -16,7 +16,19 @@ extension Lint.Rule {
                     """,
                 path: "Controls/CarrierColumnBound.swift",
                 expectation: .findings(1)
-            )
+            ),
+            .init(
+                id: "carrier column bound on the capability extension",
+                source: """
+                    public struct __Array<S: ~Copyable>: ~Copyable {
+                        var storage: S
+                    }
+
+                    extension __Array where S: Store.`Protocol` & Buffer.`Protocol` & ~Copyable {}
+                    """,
+                path: "Controls/CarrierColumnBoundExtension.swift",
+                expectation: .clean
+            ),
         ],
         observe: Lint.Rule.measured { source, severity in
             let visitor = CarrierColumnBoundVisitor(

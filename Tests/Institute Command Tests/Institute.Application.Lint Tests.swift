@@ -43,3 +43,34 @@ func `institute lint is a verb of the institute command`() throws {
     }
     #expect(lint.fix)
 }
+
+@Test
+func `lint takes --rules, and --kind with it`() throws {
+    let listing = try Command.parse(
+        Institute.Application.Lint.self,
+        from: ["--rules", "--kind", "test"],
+        initial: .init()
+    )
+    #expect(listing.rules)
+    #expect(listing.kind == "test")
+    #expect(try Institute.Application.Lint.selection(rules: true, kind: "test", fix: false, report: "") == .test)
+    #expect(try Institute.Application.Lint.selection(rules: true, kind: "", fix: false, report: "") == nil)
+    #expect(try Institute.Application.Lint.selection(rules: false, kind: "", fix: true, report: "r.json") == nil)
+}
+
+@Test(arguments: [
+    (true, "header", false, ""),
+    (false, "test", false, ""),
+    (true, "", true, ""),
+    (true, "source", false, "report.json"),
+])
+func `lint refuses a kind that is none, --kind alone, and --rules with --fix or --report`(
+    rules: Bool,
+    kind: String,
+    fix: Bool,
+    report: String
+) {
+    #expect(throws: Institute.Error.self) {
+        _ = try Institute.Application.Lint.selection(rules: rules, kind: kind, fix: fix, report: report)
+    }
+}

@@ -268,3 +268,68 @@ func `a measurement of the staged copy is reported at the subject's own paths`()
     #expect(finding.repair == .unavailable(.init(code: "unavailable", detail: own)))
     package.remove()
 }
+
+/// `Institute.Source.Application.rules` over the same package, with a
+/// stand-in for the pinned swift-linter.
+@Test
+func `the rules are what the pinned swift-linter prints for the bundle, the kind and the repository`() async throws {
+    let package = try Package(files: ["Sources/A.swift": "let a = 1\n"])
+    let calls = Mutex<[(executable: Swift.String, arguments: [Swift.String], repository: Swift.String?)]>([])
+    let linter = Source.Engine.Process { executable, arguments, _, environment in
+        calls.withLock { $0.append((executable, arguments, environment[Institute.Repository.Coordinate.variable])) }
+        return .init(status: 0, output: "bundle primitives: 1 rules\n", diagnostics: "")
+    }
+    let application = Institute.Source.Application(process: linter)
+
+    let every = try await application.rules(subject: package.subject, bundle: .primitives, preparation: package.preparation)
+    let tests = try await application.rules(
+        subject: package.subject,
+        bundle: .standards,
+        kind: .test,
+        preparation: package.preparation
+    )
+
+    #expect(every == "bundle primitives: 1 rules\n")
+    #expect(tests == every)
+    let made = calls.withLock { $0 }
+    #expect(made.map(\.arguments) == [["--catalog", "primitives"], ["--catalog", "standards", "test"]])
+    #expect(made.allSatisfy { $0.executable == package.preparation.linterExecutable })
+    #expect(made.allSatisfy { $0.repository == "swift-atoms/swift-example" })
+    package.remove()
+}
+
+@Test
+func `a pinned swift-linter that cannot print its rules is an error that says what is needed`() async throws {
+    let package = try Package(files: ["Sources/A.swift": "let a = 1\n"])
+    let linter = Source.Engine.Process { _, _, _, _ in
+        .init(status: 1, output: "", diagnostics: "error: unknown option '--catalog'")
+    }
+
+    await #expect {
+        _ = try await Institute.Source.Application(process: linter).rules(
+            subject: package.subject,
+            bundle: .primitives,
+            preparation: package.preparation
+        )
+    } throws: { error in
+        "\(error)".contains("unknown option '--catalog'") && "\(error)".contains("published with --catalog")
+    }
+    package.remove()
+}
+
+@Test
+func `the rules are refused for a preparation made for another subject`() async throws {
+    let package = try Package(files: ["Sources/A.swift": "let a = 1\n"])
+    let other = try Package(files: ["Sources/A.swift": "let a = 1\n", "Sources/B.swift": "let b = 1\n"])
+    let linter = Source.Engine.Process { _, _, _, _ in .init(status: 0, output: "rules\n", diagnostics: "") }
+
+    await #expect(throws: Institute.Error.self) {
+        _ = try await Institute.Source.Application(process: linter).rules(
+            subject: package.subject,
+            bundle: .primitives,
+            preparation: other.preparation
+        )
+    }
+    package.remove()
+    other.remove()
+}

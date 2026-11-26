@@ -31,10 +31,19 @@ extension Institute.Application {
     public struct Lint: Sendable, Command_Schema::Command.`Protocol` {
         public var fix: Swift.Bool
         public var report: Swift.String
+        public var rules: Swift.Bool
+        public var kind: Swift.String
 
-        public init(fix: Swift.Bool = false, report: Swift.String = "") {
+        public init(
+            fix: Swift.Bool = false,
+            report: Swift.String = "",
+            rules: Swift.Bool = false,
+            kind: Swift.String = ""
+        ) {
             self.fix = fix
             self.report = report
+            self.rules = rules
+            self.kind = kind
         }
     }
 }
@@ -51,7 +60,11 @@ extension Institute.Application.Lint {
                 CI run would give: 0 when Quality · source would pass, 1 when it would fail \
                 (an error, or a rule over its limit), 2 when the lint could not be completed. \
                 --fix first rewrites what swift-format can repair (spacing, indentation, import \
-                order). --report also writes the JSON report CI keeps as quality-report.
+                order). --report also writes the JSON report CI keeps as quality-report. \
+                --rules lints nothing: it prints every rule of the package's bundle, as the pinned \
+                swift-linter states it, with the rule's id, its statement in one sentence and one \
+                example of code that passes. Read it before you write. --kind keeps the rules that \
+                give findings in that kind of file: manifest, source or test.
                 """
         )
     }
@@ -68,6 +81,17 @@ extension Institute.Application.Lint {
                 name: .long(.literal("report")),
                 placeholder: "file",
                 help: .init(abstract: "Also write the JSON report to this file.")
+            )
+            Command_Schema::Command.Flag(
+                \.rules,
+                name: .long(.literal("rules")),
+                help: .init(abstract: "Print the rules, each with one example that passes, and lint nothing.")
+            )
+            Command_Schema::Command.Option(
+                \.kind,
+                name: .long(.literal("kind")),
+                placeholder: "manifest|source|test",
+                help: .init(abstract: "With --rules, only the rules for this kind of file.")
             )
         }
     }
@@ -86,6 +110,7 @@ extension Institute.Application.Lint {
     /// Lints the package in the current directory, prints the lines and
     /// returns the exit status.
     private func outcome() async throws(Institute.Error) -> Swift.Int32 {
+        let selected = try Self.selection(rules: rules, kind: kind, fix: fix, report: report)
         let root: File.Path
         do throws(File.System.Canonical.Error) {
             root = try File.System.Canonical.resolve(".")
@@ -120,6 +145,17 @@ extension Institute.Application.Lint {
         let application = Institute.Source.Application()
         var subject = try Institute.Source.Workspace.subject(identity: identity, root: "\(root)", using: git)
         var preparation = try await application.prepare(subject: subject, tools: tools)
+        if rules {
+            let listed = try await application.rules(
+                subject: subject,
+                bundle: bundle,
+                kind: selected,
+                preparation: preparation
+            )
+            print(listed, terminator: listed.hasSuffix("\n") ? "" : "\n")
+            print("institute lint: \(repository): the rules above are what Quality · source lints with; nothing was linted")
+            return 0
+        }
         var lines: [Swift.String] = []
         if fix {
             let repaired = try await application.repair(subject: subject, bundle: bundle, preparation: preparation)
@@ -172,6 +208,30 @@ extension Institute.Application.Lint {
         )
         for line in lines { print(line) }
         return code
+    }
+
+    /// The kind of file `--kind` names, or `nil` for every rule. `--kind`
+    /// belongs to `--rules`, and `--rules` goes with neither `--fix` nor
+    /// `--report`, since it lints nothing.
+    static func selection(
+        rules: Swift.Bool,
+        kind: Swift.String,
+        fix: Swift.Bool,
+        report: Swift.String
+    ) throws(Institute.Error) -> Institute.Source.Kind? {
+        guard rules else {
+            guard kind.isEmpty else { throw .configuration("--kind goes with --rules") }
+            return nil
+        }
+        guard !fix, report.isEmpty else {
+            throw .configuration("--rules lints nothing, so it takes neither --fix nor --report")
+        }
+        guard !kind.isEmpty else { return nil }
+        guard let selected = Institute.Source.Kind(rawValue: kind) else {
+            let kinds = Institute.Source.Kind.allCases.map { "\($0)" }.joined(separator: ", ")
+            throw .configuration("--kind \(kind) is no kind of file; it is one of \(kinds)")
+        }
+        return selected
     }
 
     /// The lines `institute lint` prints for `report`: one per finding as

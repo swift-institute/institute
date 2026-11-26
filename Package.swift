@@ -929,16 +929,42 @@ let linterRuleTargets: [Target] = [
             .target(name: "Institute Linter Rule Testing"),
         ]
     ),
+    .target(
+        name: "Institute Linter Catalog",
+        dependencies: [
+            .target(name: "Institute Model"),
+            .product(name: "Byte", package: "swift-byte"),
+            .product(name: "Lint", package: "swift-lint"),
+            .product(name: "SwiftParser", package: "swift-syntax"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+        ]
+    ),
+    .testTarget(
+        name: "Institute Linter Catalog Tests",
+        dependencies: [
+            .product(name: "GitHub Standard", package: "swift-github-standard"),
+            .target(name: "Institute Linter Catalog"),
+            .target(name: "Institute Linter Rule Naming"),
+            .target(name: "Institute Model"),
+            .product(name: "Lint", package: "swift-lint"),
+            .target(name: "Linter Institute Rules"),
+            .target(name: "Linter Primitives Rules"),
+            .target(name: "Linter Standards Rules"),
+        ]
+    ),
     .executableTarget(
         name: "Institute Linter Runner",
         dependencies: [
             .product(name: "GitHub Standard", package: "swift-github-standard"),
             .product(name: "Linter", package: "swift-linter"),
+            .target(name: "Institute Linter Catalog"),
             .target(name: "Linter Institute Rules"),
             .target(name: "Linter Primitives Rules"),
             .target(name: "Linter Standards Rules"),
             .target(name: "Institute Model"),
             .product(name: "Environment", package: "swift-environment"),
+            .product(name: "Console", package: "swift-console"),
+            .product(name: "Process", package: "swift-process"),
         ]
     ),
 ]
