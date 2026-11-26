@@ -21,17 +21,8 @@ extension Institute.Shader {
 }
 
 extension Institute.Shader.Package {
-    /// A generated file, with what it holds and what it should hold.
-    public struct Generated: Sendable {
-        public var path: Swift.String
-        public var current: Swift.String
-        public var wanted: Swift.String
-
-        public var fresh: Swift.Bool { current == wanted }
-    }
-
     /// The package's generated files, each made again from its target.
-    public func generated() throws(Institute.Error) -> [Generated] {
+    public func generated() throws(Institute.Error) -> [Institute.Shader.Generated] {
         let paths: [Swift.String]
         do throws(Git.Client.Error) {
             paths = try Git.Client().paths(at: root)
@@ -39,9 +30,9 @@ extension Institute.Shader.Package {
             throw .repository("cannot list the files of \(root): \(error)")
         }
         var texts: [Swift.String: Swift.String] = [:]
-        var generated: [Generated] = []
+        var generated: [Institute.Shader.Generated] = []
         for path in paths.sorted() where path.hasPrefix("Sources/") && path.hasSuffix(".swift") {
-            // Git lists a file that is deleted and not yet committed.
+            // WHY: Git lists a file that is deleted and not yet committed.
             guard File(try self.path(path)).stat.isFile else { continue }
             let current = Swift.String(decoding: try bytes(at: path), as: Swift.UTF8.self)
             guard let file = Shader_Compiler::Shader.Compiler.File(reading: current) else { continue }
@@ -58,7 +49,7 @@ extension Institute.Shader.Package {
     }
 
     /// Writes a generated file as it should be.
-    public func write(_ generated: Generated) throws(Institute.Error) {
+    public func write(_ generated: Institute.Shader.Generated) throws(Institute.Error) {
         let path = try path(generated.path)
         let bytes = Swift.Array(generated.wanted.utf8).map(Byte.init(bitPattern:))
         do throws(File.System.Write.Atomic.Error) {
@@ -78,7 +69,7 @@ extension Institute.Shader.Package {
                 "-c", "release", "--target", target, "-Xswiftc", "-Ounchecked", "-Xswiftc", "-DSHADER",
                 "-Xswiftc", "-Wwarning", "-Xswiftc", "StrictMemorySafety",
                 "-Xswiftc", "-Xfrontend", "-Xswiftc", "-disable-stack-protector",
-                // A buffer's number must stay a constant: no branches merged that read different buffers.
+                // WHY: A buffer's number must stay a constant: no branches merged that read different buffers.
                 "-Xswiftc", "-Xllvm", "-Xswiftc", "-sink-common-insts=false", "-Xswiftc", "-Xllvm", "-Xswiftc", "-hoist-common-insts=false",
                 "-Xswiftc", "-Xllvm", "-Xswiftc", "-enable-tail-merge=false",
             ],
