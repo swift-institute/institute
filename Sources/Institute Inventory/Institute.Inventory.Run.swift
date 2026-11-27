@@ -1,7 +1,7 @@
-public import Institute_Model
 internal import Async_Fanout
 internal import File_System
 internal import Git_Foundation
+public import Institute_Model
 internal import Package_Manager
 
 extension Institute.Inventory {

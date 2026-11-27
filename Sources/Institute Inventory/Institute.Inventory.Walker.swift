@@ -71,8 +71,12 @@ extension Institute.Inventory.Walker {
 
         override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
             declare(
-                node, name: node.name, kind: "struct", modifiers: node.modifiers,
-                generics: node.genericParameterClause, inheritance: node.inheritanceClause,
+                node,
+                name: node.name,
+                kind: "struct",
+                modifiers: node.modifiers,
+                generics: node.genericParameterClause,
+                inheritance: node.inheritanceClause,
                 members: node.memberBlock
             )
             return .visitChildren
@@ -81,8 +85,12 @@ extension Institute.Inventory.Walker {
 
         override func visit(_ node: EnumDeclSyntax) -> SyntaxVisitorContinueKind {
             declare(
-                node, name: node.name, kind: "enum", modifiers: node.modifiers,
-                generics: node.genericParameterClause, inheritance: node.inheritanceClause,
+                node,
+                name: node.name,
+                kind: "enum",
+                modifiers: node.modifiers,
+                generics: node.genericParameterClause,
+                inheritance: node.inheritanceClause,
                 members: node.memberBlock
             )
             return .visitChildren
@@ -91,8 +99,12 @@ extension Institute.Inventory.Walker {
 
         override func visit(_ node: ClassDeclSyntax) -> SyntaxVisitorContinueKind {
             declare(
-                node, name: node.name, kind: "class", modifiers: node.modifiers,
-                generics: node.genericParameterClause, inheritance: node.inheritanceClause,
+                node,
+                name: node.name,
+                kind: "class",
+                modifiers: node.modifiers,
+                generics: node.genericParameterClause,
+                inheritance: node.inheritanceClause,
                 members: node.memberBlock
             )
             return .visitChildren
@@ -101,8 +113,12 @@ extension Institute.Inventory.Walker {
 
         override func visit(_ node: ActorDeclSyntax) -> SyntaxVisitorContinueKind {
             declare(
-                node, name: node.name, kind: "actor", modifiers: node.modifiers,
-                generics: node.genericParameterClause, inheritance: node.inheritanceClause,
+                node,
+                name: node.name,
+                kind: "actor",
+                modifiers: node.modifiers,
+                generics: node.genericParameterClause,
+                inheritance: node.inheritanceClause,
                 members: node.memberBlock
             )
             return .visitChildren
@@ -114,9 +130,14 @@ extension Institute.Inventory.Walker {
                 $0.as(AssociatedTypeDeclSyntax.self).map { Self.strip($0.name.text) }
             }
             declare(
-                node, name: node.name, kind: "protocol", modifiers: node.modifiers,
-                generics: nil, inheritance: node.inheritanceClause,
-                members: node.memberBlock, extraGenerics: associated
+                node,
+                name: node.name,
+                kind: "protocol",
+                modifiers: node.modifiers,
+                generics: nil,
+                inheritance: node.inheritanceClause,
+                members: node.memberBlock,
+                extraGenerics: associated
             )
             return .visitChildren
         }
@@ -171,7 +192,10 @@ extension Institute.Inventory.Walker {
             )
             scopes.append(
                 .init(
-                    kind: .extension, path: chain, generics: [], moduleSelector: module,
+                    kind: .extension,
+                    path: chain,
+                    generics: [],
+                    moduleSelector: module,
                     access: written == "private" ? "fileprivate" : written
                 )
             )
@@ -337,8 +361,11 @@ extension Institute.Inventory.Walker {
             )
             scopes.append(
                 .init(
-                    kind: .type, path: path, generics: parameters + extraGenerics,
-                    moduleSelector: moduleSelector, access: ""
+                    kind: .type,
+                    path: path,
+                    generics: parameters + extraGenerics,
+                    moduleSelector: moduleSelector,
+                    access: ""
                 )
             )
             pushed.append(true)

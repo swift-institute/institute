@@ -37,7 +37,7 @@ extension Institute.Application.Inventory {
                 to failures.json and the run goes on. Sources are read by syntax alone. Each table is \
                 one JSON array of flat objects in --output:
                 repositories.json: path, origin (owner/name), organization, layer, head, dirty.
-                packages.json: package (the key other tables use), repository, name, nested, tools_version.
+                packages.json: package (the key other tables use), repository, name, nested, tools_version, targets, products.
                 package_dependencies.json: package, identity, kind, location, requirement, traits.
                 traits.json: package, name, enables.
                 products.json: package, name, kind, library_type, targets.
