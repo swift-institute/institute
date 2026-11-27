@@ -8,6 +8,7 @@ extension Institute.Inventory {
         public var targets = 0
         public var files = 0
         public var types = 0
+        public var members = 0
         public var references = 0
         public var resolved = 0
         public var ambiguous = 0
@@ -19,7 +20,7 @@ extension Institute.Inventory {
 extension Institute.Inventory.Summary {
     public var description: Swift.String {
         "\(repositories) repositories, \(packages) packages, \(targets) targets, \(files) files, "
-            + "\(types) types, \(references) references (aggregated rows: \(resolved) resolved, "
+            + "\(types) types, \(members) members, \(references) references (aggregated rows: \(resolved) resolved, "
             + "\(ambiguous) of them ambiguous, \(unresolved) unresolved), \(failures) failures"
     }
 }

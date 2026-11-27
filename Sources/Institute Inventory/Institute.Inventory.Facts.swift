@@ -8,6 +8,10 @@ extension Institute.Inventory {
         public var types: [Declaration] = []
         public var extensions: [Extension] = []
         public var references: [Reference] = []
+        public var members: [Symbol] = []
+        /// How often each member name is used: `name` for an access,
+        /// `name(a:_:)` for a call, labels as the call site writes them.
+        public var uses: [Swift.String: Swift.Int] = [:]
 
         public init() {}
     }

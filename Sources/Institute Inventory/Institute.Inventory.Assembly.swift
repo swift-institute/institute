@@ -45,6 +45,11 @@ extension Institute.Inventory.Assembly {
         summary.types = types.rows.count
         tables.append(types)
         tables.append(extensionsTable())
+        let surface = Surface(assembly: self)
+        let declared = surface.declared
+        summary.members = declared.rows.count
+        tables.append(declared)
+        tables.append(surface.used)
 
         var references: [Institute.Inventory.Reference.Key: Swift.Int] = [:]
         for (target, _, facts) in files {

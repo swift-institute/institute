@@ -162,22 +162,58 @@ extension Institute.Inventory.Walker {
         override func visitPost(_ node: ExtensionDeclSyntax) { pop() }
 
         override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
+            member(.init(node), at: node.name, modifiers: node.modifiers)
             pushGenerics(node.genericParameterClause)
             return .visitChildren
         }
         override func visitPost(_ node: FunctionDeclSyntax) { pop() }
 
         override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
+            member(.init(node), at: node.initKeyword, modifiers: node.modifiers)
             pushGenerics(node.genericParameterClause)
             return .visitChildren
         }
         override func visitPost(_ node: InitializerDeclSyntax) { pop() }
 
         override func visit(_ node: SubscriptDeclSyntax) -> SyntaxVisitorContinueKind {
+            member(.init(node), at: node.subscriptKeyword, modifiers: node.modifiers)
             pushGenerics(node.genericParameterClause)
             return .visitChildren
         }
         override func visitPost(_ node: SubscriptDeclSyntax) { pop() }
+
+        override func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {
+            for binding in node.bindings {
+                member(.init(binding, in: node), at: binding, modifiers: node.modifiers)
+            }
+            return .visitChildren
+        }
+
+        override func visit(_ node: EnumCaseDeclSyntax) -> SyntaxVisitorContinueKind {
+            for element in node.elements {
+                member(.init(element), at: element, modifiers: node.modifiers)
+            }
+            return .visitChildren
+        }
+
+        override func visit(_ node: MemberAccessExprSyntax) -> SyntaxVisitorContinueKind {
+            if !Self.called(Syntax(node)) { use(Self.spelled(node.declName)) }
+            return .visitChildren
+        }
+
+        override func visit(_ node: FunctionCallExprSyntax) -> SyntaxVisitorContinueKind {
+            var callee = node.calledExpression
+            if let specialised = callee.as(GenericSpecializationExprSyntax.self) { callee = specialised.expression }
+            let named = callee.as(MemberAccessExprSyntax.self)?.declName ?? callee.as(DeclReferenceExprSyntax.self)
+            guard let named else { return .visitChildren }
+            if named.argumentNames != nil {
+                use(Self.spelled(named))
+            } else {
+                let labels = node.arguments.map { $0.label?.text ?? "_" }
+                use(Self.strip(named.baseName.text) + Institute.Inventory.Walker.Signature.labels(labels))
+            }
+            return .visitChildren
+        }
 
         override func visit(_ node: ImportDeclSyntax) -> SyntaxVisitorContinueKind {
             var components = node.path.map { Self.strip($0.name.text) }
@@ -316,10 +352,51 @@ extension Institute.Inventory.Walker {
                     path: path,
                     generics: parameters + extraGenerics,
                     moduleSelector: moduleSelector,
-                    access: ""
+                    access: effective
                 )
             )
             pushed.append(true)
+        }
+
+        /// Records a member that is not local to a body, at the line of
+        /// `node`, its name. An enum case and a protocol's requirement take
+        /// the access of their type.
+        func member(
+            _ signature: Institute.Inventory.Walker.Signature,
+            at node: some SyntaxProtocol,
+            modifiers: DeclModifierListSyntax
+        ) {
+            if Self.local(Syntax(node)) { return }
+            let enclosing = scopes.last
+            var access = effectiveAccess(modifiers)
+            if let enclosing, enclosing.kind == .type, signature.kind == "case" || Self.requirement(Syntax(node)) {
+                access = enclosing.access
+            }
+            let written = modifiers.map(\.name.text)
+            facts.members.append(
+                .init(
+                    owner: from,
+                    extended: enclosing?.kind == .extension,
+                    kind: signature.kind,
+                    name: signature.name,
+                    access: access,
+                    shared: written.contains("static") || written.contains("class"),
+                    mutating: signature.mutating || written.contains("mutating"),
+                    async: signature.async,
+                    thrown: signature.thrown,
+                    generics: signature.generics,
+                    parameters: signature.parameters,
+                    result: signature.result,
+                    stored: signature.stored,
+                    condition: Self.condition(Syntax(node)),
+                    line: line(node)
+                )
+            )
+        }
+
+        func use(_ name: Swift.String) {
+            guard !name.isEmpty, !Self.capitalised(name) else { return }
+            facts.uses[name, default: 0] += 1
         }
 
         func pushGenerics(_ clause: GenericParameterClauseSyntax?) {
@@ -452,6 +529,45 @@ extension Institute.Inventory.Walker.Visitor {
             current = parent
         }
         return false
+    }
+
+    /// Whether `node` is local: anywhere inside a function, accessor or
+    /// closure body, a local type's members included.
+    static func local(_ node: Syntax) -> Swift.Bool {
+        var current = node
+        while let parent = current.parent {
+            if parent.is(CodeBlockSyntax.self) || parent.is(ClosureExprSyntax.self) { return true }
+            if let block = parent.as(AccessorBlockSyntax.self), case .getter = block.accessors { return true }
+            current = parent
+        }
+        return false
+    }
+
+    /// Whether `node` is declared directly in a protocol's body.
+    static func requirement(_ node: Syntax) -> Swift.Bool {
+        var current = node
+        while let parent = current.parent {
+            if parent.is(MemberBlockSyntax.self) { return parent.parent?.is(ProtocolDeclSyntax.self) == true }
+            current = parent
+        }
+        return false
+    }
+
+    /// Whether `node` is what a call calls, generic arguments aside.
+    static func called(_ node: Syntax) -> Swift.Bool {
+        var current = node
+        if let parent = current.parent?.as(GenericSpecializationExprSyntax.self), parent.expression.id == current.id {
+            current = Syntax(parent)
+        }
+        return current.parent?.as(FunctionCallExprSyntax.self)?.calledExpression.id == current.id
+    }
+
+    /// A name as a reference writes it: `name`, or `name(a:_:)` when it
+    /// carries argument labels.
+    static func spelled(_ reference: DeclReferenceExprSyntax) -> Swift.String {
+        let name = strip(reference.baseName.text)
+        guard let labels = reference.argumentNames else { return name }
+        return name + Institute.Inventory.Walker.Signature.labels(labels.arguments.map(\.name.text))
     }
 
     /// Where, outside a body, a type is named.

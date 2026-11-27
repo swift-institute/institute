@@ -48,6 +48,14 @@ extension Institute.Application.Inventory {
                 stored_properties, inherits, aliased, in_extension, module_selector, condition, file, line.
                 extensions.json: package, target, extended, module_selector, conformances, where_clause, \
                 public_members, nested_types, condition, file, line.
+                members.json: package, target, owner, in_extension, kind, name, access, static, mutating, async, \
+                throws, generic_parameters, parameters, parameter_types, result, stored, condition, file, line; \
+                one row per function, initializer, property, subscript and enum case that is not local \
+                to a body; kind is func, init, var, let, subscript or case; name is spelled as a \
+                reference, parse(_:from:); throws is empty, throws, rethrows or the written error type.
+                member_uses.json: package, target, name, count; a member access x.name or .name counts \
+                under name, a call under name(a:_:) with the labels of the call site; by syntax \
+                alone, for matching by name; names that start uppercase are left to references.json.
                 references.json: package, target, from, written, position, generic_parameter, count; \
                 position is stored, parameter, return, inheritance, extension, constraint, alias, \
                 generic_argument, case, body or other.
