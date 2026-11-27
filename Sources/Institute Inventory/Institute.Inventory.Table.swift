@@ -1,7 +1,7 @@
-public import Institute_Model
-public import JSON
 internal import Byte
 internal import File_System
+public import Institute_Model
+public import JSON
 
 extension Institute.Inventory {
     /// One output file: a JSON array of flat objects, fields in a fixed order.

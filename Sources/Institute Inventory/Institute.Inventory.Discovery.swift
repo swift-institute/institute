@@ -1,5 +1,5 @@
-public import Institute_Model
 internal import File_System
+public import Institute_Model
 
 extension Institute.Inventory {
     /// The packages and repositories under a root, found by walking real

@@ -51,8 +51,12 @@ extension Institute.Inventory {
                 for reference in facts.references {
                     references[
                         .init(
-                            target: target, from: reference.from, module: reference.module,
-                            chain: reference.chain, position: reference.position, generic: reference.generic
+                            target: target,
+                            from: reference.from,
+                            module: reference.module,
+                            chain: reference.chain,
+                            position: reference.position,
+                            generic: reference.generic
                         ),
                         default: 0
                     ] += 1
@@ -107,7 +111,11 @@ extension Institute.Inventory {
                     }
                 }
                 let resolution = resolver.resolve(
-                    chain: key.chain, module: key.module, from: key.from, generic: generic, visible: visible
+                    chain: key.chain,
+                    module: key.module,
+                    from: key.from,
+                    generic: generic,
+                    visible: visible
                 )
                 if resolution.candidates.isEmpty {
                     unresolved[.init(target: key.target, written: key.written), default: 0] += count
@@ -116,8 +124,12 @@ extension Institute.Inventory {
                 for candidate in resolution.candidates {
                     resolved[
                         .init(
-                            target: key.target, from: key.from.joined(separator: "."), position: key.position,
-                            path: candidate.path, declaring: candidate.target, ambiguous: resolution.ambiguous
+                            target: key.target,
+                            from: key.from.joined(separator: "."),
+                            position: key.position,
+                            path: candidate.path,
+                            declaring: candidate.target,
+                            ambiguous: resolution.ambiguous
                         ),
                         default: 0
                     ] += count
@@ -376,8 +388,12 @@ extension Institute.Inventory.Assembly {
             let keys = Swift.Set(
                 facts.imports.map {
                     Key(
-                        target: target, module: $0.module, access: $0.access, exported: $0.exported,
-                        attributes: $0.attributes, condition: $0.condition
+                        target: target,
+                        module: $0.module,
+                        access: $0.access,
+                        exported: $0.exported,
+                        attributes: $0.attributes,
+                        condition: $0.condition
                     )
                 }
             )
