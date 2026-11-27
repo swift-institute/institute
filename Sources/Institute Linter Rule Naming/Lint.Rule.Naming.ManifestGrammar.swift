@@ -6,11 +6,29 @@ extension Lint.Rule {
 
     /// The rule for code that names targets and products after words of its own, such as the Apple frameworks an app's
     /// adapters are named for: each of `words` reads as one word.
-    public static func `manifest naming grammar`(words: Swift::Set<Swift::String>) -> Lint.Rule {
+    ///
+    /// A website's repository is named for the address it serves (`nl.example.org`): with `"."` among `separators` a
+    /// package name is kebab-case slugs joined by it.
+    public static func `manifest naming grammar`(
+        words: Swift::Set<Swift::String>,
+        separators: Swift::Set<Swift::Character> = []
+    ) -> Lint.Rule {
         Lint.Rule(
             id: "manifest naming grammar",
             default: .warning,
             controls: [
+                .init(
+                    id: "manifest naming grammar package named for an address",
+                    source: "let package = Package(name: \"nl.example.org\")",
+                    path: "Package.swift",
+                    expectation: separators.contains(".") ? .clean : .findings(1)
+                ),
+                .init(
+                    id: "manifest naming grammar empty label",
+                    source: "let package = Package(name: \"example..org\")",
+                    path: "Package.swift",
+                    expectation: .findings(1)
+                ),
                 .init(
                     id: "manifest naming grammar concatenated target",
                     source: "let package = Package(name: \"swift-example\", "
@@ -49,13 +67,22 @@ extension Lint.Rule {
                     source: source.file,
                     severity: severity,
                     converter: source.converter,
-                    words: words
+                    words: words,
+                    separators: separators
                 )
                 visitor.walk(source.tree)
                 return visitor.matches
             }
         )
     }
+}
+
+internal func namingManifestIsPackageName(
+    _ name: Swift::String,
+    separators: Swift::Set<Swift::Character>
+) -> Swift::Bool {
+    name.split(omittingEmptySubsequences: false, whereSeparator: separators.contains)
+        .allSatisfy { namingManifestIsKebabSlug(Swift::String($0)) }
 }
 
 internal func namingManifestIsKebabSlug(_ name: Swift::String) -> Swift::Bool {
@@ -136,18 +163,21 @@ internal final class NamingManifestGrammarVisitor: SyntaxVisitor {
     let severity: Diagnostic.Severity
     let converter: SourceLocationConverter
     let words: Swift::Set<Swift::String>
+    let separators: Swift::Set<Swift::Character>
     var matches: [Diagnostic.Record] = []
 
     init(
         source: Source.File,
         severity: Diagnostic.Severity,
         converter: SourceLocationConverter,
-        words: Swift::Set<Swift::String>
+        words: Swift::Set<Swift::String>,
+        separators: Swift::Set<Swift::Character>
     ) {
         self.source = source
         self.severity = severity
         self.converter = converter
         self.words = words
+        self.separators = separators
         super.init(viewMode: .sourceAccurate)
     }
 
@@ -165,7 +195,7 @@ internal final class NamingManifestGrammarVisitor: SyntaxVisitor {
         {
             for argument in node.arguments where argument.label?.text == "name" {
                 guard let (name, position) = literalText(argument.expression) else { continue }
-                if !namingManifestIsKebabSlug(name) {
+                if !namingManifestIsPackageName(name, separators: separators) {
                     emit(at: position, message: namingManifestGrammarSlugMessage(name))
                 }
             }

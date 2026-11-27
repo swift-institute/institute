@@ -349,3 +349,18 @@ extension `Lint.Rule Tests`.`manifest naming grammar Tests`.`Edge Case` {
         #expect(!Lint.Rule.`manifest naming grammar`(words: ["SwiftUI"]).observe(parsed, .warning).findings.isEmpty)
     }
 }
+
+extension `Lint.Rule Tests`.`manifest naming grammar Tests`.`Edge Case` {
+    @Test
+    func `a package named for an address passes only where the dot is a separator`() {
+        let parsed = Lint.Source.parsed(from: "let package = Package(name: \"nl.example.org\")", file: "Package.swift")
+        #expect(Lint.Rule.`manifest naming grammar`(words: [], separators: ["."]).observe(parsed, .warning).findings.isEmpty)
+        #expect(Lint.Rule.`manifest naming grammar`.observe(parsed, .warning).findings.count == 1)
+    }
+
+    @Test
+    func `an address with an empty label is flagged`() {
+        let parsed = Lint.Source.parsed(from: "let package = Package(name: \"example..org\")", file: "Package.swift")
+        #expect(Lint.Rule.`manifest naming grammar`(words: [], separators: ["."]).observe(parsed, .warning).findings.count == 1)
+    }
+}
