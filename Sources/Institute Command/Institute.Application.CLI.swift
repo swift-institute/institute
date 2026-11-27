@@ -22,6 +22,7 @@ extension Institute.Application {
         case version(Institute.Version.Command)
         case shader(Institute.Application.Shader)
         case organizations(Institute.Application.Organizations)
+        case inventory(Institute.Application.Inventory)
 
         public static var configuration: Command_Schema::Command.Configuration {
             .init(
@@ -87,6 +88,12 @@ extension Institute.Application {
                         initial: { .init() },
                         map: Self.organizations
                     )
+                    Command_Schema::Command.Subcommand.Case(
+                        "inventory",
+                        help: .init(abstract: "Write the packages, targets, types and type references under a directory as JSON tables."),
+                        initial: { .init() },
+                        map: Self.inventory
+                    )
                 }
             }
         }
@@ -120,6 +127,9 @@ extension Institute.Application {
             case .organizations(var command):
                 try await command.run()
                 self = .organizations(command)
+            case .inventory(var command):
+                try await command.run()
+                self = .inventory(command)
             }
         }
     }
