@@ -13,11 +13,12 @@ import struct Swift.String
 extension Institute.Repository.Policy.Command {
     /// `institute repository census --repo <name>=<root>=<headSha> ... --output <csv>`
     ///
-    /// Regenerates the FT1 census from checked-out trees at the given heads
+    /// Regenerates the FT1 census of repository automation, `Institute.Repository.Policy.Automation`,
+    /// from checked-out trees at the given heads
     /// (F1; swift-institute/.github#363). Deterministic sorted traversal;
     /// parity with the FT1 artifact is order-normalized.
     static func census(_ arguments: [Swift.String]) throws(Error) {
-        var repos: [Institute.Repository.Policy.Census.Generator.Repo] = []
+        var repos: [Institute.Repository.Policy.Automation.Generator.Repo] = []
         var output: Swift.String?
         var iterator = arguments.makeIterator()
         while let argument = iterator.next() {
@@ -42,9 +43,9 @@ extension Institute.Repository.Policy.Command {
         guard let output, !repos.isEmpty else {
             throw configuration("census requires --repo … and --output")
         }
-        let census: Institute.Repository.Policy.Census
-        do throws(Institute.Repository.Policy.Census.Generator.Error) {
-            census = try Institute.Repository.Policy.Census.Generator(repos: repos).run()
+        let census: Institute.Repository.Policy.Automation
+        do throws(Institute.Repository.Policy.Automation.Generator.Error) {
+            census = try Institute.Repository.Policy.Automation.Generator(repos: repos).run()
         } catch {
             throw .census(error)
         }

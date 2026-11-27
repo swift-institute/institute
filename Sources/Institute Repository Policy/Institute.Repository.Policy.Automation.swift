@@ -1,10 +1,12 @@
 public import Institute_Model
 
 extension Institute.Repository.Policy {
-    /// The canonical non-Swift executable census (FT1-frozen sixteen-field
-    /// schema, censusVersion 1). Owns serialization; scanning lives in
-    /// `Institute.Repository.Policy.Census.Generator`.
-    public struct Census: Sendable, Equatable {
+    /// The automation of repositories, counted: what their `.github` runs that is not Swift, one row for each
+    /// coordinate (a workflow, action or script file, a run block, an expression, a uses edge, a command a run
+    /// block names). Written in the FT1-frozen sixteen-field schema that calls itself a census (censusVersion 1,
+    /// the `institute repository census` verb); it is not the product census of packages, targets and types.
+    /// Owns serialization; scanning lives in `Institute.Repository.Policy.Automation.Generator`.
+    public struct Automation: Sendable, Equatable {
         public var rows: [Row]
 
         public init(rows: [Row]) {
@@ -30,8 +32,8 @@ extension Institute.Repository.Policy {
 
         /// Rows sorted by coordinate identity, for order-normalized parity
         /// between generators whose directory traversal order differs.
-        public var normalized: Census {
-            Census(
+        public var normalized: Automation {
+            Automation(
                 rows: rows.sorted {
                     ($0.repository, $0.path, $0.coordinateId) < (
                         $1.repository, $1.path, $1.coordinateId

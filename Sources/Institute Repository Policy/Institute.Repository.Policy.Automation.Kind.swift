@@ -1,7 +1,7 @@
 public import Institute_Model
 
-extension Institute.Repository.Policy.Census {
-    /// The coordinate kinds of the FT1 census schema.
+extension Institute.Repository.Policy.Automation {
+    /// The kinds of coordinate a row of the automation names, as the FT1 census schema spells them.
     public enum Kind: String, Sendable, Equatable, CaseIterable {
         case file
         case runBlock = "run-block"

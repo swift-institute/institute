@@ -4,21 +4,21 @@ import JSON
 import Testing
 
 @Suite
-struct `Repository Policy Census Tests` {
+struct `Repository Policy Automation Tests` {
     @Test
     func csvQuotingMatchesMinimalDialect() {
-        #expect(Institute.Repository.Policy.Census.quoted("plain") == "plain")
-        #expect(Institute.Repository.Policy.Census.quoted("a,b") == "\"a,b\"")
-        #expect(Institute.Repository.Policy.Census.quoted("say \"hi\"") == "\"say \"\"hi\"\"\"")
-        #expect(Institute.Repository.Policy.Census.quoted("line\nbreak") == "\"line\nbreak\"")
+        #expect(Institute.Repository.Policy.Automation.quoted("plain") == "plain")
+        #expect(Institute.Repository.Policy.Automation.quoted("a,b") == "\"a,b\"")
+        #expect(Institute.Repository.Policy.Automation.quoted("say \"hi\"") == "\"say \"\"hi\"\"\"")
+        #expect(Institute.Repository.Policy.Automation.quoted("line\nbreak") == "\"line\nbreak\"")
     }
 
     @Test
     func generatorScansWorkflowCoordinates() throws {
-        let root = CensusFoundation.temporaryRoot(name: CensusFoundation.uuidString())
-        defer { CensusFoundation.removeItem(atPath: root) }
+        let root = AutomationFoundation.temporaryRoot(name: AutomationFoundation.uuidString())
+        defer { AutomationFoundation.removeItem(atPath: root) }
         let workflows = root + "/.github/workflows"
-        try CensusFoundation.createDirectory(atPath: workflows)
+        try AutomationFoundation.createDirectory(atPath: workflows)
         let yaml = """
             on: push
             jobs:
@@ -33,13 +33,13 @@ struct `Repository Policy Census Tests` {
                   - name: inline
                     run: gh api /rate_limit
             """
-        try CensusFoundation.write(yaml, toPath: workflows + "/demo.yml")
-        let census = try Institute.Repository.Policy.Census.Generator(
+        try AutomationFoundation.write(yaml, toPath: workflows + "/demo.yml")
+        let census = try Institute.Repository.Policy.Automation.Generator(
             repos: [
                 .init(name: "fixture/repo", root: root, headSha: String(repeating: "a", count: 40))
             ]
         ).run()
-        func rows(_ kind: Institute.Repository.Policy.Census.Kind) -> [Institute.Repository.Policy.Census.Row] {
+        func rows(_ kind: Institute.Repository.Policy.Automation.Kind) -> [Institute.Repository.Policy.Automation.Row] {
             census.rows.filter { $0.coordinateKind == kind && $0.repository == "fixture/repo" }
         }
         #expect(rows(.file).count == 1)

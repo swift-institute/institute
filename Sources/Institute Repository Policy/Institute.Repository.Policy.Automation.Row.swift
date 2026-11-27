@@ -1,7 +1,7 @@
 public import Institute_Model
 
-extension Institute.Repository.Policy.Census {
-    /// One census coordinate; sixteen fields, censusVersion 1.
+extension Institute.Repository.Policy.Automation {
+    /// One coordinate of the automation; sixteen fields, censusVersion 1.
     public struct Row: Sendable, Equatable {
         // swift-linter:disable:next raw concept
         // REASON: the census format's version, a CI wire field written as 1; looked at Version, whose Version.Semantic needs three components.

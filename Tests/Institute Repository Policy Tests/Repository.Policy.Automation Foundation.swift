@@ -1,6 +1,6 @@
 import Foundation
 
-enum CensusFoundation {
+enum AutomationFoundation {
     static func uuidString() -> String {
         UUID().uuidString
     }

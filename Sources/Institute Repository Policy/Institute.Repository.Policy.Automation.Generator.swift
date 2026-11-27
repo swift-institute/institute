@@ -5,12 +5,12 @@ public import Institute_Model
 
 import struct Swift.String
 
-extension Institute.Repository.Policy.Census {
-    /// Regenerates the census from checked-out trees at frozen heads.
+extension Institute.Repository.Policy.Automation {
+    /// Counts the automation of checked-out trees at frozen heads.
     ///
     /// Semantics mirror the FT1 generator coordinate-for-coordinate;
     /// traversal order is deterministic (sorted), so parity against the
-    /// FT1 artifact is order-normalized via `Census.normalized`.
+    /// FT1 artifact is order-normalized via `Automation.normalized`.
     ///
     /// Excerpt digests compose onto the Institute FIPS 180-4 SHA-256
     /// witness (R37, swift-fips-180-4): pure, in-process, cross-platform.
@@ -43,9 +43,9 @@ extension Institute.Repository.Policy.Census {
     }
 }
 
-extension Institute.Repository.Policy.Census.Generator {
-    typealias Row = Institute.Repository.Policy.Census.Row
-    typealias Kind = Institute.Repository.Policy.Census.Kind
+extension Institute.Repository.Policy.Automation.Generator {
+    typealias Row = Institute.Repository.Policy.Automation.Row
+    typealias Kind = Institute.Repository.Policy.Automation.Kind
 
     static let skipCommands: Set<Swift.String> = [
         "if", "then", "else", "fi", "for", "do", "done", "while", "case",
@@ -74,7 +74,7 @@ extension Institute.Repository.Policy.Census.Generator {
         return "other"
     }
 
-    public func run() throws(Error) -> Institute.Repository.Policy.Census {
+    public func run() throws(Error) -> Institute.Repository.Policy.Automation {
         var rows: [Row] = []
         for repo in repos {
             let githubRoot = repo.root + "/.github"
@@ -84,7 +84,7 @@ extension Institute.Repository.Policy.Census.Generator {
         }
         rows.append(Self.leafCallerFamilyRow)
         rows.append(contentsOf: Self.sentinelRows)
-        return Institute.Repository.Policy.Census(rows: rows)
+        return Institute.Repository.Policy.Automation(rows: rows)
     }
 
     static func walk(root: Swift.String, under directory: Swift.String) -> [Swift.String] {
