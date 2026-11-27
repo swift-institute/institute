@@ -166,6 +166,26 @@ let package = Package(
             swiftSettings: vendoredSourceSettings
         ),
         .target(
+            name: "Institute Inventory",
+            dependencies: [
+                .target(name: "Institute Model"),
+                .product(name: "Async Fanout", package: "swift-async-fanout"),
+                .product(name: "Byte", package: "swift-byte"),
+                .product(name: "File System", package: "swift-file-system"),
+                .product(name: "Git", package: "swift-git"),
+                .product(name: "JSON", package: "swift-json"),
+                .product(name: "Package Manager", package: "swift-package-manager"),
+                .product(name: "SwiftParser", package: "swift-syntax"),
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+            ]
+        ),
+        .testTarget(
+            name: "Institute Inventory Tests",
+            dependencies: [
+                .target(name: "Institute Inventory"),
+            ]
+        ),
+        .target(
             name: "Institute Installation",
             dependencies: [
                 .target(name: "Institute Model"),
@@ -469,6 +489,7 @@ let package = Package(
                 .target(name: "Institute CI Validation"),
                 .target(name: "Institute GitHub"),
                 .target(name: "Institute Installation"),
+                .target(name: "Institute Inventory"),
                 .target(name: "Institute Model"),
                 .target(name: "Institute Planner"),
                 .target(name: "Institute Repository Policy"),
