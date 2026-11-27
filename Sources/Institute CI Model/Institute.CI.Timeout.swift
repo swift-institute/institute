@@ -6,7 +6,6 @@ extension Institute.CI {
     ///
     /// A repository sets it with `timeout-minutes:` in its own
     /// `.github/metadata.yaml`; without that key it is ``default``.
-    /// swift-institute/.github#660.
     public struct Timeout: Sendable, Equatable {
         public let minutes: Int
 
@@ -46,8 +45,7 @@ extension Institute.CI.Timeout {
     /// 40 minutes, about 1.5 times the slowest healthy build or test
     /// job measured across the fleet on 12 Nov 2026 (25.6 minutes,
     /// swift-compositions/swift-sqlite's iOS simulator tests; Windows
-    /// release builds reach 25.4). The measurements are on
-    /// swift-institute/.github#660.
+    /// release builds reach 25.4).
     public static let `default` = Self(checked: 40)
 
     /// GitHub's own ceiling for a job on a hosted runner.
