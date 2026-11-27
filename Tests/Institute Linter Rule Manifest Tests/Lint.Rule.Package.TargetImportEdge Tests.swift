@@ -312,6 +312,13 @@ extension `target import edge Tests`.Exemption {
                 import ScreenCaptureKit
                 import CoreVideo
                 import CoreMedia
+                import Metal
+                import MetalKit
+                import AVFAudio
+                import Speech
+                import Vision
+                import CoreData
+                import AppIntents
                 """
             ]
         )
