@@ -1,3 +1,4 @@
+import Institute_Model
 import Testing
 
 @testable import Institute_Inventory

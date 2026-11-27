@@ -1,3 +1,4 @@
+import Institute_Model
 import Testing
 
 @testable import Institute_Inventory
@@ -59,7 +60,7 @@ struct `Institute.Inventory.Walker Tests` {
         #expect(facts.types.first?.moduleSelector == "Swift")
         #expect(facts.types.first?.condition == "Byte")
         #expect(facts.extensions.first?.moduleSelector == "Swift")
-        #expect(references(source).contains("String Swift::String generic_argument"))
+        #expect(references(source).contains("String.Coder Swift::String generic_argument"))
     }
 
     @Test

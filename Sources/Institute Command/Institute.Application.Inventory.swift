@@ -93,9 +93,15 @@ extension Institute.Application.Inventory {
     }
 
     public mutating func run() async throws(Institute.Error) {
+        let path: File.Path
+        do throws(File.Path.Error) {
+            path = try File.Path(root)
+        } catch {
+            throw .filesystem("--root \(root) is not a path: \(error)")
+        }
         let resolved: Swift.String
         do throws(File.System.Canonical.Error) {
-            resolved = "\(try File.System.Canonical.resolve(root))"
+            resolved = "\(try File.System.Canonical.resolve(path))"
         } catch {
             throw .filesystem("cannot resolve --root \(root): \(error)")
         }

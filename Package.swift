@@ -183,6 +183,7 @@ let package = Package(
             name: "Institute Inventory Tests",
             dependencies: [
                 .target(name: "Institute Inventory"),
+                .target(name: "Institute Model"),
             ]
         ),
         .target(
