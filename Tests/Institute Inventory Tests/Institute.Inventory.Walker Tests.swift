@@ -40,7 +40,7 @@ struct `Institute.Inventory.Walker Tests` {
             ]
         )
         let facts = Institute.Inventory.Walker.facts(source: source)
-        #expect(facts.types.map(\.inExtension) == [false, false, false, true, true])
+        #expect(facts.types.map(\.isInExtension) == [false, false, false, true, true])
         #expect(facts.types.last?.cases == 2)
         #expect(facts.extensions.map { $0.extended.joined(separator: ".") } == ["Swift.String", "Picture.Encoded"])
     }
@@ -57,9 +57,9 @@ struct `Institute.Inventory.Walker Tests` {
         let facts = Institute.Inventory.Walker.facts(source: source)
         #expect(facts.types.count == 1)
         #expect(facts.types.first?.path == ["String", "Coder"])
-        #expect(facts.types.first?.moduleSelector == "Swift")
+        #expect(facts.types.first?.module == "Swift")
         #expect(facts.types.first?.condition == "Byte")
-        #expect(facts.extensions.first?.moduleSelector == "Swift")
+        #expect(facts.extensions.first?.module == "Swift")
         #expect(references(source).contains("String.Coder Swift::String generic_argument"))
     }
 
@@ -80,8 +80,8 @@ struct `Institute.Inventory.Walker Tests` {
             """
         let types = Institute.Inventory.Walker.facts(source: source).types
         #expect(types.map(\.access) == ["public", "private", "internal"])
-        #expect(types[0].genericParameters == ["Element", "Storage"])
-        #expect(types[0].storedProperties == 4)
+        #expect(types[0].generics == ["Element", "Storage"])
+        #expect(types[0].stored == 4)
         #expect(types[0].inherits == ["Sendable", "Equatable"])
         #expect(types[0].cases == -1)
         #expect(types[2].kind == "typealias")

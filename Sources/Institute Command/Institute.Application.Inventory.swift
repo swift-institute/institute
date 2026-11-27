@@ -105,9 +105,11 @@ extension Institute.Application.Inventory {
         } catch {
             throw .filesystem("cannot resolve --root \(root): \(error)")
         }
-        // git status takes no optional index lock, so a checkout another
+        // WHY: git status takes no optional index lock, so a checkout another
         // process is working in is left alone.
-        try? Environment.write("GIT_OPTIONAL_LOCKS", to: "0")
+        do throws(Kernel.Environment.Error) {
+            try Environment.write("GIT_OPTIONAL_LOCKS", to: "0")
+        } catch {}
         let started = ContinuousClock.now
         let summary = try await Institute.Inventory.run(
             .init(root: resolved, output: output, excluded: exclude),
