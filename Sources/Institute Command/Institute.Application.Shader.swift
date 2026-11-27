@@ -27,9 +27,11 @@ extension Institute.Application.Shader {
             abstract: "Write the package's kernels in a GPU's language.",
             discussion: """
                 Run it in a package directory. Every Swift file of Sources whose first line is \
-                "// institute shader: target, constant, condition" is written again: the target is \
-                compiled to WebAssembly with the swift.org release Institute.Shader names, and its \
-                kernels are written in Metal's shading language into the constant. --check writes \
+                "// institute shader: target, constant, condition", or "// institute shader (WGSL): ..." \
+                for WGSL, is written again: the target is compiled to WebAssembly with the swift.org \
+                release Institute.Shader names, and its kernels are written in the file's language \
+                into the constant: Metal's shading language as one text, or WGSL as a module for each \
+                kernel by name. --check writes \
                 nothing. The exit status is 0 when every file is written or fresh, 1 when a checked \
                 file is stale, 2 when a file could not be made.
                 """
