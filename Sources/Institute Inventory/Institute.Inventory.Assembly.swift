@@ -4,8 +4,6 @@ internal import Package_Manager
 extension Institute.Inventory {
     /// Turns what was read into the tables, resolving references on the way.
     struct Assembly {
-        typealias Row = Table.Row
-
         let root: Swift.String
         let repositories: [Repository]
         let members: [Member]
@@ -13,206 +11,165 @@ extension Institute.Inventory {
         /// `(target index, file relative to the target directory, facts)`.
         let files: [(Swift.Int, Swift.String, Facts?)]
         let failures: [(path: Swift.String, reason: Swift.String)]
-
-        func tables() -> ([Table], Summary) {
-            var summary = Summary()
-            summary.repositories = repositories.count
-            summary.packages = members.count
-            summary.targets = targets.count
-            summary.files = files.count
-            summary.failures = failures.count
-
-            let targetIndex = Self.targetIndex(members: members, targets: targets)
-            let dependencyPackages = self.dependencyPackages()
-            let graph = Graph(
-                members: members,
-                targets: targets,
-                targetIndex: targetIndex,
-                dependencyPackages: dependencyPackages
-            )
-
-            var tables: [Table] = []
-            tables.append(repositoriesTable())
-            tables.append(packagesTable())
-            tables.append(packageDependenciesTable())
-            tables.append(traitsTable())
-            tables.append(productsTable())
-            tables.append(targetsTable())
-            tables.append(targetDependenciesTable(graph: graph))
-            tables.append(importsTable())
-            let (types, declarations) = typesTable()
-            summary.types = types.rows.count
-            tables.append(types)
-            tables.append(extensionsTable())
-
-            var references: [ReferenceKey: Swift.Int] = [:]
-            for (target, _, facts) in files {
-                guard let facts else { continue }
-                for reference in facts.references {
-                    references[
-                        .init(
-                            target: target,
-                            from: reference.from,
-                            module: reference.module,
-                            chain: reference.chain,
-                            position: reference.position,
-                            generic: reference.generic
-                        ),
-                        default: 0
-                    ] += 1
-                }
-            }
-            summary.references = references.values.reduce(0, +)
-            let ordered = references.sorted { $0.key < $1.key }
-            tables.append(
-                Table(
-                    name: "references",
-                    rows: ordered.map { key, count in
-                        location(key.target) + [
-                            ("from", .text(key.from.joined(separator: "."))),
-                            ("written", .text(key.written)),
-                            ("position", .text(key.position.rawValue)),
-                            ("generic_parameter", .flag(key.generic)),
-                            ("count", .number(count)),
-                        ]
-                    }
-                )
-            )
-
-            var modules: Swift.Set<Swift.String> = ["Swift", "_Concurrency", "Foundation", "Darwin", "Glibc", "Dispatch"]
-            for target in targets { modules.insert(Self.moduleName(target.name)) }
-            for (_, _, facts) in files { for module in facts?.imports ?? [] { modules.insert(module.module) } }
-            let resolver = Resolver(declarations: declarations, modules: modules)
-            var genericParameters: [Swift.String: Swift.Set<Swift.String>] = [:]
-            for (_, _, facts) in files {
-                for type in facts?.types ?? [] where !(type.genericParameters + type.associatedTypes).isEmpty {
-                    genericParameters[type.path.joined(separator: "."), default: []]
-                        .formUnion(type.genericParameters + type.associatedTypes)
-                }
-            }
-
-            var resolved: [ResolvedKey: Swift.Int] = [:]
-            var unresolved: [UnresolvedKey: Swift.Int] = [:]
-            var visibility: [Swift.Int: Swift.Set<Swift.Int>] = [:]
-            for (key, count) in ordered {
-                let visible: Swift.Set<Swift.Int>
-                if let known = visibility[key.target] {
-                    visible = known
-                } else {
-                    visible = graph.visible(from: key.target)
-                    visibility[key.target] = visible
-                }
-                // Inside an extension the extended type's generic parameters
-                // are in scope too, though the extension does not declare them.
-                var generic = key.generic
-                if !generic, key.module.isEmpty, let first = key.chain.first, !key.from.isEmpty {
-                    generic = (1...key.from.count).contains { length in
-                        genericParameters[key.from.prefix(length).joined(separator: ".")]?.contains(first) ?? false
-                    }
-                }
-                let resolution = resolver.resolve(
-                    chain: key.chain,
-                    module: key.module,
-                    from: key.from,
-                    generic: generic,
-                    visible: visible
-                )
-                if resolution.candidates.isEmpty {
-                    unresolved[.init(target: key.target, written: key.written), default: 0] += count
-                    continue
-                }
-                for candidate in resolution.candidates {
-                    resolved[
-                        .init(
-                            target: key.target,
-                            from: key.from.joined(separator: "."),
-                            position: key.position,
-                            path: candidate.path,
-                            declaring: candidate.target,
-                            ambiguous: resolution.ambiguous
-                        ),
-                        default: 0
-                    ] += count
-                }
-            }
-            let resolvedRows = resolved.sorted { $0.key < $1.key }.map { key, count -> Row in
-                let declaring = targets[key.declaring]
-                return location(key.target) + [
-                    ("from", .text(key.from)),
-                    ("position", .text(key.position.rawValue)),
-                    ("type_path", .text(key.path)),
-                    ("type_target", .text(declaring.name)),
-                    ("type_package", .text(members[declaring.package].path)),
-                    ("ambiguous", .flag(key.ambiguous)),
-                    ("count", .number(count)),
-                ]
-            }
-            summary.resolved = resolvedRows.count
-            summary.ambiguous = resolved.keys.filter(\.ambiguous).count
-            tables.append(Table(name: "resolved_references", rows: resolvedRows))
-            let unresolvedRows = unresolved.sorted { $0.key < $1.key }.map { key, count -> Row in
-                location(key.target) + [("written", .text(key.written)), ("count", .number(count))]
-            }
-            summary.unresolved = unresolvedRows.count
-            tables.append(Table(name: "unresolved_references", rows: unresolvedRows))
-
-            tables.append(
-                Table(
-                    name: "failures",
-                    rows: failures.map { [("package", .text($0.path)), ("reason", .text($0.reason))] }
-                )
-            )
-            return (tables, summary)
-        }
-
-        func location(_ target: Swift.Int) -> Row {
-            [("package", .text(members[targets[target].package].path)), ("target", .text(targets[target].name))]
-        }
     }
 }
-
-// MARK: Keys
 
 extension Institute.Inventory.Assembly {
-    struct ReferenceKey: Hashable, Comparable {
-        var target: Swift.Int
-        var from: [Swift.String]
-        var module: Swift.String
-        var chain: [Swift.String]
-        var position: Institute.Inventory.Position
-        var generic: Swift.Bool
+    func tables() -> ([Institute.Inventory.Table], Institute.Inventory.Summary) {
+        var summary = Institute.Inventory.Summary()
+        summary.repositories = repositories.count
+        summary.packages = members.count
+        summary.targets = targets.count
+        summary.files = files.count
+        summary.failures = failures.count
 
-        var written: Swift.String { (module.isEmpty ? "" : module + "::") + chain.joined(separator: ".") }
+        let targetIndex = Self.targetIndex(members: members, targets: targets)
+        let dependencyPackages = self.dependencyPackages()
+        let graph = Graph(
+            members: members,
+            targets: targets,
+            targetIndex: targetIndex,
+            dependencyPackages: dependencyPackages
+        )
 
-        static func < (lhs: Self, rhs: Self) -> Swift.Bool {
-            (lhs.target, lhs.from.joined(separator: "."), lhs.written, lhs.position.rawValue, lhs.generic ? 1 : 0)
-                < (rhs.target, rhs.from.joined(separator: "."), rhs.written, rhs.position.rawValue, rhs.generic ? 1 : 0)
+        var tables: [Institute.Inventory.Table] = []
+        tables.append(repositoriesTable())
+        tables.append(packagesTable())
+        tables.append(packageDependenciesTable())
+        tables.append(traitsTable())
+        tables.append(productsTable())
+        tables.append(targetsTable())
+        tables.append(targetDependenciesTable(graph: graph))
+        tables.append(importsTable())
+        let (types, declarations) = typesTable()
+        summary.types = types.rows.count
+        tables.append(types)
+        tables.append(extensionsTable())
+
+        var references: [Institute.Inventory.Reference.Key: Swift.Int] = [:]
+        for (target, _, facts) in files {
+            guard let facts else { continue }
+            for reference in facts.references {
+                references[
+                    .init(
+                        target: target,
+                        from: reference.from,
+                        module: reference.module,
+                        chain: reference.chain,
+                        position: reference.position,
+                        generic: reference.generic
+                    ),
+                    default: 0
+                ] += 1
+            }
         }
+        summary.references = references.values.reduce(0, +)
+        let ordered = references.sorted { $0.key < $1.key }
+        tables.append(
+            Institute.Inventory.Table(
+                name: "references",
+                rows: ordered.map { key, count in
+                    location(key.target) + [
+                        ("from", .text(key.from.joined(separator: "."))),
+                        ("written", .text(key.written)),
+                        ("position", .text(key.position.spelling)),
+                        ("generic_parameter", .flag(key.generic)),
+                        ("count", .number(count)),
+                    ]
+                }
+            )
+        )
+
+        var modules: Swift.Set<Swift.String> = ["Swift", "_Concurrency", "Foundation", "Darwin", "Glibc", "Dispatch"]
+        for target in targets { modules.insert(Self.moduleName(target.name)) }
+        for (_, _, facts) in files { for module in facts?.imports ?? [] { modules.insert(module.module) } }
+        let resolver = Institute.Inventory.Resolver(declarations: declarations, modules: modules)
+        var genericParameters: [Swift.String: Swift.Set<Swift.String>] = [:]
+        for (_, _, facts) in files {
+            for type in facts?.types ?? [] where !(type.generics + type.associated).isEmpty {
+                genericParameters[type.path.joined(separator: "."), default: []]
+                    .formUnion(type.generics + type.associated)
+            }
+        }
+
+        var resolved: [Institute.Inventory.Reference.Resolved: Swift.Int] = [:]
+        var unresolved: [Institute.Inventory.Reference.Unresolved: Swift.Int] = [:]
+        var visibility: [Swift.Int: Swift.Set<Swift.Int>] = [:]
+        for (key, count) in ordered {
+            let visible: Swift.Set<Swift.Int>
+            if let known = visibility[key.target] {
+                visible = known
+            } else {
+                visible = graph.visible(from: key.target)
+                visibility[key.target] = visible
+            }
+            // WHY: inside an extension the extended type's generic parameters
+            // are in scope too, though the extension does not declare them.
+            var generic = key.generic
+            if !generic, key.module.isEmpty, let first = key.chain.first, !key.from.isEmpty {
+                generic = (1...key.from.count).contains { length in
+                    genericParameters[key.from.prefix(length).joined(separator: ".")]?.contains(first) ?? false
+                }
+            }
+            let resolution = resolver.resolve(
+                chain: key.chain,
+                module: key.module,
+                from: key.from,
+                generic: generic,
+                visible: visible
+            )
+            if resolution.candidates.isEmpty {
+                unresolved[.init(target: key.target, written: key.written), default: 0] += count
+                continue
+            }
+            for candidate in resolution.candidates {
+                resolved[
+                    .init(
+                        target: key.target,
+                        from: key.from.joined(separator: "."),
+                        position: key.position,
+                        path: candidate.path,
+                        declaring: candidate.target,
+                        ambiguous: resolution.ambiguous
+                    ),
+                    default: 0
+                ] += count
+            }
+        }
+        let resolvedRows = resolved.sorted { $0.key < $1.key }.map { key, count -> Institute.Inventory.Table.Row in
+            let declaring = targets[key.declaring]
+            return location(key.target) + [
+                ("from", .text(key.from)),
+                ("position", .text(key.position.spelling)),
+                ("type_path", .text(key.path)),
+                ("type_target", .text(declaring.name)),
+                ("type_package", .text(members[declaring.package].path)),
+                ("ambiguous", .flag(key.ambiguous)),
+                ("count", .number(count)),
+            ]
+        }
+        summary.resolved = resolvedRows.count
+        summary.ambiguous = resolved.keys.filter(\.ambiguous).count
+        tables.append(Institute.Inventory.Table(name: "resolved_references", rows: resolvedRows))
+        let unresolvedRows = unresolved.sorted { $0.key < $1.key }.map { key, count -> Institute.Inventory.Table.Row in
+            location(key.target) + [("written", .text(key.written)), ("count", .number(count))]
+        }
+        summary.unresolved = unresolvedRows.count
+        tables.append(Institute.Inventory.Table(name: "unresolved_references", rows: unresolvedRows))
+
+        tables.append(
+            Institute.Inventory.Table(
+                name: "failures",
+                rows: failures.map { [("package", .text($0.path)), ("reason", .text($0.reason))] }
+            )
+        )
+        return (tables, summary)
     }
 
-    struct ResolvedKey: Hashable, Comparable {
-        var target: Swift.Int
-        var from: Swift.String
-        var position: Institute.Inventory.Position
-        var path: Swift.String
-        var declaring: Swift.Int
-        var ambiguous: Swift.Bool
-
-        static func < (lhs: Self, rhs: Self) -> Swift.Bool {
-            (lhs.target, lhs.from, lhs.position.rawValue, lhs.path, lhs.declaring)
-                < (rhs.target, rhs.from, rhs.position.rawValue, rhs.path, rhs.declaring)
-        }
-    }
-
-    struct UnresolvedKey: Hashable, Comparable {
-        var target: Swift.Int
-        var written: Swift.String
-
-        static func < (lhs: Self, rhs: Self) -> Swift.Bool { (lhs.target, lhs.written) < (rhs.target, rhs.written) }
+    func location(_ target: Swift.Int) -> Institute.Inventory.Table.Row {
+        [("package", .text(members[targets[target].package].path)), ("target", .text(targets[target].name))]
     }
 }
-
-// MARK: Manifest tables
 
 extension Institute.Inventory.Assembly {
     func repositoriesTable() -> Institute.Inventory.Table {
@@ -251,7 +208,7 @@ extension Institute.Inventory.Assembly {
     }
 
     func packageDependenciesTable() -> Institute.Inventory.Table {
-        var rows: [Row] = []
+        var rows: [Institute.Inventory.Table.Row] = []
         for member in members {
             for dependency in member.evaluation.dependencies {
                 rows.append([
@@ -268,7 +225,7 @@ extension Institute.Inventory.Assembly {
     }
 
     func traitsTable() -> Institute.Inventory.Table {
-        var rows: [Row] = []
+        var rows: [Institute.Inventory.Table.Row] = []
         for member in members {
             for trait in member.evaluation.traits {
                 rows.append([
@@ -282,7 +239,7 @@ extension Institute.Inventory.Assembly {
     }
 
     func productsTable() -> Institute.Inventory.Table {
-        var rows: [Row] = []
+        var rows: [Institute.Inventory.Table.Row] = []
         for member in members {
             for product in member.evaluation.products {
                 let kind: Swift.String
@@ -290,7 +247,12 @@ extension Institute.Inventory.Assembly {
                 switch product.kind {
                 case .library(let type):
                     kind = "library"
-                    library = type.rawValue
+                    library =
+                        switch type {
+                        case .static: "static"
+                        case .dynamic: "dynamic"
+                        case .automatic: "automatic"
+                        }
                 case .executable:
                     kind = "executable"
                     library = ""
@@ -319,8 +281,18 @@ extension Institute.Inventory.Assembly {
         return .init(
             name: "targets",
             rows: targets.enumerated().map { offset, target in
-                location(offset) + [
-                    ("kind", .text(target.manifest.kind.rawValue)),
+                let kind =
+                    switch target.manifest.kind {
+                    case .regular: "regular"
+                    case .executable: "executable"
+                    case .test: "test"
+                    case .plugin: "plugin"
+                    case .binary: "binary"
+                    case .system: "system"
+                    case .macro: "macro"
+                    }
+                return location(offset) + [
+                    ("kind", .text(kind)),
                     ("path", .text(target.path)),
                     ("files", .number(counts[offset].files)),
                     ("lines", .number(counts[offset].lines)),
@@ -330,7 +302,7 @@ extension Institute.Inventory.Assembly {
     }
 
     func targetDependenciesTable(graph: Graph) -> Institute.Inventory.Table {
-        var rows: [Row] = []
+        var rows: [Institute.Inventory.Table.Row] = []
         for (offset, target) in targets.enumerated() {
             for dependency in target.manifest.dependencies {
                 let condition = target.manifest.conditions[dependency]
@@ -365,8 +337,6 @@ extension Institute.Inventory.Assembly {
         return .init(name: "target_dependencies", rows: rows)
     }
 }
-
-// MARK: Source tables
 
 extension Institute.Inventory.Assembly {
     func importsTable() -> Institute.Inventory.Table {
@@ -420,7 +390,7 @@ extension Institute.Inventory.Assembly {
     }
 
     func typesTable() -> (Institute.Inventory.Table, [(path: [Swift.String], target: Swift.Int)]) {
-        var rows: [Row] = []
+        var rows: [Institute.Inventory.Table.Row] = []
         var declarations: [(path: [Swift.String], target: Swift.Int)] = []
         let sorted = files.enumerated().sorted { lhs, rhs in
             let (left, right) = (lhs.element, rhs.element)
@@ -437,14 +407,14 @@ extension Institute.Inventory.Assembly {
                         ("name", .text(type.name)),
                         ("kind", .text(type.kind)),
                         ("access", .text(type.access)),
-                        ("generic_parameters", .text(type.genericParameters.joined(separator: ","))),
-                        ("associated_types", .text(type.associatedTypes.joined(separator: ","))),
+                        ("generic_parameters", .text(type.generics.joined(separator: ","))),
+                        ("associated_types", .text(type.associated.joined(separator: ","))),
                         ("cases", .number(type.cases)),
-                        ("stored_properties", .number(type.storedProperties)),
+                        ("stored_properties", .number(type.stored)),
                         ("inherits", .text(type.inherits.joined(separator: ","))),
                         ("aliased", .text(type.aliased)),
-                        ("in_extension", .flag(type.inExtension)),
-                        ("module_selector", .text(type.moduleSelector)),
+                        ("in_extension", .flag(type.isInExtension)),
+                        ("module_selector", .text(type.module)),
                         ("condition", .text(type.condition)),
                         ("file", .text(file(target, name))),
                         ("line", .number(type.line)),
@@ -456,18 +426,18 @@ extension Institute.Inventory.Assembly {
     }
 
     func extensionsTable() -> Institute.Inventory.Table {
-        var rows: [Row] = []
+        var rows: [Institute.Inventory.Table.Row] = []
         for (target, name, facts) in files {
             guard let facts else { continue }
             for declaration in facts.extensions {
                 rows.append(
                     location(target) + [
                         ("extended", .text(declaration.extended.joined(separator: "."))),
-                        ("module_selector", .text(declaration.moduleSelector)),
+                        ("module_selector", .text(declaration.module)),
                         ("conformances", .text(declaration.conformances.joined(separator: ","))),
-                        ("where_clause", .text(declaration.whereClause)),
-                        ("public_members", .number(declaration.publicMembers)),
-                        ("nested_types", .number(declaration.nestedTypes)),
+                        ("where_clause", .text(declaration.requirements)),
+                        ("public_members", .number(declaration.surface)),
+                        ("nested_types", .number(declaration.nested)),
                         ("condition", .text(declaration.condition)),
                         ("file", .text(file(target, name))),
                         ("line", .number(declaration.line)),
@@ -478,8 +448,6 @@ extension Institute.Inventory.Assembly {
         return .init(name: "extensions", rows: rows)
     }
 }
-
-// MARK: Dependencies
 
 extension Institute.Inventory.Assembly {
     static func targetIndex(
@@ -588,66 +556,6 @@ extension Institute.Inventory.Assembly {
         case .exact(let version): return "exact \(version)"
         case .branch(let branch): return "branch \(branch)"
         case .revision(let revision): return "revision \(revision)"
-        }
-    }
-}
-
-extension Institute.Inventory.Assembly {
-    /// The target graph across packages, for visibility.
-    struct Graph {
-        let members: [Institute.Inventory.Member]
-        let targets: [Institute.Inventory.Target]
-        let targetIndex: [[Swift.String: Swift.Int]]
-        let dependencyPackages: [[Swift.String: Swift.Int]]
-
-        func sameTarget(_ name: Swift.String, package: Swift.Int) -> Swift.Int? {
-            targetIndex[package][name]
-        }
-
-        /// The targets a product of `package` lists.
-        func product(_ name: Swift.String, in package: Swift.Int) -> [Swift.Int] {
-            guard let product = members[package].evaluation.products.first(where: { $0.name.underlying == name })
-            else { return [] }
-            return product.targets.compactMap { targetIndex[package][$0.underlying] }
-        }
-
-        func direct(_ target: Swift.Int) -> [Swift.Int] {
-            let package = targets[target].package
-            var result: [Swift.Int] = []
-            for dependency in targets[target].manifest.dependencies {
-                switch dependency {
-                case .target(let name):
-                    if let found = sameTarget(name.underlying, package: package) { result.append(found) }
-                case .byName(let name):
-                    if let found = sameTarget(name, package: package) {
-                        result.append(found)
-                    } else {
-                        for other in dependencyPackages[package].values { result += product(name, in: other) }
-                    }
-                case .product(let name, let from):
-                    let token = from.underlying.lowercased()
-                    let other =
-                        dependencyPackages[package][token]
-                        ?? dependencyPackages[package].values.first {
-                            members[$0].evaluation.name.underlying.lowercased() == token
-                        }
-                    if let other { result += product(name.underlying, in: other) }
-                }
-            }
-            return result
-        }
-
-        /// The target itself and every target it reaches through target
-        /// and product dependencies, conditions ignored.
-        func visible(from target: Swift.Int) -> Swift.Set<Swift.Int> {
-            var seen: Swift.Set<Swift.Int> = [target]
-            var stack = [target]
-            while let next = stack.popLast() {
-                for dependency in direct(next) where seen.insert(dependency).inserted {
-                    stack.append(dependency)
-                }
-            }
-            return seen
         }
     }
 }
