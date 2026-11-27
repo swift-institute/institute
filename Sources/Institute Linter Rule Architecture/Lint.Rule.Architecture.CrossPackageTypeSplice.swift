@@ -71,6 +71,11 @@ private func architectureCrossPackageTypeSpliceControls(
     let root = "/workspace/\(name)"
     let isPictureOwner = architectureSpliceOwns(root: "Picture", repository: repository)
     let isForeignAllowed = architectureSpliceOwns(root: "Translation", repository: repository)
+        || architectureSpliceNamed(path: ["Translation", "Rule"], repository: repository)
+    let isWatercolorNamed = architectureSpliceNamed(path: ["Picture", "Watercolor"], repository: repository)
+    let isMotionReelNamed = architectureSpliceOwns(root: "Motion", repository: repository)
+        || architectureSpliceNamed(path: ["Motion", "Reel"], repository: repository)
+    let isShaderOwner = architectureSpliceOwns(root: "Shader", repository: repository)
     return [
         .init(
             id: "cross package type splice foreign domain",
@@ -106,7 +111,19 @@ private func architectureCrossPackageTypeSpliceControls(
             id: "cross package type splice composition peer splice",
             source: "extension Picture {\n    public enum Watercolor {}\n}",
             path: "\(root)/Sources/Core/Picture.Watercolor.swift",
-            expectation: isPictureOwner ? .clean : .findings(1)
+            expectation: isPictureOwner || isWatercolorNamed ? .clean : .findings(1)
+        ),
+        .init(
+            id: "cross package type splice path named by package",
+            source: "extension Motion {\n    public enum Reel {}\n}\nextension Motion.Reel {\n    public struct Cut {}\n}",
+            path: "\(root)/Sources/Motion Reel/Motion.Reel.swift",
+            expectation: isMotionReelNamed ? .clean : .findings(2)
+        ),
+        .init(
+            id: "cross package type splice target name does not license",
+            source: "extension Shader {\n    public struct Program {}\n}",
+            path: "\(root)/Sources/Picture Shader/Shader.Program.swift",
+            expectation: isShaderOwner ? .clean : .findings(1)
         ),
         .init(
             id: "cross package type splice tests exempt",
@@ -125,6 +142,20 @@ private func architectureSpliceNormalizedPackage(_ name: Swift::String) -> Swift
 
 private func architectureSpliceNormalizedType(_ name: Swift::String) -> Swift::String {
     name.filter { $0 != "_" && $0 != "`" }.lowercased()
+}
+
+private func architectureSpliceNamed(
+    path: [Swift::String],
+    repository: Institute.Repository.Coordinate
+) -> Swift::Bool {
+    let packageKey = architectureSpliceNormalizedPackage(repository.name)
+    var key: Swift::String = ""
+    for (index, segment) in path.enumerated() {
+        key += architectureSpliceNormalizedType(segment)
+        if index >= 1, key == packageKey { return true }
+        if !packageKey.hasPrefix(key) { return false }
+    }
+    return false
 }
 
 private func architectureSpliceOwns(
@@ -293,7 +324,7 @@ internal final class ArchitectureCrossPackageTypeSpliceVisitor: SyntaxVisitor {
             }
             guard let member = nominalDecl(of: decl) else { continue }
             let path = prefix + [member.name]
-            if member.isPublicOrPackage {
+            if member.isPublicOrPackage, !architectureSpliceNamed(path: path, repository: repository) {
                 let tailSegments = path.dropFirst()
                 let isCapabilityOnNoun = tailSegments.contains { architectureSpliceCapabilities.contains($0) }
                 if !isCapabilityOnNoun {

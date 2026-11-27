@@ -27,12 +27,37 @@ extension Lint.Rule {
                 .init(organization: .`swift-compositions`, name: "swift-picture-watercolor"),
                 .init(organization: .`swift-compositions`, name: "swift-picture"),
                 .init(organization: .`swift-linux-foundation`, name: "swift-linux-standard"),
+                .init(organization: .`swift-compositions`, name: "swift-motion-reel"),
+                .init(organization: .`swift-compositions`, name: "swift-transcript-heard"),
             ]
             for repo in repos {
                 for outcome in Lint.Rule.`cross package type splice`(in: repo).outcomes() {
                     #expect(outcome.holds, "\(repo.name): \(outcome)")
                 }
             }
+        }
+
+        @Test func `cross package type splice allows the path its package name owns`() {
+            let source = """
+                extension Transcript {
+                    public enum Dictation {}
+                }
+                extension Transcript.Dictation {
+                    public struct Segment {
+                        public struct Word {}
+                    }
+                }
+                """
+            let named = Institute.Repository.Coordinate(
+                organization: .`swift-compositions`,
+                name: "swift-transcript-dictation"
+            )
+            let other = Institute.Repository.Coordinate(organization: .`swift-compositions`, name: "swift-picture")
+            let file = "/workspace/repo/Sources/Transcript Dictation/Transcript.Dictation.swift"
+            let namedSource = Lint.Source.parsed(from: source, file: file)
+            let otherSource = Lint.Source.parsed(from: source, file: file)
+            #expect(Lint.Rule.`cross package type splice`(in: named).observe(namedSource, .warning).findings.isEmpty)
+            #expect(Lint.Rule.`cross package type splice`(in: other).observe(otherSource, .warning).findings.count == 2)
         }
 
         @Test func `domain nesting depth controls hold`() {
