@@ -79,9 +79,11 @@ extension Institute.Shader.Package {
         let found = try run("/usr/bin/find", [build, "-name", "*.o", "-type", "f"], as: "list \(build)")
         let objects = found.split(separator: "\n").map(Swift.String.init).sorted()
         let linked = "\(build)/shader.wasm"
+        // WHY: --strip-debug keeps the name section, whose data segment names let the compiler leave Swift's module
+        // hashes, which change with the build's paths, out of the kernels' data image.
         try run(
             "\(toolchain)/wasm-ld",
-            ["--no-entry", "--gc-sections", "--allow-undefined", "--strip-all"] + objects.filter { $0.hasPrefix(own) }
+            ["--no-entry", "--gc-sections", "--allow-undefined", "--strip-debug"] + objects.filter { $0.hasPrefix(own) }
                 + ["--start-lib"] + objects.filter { !$0.hasPrefix(own) } + ["--end-lib", "-o", linked],
             as: "link \(target)"
         )
