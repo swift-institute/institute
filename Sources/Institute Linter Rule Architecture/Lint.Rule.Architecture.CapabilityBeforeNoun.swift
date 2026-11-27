@@ -1,6 +1,7 @@
 internal import Institute_Linter_Rule_Manifest
 public import Institute_Model
 public import Lint
+internal import Package
 internal import SwiftSyntax
 
 extension Lint.Rule {
@@ -62,7 +63,7 @@ private func architectureCapabilityBeforeNounControls(
 ) -> [Lint.Rule.Control] {
     let name = repository?.name ?? "swift-radix"
     let root = "/workspace/\(name)"
-    let isFormatterOwner = architectureCapabilityNormalizedKey(package: name) == "formatter"
+    let isFormatterOwner = Package.Concept(Package.Name(_unchecked: name)) == Package.Concept(type: ["Formatter"])
     return [
         .init(
             id: "capability before noun inverted extension",
@@ -96,15 +97,6 @@ private func architectureCapabilityBeforeNounControls(
             applicability: .inapplicable
         ),
     ]
-}
-
-private func architectureCapabilityNormalizedKey(package: Swift::String) -> Swift::String {
-    let stripped = package.hasPrefix("swift-") ? package.dropFirst("swift-".count) : Swift::Substring(package)
-    return stripped.filter { $0 != "-" }.lowercased()
-}
-
-private func architectureCapabilityNormalizedKey(type: Swift::String) -> Swift::String {
-    type.filter { $0 != "_" && $0 != "`" }.lowercased()
 }
 
 internal final class ArchitectureCapabilityBeforeNounVisitor: SyntaxVisitor {
@@ -222,19 +214,13 @@ internal final class ArchitectureCapabilityBeforeNounVisitor: SyntaxVisitor {
             !ownedTopLevelTypes.contains(root)
         else { return }
         if let repository {
-            let packageKey = architectureCapabilityNormalizedKey(package: repository.name)
-            let rootKey = architectureCapabilityNormalizedKey(type: root)
-            if packageKey == rootKey {
+            let name = Package.Name(_unchecked: repository.name)
+            let rootConcept = Package.Concept(type: [root])
+            if Package.Concept(name) == rootConcept {
                 return
             }
-            if repository.organization.layer <= .molecules {
-                let stem =
-                    repository.name.hasPrefix("swift-")
-                    ? Swift::String(repository.name.dropFirst("swift-".count))
-                    : repository.name
-                if stem.split(separator: "-").first?.lowercased() == rootKey {
-                    return
-                }
+            if repository.organization.layer <= .molecules, architecturePackageWords(of: name).first == rootConcept.text {
+                return
             }
         }
         emit(

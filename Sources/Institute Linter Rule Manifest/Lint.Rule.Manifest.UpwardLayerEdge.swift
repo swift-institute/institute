@@ -72,7 +72,7 @@ private let manifestLayerNames: [Swift::Int: Swift::String] = [
 ]
 
 internal func manifestLayer(ofURL url: Swift::String) -> Swift::Int? {
-    Institute.Organization(url: url).map(\.layer).flatMap { $0 == .control ? nil : $0.rawValue }
+    Institute.Organization(remote: url).map(\.layer).flatMap { $0 == .control ? nil : $0.rawValue }
 }
 
 internal final class ManifestUpwardLayerEdgeVisitor: SyntaxVisitor {

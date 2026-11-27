@@ -39,13 +39,13 @@ extension Institute.Organization {
         }
     }
 
-    // swift-linter:disable:next raw concept
-    // REASON: a dependency URL as a manifest spells it, read by prefix and first segment; SwiftPM admits git@host:org/repo forms that RFC_3986.URI and WHATWG_URL.URL refuse, and those are no organization here, nil.
-    public init?(url: Swift.String) {
-        let prefix = "https://github.com/"
-        guard url.hasPrefix(prefix) else { return nil }
-        guard let owner = url.dropFirst(prefix.count).split(separator: "/").first else { return nil }
-        self.init(rawValue: Swift.String(owner))
+    /// The organization of the repository on github.com that a git remote names, as a manifest's dependency spells
+    /// it, or `nil` when it names none or one outside the Institute. `GitHub.Repository.Slug.init(remote:)` reads it.
+    public init?(remote: Swift.String) {
+        guard let repository = GitHub_Standard::GitHub.Repository.Slug(remote: remote),
+            let coordinate = Institute.Repository.Coordinate(repository)
+        else { return nil }
+        self = coordinate.organization
     }
 }
 

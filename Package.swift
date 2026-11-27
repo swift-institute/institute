@@ -86,6 +86,7 @@ let package = Package(
         .package(url: "https://github.com/swift-compositions/swift-json.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-kernel.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-package-manager.git", branch: "main"),
+        .package(url: "https://github.com/swift-atoms/swift-package.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-path.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-process.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-threads.git", branch: "main"),
@@ -554,6 +555,7 @@ let linterRuleTargets: [Target] = [
             .target(name: "Institute Model"),
             .product(name: "Lint", package: "swift-lint"),
             .target(name: "Institute Linter Rule Manifest"),
+            .product(name: "Package", package: "swift-package"),
             .product(name: "SwiftSyntax", package: "swift-syntax"),
         ]
     ),
@@ -722,6 +724,7 @@ let linterRuleTargets: [Target] = [
         dependencies: [
             .target(name: "Institute Linter Rule Architecture"),
             .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+            .product(name: "Package", package: "swift-package"),
             .product(name: "SwiftParser", package: "swift-syntax"),
         ]
     ),

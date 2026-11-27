@@ -1,6 +1,7 @@
 internal import Institute_Linter_Rule_Manifest
 public import Institute_Model
 public import Lint
+internal import Package
 internal import SwiftSyntax
 
 extension Lint.Rule {
@@ -70,10 +71,12 @@ private func architectureCrossPackageTypeSpliceControls(
     let name = repository.name
     let root = "/workspace/\(name)"
     let isPictureOwner = architectureSpliceOwns(root: "Picture", repository: repository)
-    let isForeignAllowed = architectureSpliceOwns(root: "Translation", repository: repository)
+    let isForeignAllowed =
+        architectureSpliceOwns(root: "Translation", repository: repository)
         || architectureSpliceNamed(path: ["Translation", "Rule"], repository: repository)
     let isWatercolorNamed = architectureSpliceNamed(path: ["Picture", "Watercolor"], repository: repository)
-    let isMotionReelNamed = architectureSpliceOwns(root: "Motion", repository: repository)
+    let isMotionReelNamed =
+        architectureSpliceOwns(root: "Motion", repository: repository)
         || architectureSpliceNamed(path: ["Motion", "Reel"], repository: repository)
     let isShaderOwner = architectureSpliceOwns(root: "Shader", repository: repository)
     return [
@@ -135,23 +138,21 @@ private func architectureCrossPackageTypeSpliceControls(
     ]
 }
 
-private func architectureSpliceNormalizedPackage(_ name: Swift::String) -> Swift::String {
-    let stripped = name.hasPrefix("swift-") ? name.dropFirst("swift-".count) : Swift::Substring(name)
-    return stripped.filter { $0 != "-" }.lowercased()
-}
-
-private func architectureSpliceNormalizedType(_ name: Swift::String) -> Swift::String {
-    name.filter { $0 != "_" && $0 != "`" }.lowercased()
+/// The words of a package's name, each as the text of its concept, without the leading `swift` that
+/// `Package.Concept` takes off: `swift-file-system` gives `file` and `system`. Which word a rule reads is its
+/// policy; whether the name loses a prefix is `Package.Concept`'s answer, asked here and not decided again.
+internal func architecturePackageWords(of name: Package.Name) -> [Swift::String] {
+    let words = name.underlying.split(separator: "-").map { Package.Concept(type: [$0]).text }
+    return words.joined() == Package.Concept(name).text ? words : Swift::Array(words.dropFirst())
 }
 
 private func architectureSpliceNamed(
     path: [Swift::String],
     repository: Institute.Repository.Coordinate
 ) -> Swift::Bool {
-    let packageKey = architectureSpliceNormalizedPackage(repository.name)
-    var key: Swift::String = ""
-    for (index, segment) in path.enumerated() {
-        key += architectureSpliceNormalizedType(segment)
+    let packageKey = Package.Concept(Package.Name(_unchecked: repository.name)).text
+    for index in path.indices {
+        let key = Package.Concept(type: path[...index]).text
         if index >= 1, key == packageKey { return true }
         if !packageKey.hasPrefix(key) { return false }
     }
@@ -162,11 +163,10 @@ private func architectureSpliceOwns(
     root: Swift::String,
     repository: Institute.Repository.Coordinate
 ) -> Swift::Bool {
-    let rootKey = architectureSpliceNormalizedType(root)
-    let packageName = repository.name
-    let stem = packageName.hasPrefix("swift-") ? Swift::String(packageName.dropFirst("swift-".count)) : packageName
-    let packageKey = stem.filter { $0 != "-" }.lowercased()
-    let words = stem.split(separator: "-").map { $0.lowercased() }
+    let rootKey = Package.Concept(type: [root]).text
+    let name = Package.Name(_unchecked: repository.name)
+    let packageKey = Package.Concept(name).text
+    let words = architecturePackageWords(of: name)
 
     if packageKey == rootKey { return true }
     if packageKey == rootKey + "s" || packageKey == rootKey + "es" || packageKey == rootKey + "er" { return true }

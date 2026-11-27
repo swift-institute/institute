@@ -1,6 +1,7 @@
 internal import Institute_Linter_Rule_Manifest
 public import Institute_Model
 public import Lint
+internal import Package
 internal import SwiftSyntax
 
 extension Lint.Rule {
@@ -37,8 +38,7 @@ private func architectureTopLevelTypeOwnerControls(
 ) -> [Lint.Rule.Control] {
     let name = repository?.name ?? "swift-package"
     let root = "/workspace/\(name)"
-    let words = (name.hasPrefix("swift-") ? name.dropFirst("swift-".count) : Swift::Substring(name))
-        .split(separator: "-")
+    let words = architecturePackageWords(of: Package.Name(_unchecked: name))
     let owner = words.map { $0.prefix(1).uppercased() + $0.dropFirst() }.joined()
     let target = words.map { $0.prefix(1).uppercased() + $0.dropFirst() }.joined(separator: " ")
     guard let repository, repository.organization.layer <= .molecules else {
@@ -120,27 +120,18 @@ private func architectureTopLevelTypeOwnerControls(
     ]
 }
 
-private func architectureTopLevelTypeOwnerKey(package: Swift::String) -> Swift::String {
-    let name = package.hasPrefix("swift-") ? package.dropFirst("swift-".count) : Swift::Substring(package)
-    return name.filter { $0 != "-" }.lowercased()
-}
-
-private func architectureTopLevelTypeOwnerKey(type: Swift::String) -> Swift::String {
-    type.filter { $0 != "_" }.lowercased()
-}
-
 private func architectureTopLevelTypeOwnerAllows(
     _ name: Swift::String,
     isProtocol: Swift::Bool,
     package: Swift::String
 ) -> Swift::Bool {
-    let owner = architectureTopLevelTypeOwnerKey(package: package)
-    let key = architectureTopLevelTypeOwnerKey(type: name)
+    let owner = Package.Concept(Package.Name(_unchecked: package))
+    let key = Package.Concept(type: [name])
     if key == owner { return true }
     guard isProtocol else { return false }
-    for suffix in ["ing", "able"] where key.hasSuffix(suffix) {
-        let stem = key.dropLast(suffix.count)
-        if stem.count >= 3, owner.hasPrefix(stem) { return true }
+    for suffix in ["ing", "able"] where key.text.hasSuffix(suffix) {
+        let stem = key.text.dropLast(suffix.count)
+        if stem.count >= 3, owner.text.hasPrefix(stem) { return true }
     }
     return false
 }

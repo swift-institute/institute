@@ -123,3 +123,31 @@ extension `Lint.Rule Tests`.`upward layer edge Tests`.`Edge Case` {
         #expect(observation.applicability == .inapplicable)
     }
 }
+
+extension `Lint.Rule Tests`.`upward layer edge Tests`.`Edge Case` {
+    @Test
+    func `an edge is read from every form of remote that names a repository on github.com`() {
+        let observation = `Lint.Rule Tests`.`upward layer edge Tests`.observation(
+            `Lint.Rule Tests`.`upward layer edge Tests`.manifest(
+                "https://github.com/swift-compositions/swift-json",
+                "http://github.com/swift-compositions/swift-json.git",
+                "ssh://git@github.com/swift-compositions/swift-json.git",
+                "git://github.com/swift-compositions/swift-json.git",
+                "git@github.com:swift-compositions/swift-json.git"
+            ),
+            repository: "swift-atoms/swift-owner"
+        )
+        #expect(observation.findings.count == 5)
+    }
+
+    @Test
+    func `a remote that names no repository on github.com names no organisation`() {
+        #expect(Institute.Organization(remote: "https://github.com/swift-atoms/swift-byte.git") == .`swift-atoms`)
+        #expect(Institute.Organization(remote: "git@github.com:swift-ietf/swift-rfc-3986") == .`swift-ietf`)
+        #expect(Institute.Organization(remote: "https://gitlab.com/swift-atoms/swift-byte.git") == nil)
+        #expect(Institute.Organization(remote: "https://github.com/swift-atoms") == nil)
+        #expect(Institute.Organization(remote: "https://github.com/Swift-Atoms/swift-byte.git") == nil)
+        #expect(Institute.Organization(remote: "https://github.com/apple/swift-syntax.git") == nil)
+        #expect(Institute.Organization(remote: "../swift-byte") == nil)
+    }
+}
