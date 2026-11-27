@@ -29,21 +29,21 @@ extension Institute.Shader.Package {
         } catch {
             throw .repository("cannot list the files of \(root): \(error)")
         }
-        var texts: [Swift.String: Swift.String] = [:]
+        var modules: [Swift.String: W3C.WebAssembly.Module] = [:]
         var generated: [Institute.Shader.Generated] = []
         for path in paths.sorted() where path.hasPrefix("Sources/") && path.hasSuffix(".swift") {
             // WHY: Git lists a file that is deleted and not yet committed.
             guard File(try self.path(path)).stat.isFile else { continue }
             let current = Swift.String(decoding: try bytes(at: path), as: Swift.UTF8.self)
             guard let file = Shader_Compiler::Shader.Compiler.File(reading: current) else { continue }
-            let text: Swift.String
-            if let known = texts[file.target] {
-                text = known
+            let module: W3C.WebAssembly.Module
+            if let known = modules[file.target] {
+                module = known
             } else {
-                text = try self.text(of: file.target)
-                texts[file.target] = text
+                module = try self.module(of: file.target)
+                modules[file.target] = module
             }
-            generated.append(.init(path: path, current: current, wanted: file.contents(text)))
+            generated.append(.init(path: path, current: current, wanted: try contents(of: file, from: module)))
         }
         return generated
     }
@@ -59,8 +59,20 @@ extension Institute.Shader.Package {
         }
     }
 
-    /// A target's kernels in Metal's shading language: compiled to WebAssembly, linked and written.
-    private func text(of target: Swift.String) throws(Institute.Error) -> Swift.String {
+    /// A generated file's contents: its target's kernels in the file's language.
+    private func contents(of file: Shader_Compiler::Shader.Compiler.File, from module: W3C.WebAssembly.Module) throws(Institute.Error) -> Swift.String {
+        do throws(Shader_Compiler::Shader.Compiler.Error) {
+            switch file.language {
+            case .metal: return file.contents(try Shader_Compiler::Shader.Compiler.metal(module).text)
+            case .wgsl: return file.contents(try Shader_Compiler::Shader.Compiler.wgsl(module).mapValues(\.text))
+            }
+        } catch {
+            throw .configuration("\(file.target) has no text in \(file.language.rawValue): \(error)")
+        }
+    }
+
+    /// A target's kernels as one WebAssembly module: compiled and linked.
+    private func module(of target: Swift.String) throws(Institute.Error) -> W3C.WebAssembly.Module {
         let build = "\(root)/.build/wasm32-unknown-wasip1/release"
         try run(
             "\(toolchain)/swift",
@@ -88,16 +100,10 @@ extension Institute.Shader.Package {
             as: "link \(target)"
         )
         let binary = try bytes(at: ".build/wasm32-unknown-wasip1/release/shader.wasm")
-        let module: W3C.WebAssembly.Module
         do throws(W3C.WebAssembly.Error) {
-            module = try .parse(binary)
+            return try .parse(binary)
         } catch {
             throw .configuration("\(target) did not link to a module: \(error)")
-        }
-        do throws(Shader_Compiler::Shader.Compiler.Error) {
-            return try Shader_Compiler::Shader.Compiler.metal(module).text
-        } catch {
-            throw .configuration("\(target) has no text in Metal's shading language: \(error)")
         }
     }
 
