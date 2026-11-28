@@ -110,7 +110,7 @@ struct `Institute source policy` {
         }
         #expect(
             linux.executable.digest
-                == .init("c8a45491d32d99c30add68692d3e288a70be21e278c0954915996e60997f834e")
+                == .init("4246fd8555d1de6bcce4ef1a2ce03950cad22483ce971532f41f0bb1238a6e8b")
         )
     }
 
@@ -314,13 +314,13 @@ extension `Institute source policy` {
     func `adopted linter catalog preserves published bundle identities and profiles`() {
         let policy = Institute.Source.Policy.current
         let expected: [(Institute.Source.Bundle, Swift.Int, Swift.String)] = [
-            (.institute, 137, "30ac4cf5d7a181cc9178c63e99bb366fe4d04f96f3af3d05da0dc78cf4a3ae4d"),
-            (.primitives, 140, "592886113ab2f4d1ef71df122fef6eddfcd17ae6c4b8337377dbc85a3a4df921"),
-            (.standards, 133, "2c89fe7aada896252c533f7390bb782902146c8849957a101c9227b335d3859c"),
+            (.institute, 143, "6186e7d65ff96f9ca2f62e0d07d1a30badd710efe18bc9a61f7389711bf51b55"),
+            (.primitives, 146, "a1d406014d14bcc78e9a9b815d70c3fe174e3b7e9e0976fa5cca61c9513b53d1"),
+            (.standards, 139, "74d87c82b0e4d955389815434c14f59a43c0578699c7600895d0dceb89aca668"),
         ]
         let engine = policy.engine(.init("swift-linter"), on: .macOSARM64)
-        #expect(engine?.revision == "ccd7aadc02b941f38e0ea98b6e88ab01176da2b3")
-        #expect(engine?.executable.digest == .init("c73486666ecb870e0bd873a00071a2461621ed52658db30c67e022f92dec891c"))
+        #expect(engine?.revision == "65a15f5ef1a73739f5ab4bd8d50c638b056a736d")
+        #expect(engine?.executable.digest == .init("eda594d9bb3a26f67809b811d6000cfae629411be8c16f4bc833e5240652e2e1"))
         for (bundle, count, digest) in expected {
             let rules = policy.linterRules(for: bundle)
             #expect(rules.count == count)

@@ -2257,7 +2257,7 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-sql|statement where expression fits|4
         swift-compositions/swift-sql|tagged extension public init|2
         swift-compositions/swift-sql|throwing wrapper init|1
-        swift-compositions/swift-sql|top level type owner|61
+        swift-compositions/swift-sql|top level type owner|63
         swift-compositions/swift-sql|type transform placement|1
         swift-compositions/swift-sql|unification typealias|1
         swift-compositions/swift-sql|unknown default|1
@@ -2306,7 +2306,7 @@ extension Institute.CI.Command.Source.Ratchet {
         swift-compositions/swift-sqlite|trait consistency|33
         swift-compositions/swift-sqlite|try optional|47
         swift-compositions/swift-sqlite|unknown default|26
-        swift-compositions/swift-sqlite|untraited partial dependency|1
+        swift-compositions/swift-sqlite|untraited partial dependency|2
         swift-compositions/swift-sqlite|untyped throws|272
         swift-compositions/swift-stores|canonical settings tail|1
         swift-compositions/swift-stores|compound identifier|4

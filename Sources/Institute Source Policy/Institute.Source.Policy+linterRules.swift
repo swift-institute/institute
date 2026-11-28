@@ -4,8 +4,8 @@ public import Source_Profile
 extension Institute.Source.Policy {
     public func linterRules(for bundle: Institute.Source.Bundle) -> [Source_Profile::Source.Rule.ID] {
         guard let engine = engines.first(where: { $0.id.token == "swift-linter" }),
-            engine.revision == "ccd7aadc02b941f38e0ea98b6e88ab01176da2b3",
-            engine.executable.digest == .init("c73486666ecb870e0bd873a00071a2461621ed52658db30c67e022f92dec891c")
+            engine.revision == "65a15f5ef1a73739f5ab4bd8d50c638b056a736d",
+            engine.executable.digest == .init("eda594d9bb3a26f67809b811d6000cfae629411be8c16f4bc833e5240652e2e1")
         else { return [] }
         let tokens: [Swift.String]
         switch bundle {
@@ -39,6 +39,7 @@ extension Institute.Source.Policy {
         "capability before noun",
         "canonical settings tail",
         "chained rawvalue access",
+        "claimed path owner",
         "closure typed throws annotation",
         "comment in source",
         "concept parallel",
@@ -57,6 +58,8 @@ extension Institute.Source.Policy {
         "domain nesting depth",
         "do throws for typed catch",
         "do throws for typed catch with throw",
+        "duplicate type path",
+        "empty target",
         "enumerated with subscript",
         "existential parameter",
         "exported import",
@@ -81,6 +84,7 @@ extension Institute.Source.Policy {
         "module selector spelling",
         "namespace adoption typealias",
         "nested tag",
+        "no primary target",
         "noncopyable error",
         "nonisolated unsafe without invariant",
         "optimize suppression attribute",
@@ -93,6 +97,7 @@ extension Institute.Source.Policy {
         "platform floor",
         "platform layer import",
         "pointer advanced by",
+        "product name",
         "property named flags",
         "protocol sentinel under generic front door",
         "raw concept",
@@ -108,6 +113,7 @@ extension Institute.Source.Policy {
         "sli literal",
         "statement where expression fits",
         "stdlib forwarder outside sli",
+        "stratum target",
         "string utf8 scanning",
         "suppression reason required",
         "swift protocol qualification",

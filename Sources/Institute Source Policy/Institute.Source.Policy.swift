@@ -98,13 +98,13 @@ extension Institute.Source {
                     id: .init("swift-linter"),
                     platform: .macOSARM64,
                     version: "ci-binaries",
-                    revision: "ccd7aadc02b941f38e0ea98b6e88ab01176da2b3",
+                    revision: "65a15f5ef1a73739f5ab4bd8d50c638b056a736d",
                     toolchain: "Apple Swift 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)",
                     schema: "swift-linter-structured:2",
                     executable: .init(
-                        name: "institute-linter-runner-macos-arm64-c73486666ecb870e0bd873a00071a2461621ed52658db30c67e022f92dec891c",
+                        name: "institute-linter-runner-macos-arm64-eda594d9bb3a26f67809b811d6000cfae629411be8c16f4bc833e5240652e2e1",
                         digest: .init(
-                            "c73486666ecb870e0bd873a00071a2461621ed52658db30c67e022f92dec891c"
+                            "eda594d9bb3a26f67809b811d6000cfae629411be8c16f4bc833e5240652e2e1"
                         ),
                         origin: .release(
                             base:
@@ -166,13 +166,13 @@ extension Institute.Source {
                     id: .init("swift-linter"),
                     platform: .linuxX86_64,
                     version: "ci-binaries",
-                    revision: "ccd7aadc02b941f38e0ea98b6e88ab01176da2b3",
+                    revision: "65a15f5ef1a73739f5ab4bd8d50c638b056a736d",
                     toolchain: "Swift 6.4.3 (swift-6.4.3-RELEASE), x86_64-unknown-linux-gnu",
                     schema: "swift-linter-structured:2",
                     executable: .init(
-                        name: "institute-linter-runner-linux-x86_64-c8a45491d32d99c30add68692d3e288a70be21e278c0954915996e60997f834e",
+                        name: "institute-linter-runner-linux-x86_64-4246fd8555d1de6bcce4ef1a2ce03950cad22483ce971532f41f0bb1238a6e8b",
                         digest: .init(
-                            "c8a45491d32d99c30add68692d3e288a70be21e278c0954915996e60997f834e"
+                            "4246fd8555d1de6bcce4ef1a2ce03950cad22483ce971532f41f0bb1238a6e8b"
                         ),
                         origin: .release(
                             base:
