@@ -198,13 +198,24 @@ internal final class ManifestGraphVisitor: SyntaxVisitor {
         return .visitChildren
     }
 
+    /// A declared trait's name. A name that cannot be read leaves the trait out rather than the manifest unmeasured.
     private func trait(_ expression: ExprSyntax) -> Swift::String? {
-        if expression.is(StringLiteralExprSyntax.self) { return resolved(expression) }
+        if expression.is(StringLiteralExprSyntax.self) { return quietlyResolved(expression) }
         guard let call = expression.as(FunctionCallExprSyntax.self),
             call.calledExpression.as(MemberAccessExprSyntax.self)?.declName.baseName.text == "trait",
             let name = call.arguments.first(where: { $0.label?.text == "name" })
         else { return nil }
-        return resolved(name.expression)
+        return quietlyResolved(name.expression)
+    }
+
+    private func quietlyResolved(_ expression: ExprSyntax) -> Swift::String? {
+        var ignored: Swift::String?
+        return manifestResolvedString(
+            expression,
+            staticAccessors: stringStaticAccessorBodies,
+            instanceAccessors: stringInstanceAccessorBodies,
+            unhandledSourceShape: &ignored
+        )
     }
 
     private func isNestedInsideDependenciesArgument(_ node: Syntax) -> Swift::Bool {
@@ -252,7 +263,7 @@ internal final class ManifestGraphVisitor: SyntaxVisitor {
             let name = resolved(nameArgument.expression)
         else { return }
         var edges: [ManifestGraph.Edge] = []
-        for argument in node.arguments where argument.label?.text == "dependencies" {
+        for argument in node.arguments where argument.label?.text == "dependencies" && kind != .test {
             guard let array = argument.expression.as(ArrayExprSyntax.self) else {
                 unhandledSourceShape =
                     unhandledSourceShape
@@ -263,7 +274,10 @@ internal final class ManifestGraphVisitor: SyntaxVisitor {
                 edges += self.edges(element.expression, visited: [])
             }
         }
-        let path = node.arguments.first(where: { $0.label?.text == "path" }).flatMap { resolved($0.expression) }
+        // Only a literal path is read; a computed one leaves the target at its default folder.
+        let path = node.arguments.first(where: { $0.label?.text == "path" })
+            .flatMap { $0.expression.as(StringLiteralExprSyntax.self) }
+            .flatMap(manifestStringLiteralText)
         graph.targets.append(
             .init(
                 name: name,
@@ -326,6 +340,6 @@ internal final class ManifestGraphVisitor: SyntaxVisitor {
             call.calledExpression.as(MemberAccessExprSyntax.self)?.declName.baseName.text == "when",
             let traits = call.arguments.first(where: { $0.label?.text == "traits" })?.expression.as(ArrayExprSyntax.self)
         else { return [] }
-        return traits.elements.compactMap { resolved($0.expression) }
+        return traits.elements.compactMap { quietlyResolved($0.expression) }
     }
 }
