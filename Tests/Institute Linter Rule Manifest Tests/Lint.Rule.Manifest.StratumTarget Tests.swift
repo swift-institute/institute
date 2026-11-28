@@ -90,11 +90,11 @@ extension `Lint.Rule Tests`.`stratum target Tests`.Integration {
     func `a stratum of a public type the package declares is found when the package is on disk`() throws {
         let fixture = try Lint.Source.Fixture(files: [
             "Package.swift": """
-                let package = Package(
-                    name: "swift-sigma",
-                    targets: [.target(name: "Sigma"), .target(name: "Dublin Core"), .target(name: "Quill Core")]
-                )
-                """,
+            let package = Package(
+                name: "swift-sigma",
+                targets: [.target(name: "Sigma"), .target(name: "Dublin Core"), .target(name: "Quill Core")]
+            )
+            """,
             "Sources/Sigma/Sigma.swift": "public enum Sigma {}\npublic typealias Dublin = Sigma",
             "Sources/Dublin Core/Value.swift": "struct Value {}",
             "Sources/Quill Core/Value.swift": "struct Value {}",

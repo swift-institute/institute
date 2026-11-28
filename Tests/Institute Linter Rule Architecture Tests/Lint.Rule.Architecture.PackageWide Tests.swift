@@ -6,31 +6,42 @@ import Testing
 @testable import Institute_Linter_Rule_Architecture
 
 extension `Lint.Rule Tests` {
-    /// The rules that read the whole package on disk: `empty target`, `duplicate type path` and `claimed path owner`.
     @Suite
-    struct `package wide Tests` {
-        @Suite struct `empty target` {}
-        @Suite struct `duplicate type path` {}
-        @Suite struct `claimed path owner` {}
-        @Suite struct `top level type owner` {}
+    struct `empty target Tests` {
+        @Suite struct Unit {}
+    }
+
+    @Suite
+    struct `duplicate type path Tests` {
+        @Suite struct Unit {}
+    }
+
+    @Suite
+    struct `claimed path owner Tests` {
+        @Suite struct Unit {}
+    }
+
+    @Suite
+    struct `top level type owner Tests` {
+        @Suite struct Unit {}
     }
 }
 
-extension `Lint.Rule Tests`.`package wide Tests`.`empty target` {
+extension `Lint.Rule Tests`.`empty target Tests`.Unit {
     @Test
     func `a target is empty only when every one of its files declares nothing`() throws {
         let fixture = try Lint.Source.Fixture(files: [
             "Package.swift": """
-                let package = Package(
-                    name: "swift-owner",
-                    targets: [
-                        .target(name: "Owner"),
-                        .target(name: "Owner Glob", dependencies: ["Owner"]),
-                        .target(name: "Owner Test Support", dependencies: ["Owner"], path: "Tests/Support"),
-                        .testTarget(name: "Owner Tests", dependencies: ["Owner"]),
-                    ]
-                )
-                """,
+            let package = Package(
+                name: "swift-owner",
+                targets: [
+                    .target(name: "Owner"),
+                    .target(name: "Owner Glob", dependencies: ["Owner"]),
+                    .target(name: "Owner Test Support", dependencies: ["Owner"], path: "Tests/Support"),
+                    .testTarget(name: "Owner Tests", dependencies: ["Owner"]),
+                ]
+            )
+            """,
             "Sources/Owner/Owner.swift": "public enum Owner {}",
             "Sources/Owner/exports.swift": "@_exported public import Glob",
             "Sources/Owner/Owner.Value.swift": "extension Owner {\n    public struct Value {}\n}",
@@ -67,16 +78,16 @@ extension `Lint.Rule Tests`.`package wide Tests`.`empty target` {
     }
 }
 
-extension `Lint.Rule Tests`.`package wide Tests`.`duplicate type path` {
+extension `Lint.Rule Tests`.`duplicate type path Tests`.Unit {
     @Test
     func `a path declared in two targets is found once, on the later file`() throws {
         let fixture = try Lint.Source.Fixture(files: [
             "Package.swift": """
-                let package = Package(
-                    name: "swift-owner",
-                    targets: [.target(name: "Owner"), .target(name: "Owner Glob", dependencies: ["Owner"])]
-                )
-                """,
+            let package = Package(
+                name: "swift-owner",
+                targets: [.target(name: "Owner"), .target(name: "Owner Glob", dependencies: ["Owner"])]
+            )
+            """,
             "Sources/Owner/Owner.swift": "public enum Owner {}\nextension Owner {\n    public struct Error: Swift.Error {}\n}",
             "Sources/Owner Glob/Owner.Error.swift": "extension Owner {\n    public struct Error: Swift.Error {}\n}",
         ])
@@ -100,7 +111,7 @@ extension `Lint.Rule Tests`.`package wide Tests`.`duplicate type path` {
     }
 }
 
-extension `Lint.Rule Tests`.`package wide Tests`.`claimed path owner` {
+extension `Lint.Rule Tests`.`claimed path owner Tests`.Unit {
     static let atoms = Institute.Repository.Coordinate(organization: .`swift-atoms`, name: "swift-owner")
 
     @Test
@@ -160,7 +171,7 @@ extension `Lint.Rule Tests`.`package wide Tests`.`claimed path owner` {
     }
 }
 
-extension `Lint.Rule Tests`.`package wide Tests`.`top level type owner` {
+extension `Lint.Rule Tests`.`top level type owner Tests`.Unit {
     @Test
     func `in the standards layer swift-x-standard owns X, and compositions are judged`() {
         let standard = Institute.Repository.Coordinate(organization: .`swift-standards`, name: "swift-github-standard")
