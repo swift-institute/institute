@@ -110,7 +110,7 @@ struct `Institute source policy` {
         }
         #expect(
             linux.executable.digest
-                == .init("4246fd8555d1de6bcce4ef1a2ce03950cad22483ce971532f41f0bb1238a6e8b")
+                == .init("3ac0a7a3fb2edeada752a89c9c55a4bea44cd103a3799b7552ef75f39ba2e505")
         )
     }
 
@@ -319,8 +319,8 @@ extension `Institute source policy` {
             (.standards, 139, "74d87c82b0e4d955389815434c14f59a43c0578699c7600895d0dceb89aca668"),
         ]
         let engine = policy.engine(.init("swift-linter"), on: .macOSARM64)
-        #expect(engine?.revision == "65a15f5ef1a73739f5ab4bd8d50c638b056a736d")
-        #expect(engine?.executable.digest == .init("eda594d9bb3a26f67809b811d6000cfae629411be8c16f4bc833e5240652e2e1"))
+        #expect(engine?.revision == "b3e6db8375f437ca2ba9be32c23cb3a6c9c8e7b0")
+        #expect(engine?.executable.digest == .init("0ff987f2cbccb115c65bbb6c0c2bfddfa4d10982b197df6c8f3217642f312607"))
         for (bundle, count, digest) in expected {
             let rules = policy.linterRules(for: bundle)
             #expect(rules.count == count)

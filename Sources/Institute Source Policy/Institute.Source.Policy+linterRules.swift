@@ -4,8 +4,8 @@ public import Source_Profile
 extension Institute.Source.Policy {
     public func linterRules(for bundle: Institute.Source.Bundle) -> [Source_Profile::Source.Rule.ID] {
         guard let engine = engines.first(where: { $0.id.token == "swift-linter" }),
-            engine.revision == "65a15f5ef1a73739f5ab4bd8d50c638b056a736d",
-            engine.executable.digest == .init("eda594d9bb3a26f67809b811d6000cfae629411be8c16f4bc833e5240652e2e1")
+            engine.revision == "b3e6db8375f437ca2ba9be32c23cb3a6c9c8e7b0",
+            engine.executable.digest == .init("0ff987f2cbccb115c65bbb6c0c2bfddfa4d10982b197df6c8f3217642f312607")
         else { return [] }
         let tokens: [Swift.String]
         switch bundle {
