@@ -61,7 +61,7 @@ extension `Lint.Rule Tests`.`empty target Tests`.Unit {
     }
 
     @Test
-    func `a target that declares only the namespace its package's name claims is no finding`() throws {
+    func `a target named for its package that declares only the package's namespace is no finding`() throws {
         let fixture = try Lint.Source.Fixture(files: [
             "Package.swift": """
             let package = Package(
@@ -70,6 +70,7 @@ extension `Lint.Rule Tests`.`empty target Tests`.Unit {
                     .target(name: "IETF"),
                     .target(name: "IETF Glob", dependencies: ["IETF"]),
                     .target(name: "IETF Other", dependencies: ["IETF"]),
+                    .target(name: "IETF Primitive"),
                 ]
             )
             """,
@@ -77,11 +78,13 @@ extension `Lint.Rule Tests`.`empty target Tests`.Unit {
             "Sources/IETF/exports.swift": "@_exported public import Glob",
             "Sources/IETF Glob/IETF.Glob.swift": "extension IETF {\n    public enum Glob {}\n}",
             "Sources/IETF Other/IETF.swift": "public enum IETF {}\npublic enum Other {}",
+            "Sources/IETF Primitive/IETF.swift": "public enum IETF {}",
         ])
         let rule = Lint.Rule.`empty target`
         #expect(rule.observe(fixture.parsed("Sources/IETF/IETF.swift"), .warning).findings.isEmpty)
         #expect(rule.observe(fixture.parsed("Sources/IETF Glob/IETF.Glob.swift"), .warning).findings.count == 1)
         #expect(rule.observe(fixture.parsed("Sources/IETF Other/IETF.swift"), .warning).findings.count == 1)
+        #expect(rule.observe(fixture.parsed("Sources/IETF Primitive/IETF.swift"), .warning).findings.count == 1)
     }
 
     @Test

@@ -6,9 +6,10 @@ internal import SwiftSyntax
 
 extension Lint.Rule {
     /// A regular target that declares nothing is no target: its sources hold only imports, or imports and namespace
-    /// enums with no cases and no members. A target that declares only the namespace its own package's name claims
-    /// (`IETF` in swift-ietf) is no finding. Macro declarations count as declarations, and `… Test Support` targets
-    /// are judged. The finding is on the first file of the target.
+    /// enums with no cases and no members. A target named for its package that declares only the namespace the
+    /// package's name claims (`IETF` in swift-ietf) is no finding; an `IETF Primitive` target there still is. Macro
+    /// declarations count as declarations, and `… Test Support` targets are judged. The finding is on the first file
+    /// of the target.
     public static let `empty target` = Lint.Rule(
         id: "empty target",
         default: .warning,
@@ -60,7 +61,7 @@ extension Lint.Rule {
                 }
                 let declarations = files.flatMap { sources.facts[$0]?.declarations ?? [] }
                 let namespace =
-                    !declarations.isEmpty
+                    !declarations.isEmpty && Package.Concept(type: [owner.name]) == sources.graph.concept
                     && declarations.allSatisfy { Package.Concept(type: $0.path) == sources.graph.concept }
                 empty = !namespace && files.allSatisfy { sources.facts[$0]?.empty ?? false }
                 target = owner.name
@@ -85,9 +86,9 @@ extension Lint.Rule {
                 severity: severity,
                 identifier: "empty target",
                 message: "[empty target]: a regular target that declares nothing is no target: its sources hold only "
-                    + "imports, or imports and namespace enums with no cases and no members, other than the namespace "
-                    + "its own package's name claims. `\(target)` declares "
-                    + "nothing; move what it imports to the targets that use it and remove it."
+                    + "imports, or imports and namespace enums with no cases and no members, other than a target named "
+                    + "for its package that declares only the namespace the package's name claims. `\(target)` "
+                    + "declares nothing; move what it imports to the targets that use it and remove it."
             )
             return Lint.Rule.Observation(findings: [finding], coverage: .measured)
         }
