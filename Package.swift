@@ -617,6 +617,7 @@ let linterRuleTargets: [Target] = [
             .product(name: "File System", package: "swift-file-system"),
             .product(name: "Lint", package: "swift-lint"),
             .product(name: "Linter Rule Scope", package: "swift-linter-rules"),
+            .product(name: "Package", package: "swift-package"),
             .product(name: "SwiftParser", package: "swift-syntax"),
             .product(name: "SwiftSyntax", package: "swift-syntax"),
             .product(name: "SPM Standard", package: "swift-spm-standard"),

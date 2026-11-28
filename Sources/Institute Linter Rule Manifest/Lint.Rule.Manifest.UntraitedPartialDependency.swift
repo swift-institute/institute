@@ -1,7 +1,14 @@
 public import Lint
+internal import Package
 internal import SwiftSyntax
 
 extension Lint.Rule {
+    /// I7: in a package with a primary target, a target outside the primary target's closure takes a product from a
+    /// package the closure does not reach only under a trait condition, one trait per such target, named for the
+    /// peer when the target is glue to one package. A macro's declarations, its macro target and its implementation
+    /// share one trait. While swift-institute/Issues#123 is open, a target whose source is gated by that trait meets
+    /// the rule with an unconditional product dependency. Not judged here: that a trait of a target that is glue to
+    /// several packages, or to none, is named for the target's role.
     public static let `untraited partial dependency` = Lint.Rule(
         id: "untraited partial dependency",
         default: .warning,
@@ -42,31 +49,28 @@ extension Lint.Rule {
                 expectation: .clean
             ),
             .init(
-                id: "untraited partial dependency single main product",
+                id: "untraited partial dependency test support reaching only the primary target",
                 source: "let package = Package(name: \"swift-owner\", products: ["
                     + ".library(name: \"Owner\", targets: [\"Owner\"]), "
                     + ".library(name: \"Owner Test Support\", targets: [\"Owner Test Support\"])], targets: ["
                     + ".target(name: \"Owner\", dependencies: [.product(name: \"Span\", package: \"swift-span\")]), "
                     + ".target(name: \"Owner Test Support\", dependencies: [.target(name: \"Owner\")])])",
                 path: "Package.swift",
-                expectation: .clean,
-                applicability: .inapplicable
-            ),
-            .init(
-                id: "untraited partial dependency test support only",
-                source: "let package = Package(name: \"swift-owner\", products: ["
-                    + ".library(name: \"Owner\", targets: [\"Owner\"]), "
-                    + ".library(name: \"Owner Glob\", targets: [\"Owner Glob\"]), "
-                    + ".library(name: \"Owner Test Support\", targets: [\"Owner Test Support\"])], targets: ["
-                    + ".target(name: \"Owner\"), "
-                    + ".target(name: \"Owner Glob\", dependencies: [.target(name: \"Owner\")]), "
-                    + ".target(name: \"Owner Test Support\", dependencies: [.target(name: \"Owner\"), "
-                    + ".product(name: \"Testing Support\", package: \"swift-testing-support\")])])",
-                path: "Package.swift",
                 expectation: .clean
             ),
             .init(
-                id: "untraited partial dependency primary product needs it",
+                id: "untraited partial dependency test support is judged",
+                source: "let package = Package(name: \"swift-owner\", products: ["
+                    + ".library(name: \"Owner\", targets: [\"Owner\"]), "
+                    + ".library(name: \"Owner Test Support\", targets: [\"Owner Test Support\"])], targets: ["
+                    + ".target(name: \"Owner\"), "
+                    + ".target(name: \"Owner Test Support\", dependencies: [.target(name: \"Owner\"), "
+                    + ".product(name: \"Testing Support\", package: \"swift-testing-support\")])])",
+                path: "Package.swift",
+                expectation: .findings(1)
+            ),
+            .init(
+                id: "untraited partial dependency primary target needs it",
                 source: "let package = Package(name: \"swift-owner\", products: ["
                     + ".library(name: \"Owner\", targets: [\"Owner\"]), "
                     + ".library(name: \"Owner Core\", targets: [\"Owner Core\"])], targets: ["
@@ -77,7 +81,7 @@ extension Lint.Rule {
                 expectation: .clean
             ),
             .init(
-                id: "untraited partial dependency no primary product",
+                id: "untraited partial dependency no primary target",
                 source: "let package = Package(name: \"swift-owner\", products: ["
                     + ".library(name: \"Owner Kernel\", targets: [\"Owner Kernel\"]), "
                     + ".library(name: \"Owner Glob\", targets: [\"Owner Glob\"])], targets: ["
@@ -98,28 +102,29 @@ extension Lint.Rule {
         ],
         observe: { source, severity in
             guard manifestIsPackageManifest(source.file.filePath, path: source.path.underlying, text: source.tree.description) else {
-                return Lint.Rule.Observation(
-                    findings: [],
-                    coverage: .measured,
-                    applicability: .inapplicable
-                )
+                return Lint.Rule.Observation(findings: [], coverage: .measured, applicability: .inapplicable)
             }
-            let visitor = ManifestUntraitedPartialDependencyVisitor(
-                source: source.file,
-                severity: severity,
-                converter: source.converter
-            )
-            visitor.collectManifestAccessors(source.tree)
-            visitor.walk(source.tree)
+            let graph = ManifestGraph(tree: source.tree)
             let coverage: Lint.Rule.Coverage =
-                visitor.unhandledSourceShape.map {
-                    .unmeasured(.unsupportedSourceShape($0))
-                } ?? .measured
-            guard let findings = visitor.resolvedMatches() else {
-                return Lint.Rule.Observation(
-                    findings: [],
-                    coverage: coverage,
-                    applicability: .inapplicable
+                graph.unhandledSourceShape.map { .unmeasured(.unsupportedSourceShape($0)) } ?? .measured
+            guard graph.primaryTarget != nil else {
+                return Lint.Rule.Observation(findings: [], coverage: coverage, applicability: .inapplicable)
+            }
+            let sources = ManifestPackageSources.of(source)
+            let findings = manifestUntraitedPartialDependencyFindings(graph, gate: { target in
+                manifestTargetSourceGate(target, in: sources)
+            }).map { finding in
+                let location = source.converter.location(for: finding.position)
+                return Diagnostic.Record(
+                    location: Source.Location(
+                        fileID: source.file.fileID,
+                        filePath: source.file.filePath,
+                        line: location.line,
+                        column: location.column
+                    ),
+                    severity: severity,
+                    identifier: "untraited partial dependency",
+                    message: finding.message
                 )
             }
             return Lint.Rule.Observation(findings: findings, coverage: coverage)
@@ -127,268 +132,106 @@ extension Lint.Rule {
     )
 }
 
-internal func manifestUntraitedPartialDependencyMessage(
-    _ dependency: Swift::String,
-    needing: [Swift::String],
-    notNeeding: [Swift::String]
-) -> Swift::String {
-    "[untraited partial dependency] [PACKAGE-TRAIT-GATED-DEPENDENCY]: `\(dependency)` is needed by "
-        + needing.map { "`\($0)`" }.joined(separator: ", ")
-        + " but not by "
-        + notNeeding.map { "`\($0)`" }.joined(separator: ", ")
-        + "; gate its uses with `condition: .when(traits: [...])`. SwiftPM ignores the "
-        + "product filter (`ENABLE_TARGET_BASED_DEPENDENCY_RESOLUTION` is compiled out in "
-        + "`Manifest.dependenciesRequired`), so every consumer of any product of this package "
-        + "resolves and loads the dependency; only a trait condition that is switched off "
-        + "keeps it out of the graph."
+internal let manifestUntraitedPartialDependencyStatement: Swift::String =
+    "[untraited partial dependency] [I7]: in a package with a primary target, a target outside the primary "
+    + "target's closure takes a product from a package the closure does not reach only under a trait condition, "
+    + "one trait per such target, named for the peer when the target is glue to one package."
+
+/// The identifiers that gate every file of `target` that has content, or nil when a file is not gated, the target
+/// has no file with content, or the package is not on disk.
+internal func manifestTargetSourceGate(
+    _ target: Swift::String,
+    in sources: ManifestPackageSources?
+) -> Swift::Set<Swift::String>? {
+    guard let sources, let files = sources.files[target] else { return nil }
+    var gates: Swift::Set<Swift::String>?
+    for file in files {
+        switch sources.facts[file]?.gate {
+        case .gated(let identifiers)?: gates = (gates ?? identifiers).intersection(identifiers)
+        case .none?: continue
+        case .open?, nil: return nil
+        }
+    }
+    return gates
 }
 
-internal let manifestUntraitedPartialDependencyExemptSuffixes: [Swift::String] = [
-    " Test Support",
-    " Foundation Integration",
-]
-
-private let manifestUntraitedPartialDependencyTargetFactories: Swift::Set<Swift::String> = [
-    "target", "executableTarget", "macro", "systemLibrary", "binaryTarget",
-]
-
-internal final class ManifestUntraitedPartialDependencyVisitor: SyntaxVisitor {
-    let source: Source.File
-    let severity: Diagnostic.Severity
-    let converter: SourceLocationConverter
-    var unhandledSourceShape: Swift::String?
-
-    private enum Edge {
-        case named(Swift::String, gated: Swift::Bool, position: AbsolutePosition)
-        case product(Swift::String, package: Swift::String, gated: Swift::Bool, position: AbsolutePosition)
-    }
-
-    private var packageName: Swift::String?
-    private var products: [(name: Swift::String, targets: [Swift::String])] = []
-    private var edgesByTarget: [Swift::String: [Edge]] = [:]
-    private var stringStaticAccessorBodies: [Swift::String: ExprSyntax] = [:]
-    private var stringInstanceAccessorBodies: [Swift::String: ExprSyntax] = [:]
-    private var dependencyAccessorBodies: [Swift::String: ExprSyntax] = [:]
-
-    init(source: Source.File, severity: Diagnostic.Severity, converter: SourceLocationConverter) {
-        self.source = source
-        self.severity = severity
-        self.converter = converter
-        super.init(viewMode: .sourceAccurate)
-    }
-
-    internal func collectManifestAccessors(_ file: SourceFileSyntax) {
-        let stringTypes: Swift::Set<Swift::String> = ["String", "Swift.String"]
-        stringStaticAccessorBodies = manifestAccessorBodies(in: file, extendedTypes: stringTypes, static: true)
-        stringInstanceAccessorBodies = manifestAccessorBodies(in: file, extendedTypes: stringTypes, static: false)
-        dependencyAccessorBodies = manifestAccessorBodies(
-            in: file,
-            extendedTypes: ["Target.Dependency", "PackageDescription.Target.Dependency"],
-            static: true
-        )
-    }
-
-    override func visit(_ node: FunctionCallExprSyntax) -> SyntaxVisitorContinueKind {
-        if node.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName.text == "Package",
-            let nameArgument = node.arguments.first(where: { $0.label?.text == "name" })
-        {
-            packageName = resolved(nameArgument.expression)
+/// The findings of `untraited partial dependency` in `graph`, which has a primary target. `gate` gives the
+/// identifiers that gate a target's whole source.
+internal func manifestUntraitedPartialDependencyFindings(
+    _ graph: ManifestGraph,
+    gate: (Swift::String) -> Swift::Set<Swift::String>?
+) -> [(position: AbsolutePosition, message: Swift::String)] {
+    guard let primary = graph.primaryTarget else { return [] }
+    let closure = graph.closure(of: primary.name)
+    let reached = graph.packages(reachedBy: closure)
+    let declaredTraits = Swift::Set(graph.traits)
+    var findings: [(position: AbsolutePosition, message: Swift::String)] = []
+    var traitUsers: [Swift::String: [Swift::String]] = [:]
+    for target in graph.targets where target.kind == .regular || target.kind == .macro {
+        guard !closure.contains(target.name) else { continue }
+        var foreign: [(package: Swift::String, product: Swift::String, edge: ManifestGraph.Edge)] = []
+        for edge in target.edges {
+            guard case .product(let product, let package) = edge.reference, !reached.contains(package) else { continue }
+            foreign.append((package, product, edge))
         }
-        guard let member = node.calledExpression.as(MemberAccessExprSyntax.self),
-            !isNestedInsideDependenciesArgument(Syntax(node))
-        else { return .visitChildren }
-        let calleeName = member.declName.baseName.text
-        if calleeName == "library" {
-            recordProduct(node)
-        } else if manifestUntraitedPartialDependencyTargetFactories.contains(calleeName) {
-            recordTarget(node)
-        }
-        return .visitChildren
-    }
-
-    private func isNestedInsideDependenciesArgument(_ node: Syntax) -> Swift::Bool {
-        var current: Syntax? = node.parent
-        while let candidate = current {
-            if let labeled = candidate.as(LabeledExprSyntax.self),
-                labeled.label?.text == "dependencies"
-            {
-                return true
-            }
-            current = candidate.parent
-        }
-        return false
-    }
-
-    private func resolved(_ expression: ExprSyntax) -> Swift::String? {
-        manifestResolvedString(
-            expression,
-            staticAccessors: stringStaticAccessorBodies,
-            instanceAccessors: stringInstanceAccessorBodies,
-            unhandledSourceShape: &unhandledSourceShape
-        )
-    }
-
-    private func recordProduct(_ node: FunctionCallExprSyntax) {
-        guard let nameArgument = node.arguments.first(where: { $0.label?.text == "name" }),
-            let name = resolved(nameArgument.expression),
-            let targetsArgument = node.arguments.first(where: { $0.label?.text == "targets" })
-        else { return }
-        guard let array = targetsArgument.expression.as(ArrayExprSyntax.self) else {
-            unhandledSourceShape =
-                unhandledSourceShape ?? "computed product targets '\(targetsArgument.expression.trimmedDescription)'"
-            return
-        }
-        products.append((name, array.elements.compactMap { resolved($0.expression) }))
-    }
-
-    private func recordTarget(_ node: FunctionCallExprSyntax) {
-        guard let nameArgument = node.arguments.first(where: { $0.label?.text == "name" }),
-            let name = resolved(nameArgument.expression)
-        else { return }
-        var edges: [Edge] = []
-        for argument in node.arguments where argument.label?.text == "dependencies" {
-            guard let array = argument.expression.as(ArrayExprSyntax.self) else {
-                unhandledSourceShape =
-                    unhandledSourceShape ?? "computed target dependencies '\(argument.expression.trimmedDescription)'"
-                continue
-            }
-            for element in array.elements {
-                edges += self.edges(element.expression, visited: [])
-            }
-        }
-        edgesByTarget[name, default: []] += edges
-    }
-
-    private func edges(_ expression: ExprSyntax, visited: Swift::Set<Swift::String>) -> [Edge] {
-        let position = expression.positionAfterSkippingLeadingTrivia
-        if let literal = expression.as(StringLiteralExprSyntax.self) {
-            guard let text = manifestStringLiteralText(literal) else {
-                unhandledSourceShape =
-                    unhandledSourceShape ?? "interpolated target dependency '\(expression.trimmedDescription)'"
-                return []
-            }
-            return [.named(text, gated: false, position: position)]
-        }
-        if let call = expression.as(FunctionCallExprSyntax.self),
-            let member = call.calledExpression.as(MemberAccessExprSyntax.self)
-        {
-            let gated = call.arguments.contains { argument in
-                argument.label?.text == "condition" && manifestConditionNamesTraits(argument.expression)
-            }
-            switch member.declName.baseName.text {
-            case "target", "byName":
-                guard
-                    let nameArgument = call.arguments.first(where: { $0.label?.text == "name" || $0.label == nil }),
-                    let name = resolved(nameArgument.expression)
-                else { return [] }
-                return [.named(name, gated: gated, position: position)]
-            case "product":
-                guard
-                    let nameArgument = call.arguments.first(where: { $0.label?.text == "name" }),
-                    let name = resolved(nameArgument.expression)
-                else { return [] }
-                let package =
-                    call.arguments.first(where: { $0.label?.text == "package" })
-                    .flatMap { resolved($0.expression) } ?? name
-                return [.product(name, package: package, gated: gated, position: position)]
-            default:
-                break
-            }
-        }
-        if let member = expression.as(MemberAccessExprSyntax.self), member.base == nil {
-            let name = member.declName.baseName.text
-            guard !visited.contains(name), let body = dependencyAccessorBodies[name] else {
-                unhandledSourceShape =
-                    unhandledSourceShape ?? "unresolved target dependency accessor '\(name)'"
-                return []
-            }
-            return edges(body, visited: visited.union([name]))
-        }
-        unhandledSourceShape =
-            unhandledSourceShape ?? "unhandled target dependency '\(expression.trimmedDescription)'"
-        return []
-    }
-
-    /// The findings, or nil when the package has fewer than two main products or no primary
-    /// product: the main product named after the package (`swift-kernel` → `Kernel`), compared
-    /// without case, spaces or hyphens. A dependency the primary product needs is the package's
-    /// own; gating it would make nearly every consumer opt back in. Only what the primary product
-    /// can do without is optional.
-    internal func resolvedMatches() -> [Diagnostic.Record]? {
-        let mainProducts = products.filter { product in
-            !manifestUntraitedPartialDependencyExemptSuffixes.contains(where: product.name.hasSuffix)
-        }
-        guard mainProducts.count >= 2,
-            let packageName = self.packageName,
-            let primary = mainProducts.first(where: {
-                manifestUntraitedPartialDependencyFolded($0.name)
-                    == manifestUntraitedPartialDependencyFolded(packageName, droppingPrefix: "swift-")
-            })
-        else { return nil }
-
-        var needing: [Swift::String: Swift::Set<Swift::String>] = [:]
-        var firstUse: [Swift::String: AbsolutePosition] = [:]
-        for product in mainProducts {
-            var stack = product.targets
-            var seen: Swift::Set<Swift::String> = []
-            while let target = stack.popLast() {
-                guard seen.insert(target).inserted,
-                    !manifestUntraitedPartialDependencyExemptSuffixes.contains(where: target.hasSuffix)
-                else { continue }
-                for edge in edgesByTarget[target] ?? [] {
-                    switch edge {
-                    case .named(let name, let gated, let position):
-                        if edgesByTarget[name] != nil {
-                            stack.append(name)
-                        } else if !gated {
-                            needing[name, default: []].insert(product.name)
-                            firstUse[name] = min(firstUse[name] ?? position, position)
-                        }
-                    case .product(_, let package, let gated, let position):
-                        guard !gated else { continue }
-                        needing[package, default: []].insert(product.name)
-                        firstUse[package] = min(firstUse[package] ?? position, position)
-                    }
-                }
-            }
-        }
-
-        let mainNames = mainProducts.map(\.name)
-        let partial = firstUse.filter { !(needing[$0.key]?.contains(primary.name) ?? false) }
-        return partial.sorted { $0.value < $1.value }.map { dependency, position in
-            let users = needing[dependency] ?? []
-            let location = converter.location(for: position)
-            return Diagnostic.Record(
-                location: Source.Location(
-                    fileID: source.fileID,
-                    filePath: source.filePath,
-                    line: location.line,
-                    column: location.column
-                ),
-                severity: severity,
-                identifier: "untraited partial dependency",
-                message: manifestUntraitedPartialDependencyMessage(
-                    dependency,
-                    needing: mainNames.filter(users.contains),
-                    notNeeding: mainNames.filter { !users.contains($0) }
+        guard !foreign.isEmpty else { continue }
+        let sourceGate = gate(target.name)?.intersection(declaredTraits) ?? []
+        var reported: Swift::Set<Swift::String> = []
+        for use in foreign where !use.edge.gated && sourceGate.isEmpty && reported.insert(use.package).inserted {
+            findings.append(
+                (
+                    use.edge.position,
+                    manifestUntraitedPartialDependencyStatement
+                        + " `\(target.name)` takes `\(use.package)` without one, and `\(primary.name)` and the targets "
+                        + "it reaches do not take `\(use.package)`; gate it with `condition: .when(traits: [...])`, or, "
+                        + "while swift-institute/Issues#123 is open, gate the target's source with `#if` that trait. "
+                        + "SwiftPM ignores the product filter (`ENABLE_TARGET_BASED_DEPENDENCY_RESOLUTION` is compiled "
+                        + "out in `Manifest.dependenciesRequired`), so every consumer of any product of this package "
+                        + "resolves and loads the dependency; only a trait condition that is switched off keeps it out "
+                        + "of the graph."
                 )
             )
         }
+        let traits = Swift::Set(foreign.flatMap { $0.edge.traits }).union(sourceGate).sorted()
+        if traits.count > 1 {
+            findings.append(
+                (
+                    target.position,
+                    manifestUntraitedPartialDependencyStatement
+                        + " `\(target.name)` is gated by " + traits.map { "`\($0)`" }.joined(separator: ", ")
+                        + "; one trait gates one target."
+                )
+            )
+        }
+        let peers = Swift::Set(foreign.map { $0.package })
+        if traits.count == 1, let trait = traits.first, peers.count == 1, let peer = peers.first {
+            let named =
+                Package.Concept(type: [trait]) == Package.Concept(Package.Name(_unchecked: peer))
+                || foreign.contains { Package.Concept(type: [$0.product]) == Package.Concept(type: [trait]) }
+            if !named {
+                findings.append(
+                    (
+                        target.position,
+                        manifestUntraitedPartialDependencyStatement
+                            + " `\(target.name)` is glue to `\(peer)` alone, so its trait is named for `\(peer)`, "
+                            + "not `\(trait)`."
+                    )
+                )
+            }
+        }
+        for trait in traits {
+            if let other = traitUsers[trait]?.first(where: { !graph.macroGroup(of: target.name).contains($0) }) {
+                findings.append(
+                    (
+                        target.position,
+                        manifestUntraitedPartialDependencyStatement
+                            + " `\(target.name)` and `\(other)` share the trait `\(trait)`; one trait gates one target, "
+                            + "and only a macro's declarations, its macro target and its implementation share one."
+                    )
+                )
+            }
+            traitUsers[trait, default: []].append(target.name)
+        }
     }
-}
-
-internal func manifestUntraitedPartialDependencyFolded(
-    _ name: Swift::String,
-    droppingPrefix prefix: Swift::String = ""
-) -> Swift::String {
-    let lowered = name.lowercased()
-    let stem = !prefix.isEmpty && lowered.hasPrefix(prefix) ? Swift::String(lowered.dropFirst(prefix.count)) : lowered
-    return Swift::String(stem.filter { $0.isLetter || $0.isNumber })
-}
-
-private func manifestConditionNamesTraits(_ expression: ExprSyntax) -> Swift::Bool {
-    guard let call = expression.as(FunctionCallExprSyntax.self),
-        call.calledExpression.as(MemberAccessExprSyntax.self)?.declName.baseName.text == "when"
-    else { return false }
-    return call.arguments.contains { $0.label?.text == "traits" }
+    return findings
 }

@@ -34,7 +34,7 @@ extension `Lint.Rule Tests`.`upward layer edge Tests` {
 
 extension `Lint.Rule Tests`.`upward layer edge Tests`.Unit {
     @Test
-    func `an atoms package depending on higher layers is flagged per edge`() {
+    func `an atoms package depending on standards and compositions is flagged per edge`() {
         let observation = `Lint.Rule Tests`.`upward layer edge Tests`.observation(
             `Lint.Rule Tests`.`upward layer edge Tests`.manifest(
                 "https://github.com/swift-atoms/swift-byte.git",
@@ -45,8 +45,23 @@ extension `Lint.Rule Tests`.`upward layer edge Tests`.Unit {
             repository: "swift-atoms/swift-owner"
         )
         #expect(observation.coverage == .measured)
-        #expect(observation.findings.count == 3)
+        #expect(observation.findings.count == 2)
         #expect(observation.findings[0].message.hasPrefix("[upward layer edge] [PACKAGE-LAYER-DIRECTION]:"))
+    }
+
+    @Test
+    func `atoms and molecules are one layer, in either direction`() {
+        let atoms = `Lint.Rule Tests`.`upward layer edge Tests`.observation(
+            `Lint.Rule Tests`.`upward layer edge Tests`.manifest("https://github.com/swift-molecules/swift-buffer.git"),
+            repository: "swift-atoms/swift-owner"
+        )
+        let molecules = `Lint.Rule Tests`.`upward layer edge Tests`.observation(
+            `Lint.Rule Tests`.`upward layer edge Tests`.manifest("https://github.com/swift-atoms/swift-byte.git"),
+            repository: "swift-molecules/swift-owner"
+        )
+        #expect(atoms.findings.isEmpty)
+        #expect(atoms.applicability == .applicable)
+        #expect(molecules.findings.isEmpty)
     }
 
     @Test
@@ -98,7 +113,11 @@ extension `Lint.Rule Tests`.`upward layer edge Tests`.Integration {
             file: "/home/runner/work/swift-owner/swift-owner/Package@swift-6.4.swift"
         )
         #expect(observation.findings.count == 1)
-        #expect(observation.findings[0].message.contains("molecules package must not depend on the standards layer"))
+        #expect(
+            observation.findings[0].message.contains(
+                "A package of the atoms and molecules layer must not depend on the standards layer"
+            )
+        )
     }
 }
 

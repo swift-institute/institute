@@ -24,7 +24,7 @@ extension Lint.Rule {
                     source: source.file,
                     severity: severity,
                     converter: source.converter,
-                    layer: layer.rawValue
+                    layer: manifestLayerRank(layer)
                 )
                 visitor.walk(source.tree)
                 return Lint.Rule.Observation(findings: visitor.matches, coverage: .measured)
@@ -62,17 +62,23 @@ private func manifestUpwardLayerEdgeControls(
             source: "let package = Package(name: \"\(repository.name)\", dependencies: ["
                 + ".package(url: \"\(example.url)\", branch: \"main\")])",
             path: "/workspace/\(repository.name)/Package.swift",
-            expectation: example.layer > layer ? .findings(1) : .clean
+            expectation: manifestLayerRank(example.layer) > manifestLayerRank(layer) ? .findings(1) : .clean
         )
     }
 }
 
 private let manifestLayerNames: [Swift::Int: Swift::String] = [
-    1: "atoms", 2: "molecules", 3: "standards", 4: "compositions",
+    1: "atoms and molecules", 3: "standards", 4: "compositions",
 ]
 
+/// A layer's rank for the direction of an edge. Atoms and molecules are one layer until their two organizations
+/// merge, so an edge between them, in either direction, is an edge within one layer.
+internal func manifestLayerRank(_ layer: Institute.Organization.Layer) -> Swift::Int {
+    layer == .molecules ? Institute.Organization.Layer.atoms.rawValue : layer.rawValue
+}
+
 internal func manifestLayer(ofURL url: Swift::String) -> Swift::Int? {
-    Institute.Organization(remote: url).map(\.layer).flatMap { $0 == .control ? nil : $0.rawValue }
+    Institute.Organization(remote: url).map(\.layer).flatMap { $0 == .control ? nil : manifestLayerRank($0) }
 }
 
 internal final class ManifestUpwardLayerEdgeVisitor: SyntaxVisitor {
@@ -117,10 +123,11 @@ internal final class ManifestUpwardLayerEdgeVisitor: SyntaxVisitor {
                 ),
                 severity: severity,
                 identifier: "upward layer edge",
-                message: "[upward layer edge] [PACKAGE-LAYER-DIRECTION]: a \(manifestLayerNames[layer] ?? "") "
-                    + "package must not depend on the \(manifestLayerNames[target] ?? "") layer (`\(url)`); "
-                    + "atoms depend on atoms, molecules on atoms and molecules, standards on atoms, "
-                    + "molecules and standards, compositions on every layer."
+                message: "[upward layer edge] [PACKAGE-LAYER-DIRECTION]: a package depends on its own layer and "
+                    + "the layers below it: atoms with molecules on atoms with molecules, standards on those and on "
+                    + "standards, compositions on every layer. A package of the "
+                    + "\(manifestLayerNames[layer] ?? "") layer must not depend on the "
+                    + "\(manifestLayerNames[target] ?? "") layer (`\(url)`)."
             )
         )
         return .visitChildren
