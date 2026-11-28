@@ -6,8 +6,9 @@ internal import SwiftSyntax
 
 extension Lint.Rule {
     /// A regular target that declares nothing is no target: its sources hold only imports, or imports and namespace
-    /// enums with no cases and no members. Macro declarations count as declarations, and `… Test Support` targets are
-    /// judged. The finding is on the first file of the target.
+    /// enums with no cases and no members. A target that declares only the namespace its own package's name claims
+    /// (`IETF` in swift-ietf) is no finding. Macro declarations count as declarations, and `… Test Support` targets
+    /// are judged. The finding is on the first file of the target.
     public static let `empty target` = Lint.Rule(
         id: "empty target",
         default: .warning,
@@ -57,7 +58,11 @@ extension Lint.Rule {
                 guard files.first == relative else {
                     return Lint.Rule.Observation(findings: [], coverage: .measured)
                 }
-                empty = files.allSatisfy { sources.facts[$0]?.empty ?? false }
+                let declarations = files.flatMap { sources.facts[$0]?.declarations ?? [] }
+                let namespace =
+                    !declarations.isEmpty
+                    && declarations.allSatisfy { Package.Concept(type: $0.path) == sources.graph.concept }
+                empty = !namespace && files.allSatisfy { sources.facts[$0]?.empty ?? false }
                 target = owner.name
             } else {
                 guard let owner = manifestSourceTarget(ofPath: source.file.filePath),
@@ -80,7 +85,8 @@ extension Lint.Rule {
                 severity: severity,
                 identifier: "empty target",
                 message: "[empty target]: a regular target that declares nothing is no target: its sources hold only "
-                    + "imports, or imports and namespace enums with no cases and no members. `\(target)` declares "
+                    + "imports, or imports and namespace enums with no cases and no members, other than the namespace "
+                    + "its own package's name claims. `\(target)` declares "
                     + "nothing; move what it imports to the targets that use it and remove it."
             )
             return Lint.Rule.Observation(findings: [finding], coverage: .measured)
@@ -190,9 +196,10 @@ extension Lint.Rule {
 
 extension Lint.Rule {
     /// The last sentence of `top level type owner`: a package owns at least one declaration (a type, a typealias or
-    /// a macro) at the path its name claims. A package that declares public types and none at that path is found once,
-    /// on the first public declaration of its first file. In the standards layer the path may sit under an authority's
-    /// namespace (`IETF.RFC.3986` for `swift-rfc-3986`), and `swift-x-standard` claims `X`.
+    /// a macro) at the path its name claims, read whole from the first component: `swift-ietf-rfc-3986` claims
+    /// `IETF.RFC.3986`, and `swift-iso-9945` claims `ISO.9945`. A package that declares public types and none at that
+    /// path is found once, on the first public declaration of its first file. A composition that only extends a type
+    /// another package declares is found too.
     public static let `claimed path owner` = Lint.Rule.`claimed path owner`(in: nil)
 
     public static func `claimed path owner`(in repository: Institute.Repository.Coordinate?) -> Lint.Rule {
@@ -234,8 +241,10 @@ extension Lint.Rule {
                     severity: severity,
                     identifier: "claimed path owner",
                     message: "[claimed path owner] [ARCH-ONE-TYPE]: a package owns at least one declaration, a type, a typealias "
-                        + "or a macro, at the path its name claims. `\(repository.name)` declares public types and none "
-                        + "at that path; declare what its name claims, or rename the package for what it declares."
+                        + "or a macro, at the path its name claims, read whole from the first component. "
+                        + "`swift-ietf-rfc-3986` claims `IETF.RFC.3986`, and `\(repository.name)` declares public types "
+                        + "and none at the path it claims; declare what its name claims, or rename the package for what "
+                        + "it declares."
                 )
                 return Lint.Rule.Observation(findings: [finding], coverage: .measured)
             }

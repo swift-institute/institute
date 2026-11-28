@@ -24,8 +24,7 @@ extension Lint.Rule {
                     source: source.file,
                     severity: severity,
                     converter: source.converter,
-                    package: repository.name,
-                    standards: repository.organization.layer == .standards
+                    package: repository.name
                 )
                 visitor.walk(source.tree)
                 return Lint.Rule.Observation(findings: visitor.matches, coverage: .measured)
@@ -124,13 +123,11 @@ private func architectureTopLevelTypeOwnerControls(
 private func architectureTopLevelTypeOwnerAllows(
     _ name: Swift::String,
     isProtocol: Swift::Bool,
-    package: Swift::String,
-    standards: Swift::Bool
+    package: Swift::String
 ) -> Swift::Bool {
     let owner = Package.Concept(Package.Name(_unchecked: package))
     let key = Package.Concept(type: [name])
     if key == owner { return true }
-    if standards, owner.text == key.text + "standard" { return true }
     guard isProtocol else { return false }
     for suffix in ["ing", "able"] where key.text.hasSuffix(suffix) {
         let stem = key.text.dropLast(suffix.count)
@@ -144,21 +141,18 @@ internal final class ArchitectureTopLevelTypeOwnerVisitor: SyntaxVisitor {
     let severity: Diagnostic.Severity
     let converter: SourceLocationConverter
     let package: Swift::String
-    let standards: Swift::Bool
     var matches: [Diagnostic.Record] = []
 
     init(
         source: Source.File,
         severity: Diagnostic.Severity,
         converter: SourceLocationConverter,
-        package: Swift::String,
-        standards: Swift::Bool = false
+        package: Swift::String
     ) {
         self.source = source
         self.severity = severity
         self.converter = converter
         self.package = package
-        self.standards = standards
         super.init(viewMode: .sourceAccurate)
     }
 
@@ -199,7 +193,7 @@ internal final class ArchitectureTopLevelTypeOwnerVisitor: SyntaxVisitor {
             else { continue }
             let name = declared.name.text.filter { $0 != "`" }
             guard !name.hasPrefix("_"),
-                !architectureTopLevelTypeOwnerAllows(name, isProtocol: declared.isProtocol, package: package, standards: standards)
+                !architectureTopLevelTypeOwnerAllows(name, isProtocol: declared.isProtocol, package: package)
             else { continue }
             let location = converter.location(for: declared.name.positionAfterSkippingLeadingTrivia)
             matches.append(
@@ -213,8 +207,8 @@ internal final class ArchitectureTopLevelTypeOwnerVisitor: SyntaxVisitor {
                     severity: severity,
                     identifier: "top level type owner",
                     message: "[top level type owner] [ARCH-ONE-TYPE]: a public top-level type `X` is declared only "
-                        + "in `swift-x`; in the standards layer `X` is the authority's namespace, and "
-                        + "`swift-x-standard` owns `X`. `\(package)` declares the top-level type `\(name)`, "
+                        + "in `swift-x`, and an authority's namespace only in the package named for the authority. "
+                        + "`\(package)` declares the top-level type `\(name)`, "
                         + "which it is not named for, so a top-level `\(name)` belongs to its own repository and is "
                         + "declared nowhere else; nest it under the package's type, or move it out. `_`-prefixed "
                         + "declarations, typealiases, nested `Protocol`s and the type's gerund or `-able` protocol "

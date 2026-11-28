@@ -4,25 +4,13 @@ internal import Lint
 internal import Package
 internal import SwiftSyntax
 
-/// The concepts `repository`'s name claims: its own, and in the standards layer, for `swift-x-standard`, `X`'s.
-internal func architectureClaimedConcepts(_ repository: Institute.Repository.Coordinate) -> Swift::Set<Swift::String> {
-    let concept = Package.Concept(Package.Name(_unchecked: repository.name)).text
-    var concepts: Swift::Set<Swift::String> = [concept]
-    if repository.organization.layer == .standards, concept.hasSuffix("standard"), concept.count > "standard".count {
-        concepts.insert(Swift::String(concept.dropLast("standard".count)))
-    }
-    return concepts
-}
-
-/// Whether `declaration` is at the path `repository`'s name claims. In the standards layer a path may sit under an
-/// authority's namespace, so any trailing part of it may claim the name.
+/// Whether `declaration` is at the path `repository`'s name claims, read whole from its first component:
+/// `swift-ietf-rfc-3986` claims `IETF.RFC.3986`, and `swift-iso-9945` claims `ISO.9945`.
 internal func architectureClaims(
     _ declaration: ManifestSourceFacts.Declaration,
     repository: Institute.Repository.Coordinate
 ) -> Swift::Bool {
-    let concepts = architectureClaimedConcepts(repository)
-    let starts = repository.organization.layer == .standards ? Swift::Array(declaration.path.indices) : [0]
-    return starts.contains { concepts.contains(Package.Concept(type: declaration.path[$0...]).text) }
+    Package.Concept(type: declaration.path) == Package.Concept(Package.Name(_unchecked: repository.name))
 }
 
 internal func architectureClaimedPathOwnerControls(
@@ -44,7 +32,7 @@ internal func architectureClaimedPathOwnerControls(
             )
         ]
     }
-    let zebra = architectureClaimedConcepts(repository).contains("zebra")
+    let zebra = Package.Concept(Package.Name(_unchecked: repository.name)).text == "zebra"
     return [
         .init(
             id: "claimed path owner none at the claimed path",
